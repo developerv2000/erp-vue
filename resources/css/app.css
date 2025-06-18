@@ -1,0 +1,5 @@
+/* Vuetify SCSS config file */
+@import 'main.scss';
+
+/* Base styles */
+@import 'base.css';

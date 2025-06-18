@@ -1,0 +1,5 @@
+@use 'vuetify/settings' with (
+  $body-font-family: ("Open Sans",sans-serif),
+);
+
+@use 'vuetify' as *;

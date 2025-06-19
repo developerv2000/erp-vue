@@ -17,6 +17,9 @@ import vuetify from './vuetify'
 // Pinia store (global state manager)
 import { createPinia } from 'pinia'
 
+// i18n translations setup
+import i18n from './i18n'
+
 // Initialize Pinia once (outside of the app creation)
 const pinia = createPinia()
 
@@ -37,11 +40,15 @@ createInertiaApp({
 
     // Setup Vue app
     setup({ el, App, props, plugin }) {
+        // Set locale from initial page props
+        i18n.global.locale.value = props.initialPage.props.locale || 'en'
+
         return createApp({ render: () => h(App, props) })
             .use(plugin)     // Inertia plugin
             .use(ZiggyVue)   // Laravel route support
             .use(vuetify)    // Vuetify UI plugin
             .use(pinia)      // Global Pinia store
+            .use(i18n)       // i18n translations
             .mount(el)       // Mount to the DOM
     },
 

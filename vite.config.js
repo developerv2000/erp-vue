@@ -39,6 +39,9 @@ export default defineConfig({
 
             // Shortcut for importing from `resources/images/`
             '@images': fileURLToPath(new URL('./resources/images', import.meta.url)),
+
+            // Shortcut for importing from `lang/`
+            '@lang': fileURLToPath(new URL('./lang', import.meta.url))
         },
     },
 

@@ -10,7 +10,7 @@ function login() {
 
 <template>
     <GuestLayout>
-        <v-sheet width="460" class="px-8 pt-8 pb-10">
+        <v-sheet width="460" elevation="1" class="px-8 pt-8 pb-10">
             <v-img
                 :width="180"
                 src="/images/main/logo-dark.svg"

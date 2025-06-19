@@ -31,9 +31,12 @@ class HandleInertiaRequests extends Middleware
     {
         return [
             ...parent::share($request),
-            'auth' => [
+            'auth' => fn() => [
                 'user' => $request->user(),
             ],
+            'locale' => fn() => app()->getLocale(),
+            'query' => fn() => $request->query(),
+            'flash' => fn() => session('flash', []), // flashed messages
         ];
     }
 }

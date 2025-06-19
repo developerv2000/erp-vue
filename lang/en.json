@@ -1,4 +1,29 @@
 {
+    "validation": {
+        "required": "This field is required.",
+        "invalid": "The value is invalid.",
+        "one_of": "Value must be one of: {values}.",
+        "not_one_of": "Value must not be one of: {values}.",
+        "min": "Minimum {min} characters.",
+        "max": "Maximum {max} characters.",
+        "email": "Please enter a valid email address.",
+        "url": "Please enter a valid URL.",
+        "length": "Must be exactly {length} characters.",
+        "matches": "Value does not match the required format.",
+        "min_value": "Minimum value is {min}.",
+        "max_value": "Maximum value is {max}.",
+        "integer": "Value must be an integer.",
+        "positive": "Value must be positive.",
+        "negative": "Value must be negative.",
+        "min_date": "Date must be after {min}.",
+        "max_date": "Date must be before {max}.",
+        "min_items": "Select at least {min} items.",
+        "max_items": "Select no more than {max} items."
+    },
+
     "Email": "Email",
-    "Password": "Password"
+    "Password": "Password",
+    "Sign in": "Password",
+    "Sign in to your account": "Password",
+    "Login": "Password"
 }

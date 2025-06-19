@@ -20,6 +20,9 @@ import { createPinia } from 'pinia'
 // i18n translations setup
 import i18n from './i18n'
 
+// Validation translations setup
+import './vee-validate-config'
+
 // Initialize Pinia once (outside of the app creation)
 const pinia = createPinia()
 

@@ -1,22 +1,21 @@
 <script setup>
 import GuestLayout from "@/layouts/GuestLayout.vue";
-import { mdiCheckDecagram } from "@mdi/js";
 import WrappedLabelGroup from "@/components/form/groups/WrappedLabelGroup.vue";
+import { mdiEye, mdiEyeOff } from "@mdi/js";
+import { ref } from "vue";
 
-import { useForm, useField } from "vee-validate";
+import { Form, useForm, useField } from "vee-validate";
 import * as yup from "yup";
 import { useI18n } from "vue-i18n";
 import { router } from "@inertiajs/vue3";
-import { Form } from "vee-validate";
 
 const { t } = useI18n();
+const showPassword = ref(false);
 
 // Define Yup schema
-// Using .label(t('...')) will ensure that if Yup uses the field name in its
-// default error message (e.g., "Email is a required field"), 'Email' is translated.
 const schema = yup.object({
-    email: yup.string().required().email().label(t("Email")), // 'Email' will be used in messages like "Email is a required field"
-    password: yup.string().required().label(t("Password")), // 'Password' will be used in messages
+    email: yup.string().required().email(),
+    password: yup.string().required(),
 });
 
 // Initialize VeeValidate form context
@@ -33,14 +32,11 @@ const login = handleSubmit(async (values) => {
     router.post("/login", values, {
         preserveScroll: true,
         onStart: () => {
-            // No explicit error clearing here.
             // VeeValidate will clear client-side errors on input change.
-            // Server-side errors will be set by onError.
         },
         onError: (errors) => {
             // Set server-side errors directly. VeeValidate's `setErrors` expects an object
             // where keys are field names and values are the error messages.
-            // These 'errors' from the server should ideally be localized already.
             setErrors(errors);
         },
         onSuccess: () => {
@@ -63,11 +59,10 @@ const login = handleSubmit(async (values) => {
             <v-card
                 class="card"
                 variant="text"
-                :title="t('Sign in')"
-                :subtitle="t('Sign in to your account')"
-                :prepend-icon="mdiCheckDecagram"
+                :title="t('Welcome')"
+                :subtitle="t('Please, sign in to your account')"
             >
-                <Form @submit="login" class="d-flex flex-column mt-4">
+                <Form @submit="login" class="d-flex flex-column ga-1 mt-5">
                     <WrappedLabelGroup :label="t('Email')" :required="true">
                         <v-text-field
                             v-model="email"
@@ -77,6 +72,7 @@ const login = handleSubmit(async (values) => {
                             variant="outlined"
                             density="compact"
                             type="email"
+                            clearable
                         />
                     </WrappedLabelGroup>
 
@@ -88,12 +84,16 @@ const login = handleSubmit(async (values) => {
                             name="password"
                             variant="outlined"
                             density="compact"
-                            type="password"
+                            :type="showPassword ? 'text' : 'password'"
+                            :append-inner-icon="
+                                showPassword ? mdiEyeOff : mdiEye
+                            "
+                            @click:append-inner="showPassword = !showPassword"
                         />
                     </WrappedLabelGroup>
 
                     <v-btn class="mt-2" color="lime-accent-4" type="submit">
-                        {{ t("Login") }}
+                        {{ t("Sign in") }}
                     </v-btn>
                 </Form>
             </v-card>

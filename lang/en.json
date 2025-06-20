@@ -23,7 +23,6 @@
 
     "Email": "Email",
     "Password": "Password",
-    "Sign in": "Password",
-    "Sign in to your account": "Password",
-    "Login": "Password"
+    "Sign in": "Sign in",
+    "Sign in to your account": "Sign in to your account"
 }

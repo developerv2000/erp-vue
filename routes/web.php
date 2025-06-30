@@ -9,8 +9,3 @@ Route::controller(AuthenticationController::class)->group(function () {
     Route::post('login', 'login')->middleware('guest')->name('login');
     Route::post('logout', 'logout')->middleware('auth')->name('logout');
 });
-
-Route::get('/', function () {
-    return inertia('Home');
-});
-

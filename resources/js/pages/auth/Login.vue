@@ -28,7 +28,7 @@ const { value: email, errorMessage: emailError } = useField("email");
 const { value: password, errorMessage: passwordError } = useField("password");
 
 // Inertia login request
-const login = handleSubmit(async (values) => {
+const login = handleSubmit((values) => {
     router.post("/login", values, {
         preserveScroll: true,
         onStart: () => {

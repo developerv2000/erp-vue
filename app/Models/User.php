@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
 
 class User extends Authenticatable
@@ -35,7 +37,7 @@ class User extends Authenticatable
     const DEFAULT_COLLAPSED_LEFTBAR = false;
     const DEFAULT_LOCALE = 'ru';
 
-    const PHOTO_PATH = 'img/users';
+    const PHOTO_PATH = 'images/users';
     const PHOTO_WIDTH = 400;
     const PHOTO_HEIGHT = 400;
 
@@ -97,6 +99,13 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * The accessors to append to the model's array form.
+     */
+    protected $appends = [
+        'photo_url'
+    ];
+
     /*
     |--------------------------------------------------------------------------
     | Relations
@@ -139,14 +148,14 @@ class User extends Authenticatable
     |--------------------------------------------------------------------------
     */
 
-    public function getPhotoAssetUrlAttribute(): string
+    public function getPhotoUrlAttribute(): string
     {
-        return asset(self::PHOTO_PATH . '/' . $this->photo);
+        return url('storage/' . self::PHOTO_PATH . '/' . $this->photo);
     }
 
-    public function getPhotoFilePathAttribute()
+    public function getPhotoPathAttribute()
     {
-        return public_path(self::PHOTO_PATH . '/' . $this->photo);
+        return storage_path('app/public/' . self::PHOTO_PATH . '/' . $this->photo);
     }
 
     /*

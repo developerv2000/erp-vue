@@ -12,7 +12,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
 
 class User extends Authenticatable
@@ -48,14 +47,6 @@ class User extends Authenticatable
     const MAD_KVPP_TABLE_SETTINGS_KEY = 'MAD_KVPP';
     const MAD_MEETINGS_TABLE_SETTINGS_KEY = 'MAD_Meetings';
     const MAD_DH_TABLE_SETTINGS_KEY = 'MAD_DH';
-
-    const PLPD_ORDERS_TABLE_SETTINGS_KEY = 'PLPD_Orders';
-    const PLPD_ORDER_PRODUCTS_TABLE_SETTINGS_KEY = 'PLPD_Order_products';
-
-    const CMD_ORDERS_TABLE_SETTINGS_KEY = 'CMD_Orders';
-    const CMD_ORDER_PRODUCTS_TABLE_SETTINGS_KEY = 'CMD_Order_products';
-
-    const DD_ORDER_PRODUCTS_TABLE_SETTINGS_KEY = 'DD_Order_products';
 
     /*
     |--------------------------------------------------------------------------
@@ -342,10 +333,7 @@ class User extends Authenticatable
         $this->save();
 
         // Table settings
-        // $this->resetMADTableSettings($settings);
-        // $this->resetPLPDTableSettings($settings);
-        // $this->resetCMDTableSettings($settings);
-        // $this->resetDDTableSettings($settings);
+        $this->resetMADTableSettings($settings);
     }
 
     /**
@@ -363,56 +351,6 @@ class User extends Authenticatable
         $tableSettings[self::MAD_KVPP_TABLE_SETTINGS_KEY] = ProductSearch::getDefaultMADTableSettingsForUser($this);
         $tableSettings[self::MAD_MEETINGS_TABLE_SETTINGS_KEY] = Meeting::getDefaultMADTableSettingsForUser($this);
         $tableSettings[self::MAD_DH_TABLE_SETTINGS_KEY] = Process::getDefaultMADDHTableSettingsForUser($this);
-
-        $settings['tables'] = $tableSettings;
-        $this->settings = $settings;
-        $this->save();
-    }
-
-    /**
-     * Reset users PLPD table settings.
-     */
-    public function resetPLPDTableSettings($settings)
-    {
-        $this->refresh();
-        $settings = $this->settings;
-        $tableSettings = $settings['tables'];
-
-        $tableSettings[self::PLPD_ORDERS_TABLE_SETTINGS_KEY] = Order::getDefaultPLPDTableSettingsForUser($this);
-        $tableSettings[self::PLPD_ORDER_PRODUCTS_TABLE_SETTINGS_KEY] = OrderProduct::getDefaultPLPDTableSettingsForUser($this);
-
-        $settings['tables'] = $tableSettings;
-        $this->settings = $settings;
-        $this->save();
-    }
-
-    /**
-     * Reset users CMD table settings.
-     */
-    public function resetCMDTableSettings($settings)
-    {
-        $this->refresh();
-        $settings = $this->settings;
-        $tableSettings = $settings['tables'];
-
-        $tableSettings[self::CMD_ORDERS_TABLE_SETTINGS_KEY] = Order::getDefaultCMDTableSettingsForUser($this);
-        $tableSettings[self::CMD_ORDER_PRODUCTS_TABLE_SETTINGS_KEY] = OrderProduct::getDefaultCMDTableSettingsForUser($this);
-
-        $settings['tables'] = $tableSettings;
-        $this->settings = $settings;
-        $this->save();
-    }
-
-    /**
-     * Reset users DD table settings.
-     */
-    public function resetDDTableSettings($settings)
-    {
-        $this->refresh();
-        $settings = $this->settings;
-        $tableSettings = $settings['tables'];
-
-        $tableSettings[self::DD_ORDER_PRODUCTS_TABLE_SETTINGS_KEY] = OrderProduct::getDefaultDDTableSettingsForUser($this);
 
         $settings['tables'] = $tableSettings;
         $this->settings = $settings;
@@ -447,14 +385,6 @@ class User extends Authenticatable
             self::MAD_KVPP_TABLE_SETTINGS_KEY => ProductSearch::getDefaultMADTableSettingsForUser($this),
             self::MAD_MEETINGS_TABLE_SETTINGS_KEY => Meeting::getDefaultMADTableSettingsForUser($this),
             self::MAD_DH_TABLE_SETTINGS_KEY => Process::getDefaultMADDHTableSettingsForUser($this),
-
-            self::PLPD_ORDERS_TABLE_SETTINGS_KEY => Order::getDefaultPLPDTableSettingsForUser($this),
-            self::PLPD_ORDER_PRODUCTS_TABLE_SETTINGS_KEY => OrderProduct::getDefaultPLPDTableSettingsForUser($this),
-
-            self::CMD_ORDERS_TABLE_SETTINGS_KEY => Order::getDefaultCMDTableSettingsForUser($this),
-            self::CMD_ORDER_PRODUCTS_TABLE_SETTINGS_KEY => OrderProduct::getDefaultCMDTableSettingsForUser($this),
-
-            self::DD_ORDER_PRODUCTS_TABLE_SETTINGS_KEY => OrderProduct::getDefaultDDTableSettingsForUser($this),
 
             default => throw new InvalidArgumentException("Unknown key: $key"),
         };
@@ -694,18 +624,6 @@ class User extends Authenticatable
             'mad.product-searches.index' => 'view-MAD-KVPP',
             'mad.products.index' => 'view-MAD-IVP',
             'mad.processes.index' => 'view-MAD-VPS',
-
-            // PLPD
-            'plpd.processes.ready-for-order.index' => 'view-PLPD-ready-for-order-processes',
-            'plpd.orders.index' => 'view-PLPD-orders',
-            'plpd.order-products.index' => 'view-PLPD-order-products',
-
-            // CMD
-            'cmd.orders.index' => 'view-CMD-orders',
-            'cmd.order-products.index' => 'view-CMD-order-products',
-
-            // DD
-            'dd.order-products.index' => 'view-DD-order-products',
         ];
 
         foreach ($homepageRoutes as $routeName => $gate) {

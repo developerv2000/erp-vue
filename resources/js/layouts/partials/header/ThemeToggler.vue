@@ -1,12 +1,16 @@
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import useAuth from "@/composables/useAuth";
 import { useTheme } from "vuetify";
-import { mdiThemeLightDark } from "@mdi/js";
+import { mdiWeatherNight , mdiWeatherSunny  } from "@mdi/js";
 
 const { user } = useAuth();
 const theme = useTheme();
 const currentTheme = ref(user.value.settings.preferred_theme);
+
+const icon = computed(() => {
+    return currentTheme.value == "light" ? mdiWeatherNight : mdiWeatherSunny ;
+})
 
 function toggle() {
     currentTheme.value = currentTheme.value == "light" ? "dark" : "light";
@@ -21,5 +25,5 @@ function toggle() {
 </script>
 
 <template>
-    <v-btn :icon="mdiThemeLightDark" @click="toggle" />
+    <v-btn :icon="icon" @click="toggle" />
 </template>

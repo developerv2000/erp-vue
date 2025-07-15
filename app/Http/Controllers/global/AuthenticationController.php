@@ -23,7 +23,7 @@ class AuthenticationController extends Controller
         return redirect()->intended('/');
     }
 
-    public function destroy(Request $request)
+    public function logout(Request $request)
     {
         Auth::guard('web')->logout();
 

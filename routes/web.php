@@ -20,9 +20,7 @@ Route::middleware('auth', 'auth.session')->group(function () {
     });
 
     Route::controller(SettingController::class)->prefix('/settings')->name('settings.')->group(function () {
-        Route::patch('locale', 'updateLocale')->name('update-locale');
-        Route::patch('preferred-theme', 'toggleTheme')->name('toggle-theme');
-        Route::patch('collapsed-leftbar', 'toggleLeftbar')->name('toggle-leftbar'); // ajax request
+        Route::patch('update/{key}/{value}', 'updateByKey')->name('update-by-key'); // ajax request
         Route::patch('table-columns/{key}', 'updateTableColumns')->name('update-table-columns');
     });
 

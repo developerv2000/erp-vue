@@ -2,7 +2,9 @@
 import { ref } from "vue";
 import useAuth from "@/composables/useAuth";
 import { mdiChevronLeft } from "@mdi/js";
+import LeftbarNav from "./partials/leftbar/LeftbarNav.vue";
 
+const { user } = useAuth();
 const rail = ref(false);
 </script>
 
@@ -10,37 +12,22 @@ const rail = ref(false);
     <v-navigation-drawer :rail="rail" @click="rail = false" permanent>
         <v-list>
             <v-list-item
-                prepend-avatar="/images/main/favicon-large.png"
-                class="logo-item"
-                title="EVOLET"
+                :prepend-avatar="user.photo_url"
+                :title="user.name"
+                :subtitle="user.email"
             >
                 <template #append>
                     <v-btn
                         :icon="mdiChevronLeft"
                         @click.stop="rail = !rail"
                         variant="text"
+                        color="primary"
                     >
                     </v-btn>
                 </template>
             </v-list-item>
         </v-list>
+
+        <LeftbarNav />
     </v-navigation-drawer>
 </template>
-
-<style scoped>
-.logo-item::v-deep(.v-avatar) {
-    border-radius: 0 !important;
-}
-
-.logo-item::v-deep(.v-list-item-title) {
-    font-size: 22px;
-    font-weight: 500;
-    letter-spacing: 2px;
-}
-
-.v-navigation-drawer:not(.v-navigation-drawer--rail)
-    .logo-item::v-deep(.v-avatar.v-avatar--density-default) {
-    width: 30px;
-    height: 30px;
-}
-</style>

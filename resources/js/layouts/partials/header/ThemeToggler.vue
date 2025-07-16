@@ -2,15 +2,15 @@
 import { ref, computed } from "vue";
 import useAuth from "@/composables/useAuth";
 import { useTheme } from "vuetify";
-import { mdiWeatherNight , mdiWeatherSunny  } from "@mdi/js";
+import { mdiWeatherNight, mdiWeatherSunny } from "@mdi/js";
 
 const { user } = useAuth();
 const theme = useTheme();
 const currentTheme = ref(user.value.settings.preferred_theme);
 
 const icon = computed(() => {
-    return currentTheme.value == "light" ? mdiWeatherNight : mdiWeatherSunny ;
-})
+    return currentTheme.value == "light" ? mdiWeatherNight : mdiWeatherSunny;
+});
 
 function toggle() {
     currentTheme.value = currentTheme.value == "light" ? "dark" : "light";

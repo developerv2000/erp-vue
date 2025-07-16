@@ -1,8 +1,8 @@
 <script setup>
 import { useI18n } from "vue-i18n";
 import { router } from "@inertiajs/vue3";
-import { mdiAccount, mdiAccountCircle, mdiLogout } from "@mdi/js";
-import InertiaListItem from "@/components/inertia/InertiaListItem.vue";
+import { mdiAccount, mdiAccountEdit, mdiLogout } from "@mdi/js";
+import InertiaLinkedListItem from "@/components/inertia/InertiaLinkedListItem.vue";
 
 const { t } = useI18n();
 
@@ -24,10 +24,10 @@ const logout = () => {
             color="primary"
             nav
         >
-            <InertiaListItem
-                title="My profile"
-                :icon="mdiAccountCircle"
-                route-name="profile.edit"
+            <InertiaLinkedListItem
+                :title="t('My profile')"
+                :prepend-icon="mdiAccountEdit"
+                :link="route('profile.edit')"
             />
 
             <v-list-item

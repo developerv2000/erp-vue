@@ -13,9 +13,9 @@ class SettingController extends Controller
         $value = $request->route('value', null);
 
         $availableKeys = [
-            'preferred_theme',
-            'collapsed_leftbar',
+            'theme',
             'locale',
+            'is_leftbar_collapsed',
         ];
 
         // Check if the key is available

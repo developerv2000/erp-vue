@@ -1,11 +1,8 @@
 <script setup>
-import { ref } from "vue";
-import { useI18n } from "vue-i18n";
-import i18n from "@/i18n";
 import { mdiTranslate } from "@mdi/js";
+import { useUserSettingsStore } from "@/stores/userSettings";
 
-const { locale } = useI18n();
-const selectedLocale = ref(locale.value);
+const userSettings = useUserSettingsStore();
 
 const listItems = [
     { title: "English", value: "en", image: "/images/main/flag-en.png" },
@@ -13,7 +10,7 @@ const listItems = [
 ];
 
 function updateLocale(newLocale) {
-    i18n.global.locale.value = newLocale[0];
+    userSettings.setLocale(newLocale[0]);
 
     const url = route("settings.update-by-key", {
         key: "locale",
@@ -34,7 +31,7 @@ function updateLocale(newLocale) {
             density="compact"
             variant="text"
             color="primary"
-            v-model:selected="selectedLocale"
+            v-model:selected="userSettings.locale"
             @update:selected="updateLocale"
             mandatory
             nav
@@ -44,7 +41,7 @@ function updateLocale(newLocale) {
                 :title="item.title"
                 :value="item.value"
                 :key="index"
-                :active="selectedLocale == item.value"
+                :active="userSettings.locale == item.value"
             >
                 <template #prepend>
                     <v-img width="auto" :src="item.image"></v-img>

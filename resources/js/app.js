@@ -43,9 +43,6 @@ createInertiaApp({
 
     // Setup Vue app
     setup({ el, App, props, plugin }) {
-        // Set locale from initial page props
-        i18n.global.locale.value = props.initialPage.props.locale || 'en'
-
         return createApp({ render: () => h(App, props) })
             .use(plugin)     // Inertia plugin
             .use(ZiggyVue)   // Laravel route support

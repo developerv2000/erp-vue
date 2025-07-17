@@ -32,9 +32,9 @@ class User extends Authenticatable
     const DEFAULT_ORDER_TYPE = 'asc';
     const DEFAULT_PAGINATION_LIMIT = 50;
 
-    const DEFAULT_PREFERRED_THEME = 'light';
-    const DEFAULT_COLLAPSED_LEFTBAR = false;
+    const DEFAULT_THEME = 'light';
     const DEFAULT_LOCALE = 'ru';
+    const DEFAULT_IS_LEFTBAR_COLLAPSED = false;
 
     const PHOTO_PATH = 'images/users';
     const PHOTO_WIDTH = 400;
@@ -323,9 +323,9 @@ class User extends Authenticatable
 
         // Appearance settings
         $settings = [
-            'preferred_theme' => User::DEFAULT_PREFERRED_THEME,
-            'collapsed_leftbar' => User::DEFAULT_COLLAPSED_LEFTBAR,
+            'theme' => User::DEFAULT_THEME,
             'locale' => User::DEFAULT_LOCALE,
+            'is_leftbar_collapsed' => User::DEFAULT_IS_LEFTBAR_COLLAPSED,
             'tables' => [],
         ];
 

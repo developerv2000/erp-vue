@@ -1,29 +1,20 @@
 <script setup>
 import Leftbar from "./Leftbar.vue";
 import Header from "./Header.vue";
-
-import { usePage } from "@inertiajs/vue3";
 import { useTheme } from "vuetify";
-import { computed } from "vue";
+import { useUserSettingsStore } from "@/stores/userSettings";
+import { usePage } from "@inertiajs/vue3";
 
 const page = usePage();
-const theme = useTheme();
+const vuetifyTheme = useTheme();
+const userSettings = useUserSettingsStore();
 
-// Set theme from user settings
-const preferredTheme =
-    page.props.auth.user?.settings.preferred_theme || "light";
-theme.global.name.value = preferredTheme;
-
-// Computed background class based on theme
-const appBackgroundClass = computed(() =>
-    theme.global.name.value == "light"
-        ? "bg-grey-lighten-4"
-        : "bg-blue-grey-darken-4"
-);
+// Initialize user settings from server props
+userSettings.initializeFromServerProps(page.props, vuetifyTheme);
 </script>
 
 <template>
-    <v-app :class="appBackgroundClass">
+    <v-app :class="userSettings.appBackgroundClass">
         <Leftbar />
         <Header />
 

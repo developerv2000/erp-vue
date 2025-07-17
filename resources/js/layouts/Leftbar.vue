@@ -1,11 +1,16 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import useAuth from "@/composables/useAuth";
-import { mdiChevronLeft } from "@mdi/js";
+import { mdiMenu } from "@mdi/js";
 import LeftbarNav from "./partials/leftbar/LeftbarNav.vue";
 
 const { user } = useAuth();
 const rail = ref(false);
+const mounted = ref(false);
+
+onMounted(() => {
+    mounted.value = true;
+});
 </script>
 
 <template>
@@ -16,18 +21,19 @@ const rail = ref(false);
                 :title="user.name"
                 :subtitle="user.email"
             >
-                <template #append>
-                    <v-btn
-                        :icon="mdiChevronLeft"
-                        @click.stop="rail = !rail"
-                        variant="text"
-                        color="primary"
-                    >
-                    </v-btn>
-                </template>
             </v-list-item>
         </v-list>
 
         <LeftbarNav />
     </v-navigation-drawer>
+
+    <!-- Teleport the toggler button -->
+    <Teleport to="#leftbar_toggler" v-if="mounted">
+        <v-btn
+            :icon="mdiMenu"
+            @click.stop="rail = !rail"
+            variant="text"
+            color="primary"
+        />
+    </Teleport>
 </template>

@@ -1,24 +1,22 @@
 <script setup>
-import { ref, computed } from "vue";
-import useAuth from "@/composables/useAuth";
+import { computed } from "vue";
 import { useTheme } from "vuetify";
 import { mdiWeatherNight, mdiWeatherSunny } from "@mdi/js";
+import { useUserSettingsStore } from "@/stores/userSettings";
 
-const { user } = useAuth();
-const theme = useTheme();
-const currentTheme = ref(user.value.settings.preferred_theme);
+const vuetifyTheme = useTheme();
+const userSettings = useUserSettingsStore();
 
 const icon = computed(() => {
-    return currentTheme.value == "light" ? mdiWeatherNight : mdiWeatherSunny;
+    return userSettings.theme == "light" ? mdiWeatherNight : mdiWeatherSunny;
 });
 
 function toggle() {
-    currentTheme.value = currentTheme.value == "light" ? "dark" : "light";
-    theme.global.name.value = currentTheme.value;
+    userSettings.toggleTheme(vuetifyTheme);
 
     const url = route("settings.update-by-key", {
-        key: "preferred_theme",
-        value: currentTheme.value,
+        key: "theme",
+        value: userSettings.theme,
     });
     axios.patch(url);
 }

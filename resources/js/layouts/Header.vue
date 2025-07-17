@@ -7,6 +7,11 @@ import { mdiBellOutline } from "@mdi/js";
 
 <template>
     <v-app-bar class="app-bar" elevation="0">
+        <v-app-bar-title>
+            <!-- Target for teleport -->
+            <div id="leftbar_toggler"></div>
+        </v-app-bar-title>
+
         <template #append>
             <v-btn :icon="mdiBellOutline" />
             <ThemeToggler />

@@ -3,13 +3,13 @@ import ThemeToggler from "./partials/header/ThemeToggler.vue";
 import LocalesMenu from "./partials/header/LocalesMenu.vue";
 import ProfileMenu from "./partials/header/ProfileMenu.vue";
 import { mdiBellOutline } from "@mdi/js";
+import LeftbarToggler from "./partials/header/LeftbarToggler.vue";
 </script>
 
 <template>
     <v-app-bar class="app-bar" elevation="0">
         <v-app-bar-title>
-            <!-- Target for teleport -->
-            <div id="leftbar_toggler"></div>
+            <LeftbarToggler />
         </v-app-bar-title>
 
         <template #append>

@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
-import i18n from "@/i18n";
+import i18n from "@/boot/i18n";
 import { computed } from "vue";
+import { toBool } from "@/utils/helpers";
 
 export const useUserSettingsStore = defineStore('userSettings', {
     state: () => ({
@@ -23,7 +24,7 @@ export const useUserSettingsStore = defineStore('userSettings', {
         initializeFromServerProps(props, vuetifyTheme) {
             this.theme = props.auth.user?.settings.theme ?? 'light';
             this.locale = props.locale ?? 'en';
-            this.isLeftbarCollapsed = props.auth.user?.settings.is_leftbar_collapsed ?? false;
+            this.isLeftbarCollapsed = toBool(props.auth.user?.settings.is_leftbar_collapsed);
 
             i18n.global.locale.value = this.locale;
             vuetifyTheme.global.name.value = this.theme;

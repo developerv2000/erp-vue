@@ -11,7 +11,7 @@ export default defineConfig({
         laravel({
             input: [
                 'resources/css/app.css', // Default app styles
-                'resources/js/app.js',   // JS entry point
+                'resources/js/boot/app.js',   // JS entry point
             ],
             refresh: true, // Enables automatic browser refresh on backend/frontend changes
         }),

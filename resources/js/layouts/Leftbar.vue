@@ -1,20 +1,18 @@
 <script setup>
-import { ref, onMounted } from "vue";
-import useAuth from "@/composables/useAuth";
-import { mdiMenu } from "@mdi/js";
 import LeftbarNav from "./partials/leftbar/LeftbarNav.vue";
+import { useUserSettingsStore } from "@/stores/userSettings";
+import useAuth from "@/composables/useAuth";
 
 const { user } = useAuth();
-const rail = ref(false);
-const mounted = ref(false);
-
-onMounted(() => {
-    mounted.value = true;
-});
+const userSettings = useUserSettingsStore();
 </script>
 
 <template>
-    <v-navigation-drawer :rail="rail" @click="rail = false" permanent>
+    <v-navigation-drawer
+        :rail="userSettings.isLeftbarCollapsed"
+        @click="userSettings.toggleLeftbar()"
+        permanent
+    >
         <v-list>
             <v-list-item
                 :prepend-avatar="user.photo_url"
@@ -26,14 +24,4 @@ onMounted(() => {
 
         <LeftbarNav />
     </v-navigation-drawer>
-
-    <!-- Teleport the toggler button -->
-    <Teleport to="#leftbar_toggler" v-if="mounted">
-        <v-btn
-            :icon="mdiMenu"
-            @click.stop="rail = !rail"
-            variant="text"
-            color="primary"
-        />
-    </Teleport>
 </template>

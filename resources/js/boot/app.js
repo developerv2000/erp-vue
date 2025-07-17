@@ -9,7 +9,7 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers'
 import { createApp, h } from 'vue'
 
 // Inertia integration for Laravel routes in JavaScript
-import { ZiggyVue } from '../../vendor/tightenco/ziggy'
+import { ZiggyVue } from '../../../vendor/tightenco/ziggy'
 
 // Vuetify setup (theme, icons, etc.)
 import vuetify from './vuetify'
@@ -37,8 +37,8 @@ createInertiaApp({
     // Resolve components from the ./pages folder using glob import
     resolve: (name) =>
         resolvePageComponent(
-            `./pages/${name}.vue`,
-            import.meta.glob('./pages/**/*.vue')
+            `../pages/${name}.vue`,
+            import.meta.glob('../pages/**/*.vue')
         ),
 
     // Setup Vue app

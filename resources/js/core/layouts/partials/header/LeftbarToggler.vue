@@ -1,6 +1,6 @@
 <script setup>
 import { mdiMenu  } from '@mdi/js';
-import { useUserSettingsStore  } from '@/stores/userSettings';
+import { useUserSettingsStore  } from '@/core/stores/userSettings';
 
 const userSettings = useUserSettingsStore();
 

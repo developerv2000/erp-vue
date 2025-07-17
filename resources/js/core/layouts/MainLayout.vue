@@ -2,7 +2,7 @@
 import Leftbar from "./Leftbar.vue";
 import Header from "./Header.vue";
 import { useTheme } from "vuetify";
-import { useUserSettingsStore } from "@/stores/userSettings";
+import { useUserSettingsStore } from "@/core/stores/userSettings";
 import { usePage } from "@inertiajs/vue3";
 
 const page = usePage();

@@ -1,9 +1,9 @@
 <script setup>
-    import MainLayout from '@/layouts/MainLayout.vue';
+    import MainLayout from '@/core/layouts/MainLayout.vue';
 </script>
 
 <template>
     <MainLayout>
-        
+
     </MainLayout>
 </template>

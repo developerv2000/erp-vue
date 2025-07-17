@@ -11,7 +11,7 @@ export default defineConfig({
         laravel({
             input: [
                 'resources/css/app.css', // Default app styles
-                'resources/js/boot/app.js',   // JS entry point
+                'resources/js/core/boot/app.js',   // JS entry point
             ],
             refresh: true, // Enables automatic browser refresh on backend/frontend changes
         }),
@@ -36,9 +36,6 @@ export default defineConfig({
         alias: {
             // Shortcut to use "@/..." for importing from `resources/js/`
             '@': fileURLToPath(new URL('./resources/js', import.meta.url)),
-
-            // Shortcut for importing from `resources/images/`
-            '@images': fileURLToPath(new URL('./resources/images', import.meta.url)),
 
             // Shortcut for importing from `lang/`
             '@lang': fileURLToPath(new URL('./lang', import.meta.url))

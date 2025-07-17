@@ -2,7 +2,7 @@
 import { useI18n } from "vue-i18n";
 import { router } from "@inertiajs/vue3";
 import { mdiAccount, mdiAccountEdit, mdiLogout } from "@mdi/js";
-import InertiaLinkedListItem from "@/components/inertia/InertiaLinkedListItem.vue";
+import InertiaLinkedListItem from "@/core/components/inertia/InertiaLinkedListItem.vue";
 
 const { t } = useI18n();
 

@@ -10,7 +10,7 @@
         @routes
     @endauth
 
-    @vite(['resources/css/app.css', 'resources/js/boot/app.js'])
+    @vite(['resources/css/app.css', 'resources/js/core/boot/app.js'])
 
     @inertiaHead
 </head>

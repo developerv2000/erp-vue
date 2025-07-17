@@ -1,7 +1,7 @@
 <script setup>
 import LeftbarNav from "./partials/leftbar/LeftbarNav.vue";
-import { useUserSettingsStore } from "@/stores/userSettings";
-import useAuth from "@/composables/useAuth";
+import { useUserSettingsStore } from "@/core/stores/userSettings";
+import useAuth from "@/core/composables/useAuth";
 
 const { user } = useAuth();
 const userSettings = useUserSettingsStore();
@@ -10,7 +10,6 @@ const userSettings = useUserSettingsStore();
 <template>
     <v-navigation-drawer
         :rail="userSettings.isLeftbarCollapsed"
-        @click="userSettings.toggleLeftbar()"
         permanent
     >
         <v-list>

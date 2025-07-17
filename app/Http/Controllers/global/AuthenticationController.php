@@ -11,7 +11,7 @@ class AuthenticationController extends Controller
 {
     public function loginShow(Request $request)
     {
-        return inertia('auth/Login');
+        return inertia('global/pages/auth/Login');
     }
 
     public function login(LoginRequest $request)

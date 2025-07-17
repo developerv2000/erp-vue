@@ -2,7 +2,7 @@
 import { computed } from "vue";
 import { useTheme } from "vuetify";
 import { mdiWeatherNight, mdiWeatherSunny } from "@mdi/js";
-import { useUserSettingsStore } from "@/stores/userSettings";
+import { useUserSettingsStore } from "@/core/stores/userSettings";
 
 const vuetifyTheme = useTheme();
 const userSettings = useUserSettingsStore();

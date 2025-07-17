@@ -1,6 +1,6 @@
 <script setup>
 import { useI18n } from "vue-i18n";
-import InertiaLinkedListItem from "@/components/inertia/InertiaLinkedListItem.vue";
+import InertiaLinkedListItem from "@/core/components/inertia/InertiaLinkedListItem.vue";
 import { mdiViewList, mdiCalendarSearch, mdiPill, mdiLayersTriple, mdiAccountGroup } from "@mdi/js";
 
 const { t } = useI18n();

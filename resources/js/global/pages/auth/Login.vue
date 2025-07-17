@@ -1,6 +1,6 @@
 <script setup>
-import GuestLayout from "@/layouts/GuestLayout.vue";
-import WrappedLabelGroup from "@/components/form/groups/WrappedLabelGroup.vue";
+import GuestLayout from "@/core/layouts/GuestLayout.vue";
+import WrappedLabelGroup from "@/core/components/form/groups/WrappedLabelGroup.vue";
 import { mdiEye, mdiEyeOff } from "@mdi/js";
 import { ref } from "vue";
 

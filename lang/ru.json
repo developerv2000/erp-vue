@@ -1,48 +1,39 @@
 {
-    "validation": {
-        "required": "Это поле обязательно.",
-        "invalid": "Недопустимое значение.",
-        "one_of": "Значение должно быть одним из: {values}.",
-        "not_one_of": "Значение не должно быть одним из: {values}.",
-        "min": "Минимум {min} символов.",
-        "max": "Максимум {max} символов.",
-        "email": "Введите корректный адрес электронной почты.",
-        "url": "Введите корректный URL.",
-        "length": "Должно быть ровно {length} символов.",
-        "matches": "Значение не соответствует требуемому формату.",
-        "min_value": "Минимальное значение: {min}.",
-        "max_value": "Максимальное значение: {max}.",
-        "integer": "Значение должно быть целым числом.",
-        "positive": "Значение должно быть положительным.",
-        "negative": "Значение должно быть отрицательным.",
-        "min_date": "Дата должна быть после {min}.",
-        "max_date": "Дата должна быть до {max}.",
-        "min_items": "Выберите как минимум {min} элементов.",
-        "max_items": "Выберите не более {max} элементов."
-    },
+    "validations.required": "Это поле обязательно.",
+    "validations.invalid": "Недопустимое значение.",
+    "validations.one_of": "Значение должно быть одним из: {values}.",
+    "validations.not_one_of": "Значение не должно быть одним из: {values}.",
+    "validations.min": "Минимум {min} символов.",
+    "validations.max": "Максимум {max} символов.",
+    "validations.email": "Введите корректный адрес электронной почты.",
+    "validations.url": "Введите корректный URL.",
+    "validations.length": "Должно быть ровно {length} символов.",
+    "validations.matches": "Значение не соответствует требуемому формату.",
+    "validations.min_value": "Минимальное значение: {min}.",
+    "validations.max_value": "Максимальное значение: {max}.",
+    "validations.integer": "Значение должно быть целым числом.",
+    "validations.positive": "Значение должно быть положительным.",
+    "validations.negative": "Значение должно быть отрицательным.",
+    "validations.min_date": "Дата должна быть после {min}.",
+    "validations.max_date": "Дата должна быть до {max}.",
+    "validations.min_items": "Выберите как минимум {min} элементов.",
+    "validations.max_items": "Выберите не более {max} элементов.",
 
-    "departments": {
-        "Managment": "Руководство",
-        "MAD": "ОАП"
-    },
+    "departments.Managment": "Руководство",
+    "departments.MAD": "ОАП",
 
-    "actions": {
-        "Logout": "Выйти"
-    },
+    "pages.Main": "Главная",
+    "pages.My profile": "Мой профиль",
+    "pages.EPP": "ЕПП",
+    "pages.KVPP": "КВПП",
+    "pages.IVP": "ИВП",
+    "pages.VPS": "ВПЦ",
+    "pages.Meetings": "Встречи",
 
-    "pages": {
-        "My profile": "Мой профиль",
-        "EPP": "ЕПП",
-        "IVP": "ИВП",
-        "VPS": "ВПЦ",
-        "KVPP": "КВПП",
-        "Meetings": "Встречи"
-    },
+    "actions.Logout": "Выйти",
 
-    "fields": {
-        "Email": "Электронная почта",
-        "Password": "Пароль"
-    },
+    "fields.Email": "Электронная почта",
+    "fields.Password": "Пароль",
 
     "AAAAAAAAAAAAAA": "AAAAAAAAAAAAAA"
 }

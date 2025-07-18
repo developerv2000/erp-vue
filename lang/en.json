@@ -1,48 +1,39 @@
 {
-    "validation": {
-        "required": "This field is required.",
-        "invalid": "The value is invalid.",
-        "one_of": "Value must be one of: {values}.",
-        "not_one_of": "Value must not be one of: {values}.",
-        "min": "Minimum {min} characters.",
-        "max": "Maximum {max} characters.",
-        "email": "Please enter a valid email address.",
-        "url": "Please enter a valid URL.",
-        "length": "Must be exactly {length} characters.",
-        "matches": "Value does not match the required format.",
-        "min_value": "Minimum value is {min}.",
-        "max_value": "Maximum value is {max}.",
-        "integer": "Value must be an integer.",
-        "positive": "Value must be positive.",
-        "negative": "Value must be negative.",
-        "min_date": "Date must be after {min}.",
-        "max_date": "Date must be before {max}.",
-        "min_items": "Select at least {min} items.",
-        "max_items": "Select no more than {max} items."
-    },
+    "validations.required": "This field is required.",
+    "validations.invalid": "The value is invalid.",
+    "validations.one_of": "Value must be one of: {values}.",
+    "validations.not_one_of": "Value must not be one of: {values}.",
+    "validations.min": "Minimum {min} characters.",
+    "validations.max": "Maximum {max} characters.",
+    "validations.email": "Please enter a valid email address.",
+    "validations.url": "Please enter a valid URL.",
+    "validations.length": "Must be exactly {length} characters.",
+    "validations.matches": "Value does not match the required format.",
+    "validations.min_value": "Minimum value is {min}.",
+    "validations.max_value": "Maximum value is {max}.",
+    "validations.integer": "Value must be an integer.",
+    "validations.positive": "Value must be positive.",
+    "validations.negative": "Value must be negative.",
+    "validations.min_date": "Date must be after {min}.",
+    "validations.max_date": "Date must be before {max}.",
+    "validations.min_items": "Select at least {min} items.",
+    "validations.max_items": "Select no more than {max} items.",
 
-    "departments": {
-        "Managment": "Managment",
-        "MAD": "MAD"
-    },
+    "departments.Managment": "Managment",
+    "departments.MAD": "MAD",
 
-    "actions": {
-        "Logout": "Logout"
-    },
+    "pages.Main": "Main",
+    "pages.My profile": "My profile",
+    "pages.EPP": "EPP",
+    "pages.KVPP": "KVPP",
+    "pages.IVP": "IVP",
+    "pages.VPS": "VPS",
+    "pages.Meetings": "Meetings",
 
-    "pages": {
-        "My profile": "My profile",
-        "EPP": "EPP",
-        "KVPP": "KVPP",
-        "IVP": "IVP",
-        "VPS": "VPS",
-        "Meetings": "Meetings"
-    },
+    "actions.Logout": "Logout",
 
-    "fields": {
-        "Email": "Email",
-        "Password": "Password"
-    },
+    "fields.Email": "Email",
+    "fields.Password": "Password",
 
     "AAAAAAAAAAAAAA": "AAAAAAAAAAAAAA"
 }

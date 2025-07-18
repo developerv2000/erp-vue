@@ -1,12 +1,13 @@
 <script setup>
 import { mdiTranslate } from "@mdi/js";
 import { useUserSettingsStore } from "@/core/stores/userSettings";
+import { router } from "@inertiajs/vue3";
 
 const userSettings = useUserSettingsStore();
 
 const listItems = [
     { title: "English", value: "en", image: "/images/main/flag-en.png" },
-    { title: "Russian", value: "ru", image: "/images/main/flag-ru.png" },
+    { title: "Русский", value: "ru", image: "/images/main/flag-ru.png" },
 ];
 
 function updateLocale(newLocale) {
@@ -16,6 +17,7 @@ function updateLocale(newLocale) {
         key: "locale",
         value: newLocale[0],
     });
+
     axios.patch(url);
 }
 </script>

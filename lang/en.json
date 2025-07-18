@@ -21,10 +21,28 @@
         "max_items": "Select no more than {max} items."
     },
 
-    "Email": "Email",
-    "Password": "Password",
-    "My profile": "My profile",
-    "Logout": "Logout",
+    "departments": {
+        "Managment": "Managment",
+        "MAD": "MAD"
+    },
+
+    "actions": {
+        "Logout": "Logout"
+    },
+
+    "pages": {
+        "My profile": "My profile",
+        "EPP": "EPP",
+        "KVPP": "KVPP",
+        "IVP": "IVP",
+        "VPS": "VPS",
+        "Meetings": "Meetings"
+    },
+
+    "fields": {
+        "Email": "Email",
+        "Password": "Password"
+    },
 
     "AAAAAAAAAAAAAA": "AAAAAAAAAAAAAA"
 }

@@ -25,13 +25,13 @@ const logout = () => {
             nav
         >
             <InertiaLinkedListItem
-                :title="t('My profile')"
+                :title="t('pages.My profile')"
                 :prepend-icon="mdiAccountEdit"
                 :link="route('profile.edit')"
             />
 
             <v-list-item
-                :title="t('Logout')"
+                :title="t('actions.Logout')"
                 :prepend-icon="mdiLogout"
                 @click="logout"
             ></v-list-item>

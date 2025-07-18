@@ -21,10 +21,28 @@
         "max_items": "Выберите не более {max} элементов."
     },
 
-    "Email": "Электронная почта",
-    "Password": "Пароль",
-    "My profile": "Мой профиль",
-    "Logout": "Выйти",
+    "departments": {
+        "Managment": "Руководство",
+        "MAD": "ОАП"
+    },
+
+    "actions": {
+        "Logout": "Выйти"
+    },
+
+    "pages": {
+        "My profile": "Мой профиль",
+        "EPP": "ЕПП",
+        "IVP": "ИВП",
+        "VPS": "ВПЦ",
+        "KVPP": "КВПП",
+        "Meetings": "Встречи"
+    },
+
+    "fields": {
+        "Email": "Электронная почта",
+        "Password": "Пароль"
+    },
 
     "AAAAAAAAAAAAAA": "AAAAAAAAAAAAAA"
 }

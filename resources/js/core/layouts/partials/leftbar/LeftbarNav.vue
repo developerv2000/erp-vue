@@ -10,10 +10,15 @@ import MadNav from './partials/MadNav.vue';
 
 <style scoped>
 .leftbar-nav::v-deep(.v-list-item__spacer) {
-    width: 16px;
+    width: 20px;
 }
 
 .leftbar-nav::v-deep(.v-list-item-title) {
-    font-size: 15px;
+    font-size: 14px;
+}
+
+.leftbar-nav::v-deep(.v-list-subheader__text) {
+    font-size: 13px;
+    font-weight: bold;
 }
 </style>

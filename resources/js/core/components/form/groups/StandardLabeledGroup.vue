@@ -14,7 +14,7 @@ defineProps({
 
 <template>
     <div>
-        <label class="d-block mb-1 text-subtitle-1" :for="labelFor">
+        <label class="d-block mb-1 text-subtitle-2 font-weight-medium" :for="labelFor">
             {{ label }}
             <span v-if="required" class="text-error ms-1">*</span>
         </label>

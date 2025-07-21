@@ -23,5 +23,5 @@ function toggle() {
 </script>
 
 <template>
-    <v-btn :icon="icon" @click="toggle" />
+    <v-btn :icon="icon" @click="toggle" variant="text" />
 </template>

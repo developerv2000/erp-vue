@@ -18,21 +18,25 @@ const listItems = computed(() => [
         link: route("home"),
         prependIcon: mdiViewList,
     },
+
     {
         title: t("pages.KVPP"),
         link: route("home"),
         prependIcon: mdiCalendarSearch,
     },
+
     {
         title: t("pages.IVP"),
         link: route("home"),
         prependIcon: mdiPill,
     },
+
     {
         title: t("pages.VPS"),
         link: route("home"),
         prependIcon: mdiLayers,
     },
+    
     {
         title: t("pages.Meetings"),
         link: route("home"),

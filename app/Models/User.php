@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
+use App\Support\Helpers\FileHelper;
 use App\Support\Traits\Model\AddsDefaultQueryParamsToRequest;
 use App\Support\Traits\Model\FinalizesQueryForRequest;
 use App\Support\Traits\Model\UploadsFile;
@@ -440,14 +441,14 @@ class User extends Authenticatable
     */
 
     /**
-     * Update the user's profile based on the request data.
+     * Update the user's profile personal data based on the request data.
      *
      * This method is used by users to update their own profile via the profile edit page.
      *
      * @param \Illuminate\Http\Request $request The request object containing the profile data.
      * @return void
      */
-    public function updateProfile($request): void
+    public function updateProfilePersonalData($request): void
     {
         $validatedData = $request->validated();
 
@@ -609,8 +610,8 @@ class User extends Authenticatable
      */
     public function uploadPhoto()
     {
-        $this->uploadFile('photo', public_path(self::PHOTO_PATH), $this->name);
-        FileHelper::resizeImage($this->photo_file_path, self::PHOTO_WIDTH, self::PHOTO_HEIGHT);
+        $this->uploadFile('photo', storage_path('app/public/' . self::PHOTO_PATH), $this->name);
+        FileHelper::resizeImage($this->photo_path, self::PHOTO_WIDTH, self::PHOTO_HEIGHT);
     }
 
     /**

@@ -2,7 +2,7 @@
 import { router } from "@inertiajs/vue3";
 import i18n from "@/core/boot/i18n";
 
-const props =defineProps({
+const props = defineProps({
     breadcrumbs: {
         type: Array,
         required: true,
@@ -16,7 +16,7 @@ const navigate = (link) => {
 </script>
 
 <template>
-    <v-breadcrumbs>
+    <v-breadcrumbs density="compact" class="px-0 ml-n1">
         <v-breadcrumbs-item
             v-for="(crumb, index) in breadcrumbs"
             :key="index"
@@ -26,7 +26,9 @@ const navigate = (link) => {
                 {{ crumb.title }}
             </span>
 
-            <v-breadcrumbs-divider v-if="index < breadcrumbs.length - 1"></v-breadcrumbs-divider>
+            <v-breadcrumbs-divider
+                v-if="index < breadcrumbs.length - 1"
+            ></v-breadcrumbs-divider>
         </v-breadcrumbs-item>
     </v-breadcrumbs>
 </template>

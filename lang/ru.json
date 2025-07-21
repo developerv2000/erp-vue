@@ -31,9 +31,15 @@
     "pages.Meetings": "Встречи",
 
     "actions.Logout": "Выйти",
+    "actions.Update": "Обновить",
+    "actions.Reset": "Сбросить",
+
+    "forms.Personal data": "Персональные данные",
 
     "fields.Email": "Электронная почта",
     "fields.Password": "Пароль",
+    "fields.Name": "Имя",
+    "fields.Photo": "Фото",
 
     "AAAAAAAAAAAAAA": "AAAAAAAAAAAAAA"
 }

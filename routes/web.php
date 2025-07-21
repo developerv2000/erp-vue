@@ -30,9 +30,9 @@ Route::middleware('auth', 'auth.session')->group(function () {
         Route::delete('/destroy', 'destroy')->name('destroy');
     });
 
-    Route::controller(ProfileController::class)->name('profile.')->group(function () {
-        Route::get('profile', 'edit')->name('edit');
-        Route::patch('profile', 'update')->name('update');
-        Route::patch('password', 'updatePassword')->name('update-password');
+    Route::controller(ProfileController::class)->prefix('profile')->name('profile.')->group(function () {
+        Route::get('/', 'edit')->name('edit');
+        Route::post('/update-personal-data', 'updatePersonalData')->name('update-personal-data');
+        Route::post('/update-password', 'updatePassword')->name('update-password');
     });
 });

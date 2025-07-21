@@ -1,6 +1,6 @@
 <script setup>
 import GuestLayout from "@/core/layouts/GuestLayout.vue";
-import WrappedLabelGroup from "@/core/components/form/groups/WrappedLabelGroup.vue";
+import DefaultInput from "@/core/components/form/inputs/DefaultInput.vue";
 import { mdiEye, mdiEyeOff } from "@mdi/js";
 import { ref } from "vue";
 
@@ -63,34 +63,28 @@ const login = handleSubmit((values) => {
                 :subtitle="t('Please, sign in to your account')"
             >
                 <Form @submit="login" class="d-flex flex-column ga-1 mt-5">
-                    <WrappedLabelGroup :label="t('Email')" :required="true">
-                        <v-text-field
-                            v-model="email"
-                            :error-messages="emailError"
-                            color="lime-accent-4"
-                            name="email"
-                            variant="outlined"
-                            density="compact"
-                            type="email"
-                            clearable
-                        />
-                    </WrappedLabelGroup>
+                    <DefaultInput
+                        :label="t('Email')"
+                        name="email"
+                        type="email"
+                        :required="true"
+                        v-model="email"
+                        :error-messages="emailError"
+                        color="lime-accent-4"
+                        clearable
+                    />
 
-                    <WrappedLabelGroup :label="t('Password')" :required="true">
-                        <v-text-field
-                            v-model="password"
-                            :error-messages="passwordError"
-                            color="lime-accent-4"
-                            name="password"
-                            variant="outlined"
-                            density="compact"
-                            :type="showPassword ? 'text' : 'password'"
-                            :append-inner-icon="
-                                showPassword ? mdiEyeOff : mdiEye
-                            "
-                            @click:append-inner="showPassword = !showPassword"
-                        />
-                    </WrappedLabelGroup>
+                    <DefaultInput
+                        :label="t('Password')"
+                        name="password"
+                        :type="showPassword ? 'text' : 'password'"
+                        :required="true"
+                        v-model="password"
+                        :error-messages="passwordError"
+                        color="lime-accent-4"
+                        :append-inner-icon="showPassword ? mdiEyeOff : mdiEye"
+                        @click:append-inner="showPassword = !showPassword"
+                    />
 
                     <v-btn class="mt-2" color="lime-accent-4" type="submit">
                         {{ t("Sign in") }}

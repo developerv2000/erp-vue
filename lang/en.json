@@ -31,9 +31,15 @@
     "pages.Meetings": "Meetings",
 
     "actions.Logout": "Logout",
+    "actions.Update": "Update",
+    "actions.Reset": "Reset",
+
+    "forms.Personal data": "Personal data",
 
     "fields.Email": "Email",
     "fields.Password": "Password",
+    "fields.Name": "Name",
+    "fields.Photo": "Photo",
 
     "AAAAAAAAAAAAAA": "AAAAAAAAAAAAAA"
 }

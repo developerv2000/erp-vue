@@ -19,7 +19,9 @@ userSettings.initializeFromServerProps(page.props, vuetifyTheme);
         <Header />
 
         <v-main>
-            <slot />
+            <div class="main-box py-8 px-6">
+                <slot />
+            </div>
         </v-main>
     </v-app>
 </template>

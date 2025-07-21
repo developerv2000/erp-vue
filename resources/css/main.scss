@@ -3,3 +3,8 @@
 );
 
 @use 'vuetify' as *;
+
+// Components
+.v-text-field input {
+    font-size: 14px;
+}

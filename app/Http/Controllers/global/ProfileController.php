@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\global;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\ProfilePasswordUpdateRequest;
-use App\Http\Requests\ProfileUpdateRequest;
+use App\Http\Requests\global\ProfilePasswordUpdateRequest;
+use App\Http\Requests\global\ProfilePersonalDataUpdateRequest;
+use App\Models\User;
+use App\Support\Helpers\FileHelper;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
@@ -15,7 +17,7 @@ class ProfileController extends Controller
      */
     public function edit(Request $request)
     {
-        return inertia('global/pages/Profile', [
+        return inertia('global/pages/profile/ProfileEdit', [
             'record' => $request->user(),
         ]);
     }
@@ -23,9 +25,9 @@ class ProfileController extends Controller
     /**
      * Update the user's profile information.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function updatePersonalData(ProfilePersonalDataUpdateRequest $request): RedirectResponse
     {
-        $request->user()->updateProfile($request);
+        $request->user()->updateProfilePersonalData($request);
 
         return redirect()->route('profile.edit');
     }

@@ -24,8 +24,8 @@ class MADManufacturerController extends Controller
     public function index(Request $request)
     {
         // Preapare request for valid model querying
-        Manufacturer::addDefaultQueryParamsToRequest($request);
-        UrlHelper::addUrlWithReversedOrderTypeToRequest($request);
+        // Manufacturer::addDefaultQueryParamsToRequest($request);
+        // UrlHelper::addUrlWithReversedOrderTypeToRequest($request);
 
         // Get finalized records paginated
         $query = Manufacturer::withBasicRelations()->withBasicRelationCounts();
@@ -36,7 +36,10 @@ class MADManufacturerController extends Controller
         $allTableColumns = $request->user()->collectTableColumnsBySettingsKey(User::MAD_EPP_TABLE_SETTINGS_KEY);
         $visibleTableColumns = User::filterOnlyVisibleColumns($allTableColumns);
 
-        return inertia('departments/MAD/pages/manufacturers/Index', []);
+        return inertia('departments/MAD/pages/manufacturers/Index', [
+            'visibleTableColumns' => $visibleTableColumns,
+            'records' => $records,
+        ]);
     }
 
     public function getSmartFilterDependencies()

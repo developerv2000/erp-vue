@@ -489,6 +489,17 @@ class Manufacturer extends BaseModel implements HasTitle, CanExportRecordsAsExce
         ];
     }
 
+    public static function getDefaultMADTableSettingsForUser($user)
+    {
+        return [
+            ['title' => 'Manufacturer', 'key' => 'name', 'width' => 240, 'visible' => 1, 'sortable' => 1],
+            ['title' => 'Category', 'key' => 'category.name', 'width' => 110, 'visible' => 1, 'sortable' => 1],
+            ['title' => 'Country', 'key' => 'country.name', 'width' => 110, 'visible' => 1, 'sortable' => 1],
+            ['title' => 'Status', 'key' => 'status.name', 'width' => 110, 'visible' => 1, 'sortable' => 1],
+            ['title' => 'Zones', 'key' => 'zones.name', 'width' => 110, 'visible' => 1, 'sortable' => 0],
+        ];
+    }
+
     /**
      * Provides the default MAD table columns along with their properties.
      *
@@ -497,7 +508,7 @@ class Manufacturer extends BaseModel implements HasTitle, CanExportRecordsAsExce
      *
      * @return array
      */
-    public static function getDefaultMADTableSettingsForUser($user)
+    public static function getDefaultMADTableSettingsForUser2($user)
     {
         if (Gate::forUser($user)->denies('view-MAD-EPP')) {
             return null;

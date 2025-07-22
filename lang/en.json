@@ -40,13 +40,16 @@
 
     "forms.Personal data": "Personal data",
     "forms.Password update": "Password update",
-    "fields.Current password": "Текущий пароль",
-    "fields.New password": "Новый пароль",
+
+    "messages.Updated successfully": "Updated successfully!",
+    "messages.Submition failed": "Something went wrong, please try again later!",
 
     "fields.Email": "Email",
     "fields.Password": "Password",
     "fields.Name": "Name",
     "fields.Photo": "Photo",
+    "fields.Current password": "Current password",
+    "fields.New password": "New password",
 
     "AAAAAAAAAAAAAA": "AAAAAAAAAAAAAA"
 }

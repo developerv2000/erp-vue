@@ -11,11 +11,13 @@ import { router } from "@inertiajs/vue3";
 import { ref } from "vue";
 import * as yup from "yup";
 import { mdiEye, mdiEyeOff } from "@mdi/js";
+import { useMessagesStore } from "@/core/stores/useMessages";
 
 const { t } = useI18n();
 const loading = ref(false);
 const showCurrentPassword = ref(false);
 const showNewPassword = ref(false);
+const messages = useMessagesStore();
 
 // Define yup schema
 const schema = yup.object({
@@ -49,6 +51,7 @@ const submit = handleSubmit((values) => {
         },
         onSuccess: () => {
             resetForm();
+            messages.addUpdatedSuccessfullyMessage(t);
         },
         onFinish: () => {
             loading.value = false;
@@ -59,7 +62,7 @@ const submit = handleSubmit((values) => {
 
 <template>
     <DefaultSheet class="mt-8">
-        <DefaultTitle>{{ t("forms.Password Update") }}</DefaultTitle>
+        <DefaultTitle>{{ t("forms.Password update") }}</DefaultTitle>
 
         <Form @submit="submit">
             <v-row>

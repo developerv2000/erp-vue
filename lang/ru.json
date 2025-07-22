@@ -39,7 +39,10 @@
     "actions.Reset": "Сбросить",
 
     "forms.Personal data": "Персональные данные",
-    "forms.Password Update": "Обновить пароль",
+    "forms.Password update": "Обновить пароль",
+
+    "messages.Updated successfully": "Обновлено успешно!",
+    "messages.Submition failed": "Что-то пошло не так. Пожалуйста, попробуйте позже!",
 
     "fields.Email": "Электронная почта",
     "fields.Password": "Пароль",

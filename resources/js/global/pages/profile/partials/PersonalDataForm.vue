@@ -13,11 +13,13 @@ import * as yup from "yup";
 import { computed, ref } from "vue";
 import { router } from "@inertiajs/vue3";
 import { useFormData } from "@/core/composables/useFormData";
+import { useMessagesStore } from "@/core/stores/useMessages";
 
 const { user } = useAuth();
 const { t } = useI18n();
 const { objectToFormData } = useFormData();
 const loading = ref(false);
+const messages = useMessagesStore();
 
 // Define yup schema
 const schema = yup.object({
@@ -57,6 +59,7 @@ const submit = handleSubmit((values) => {
         },
         onSuccess: () => {
             setFieldValue("photo", null);
+            messages.addUpdatedSuccessfullyMessage(t);
         },
         onFinish: () => {
             loading.value = false;

@@ -20,55 +20,64 @@ const { t } = useI18n();
 const listItems = computed(() => [
     {
         title: t("pages.EPP"),
-        link: route("home"),
+        routeName: "mad.manufacturers.index",
+        routeParams: null,
         prependIcon: mdiViewList,
     },
 
     {
         title: t("pages.KVPP"),
-        link: route("home"),
+        routeName: "mad.product-searches.index",
+        routeParams: null,
         prependIcon: mdiCalendarSearch,
     },
 
     {
         title: t("pages.IVP"),
-        link: route("home"),
+        routeName: "mad.products.index",
+        routeParams: null,
         prependIcon: mdiPill,
     },
 
     {
         title: t("pages.VPS"),
-        link: route("home"),
+        routeName: "mad.processes.index",
+        routeParams: null,
         prependIcon: mdiLayers,
     },
 
     {
         title: t("pages.Meetings"),
-        link: route("home"),
+        routeName: "mad.meetings.index",
+        routeParams: null,
         prependIcon: mdiAccountGroup,
     },
 
     {
         title: t("pages.KPI"),
-        link: route("home"),
+        routeName: "mad.kpi.index",
+        routeParams: null,
         prependIcon: mdiFinance,
     },
 
     {
         title: t("pages.ASP"),
-        link: route("home"),
+        routeName: "mad.asp.index",
+        routeParams: null,
         prependIcon: mdiChartArc,
     },
 
     {
         title: t("pages.Decision hub"),
-        link: route("home"),
+        routeName: "mad.decision-hub.index",
+        routeParams: null,
         prependIcon: mdiTextSearch,
     },
 
     {
         title: t("pages.Misc"),
-        link: route("home"),
+        routeName: "misc-models.department-models",
+        routeParams: { department: "MAD" },
         prependIcon: mdiApps,
     },
 ]);
@@ -82,9 +91,9 @@ const listItems = computed(() => [
             v-for="(item, index) in listItems"
             :key="index"
             :title="item.title"
-            :link="item.link"
+            :link="route(item.routeName, item.routeParams)"
             :prepend-icon="item.prependIcon"
-            :active="route().current(item.link)"
+            :active="route().current(item.routeName, item.routeParams)"
         />
     </v-list>
 </template>

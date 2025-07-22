@@ -1,6 +1,5 @@
 import { defineStore } from "pinia";
 import i18n from "@/core/boot/i18n";
-import { computed } from "vue";
 import { toBool } from "@/core/scripts/utilities";
 
 export const useUserSettingsStore = defineStore('userSettings', {

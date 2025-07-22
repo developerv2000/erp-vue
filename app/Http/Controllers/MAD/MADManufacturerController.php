@@ -33,10 +33,10 @@ class MADManufacturerController extends Controller
         $records = Manufacturer::finalizeQueryForRequest($filteredQuery, $request, 'paginate');
 
         // Get all and only visible table columns
-        $allTableColumns = $request->user()->collectTableColumnsBySettingsKey(Manufacturer::SETTINGS_MAD_TABLE_COLUMNS_KEY);
+        $allTableColumns = $request->user()->collectTableColumnsBySettingsKey(User::MAD_EPP_TABLE_SETTINGS_KEY);
         $visibleTableColumns = User::filterOnlyVisibleColumns($allTableColumns);
 
-        return view('MAD.manufacturers.index', compact('request', 'records', 'allTableColumns', 'visibleTableColumns'));
+        return inertia('departments/MAD/pages/manufacturers/Index', []);
     }
 
     public function getSmartFilterDependencies()

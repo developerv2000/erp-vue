@@ -61,3 +61,6 @@ Route::middleware('auth', 'auth.session')->group(function () {
         Route::delete('/model/{model}/destroy', 'destroy')->name('destroy');
     });
 });
+
+require __DIR__.'/MGMT.php';
+require __DIR__.'/MAD.php';

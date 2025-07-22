@@ -7,10 +7,8 @@ import { Head } from "@inertiajs/vue3";
 
 import { Form, useForm, useField } from "vee-validate";
 import * as yup from "yup";
-import { useI18n } from "vue-i18n";
 import { router } from "@inertiajs/vue3";
 
-const { t } = useI18n();
 const showPassword = ref(false);
 
 // Define Yup schema
@@ -62,12 +60,12 @@ const login = handleSubmit((values) => {
             <v-card
                 class="card"
                 variant="text"
-                :title="t('Welcome')"
-                :subtitle="t('Please, sign in to your account')"
+                title="Welcome"
+                subtitle="Please, sign in to your account"
             >
                 <Form @submit="login" class="d-flex flex-column ga-1 mt-5">
                     <DefaultInput
-                        :label="t('Email')"
+                        label="Email"
                         name="email"
                         type="email"
                         required
@@ -78,7 +76,7 @@ const login = handleSubmit((values) => {
                     />
 
                     <DefaultInput
-                        :label="t('Password')"
+                        label="Password"
                         name="password"
                         :type="showPassword ? 'text' : 'password'"
                         required
@@ -90,7 +88,7 @@ const login = handleSubmit((values) => {
                     />
 
                     <v-btn class="mt-2" color="lime-accent-4" type="submit">
-                        {{ t("Sign in") }}
+                        Sign in
                     </v-btn>
                 </Form>
             </v-card>

@@ -40,15 +40,9 @@ class Role extends Model
     const MAD_INTERN_NAME = 'MAD intern';                       // Can view/edit only 'EPP' and 'IVP' of 'MAD part'. Attaches role related permissions.
     const MAD_ANALYST_NAME = 'MAD analyst';                     // User is assosiated as 'Analyst'. Doesn`t attach any role related permissions.
 
-    // PLPD
-    const PLPD_LOGISTICIAN_NAME = 'PLPD logistician';           // Not fully implemented yet!
-
     // CMD
     const CMD_BDM_NAME = 'CMD BDM';                             // User is assosiated as 'BDM'. Not fully implemented yet!
-
-    // DD
-    const DD_DESIGNER_NAME = 'DD Designer';                     // Not fully implemented yet!
-
+    
     /*
     |--------------------------------------------------------------------------
     | Properties

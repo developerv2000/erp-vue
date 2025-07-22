@@ -174,6 +174,47 @@ class User extends Authenticatable
 
     /*
     |--------------------------------------------------------------------------
+    | Scopes
+    |--------------------------------------------------------------------------
+    */
+
+    public function scopeWithBasicRelations($query)
+    {
+        return $query->with([
+            'department',
+            'roles',
+            'permissions',
+            'responsibleCountries',
+        ]);
+    }
+
+    /**
+     * Load basic relations, while sending notifications.
+     *
+     * Roles with permissions must be loaded, because of using gates.
+     */
+    public function scopeWithBasicRelationsToNotify($query)
+    {
+        return $query->with([
+            'roles' => function ($rolesQuery) {
+                $rolesQuery->with('permissions');
+            },
+            'permissions'
+        ]);
+    }
+
+    public function scopeOnlyCMDBDMs($query)
+    {
+        return $query->whereRelation('roles', 'name', Role::CMD_BDM_NAME);
+    }
+
+    public function scopeOnlyMADAnalysts($query)
+    {
+        return $query->whereRelation('roles', 'name', Role::MAD_ANALYST_NAME);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Queries
     |--------------------------------------------------------------------------
     */

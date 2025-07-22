@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\global;
 
 use App\Models\User;
 use Illuminate\Auth\Events\Lockout;

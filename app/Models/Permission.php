@@ -108,59 +108,6 @@ class Permission extends Model
 
     /*
     |--------------------------------------------------------------------------
-    | PLPD permissions
-    |--------------------------------------------------------------------------
-    */
-
-    // View
-    const CAN_VIEW_PLPD_READY_FOR_ORDER_PROCESSES_NAME = 'can view PLPD ready for order processes';
-    const CAN_VIEW_PLPD_ORDERS_NAME = 'can view PLPD orders';
-    const CAN_VIEW_PLPD_ORDER_PRODUCTS_NAME = 'can view PLPD order products';
-
-    // Edit
-    const CAN_EDIT_PLPD_ORDERS_NAME = 'can edit PLPD orders';
-    const CAN_EDIT_PLPD_ORDER_PRODUCTS_NAME = 'can edit PLPD order products';
-
-    // Other permissions
-    const CAN_RECEIVE_NOTIFICATION_WHEN_MAD_VPS_IS_MARKED_AS_READY_FOR_ORDER = 'can receive notification when MAD VPS is marked as ready for order';
-    const CAN_RECEIVE_NOTIFICATION_WHEN_CMD_ORDER_IS_SENT_FOR_CONFIRMATION = 'can receive notification when CMD order is sent for confirmation';
-
-    /*
-    |--------------------------------------------------------------------------
-    | CMD permissions
-    |--------------------------------------------------------------------------
-    */
-
-    // View
-    const CAN_VIEW_CMD_ORDERS_NAME = 'can view CMD orders';
-    const CAN_VIEW_CMD_ORDER_PRODUCTS_NAME = 'can view CMD order products';
-
-    // Edit
-    const CAN_EDIT_CMD_ORDERS_NAME = 'can edit CMD orders';
-    const CAN_EDIT_CMD_ORDER_PRODUCTS_NAME = 'can edit CMD order products';
-
-    // Other permissions
-    const CAN_RECEIVE_NOTIFICATION_WHEN_PLPD_ORDER_IS_SENT_TO_CMD_BDM = 'can receive notification when PLPD order is sent to CMD BDM';
-    const CAN_RECEIVE_NOTIFICATION_WHEN_PLPD_ORDER_IS_CONFIRMED = 'can receive notification when PLPD order is confirmed';
-
-    /*
-    |--------------------------------------------------------------------------
-    | DD permissions
-    |--------------------------------------------------------------------------
-    */
-
-    // View
-    const CAN_VIEW_DD_ORDER_PRODUCTS_NAME = 'can view DD order products';
-
-    // Edit
-    const CAN_EDIT_DD_ORDER_PRODUCTS_NAME = 'can edit DD order products';
-
-    // Global permissions
-    // PLPD and DD permissions
-    const CAN_RECEIVE_NOTIFICATION_WHEN_CMD_ORDER_IS_SENT_TO_MANUFACTURER = 'can receive notification when CMD order is sent to manufacturer';
-
-    /*
-    |--------------------------------------------------------------------------
     | Properties
     |--------------------------------------------------------------------------
     */
@@ -325,43 +272,8 @@ class Permission extends Model
         ]);
     }
 
-    public static function getPLPDLogisticianPermissionNames()
-    {
-        return [
-            self::CAN_VIEW_PLPD_READY_FOR_ORDER_PROCESSES_NAME,
-            self::CAN_VIEW_PLPD_ORDERS_NAME,
-            self::CAN_VIEW_PLPD_ORDER_PRODUCTS_NAME,
-
-            self::CAN_EDIT_PLPD_ORDERS_NAME,
-            self::CAN_EDIT_PLPD_ORDER_PRODUCTS_NAME,
-
-            self::CAN_RECEIVE_NOTIFICATION_WHEN_MAD_VPS_IS_MARKED_AS_READY_FOR_ORDER,
-            self::CAN_RECEIVE_NOTIFICATION_WHEN_CMD_ORDER_IS_SENT_FOR_CONFIRMATION,
-            self::CAN_RECEIVE_NOTIFICATION_WHEN_CMD_ORDER_IS_SENT_TO_MANUFACTURER,
-        ];
-    }
-
     public static function getCMDBDMPermissionNames()
     {
-        return [
-            self::CAN_VIEW_CMD_ORDERS_NAME,
-            self::CAN_VIEW_CMD_ORDER_PRODUCTS_NAME,
-
-            self::CAN_EDIT_CMD_ORDERS_NAME,
-            self::CAN_EDIT_CMD_ORDER_PRODUCTS_NAME,
-
-            self::CAN_RECEIVE_NOTIFICATION_WHEN_PLPD_ORDER_IS_SENT_TO_CMD_BDM,
-            self::CAN_RECEIVE_NOTIFICATION_WHEN_PLPD_ORDER_IS_CONFIRMED,
-        ];
-    }
-
-    public static function getDDDesignerPermissionNames()
-    {
-        return [
-            self::CAN_VIEW_DD_ORDER_PRODUCTS_NAME,
-            self::CAN_EDIT_DD_ORDER_PRODUCTS_NAME,
-
-            self::CAN_RECEIVE_NOTIFICATION_WHEN_CMD_ORDER_IS_SENT_TO_MANUFACTURER,
-        ];
+        return [];
     }
 }

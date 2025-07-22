@@ -31,6 +31,34 @@ return new class extends Migration
 
             $table->primary(['country_id', 'user_id']);
         });
+
+        Schema::create('clinical_trial_country_process', function (Blueprint $table) {
+            $table->unsignedInteger('process_id')
+                ->foreign()
+                ->references('id')
+                ->on('processes');
+
+            $table->unsignedSmallInteger('country_id')
+                ->foreign()
+                ->references('id')
+                ->on('countries');
+
+            $table->primary(['process_id', 'country_id']);
+        });
+
+        Schema::create('additional_search_country_product_search', function (Blueprint $table) {
+            $table->unsignedInteger('country_id')
+                ->foreign()
+                ->references('id')
+                ->on('countries');
+
+            $table->unsignedSmallInteger('product_search_id')
+                ->foreign()
+                ->references('id')
+                ->on('product_searches');
+
+            $table->primary(['country_id', 'product_search_id']);
+        });
     }
 
     /**
@@ -39,6 +67,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('countries');
+        Schema::dropIfExists('clinical_trial_country_process');
         Schema::dropIfExists('responsible_country_user');
+        Schema::dropIfExists('additional_search_country_product_search');
     }
 };

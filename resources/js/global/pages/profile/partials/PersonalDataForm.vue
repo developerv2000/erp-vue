@@ -4,20 +4,20 @@ import DefaultInput from "@/core/components/form/inputs/DefaultInput.vue";
 import DefaultSheet from "@/core/components/containers/DefaultSheet.vue";
 import DefaultTitle from "@/core/components/titles/DefaultTitle.vue";
 import DefaultFileInput from "@/core/components/form/inputs/DefaultFileInput.vue";
-import DefaultButton from "@/core/components/Buttons/DefaultButton.vue";
 import FormResetButton from "@/core/components/form/buttons/FormResetButton.vue";
 import FormActionsContainer from "@/core/components/form/containers/FormActionsContainer.vue";
+import FormUpdateButton from "@/core/components/form/buttons/FormUpdateButton.vue";
 import { Form, useForm, useField } from "vee-validate";
 import { useI18n } from "vue-i18n";
-import { mdiCheckAll, mdiRestore } from "@mdi/js";
 import * as yup from "yup";
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { router } from "@inertiajs/vue3";
 import { useFormData } from "@/core/composables/useFormData";
 
 const { user } = useAuth();
 const { t } = useI18n();
 const { objectToFormData } = useFormData();
+const loading = ref(false);
 
 // Define yup schema
 const schema = yup.object({
@@ -27,14 +27,15 @@ const schema = yup.object({
 });
 
 // Initialize VeeValidate form context
-const { handleSubmit, setErrors, resetForm, setFieldValue } = useForm({
-    validationSchema: schema,
-    initialValues: computed(() => ({
-        name: user.value.name,
-        email: user.value.email,
-        photo: null,
-    })),
-});
+const { handleSubmit, setErrors, resetForm, setFieldValue, isSubmitting } =
+    useForm({
+        validationSchema: schema,
+        initialValues: computed(() => ({
+            name: user.value.name,
+            email: user.value.email,
+            photo: null,
+        })),
+    });
 
 // Register form fields
 const { value: name, errorMessage: nameError } = useField("name");
@@ -45,13 +46,20 @@ const submit = handleSubmit((values) => {
     const data = objectToFormData(values);
 
     router.post(route("profile.update-personal-data"), data, {
+        preserveScroll: true,
         forceFormData: true,
         only: ["auth"],
+        onStart: () => {
+            loading.value = true;
+        },
         onError: (errors) => {
             setErrors(errors);
         },
         onSuccess: () => {
             setFieldValue("photo", null);
+        },
+        onFinish: () => {
+            loading.value = false;
         },
     });
 });
@@ -69,7 +77,7 @@ const submit = handleSubmit((values) => {
                         name="name"
                         v-model="name"
                         :error-messages="nameError"
-                        :required="true"
+                        required
                     />
                 </v-col>
 
@@ -80,7 +88,7 @@ const submit = handleSubmit((values) => {
                         type="email"
                         v-model="email"
                         :error-messages="emailError"
-                        :required="true"
+                        required
                     />
                 </v-col>
 
@@ -96,13 +104,8 @@ const submit = handleSubmit((values) => {
             </v-row>
 
             <FormActionsContainer>
-                <DefaultButton :prepend-icon="mdiCheckAll" type="submit">
-                    {{ t("actions.Update") }}
-                </DefaultButton>
-
-                <FormResetButton @click="resetForm">
-                    {{ t("actions.Reset") }}
-                </FormResetButton>
+                <FormUpdateButton :loading="loading" />
+                <FormResetButton @click="resetForm" />
             </FormActionsContainer>
         </Form>
     </DefaultSheet>

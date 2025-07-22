@@ -29,12 +29,19 @@
     "pages.IVP": "IVP",
     "pages.VPS": "VPS",
     "pages.Meetings": "Meetings",
+    "pages.KPI": "KPI",
+    "pages.ASP": "ASP",
+    "pages.Decision hub": "Decision hub",
+    "pages.Misc": "Misc",
 
     "actions.Logout": "Logout",
     "actions.Update": "Update",
     "actions.Reset": "Reset",
 
     "forms.Personal data": "Personal data",
+    "forms.Password update": "Password update",
+    "fields.Current password": "Текущий пароль",
+    "fields.New password": "Новый пароль",
 
     "fields.Email": "Email",
     "fields.Password": "Password",

@@ -29,17 +29,24 @@
     "pages.IVP": "ИВП",
     "pages.VPS": "ВПЦ",
     "pages.Meetings": "Встречи",
+    "pages.KPI": "КПЭ",
+    "pages.ASP": "СПГ",
+    "pages.Decision hub": "Decision hub",
+    "pages.Misc": "Разное",
 
     "actions.Logout": "Выйти",
     "actions.Update": "Обновить",
     "actions.Reset": "Сбросить",
 
     "forms.Personal data": "Персональные данные",
+    "forms.Password Update": "Обновить пароль",
 
     "fields.Email": "Электронная почта",
     "fields.Password": "Пароль",
     "fields.Name": "Имя",
     "fields.Photo": "Фото",
+    "fields.Current password": "Текущий пароль",
+    "fields.New password": "Новый пароль",
 
     "AAAAAAAAAAAAAA": "AAAAAAAAAAAAAA"
 }

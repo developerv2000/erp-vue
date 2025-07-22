@@ -1,14 +1,19 @@
 <script setup>
 import { useI18n } from "vue-i18n";
 import InertiaLinkedListItem from "@/core/components/inertia/InertiaLinkedListItem.vue";
+import { computed } from "vue";
+
 import {
     mdiViewList,
     mdiCalendarSearch,
     mdiPill,
     mdiLayers,
     mdiAccountGroup,
+    mdiFinance,
+    mdiChartArc,
+    mdiTextSearch,
+    mdiApps,
 } from "@mdi/js";
-import { computed } from "vue";
 
 const { t } = useI18n();
 
@@ -36,11 +41,35 @@ const listItems = computed(() => [
         link: route("home"),
         prependIcon: mdiLayers,
     },
-    
+
     {
         title: t("pages.Meetings"),
         link: route("home"),
         prependIcon: mdiAccountGroup,
+    },
+
+    {
+        title: t("pages.KPI"),
+        link: route("home"),
+        prependIcon: mdiFinance,
+    },
+
+    {
+        title: t("pages.ASP"),
+        link: route("home"),
+        prependIcon: mdiChartArc,
+    },
+
+    {
+        title: t("pages.Decision hub"),
+        link: route("home"),
+        prependIcon: mdiTextSearch,
+    },
+
+    {
+        title: t("pages.Misc"),
+        link: route("home"),
+        prependIcon: mdiApps,
     },
 ]);
 </script>

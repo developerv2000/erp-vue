@@ -3,6 +3,7 @@ import GuestLayout from "@/core/layouts/GuestLayout.vue";
 import DefaultInput from "@/core/components/form/inputs/DefaultInput.vue";
 import { mdiEye, mdiEyeOff } from "@mdi/js";
 import { ref } from "vue";
+import { Head } from "@inertiajs/vue3";
 
 import { Form, useForm, useField } from "vee-validate";
 import * as yup from "yup";
@@ -49,6 +50,8 @@ const login = handleSubmit((values) => {
 
 <template>
     <GuestLayout>
+        <Head title="Login" />
+
         <v-sheet width="460" elevation="1" class="px-8 pt-8 pb-10">
             <v-img
                 :width="180"
@@ -67,7 +70,7 @@ const login = handleSubmit((values) => {
                         :label="t('Email')"
                         name="email"
                         type="email"
-                        :required="true"
+                        required
                         v-model="email"
                         :error-messages="emailError"
                         color="lime-accent-4"
@@ -78,7 +81,7 @@ const login = handleSubmit((values) => {
                         :label="t('Password')"
                         name="password"
                         :type="showPassword ? 'text' : 'password'"
-                        :required="true"
+                        required
                         v-model="password"
                         :error-messages="passwordError"
                         color="lime-accent-4"

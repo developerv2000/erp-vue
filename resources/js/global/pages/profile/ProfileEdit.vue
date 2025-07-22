@@ -6,6 +6,7 @@ import { computed } from "vue";
 import PageIntro from "@/core/layouts/PageIntro.vue";
 import PersonalDataForm from "./partials/PersonalDataForm.vue";
 import PasswordForm from "./partials/PasswordForm.vue";
+import { Head } from "@inertiajs/vue3";
 
 const { t } = useI18n();
 const breadcrumbs = computed(() => [
@@ -22,6 +23,8 @@ const breadcrumbs = computed(() => [
 
 <template>
     <MainLayout>
+        <Head :title="t('pages.My profile')" />
+
         <PageIntro>
             <template #breadcrumbs>
                 <InertiaBreadcrumbs :breadcrumbs="breadcrumbs" />

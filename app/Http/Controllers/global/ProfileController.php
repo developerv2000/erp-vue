@@ -5,8 +5,6 @@ namespace App\Http\Controllers\global;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\global\ProfilePasswordUpdateRequest;
 use App\Http\Requests\global\ProfilePersonalDataUpdateRequest;
-use App\Models\User;
-use App\Support\Helpers\FileHelper;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
@@ -29,7 +27,7 @@ class ProfileController extends Controller
     {
         $request->user()->updateProfilePersonalData($request);
 
-        return redirect()->route('profile.edit');
+        return redirect()->back();
     }
 
     /**
@@ -39,6 +37,6 @@ class ProfileController extends Controller
     {
         $request->user()->updateProfilePassword($request);
 
-        return back()->with('status', 'password-updated');
+        return redirect()->back();
     }
 }

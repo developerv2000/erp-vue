@@ -1,7 +1,6 @@
 <script setup>
 import { mdiTranslate } from "@mdi/js";
 import { useUserSettingsStore } from "@/core/stores/userSettings";
-import { router } from "@inertiajs/vue3";
 
 const userSettings = useUserSettingsStore();
 

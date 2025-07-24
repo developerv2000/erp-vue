@@ -1,7 +1,7 @@
 <script setup>
-import DefaultButton from '../../Buttons/DefaultButton.vue';
 import { mdiRestore } from '@mdi/js';
 import { useI18n } from 'vue-i18n';
+import DefaultButton from '../../buttons/DefaultButton.vue';
 
 const { t } = useI18n();
 </script>

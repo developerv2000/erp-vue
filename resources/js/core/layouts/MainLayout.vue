@@ -30,7 +30,7 @@ userSettings.initializeFromServerProps(page.props, vuetifyTheme);
         <Header />
 
         <v-main>
-            <div class="main-box py-8 px-6">
+            <div class="main-box pa-6">
                 <slot />
             </div>
         </v-main>

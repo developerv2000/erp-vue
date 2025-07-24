@@ -496,7 +496,7 @@ class Manufacturer extends BaseModel implements HasTitle, CanExportRecordsAsExce
             ['title' => 'Category', 'key' => 'category.name', 'width' => 110, 'visible' => 1, 'sortable' => 1],
             ['title' => 'Country', 'key' => 'country.name', 'width' => 110, 'visible' => 1, 'sortable' => 1],
             ['title' => 'Status', 'key' => 'status.name', 'width' => 110, 'visible' => 1, 'sortable' => 1],
-            ['title' => 'Zones', 'key' => 'zones.name', 'width' => 110, 'visible' => 1, 'sortable' => 0],
+            ['title' => 'Zones', 'key' => 'zones.name', 'width' => 110, 'visible' => 1, 'sortable' => false],
         ];
     }
 

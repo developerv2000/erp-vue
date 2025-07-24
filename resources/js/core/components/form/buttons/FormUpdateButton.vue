@@ -1,5 +1,5 @@
 <script setup>
-import DefaultButton from "../../Buttons/DefaultButton.vue";
+import DefaultButton from "../../buttons/DefaultButton.vue";
 import { mdiCheckAll } from "@mdi/js";
 import { useI18n } from "vue-i18n";
 

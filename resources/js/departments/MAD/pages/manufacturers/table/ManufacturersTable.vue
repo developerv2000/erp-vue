@@ -2,7 +2,10 @@
 import TableTop from "./partials/TableTop.vue";
 import { usePage } from "@inertiajs/vue3";
 import TdEditButton from "@/core/components/table/td/TdEditButton.vue";
-import MiniAva from "@/core/components/misc/MiniAva.vue";
+import TdAva from "@/core/components/table/td/TdAva.vue";
+import TdInertiaLink from "@/core/components/table/td/TdInertiaLink.vue";
+import TdChip from "@/core/components/table/td/TdChip.vue";
+import TdChipsContainer from "@/core/components/table/td/TdChipsContainer.vue";
 
 const page = usePage();
 
@@ -15,7 +18,10 @@ const records = page.props.records.data;
         :headers="headers"
         :items="records"
         :show-select="true"
-        :cell-props="{ class: 'pa-2 text-break', style: {'vertical-align' : 'top'} }"
+        :cell-props="{
+            class: 'pa-2 text-break',
+            style: { 'vertical-align': 'top' },
+        }"
         :header-props="{ class: 'pa-2 text-truncate' }"
     >
         <!-- Top slot -->
@@ -34,19 +40,65 @@ const records = page.props.records.data;
         </template>
 
         <template v-slot:item.bdm.name="{ item }">
-            <MiniAva :user="item.bdm" />
+            <TdAva :user="item.bdm" />
         </template>
 
         <template v-slot:item.analyst.name="{ item }">
-            <MiniAva :user="item.analyst" />
+            <TdAva :user="item.analyst" />
+        </template>
+
+        <template v-slot:item.products_count="{ item }">
+            <TdInertiaLink
+                :link="
+                    route('mad.products.index', {
+                        'manufacturer_id[]': item.id,
+                    })
+                "
+            >
+                {{ item.products_count }} products
+            </TdInertiaLink>
+        </template>
+
+        <template v-slot:item.category.name="{ item }">
+            <TdChip
+                :class="{
+                    'bg-yellow-accent-4': item.category.name == 'УДС',
+                    'bg-light-blue-accent-4': item.category.name == 'НПП',
+                }"
+            >
+                {{ item.category.name }}
+            </TdChip>
         </template>
 
         <template v-slot:item.status="{ item }">
-            <span>{{ item.active ? "Active" : "Inactive" }}</span>
+            <TdChip
+                :class="{
+                    'bg-orange-accent-3': item.active,
+                    'bg-grey-lighten-2': !item.active,
+                }"
+            >
+                {{ item.active ? "Active" : "Inactive" }}
+            </TdChip>
+        </template>
+
+        <template v-slot:item.important="{ item }">
+            <TdChip v-if="item.important" class="bg-pink-lighten-3"> Important </TdChip>
+        </template>
+
+        <template v-slot:item.product_classes.name="{ item }">
+            <TdChipsContainer v-if="item.product_classes.length">
+                <TdChip
+                    v-for="obj in item.product_classes"
+                    :key="obj.id"
+                    class="bg-green-accent-2"
+                >
+                    {{ obj.name }}
+                </TdChip>
+            </TdChipsContainer>
         </template>
 
         <template v-slot:item.zones.name="{ item }">
-            <span>{{ item.zones.map((zone) => zone.name).join(", ") }}</span>
+            <span>{{ item.zones.map((obj) => obj.name).join(" ") }}</span>
         </template>
     </v-data-table>
 </template>

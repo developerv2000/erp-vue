@@ -7,7 +7,7 @@ import { mdiPen } from '@mdi/js';
     <InertiaLinkedButtonedIcon
         :icon="mdiPen"
         size="small"
-        color="primary"
+        color="orange"
         variant="tonal"
     />
 </template>

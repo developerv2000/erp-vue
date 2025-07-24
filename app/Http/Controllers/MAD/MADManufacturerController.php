@@ -32,12 +32,13 @@ class MADManufacturerController extends Controller
         $filteredQuery = Manufacturer::filterQueryForRequest($query, $request);
         $records = Manufacturer::finalizeQueryForRequest($filteredQuery, $request, 'paginate');
 
-        // Get all and only visible table columns
-        $allTableColumns = $request->user()->collectTableColumnsBySettingsKey(User::MAD_EPP_TABLE_SETTINGS_KEY);
-        $visibleTableColumns = User::filterOnlyVisibleColumns($allTableColumns);
+        // Get all and only visible table headers
+        $allTableHeaders = $request->user()->collectTableHeadersBySettingsKey(User::SETTINGS_KEY_OF_MAD_EPP_TABLE);
+        $tableVisibleHeaders = User::filterOnlyVisibleHeaders($allTableHeaders);
 
         return inertia('departments/MAD/pages/manufacturers/Index', [
-            'visibleTableColumns' => $visibleTableColumns,
+            'allTableHeaders' => $allTableHeaders,
+            'tableVisibleHeaders' => $tableVisibleHeaders,
             'records' => $records,
         ]);
     }

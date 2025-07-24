@@ -12,6 +12,10 @@ defineProps({
         type: String,
         default: null,
     },
+    displayTitleAtHeader: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const page = usePage();
@@ -27,7 +31,7 @@ userSettings.initializeFromServerProps(page.props, vuetifyTheme);
 
     <v-app :class="userSettings.appBackgroundClass">
         <Leftbar />
-        <Header />
+        <Header :title="displayTitleAtHeader ? title : null" />
 
         <v-main>
             <div class="main-box pa-6">

@@ -13,7 +13,7 @@ export const useUserSettingsStore = defineStore('userSettings', {
         appBackgroundClass: (state) =>
             state.theme === 'light'
                 ? 'bg-grey-lighten-4'
-                : 'bg-blue-grey-darken-4'
+                : 'bg-black'
         ,
     },
 

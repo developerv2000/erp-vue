@@ -42,12 +42,12 @@ class User extends Authenticatable
     const PHOTO_HEIGHT = 400;
 
     // Table setting keys
-    const MAD_EPP_TABLE_SETTINGS_KEY = 'MAD_EPP';
-    const MAD_IVP_TABLE_SETTINGS_KEY = 'MAD_IVP';
-    const MAD_VPS_TABLE_SETTINGS_KEY = 'MAD_VPS';
-    const MAD_KVPP_TABLE_SETTINGS_KEY = 'MAD_KVPP';
-    const MAD_MEETINGS_TABLE_SETTINGS_KEY = 'MAD_Meetings';
-    const MAD_DH_TABLE_SETTINGS_KEY = 'MAD_DH';
+    const SETTINGS_KEY_OF_MAD_EPP_TABLE = 'MAD_EPP';
+    const SETTINGS_KEY_OF_MAD_IVP_TABLE = 'MAD_IVP';
+    const SETTINGS_KEY_OF_MAD_VPS_TABLE = 'MAD_VPS';
+    const SETTINGS_KEY_OF_MAD_KVPP_TABLE = 'MAD_KVPP';
+    const SETTINGS_KEY_OF_MAD_MEETINGS_TABLE = 'MAD_Meetings';
+    const SETTINGS_KEY_OF_MAD_DH_TABLE = 'MAD_DH';
 
     /*
     |--------------------------------------------------------------------------
@@ -387,12 +387,12 @@ class User extends Authenticatable
         $settings = $this->settings;
         $tableSettings = $settings['tables'];
 
-        $tableSettings[self::MAD_EPP_TABLE_SETTINGS_KEY] = Manufacturer::getDefaultMADTableSettingsForUser($this);
-        $tableSettings[self::MAD_IVP_TABLE_SETTINGS_KEY] = Product::getDefaultMADTableSettingsForUser($this);
-        $tableSettings[self::MAD_VPS_TABLE_SETTINGS_KEY] = Process::getDefaultMADTableSettingsForUser($this);
-        $tableSettings[self::MAD_KVPP_TABLE_SETTINGS_KEY] = ProductSearch::getDefaultMADTableSettingsForUser($this);
-        $tableSettings[self::MAD_MEETINGS_TABLE_SETTINGS_KEY] = Meeting::getDefaultMADTableSettingsForUser($this);
-        $tableSettings[self::MAD_DH_TABLE_SETTINGS_KEY] = Process::getDefaultMADDHTableSettingsForUser($this);
+        $tableSettings[self::SETTINGS_KEY_OF_MAD_EPP_TABLE] = Manufacturer::getDefaultMADTableHeadersForUser($this);
+        // $tableSettings[self::SETTINGS_KEY_OF_MAD_IVP_TABLE] = Product::getDefaultMADTableHeadersForUser($this);
+        // $tableSettings[self::SETTINGS_KEY_OF_MAD_VPS_TABLE] = Process::getDefaultMADTableHeadersForUser($this);
+        // $tableSettings[self::SETTINGS_KEY_OF_MAD_KVPP_TABLE] = ProductSearch::getDefaultMADTableHeadersForUser($this);
+        // $tableSettings[self::SETTINGS_KEY_OF_MAD_MEETINGS_TABLE] = Meeting::getDefaultMADTableHeadersForUser($this);
+        // $tableSettings[self::SETTINGS_KEY_OF_MAD_DH_TABLE] = Process::getDefaultMADTableHeadersForUser($this);
 
         $settings['tables'] = $tableSettings;
         $this->settings = $settings;
@@ -412,21 +412,21 @@ class User extends Authenticatable
     }
 
     /**
-     * Reset only specific table settings.
+     * Reset only specific table headers.
      */
-    public function resetSpecificTableSettings(string $key): void
+    public function resetSpecificTableHeaders(string $key): void
     {
         $this->refresh();
         $settings = $this->settings;
         $tableSettings = $settings['tables'];
 
         $defaultSettings = match ($key) {
-            self::MAD_EPP_TABLE_SETTINGS_KEY => Manufacturer::getDefaultMADTableSettingsForUser($this),
-            self::MAD_IVP_TABLE_SETTINGS_KEY => Product::getDefaultMADTableSettingsForUser($this),
-            self::MAD_VPS_TABLE_SETTINGS_KEY => Process::getDefaultMADTableSettingsForUser($this),
-            self::MAD_KVPP_TABLE_SETTINGS_KEY => ProductSearch::getDefaultMADTableSettingsForUser($this),
-            self::MAD_MEETINGS_TABLE_SETTINGS_KEY => Meeting::getDefaultMADTableSettingsForUser($this),
-            self::MAD_DH_TABLE_SETTINGS_KEY => Process::getDefaultMADDHTableSettingsForUser($this),
+            self::SETTINGS_KEY_OF_MAD_EPP_TABLE => Manufacturer::getDefaultMADTableHeadersForUser($this),
+            self::SETTINGS_KEY_OF_MAD_IVP_TABLE => Product::getDefaultMADTableHeadersForUser($this),
+            self::SETTINGS_KEY_OF_MAD_VPS_TABLE => Process::getDefaultMADTableHeadersForUser($this),
+            self::SETTINGS_KEY_OF_MAD_KVPP_TABLE => ProductSearch::getDefaultMADTableHeadersForUser($this),
+            self::SETTINGS_KEY_OF_MAD_MEETINGS_TABLE => Meeting::getDefaultMADTableHeadersForUser($this),
+            self::SETTINGS_KEY_OF_MAD_DH_TABLE => Process::getDefaultMADTableHeadersForUser($this),
 
             default => throw new InvalidArgumentException("Unknown key: $key"),
         };
@@ -439,35 +439,35 @@ class User extends Authenticatable
     }
 
     /**
-     * Reset only specific table settings for all users.
+     * Reset only specific table headers for all users.
      *
      * Can be used via artisan command line.
      */
-    public function resetSpecificTableSettingsForAll(string $key): void
+    public function resetSpecificTableHeadersForAll(string $key): void
     {
         self::all()->each(function ($user) use ($key) {
-            $user->resetSpecificTableSettings($key);
+            $user->resetSpecificTableHeaders($key);
         });
     }
 
     /**
-     * Collects all table columns for a given key from user settings.
+     * Collects all table headers for a given key from user settings.
      *
      * @param  string  $key
      * @return \Illuminate\Support\Collection
      */
-    public function collectTableColumnsBySettingsKey($key): Collection
+    public function collectTableHeadersBySettingsKey($key): Collection
     {
         return collect($this->settings['tables'][$key])->sortBy('order');
     }
 
     /**
-     * Filters out only the visible columns from the provided collection.
+     * Filters out only the visible headers from the provided collection.
      *
      * @param  \Illuminate\Support\Collection  $columns
      * @return array
      */
-    public static function filterOnlyVisibleColumns($columns): array
+    public static function filterOnlyVisibleHeaders($columns): array
     {
         return $columns->filter(fn($column) => $column['visible'] ?? false)
             ->sortBy('order')

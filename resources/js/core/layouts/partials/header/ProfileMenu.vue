@@ -40,10 +40,6 @@ const logout = () => {
 </template>
 
 <style scoped>
-.linked-item {
-    color: inherit;
-}
-
 .profile-list::v-deep(.v-list-item__spacer) {
     width: 16px;
 }

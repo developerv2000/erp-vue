@@ -489,15 +489,50 @@ class Manufacturer extends BaseModel implements HasTitle, CanExportRecordsAsExce
         ];
     }
 
-    public static function getDefaultMADTableSettingsForUser($user)
+    public static function getDefaultMADTableHeadersForUser($user)
     {
-        return [
-            ['title' => 'Manufacturer', 'key' => 'name', 'width' => 240, 'visible' => 1, 'sortable' => 1],
-            ['title' => 'Category', 'key' => 'category.name', 'width' => 110, 'visible' => 1, 'sortable' => 1],
-            ['title' => 'Country', 'key' => 'country.name', 'width' => 110, 'visible' => 1, 'sortable' => 1],
-            ['title' => 'Status', 'key' => 'status.name', 'width' => 110, 'visible' => 1, 'sortable' => 1],
-            ['title' => 'Zones', 'key' => 'zones.name', 'width' => 110, 'visible' => 1, 'sortable' => false],
-        ];
+        if (Gate::forUser($user)->denies('view-MAD-EPP')) {
+            return null;
+        }
+
+        $order = 1;
+        $columns = array();
+
+        if (Gate::forUser($user)->allows('edit-MAD-EPP')) {
+            array_push(
+                $columns,
+                ['title' => 'Edit', 'key' => 'edit', 'order' => $order++, 'width' => 56, 'visible' => 1, 'sortable' => false],
+            );
+        }
+
+        array_push(
+            $columns,
+            ['title' => 'BDM', 'key' => 'bdm.name', 'order' => $order++, 'width' => 142, 'visible' => 1, 'sortable' => true],
+            ['title' => 'Analyst', 'key' => 'analyst.name', 'order' => $order++, 'width' => 142, 'visible' => 1, 'sortable' => true],
+            ['title' => 'Country', 'key' => 'country.name', 'order' => $order++, 'width' => 144, 'visible' => 1, 'sortable' => true],
+            ['title' => 'IVP', 'key' => 'products_count', 'order' => $order++, 'width' => 104, 'visible' => 1, 'sortable' => true],
+            ['title' => 'Manufacturer', 'key' => 'name', 'order' => $order++, 'width' => 140, 'visible' => 1, 'sortable' => true],
+            ['title' => 'Category', 'key' => 'category.name', 'order' => $order++, 'width' => 104, 'visible' => 1, 'sortable' => true],
+            ['title' => 'Status', 'key' => 'status', 'order' => $order++, 'width' => 106, 'visible' => 1, 'sortable' => true],
+            ['title' => 'Important', 'key' => 'important', 'order' => $order++, 'width' => 100, 'visible' => 1, 'sortable' => true],
+            ['title' => 'Product class', 'key' => 'product_classes.name', 'order' => $order++, 'width' => 114, 'visible' => 1, 'sortable' => true],
+            ['title' => 'Zones', 'key' => 'zones.name', 'order' => $order++, 'width' => 54, 'visible' => 1, 'sortable' => true],
+            ['title' => 'Blacklist', 'key' => 'blacklists.name', 'order' => $order++, 'width' => 120, 'visible' => 1, 'sortable' => true],
+            ['title' => 'Presence', 'key' => 'presences.name', 'order' => $order++, 'width' => 128, 'visible' => 1, 'sortable' => true],
+            ['title' => 'Website', 'key' => 'website', 'order' => $order++, 'width' => 180, 'visible' => 1, 'sortable' => true],
+            ['title' => 'About company', 'key' => 'about', 'order' => $order++, 'width' => 240, 'visible' => 1, 'sortable' => true],
+            ['title' => 'Relationship', 'key' => 'relationship', 'order' => $order++, 'width' => 200, 'visible' => 1, 'sortable' => true],
+            ['title' => 'Comments', 'key' => 'comments_count', 'order' => $order++, 'width' => 132, 'visible' => 1, 'sortable' => true],
+            ['title' => 'Last comment', 'key' => 'last_comment.body', 'order' => $order++, 'width' => 240, 'visible' => 1, 'sortable' => true],
+            ['title' => 'Comments date', 'key' => 'last_comment.created_at', 'order' => $order++, 'width' => 116, 'visible' => 1, 'sortable' => true],
+            ['title' => 'Date of creation', 'key' => 'created_at', 'order' => $order++, 'width' => 130, 'visible' => 1, 'sortable' => true],
+            ['title' => 'Update date', 'key' => 'updated_at', 'order' => $order++, 'width' => 150, 'visible' => 1, 'sortable' => true],
+            ['title' => 'Meetings', 'key' => 'meetings_count', 'order' => $order++, 'width' => 86, 'visible' => 1, 'sortable' => true],
+            ['title' => 'ID', 'key' => 'id', 'order' => $order++, 'width' => 62, 'visible' => 1, 'sortable' => true],
+            ['title' => 'Attachments', 'key' => 'attachments.filename', 'order' => $order++, 'width' => 260, 'visible' => 1, 'sortable' => true],
+        );
+
+        return $columns;
     }
 
     /**
@@ -508,7 +543,7 @@ class Manufacturer extends BaseModel implements HasTitle, CanExportRecordsAsExce
      *
      * @return array
      */
-    public static function getDefaultMADTableSettingsForUser2($user)
+    public static function getDefaultMADTableSettingsForUser($user)
     {
         if (Gate::forUser($user)->denies('view-MAD-EPP')) {
             return null;

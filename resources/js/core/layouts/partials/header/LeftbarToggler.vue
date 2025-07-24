@@ -21,5 +21,6 @@ function toggle() {
         @click.stop="toggle"
         variant="text"
         color="primary"
+        class="mr-4"
     />
 </template>

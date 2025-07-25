@@ -9,11 +9,13 @@ import TdChipsContainer from "@/core/components/table/td/TdChipsContainer.vue";
 import TdLink from "@/core/components/table/td/TdLink.vue";
 import TogglableMaxLinesLimitedText from "@/core/components/misc/TogglableMaxLinesLimitedText.vue";
 import TdRecordCommentsLink from "@/core/components/table/td/TdRecordCommentsLink.vue";
+import { useDateFormat } from "@vueuse/core";
 
 const page = usePage();
 
 const headers = page.props.tableVisibleHeaders;
 const records = page.props.records.data;
+
 console.log(records);
 </script>
 
@@ -126,13 +128,15 @@ console.log(records);
         </template>
 
         <template v-slot:item.comments_count="{ item }">
-            <TdRecordCommentsLink
-                :record="item"
-            />
+            <TdRecordCommentsLink :record="item" />
         </template>
 
         <template v-slot:item.last_comment.body="{ item }">
             <TogglableMaxLinesLimitedText :text="item.last_comment?.body" />
+        </template>
+
+        <template v-slot:item.last_comment.created_at="{ item }">
+            {{ useDateFormat(item.last_comment?.created_at, 'DD MMM YYYY') }}
         </template>
     </v-data-table>
 </template>

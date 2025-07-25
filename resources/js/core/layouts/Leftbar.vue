@@ -10,6 +10,7 @@ const userSettings = useUserSettingsStore();
 <template>
     <v-navigation-drawer
         :rail="userSettings.isLeftbarCollapsed"
+        width="220"
         permanent
     >
         <v-list>

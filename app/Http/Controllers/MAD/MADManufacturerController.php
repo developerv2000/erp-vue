@@ -32,6 +32,9 @@ class MADManufacturerController extends Controller
         $filteredQuery = Manufacturer::filterQueryForRequest($query, $request);
         $records = Manufacturer::finalizeQueryForRequest($filteredQuery, $request, 'paginate');
 
+        // Append basic attributes
+        Manufacturer::appendBasicAttributes($records);
+
         // Get all and only visible table headers
         $allTableHeaders = $request->user()->collectTableHeadersBySettingsKey(User::SETTINGS_KEY_OF_MAD_EPP_TABLE);
         $tableVisibleHeaders = User::filterOnlyVisibleHeaders($allTableHeaders);

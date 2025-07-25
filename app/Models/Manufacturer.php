@@ -10,6 +10,7 @@ use App\Support\Traits\Model\Commentable;
 use App\Support\Traits\Model\ExportsRecordsAsExcel;
 use App\Support\Traits\Model\GetsMinifiedRecordsWithName;
 use App\Support\Traits\Model\HasAttachments;
+use App\Support\Traits\Model\HasModelNamespace;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Gate;
@@ -23,6 +24,7 @@ class Manufacturer extends BaseModel implements HasTitle, CanExportRecordsAsExce
     use HasAttachments;
     use GetsMinifiedRecordsWithName;
     use ExportsRecordsAsExcel;
+    use HasModelNamespace;
 
     /*
     |--------------------------------------------------------------------------
@@ -118,7 +120,7 @@ class Manufacturer extends BaseModel implements HasTitle, CanExportRecordsAsExce
 
     /*
     |--------------------------------------------------------------------------
-    | Additional attributes
+    | Additional attributes & appends
     |--------------------------------------------------------------------------
     */
 
@@ -130,6 +132,15 @@ class Manufacturer extends BaseModel implements HasTitle, CanExportRecordsAsExce
         return $this->presences->pluck('name')->toArray();
     }
 
+    public static function appendBasicAttributes($records)
+    {
+        foreach ($records as $record) {
+            $record->append([
+                'base_model_class',
+            ]);
+        }
+    }
+    
     /*
     |--------------------------------------------------------------------------
     | Events

@@ -8,11 +8,13 @@ import TdChip from "@/core/components/table/td/TdChip.vue";
 import TdChipsContainer from "@/core/components/table/td/TdChipsContainer.vue";
 import TdLink from "@/core/components/table/td/TdLink.vue";
 import TogglableMaxLinesLimitedText from "@/core/components/misc/TogglableMaxLinesLimitedText.vue";
+import TdRecordCommentsLink from "@/core/components/table/td/TdRecordCommentsLink.vue";
 
 const page = usePage();
 
 const headers = page.props.tableVisibleHeaders;
 const records = page.props.records.data;
+console.log(records);
 </script>
 
 <template>
@@ -116,15 +118,21 @@ const records = page.props.records.data;
         </template>
 
         <template v-slot:item.about="{ item }">
-            <TogglableMaxLinesLimitedText>{{
-                item.about
-            }}</TogglableMaxLinesLimitedText>
+            <TogglableMaxLinesLimitedText :text="item.about" />
         </template>
 
         <template v-slot:item.relationship="{ item }">
-            <TogglableMaxLinesLimitedText>{{
-                item.relationship
-            }}</TogglableMaxLinesLimitedText>
+            <TogglableMaxLinesLimitedText :text="item.relationship" />
+        </template>
+
+        <template v-slot:item.comments_count="{ item }">
+            <TdRecordCommentsLink
+                :record="item"
+            />
+        </template>
+
+        <template v-slot:item.last_comment.body="{ item }">
+            <TogglableMaxLinesLimitedText :text="item.last_comment?.body" />
         </template>
     </v-data-table>
 </template>

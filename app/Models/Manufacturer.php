@@ -507,8 +507,8 @@ class Manufacturer extends BaseModel implements HasTitle, CanExportRecordsAsExce
 
         array_push(
             $columns,
-            ['title' => 'BDM', 'key' => 'bdm.name', 'order' => $order++, 'width' => 142, 'visible' => 1, 'sortable' => true],
-            ['title' => 'Analyst', 'key' => 'analyst.name', 'order' => $order++, 'width' => 142, 'visible' => 1, 'sortable' => true],
+            ['title' => 'BDM', 'key' => 'bdm.name', 'order' => $order++, 'width' => 146, 'visible' => 1, 'sortable' => true],
+            ['title' => 'Analyst', 'key' => 'analyst.name', 'order' => $order++, 'width' => 146, 'visible' => 1, 'sortable' => true],
             ['title' => 'Country', 'key' => 'country.name', 'order' => $order++, 'width' => 144, 'visible' => 1, 'sortable' => true],
             ['title' => 'IVP', 'key' => 'products_count', 'order' => $order++, 'width' => 104, 'visible' => 1, 'sortable' => true],
             ['title' => 'Manufacturer', 'key' => 'name', 'order' => $order++, 'width' => 140, 'visible' => 1, 'sortable' => true],

@@ -6,6 +6,8 @@ import TdAva from "@/core/components/table/td/TdAva.vue";
 import TdInertiaLink from "@/core/components/table/td/TdInertiaLink.vue";
 import TdChip from "@/core/components/table/td/TdChip.vue";
 import TdChipsContainer from "@/core/components/table/td/TdChipsContainer.vue";
+import TdLink from "@/core/components/table/td/TdLink.vue";
+import TogglableMaxLinesLimitedText from "@/core/components/misc/TogglableMaxLinesLimitedText.vue";
 
 const page = usePage();
 
@@ -18,11 +20,7 @@ const records = page.props.records.data;
         :headers="headers"
         :items="records"
         :show-select="true"
-        :cell-props="{
-            class: 'pa-2 text-break',
-            style: { 'vertical-align': 'top' },
-        }"
-        :header-props="{ class: 'pa-2 text-truncate' }"
+        class="main-table"
     >
         <!-- Top slot -->
         <template #top>
@@ -82,7 +80,9 @@ const records = page.props.records.data;
         </template>
 
         <template v-slot:item.important="{ item }">
-            <TdChip v-if="item.important" class="bg-pink-lighten-3"> Important </TdChip>
+            <TdChip v-if="item.important" class="bg-pink-lighten-3">
+                Important
+            </TdChip>
         </template>
 
         <template v-slot:item.product_classes.name="{ item }">
@@ -99,6 +99,32 @@ const records = page.props.records.data;
 
         <template v-slot:item.zones.name="{ item }">
             <span>{{ item.zones.map((obj) => obj.name).join(" ") }}</span>
+        </template>
+
+        <template v-slot:item.blacklists.name="{ item }">
+            <span>{{ item.blacklists.map((obj) => obj.name).join(" ") }}</span>
+        </template>
+
+        <template v-slot:item.presences.name="{ item }">
+            <span>{{ item.presences.map((obj) => obj.name).join(" ") }}</span>
+        </template>
+
+        <template v-slot:item.website="{ item }">
+            <TdLink :link="item.website" target="_blank">{{
+                item.website
+            }}</TdLink>
+        </template>
+
+        <template v-slot:item.about="{ item }">
+            <TogglableMaxLinesLimitedText>{{
+                item.about
+            }}</TogglableMaxLinesLimitedText>
+        </template>
+
+        <template v-slot:item.relationship="{ item }">
+            <TogglableMaxLinesLimitedText>{{
+                item.relationship
+            }}</TogglableMaxLinesLimitedText>
         </template>
     </v-data-table>
 </template>

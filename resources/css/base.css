@@ -1,0 +1,58 @@
+/* ------------ Vars ------------ */
+:root {
+    --app-bar-height: 62px;
+    --main-box-padding-top: 24px;
+    --default-toolbar-height: 56px;
+    --main-table-footer-height: 62px;
+    --main-table-wrapper-max-height: calc(100vh - var(--app-bar-height) - var(--main-box-padding-top) - var(--default-toolbar-height) - var(--main-table-footer-height));
+}
+
+/* ------------ /end Vars ------------ */
+
+
+/* ------------ Misc ------------ */
+.max-lines-limited-text {
+    display: -webkit-box;
+    line-clamp: 3;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+/* ------------ /end misc ------------ */
+
+
+/* ------------ Tables ------------ */
+.main-table .v-table__wrapper {
+    max-height: var(--main-table-wrapper-max-height);
+    overflow: auto;
+}
+
+.main-table table {
+    table-layout: fixed;
+}
+
+/* Thead */
+.main-table thead th {
+    position: sticky;
+    top: 0;
+    background-color: rgb(var(--v-theme-surface));
+    z-index: 1;
+}
+
+.main-table th {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Body */
+.main-table td {
+    padding: 8px !important;
+    align-content: start;
+    word-break: break-word;
+    justify-items: flex-start;
+}
+
+/* ------------ /end Main table ------------ */

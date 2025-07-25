@@ -14,7 +14,7 @@ defineProps({
 </script>
 
 <template>
-    <v-app-bar class="app-bar" elevation="0">
+    <v-app-bar class="app-bar" elevation="0" scroll-behavior="hide" height="60" absolute>
         <v-app-bar-title>
             <LeftbarToggler />
             <span v-if="title">{{ title }}</span>

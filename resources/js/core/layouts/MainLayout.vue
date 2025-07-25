@@ -34,7 +34,7 @@ userSettings.initializeFromServerProps(page.props, vuetifyTheme);
         <Header :title="displayTitleAtHeader ? title : null" />
 
         <v-main>
-            <div class="main-box pa-6">
+            <div class="main-box pt-6 px-6">
                 <slot />
             </div>
         </v-main>

@@ -1,5 +1,6 @@
 // Load any necessary base dependencies like axios and Inertia progress bar
 import './bootstrap'
+import '../scripts/main'
 
 // Import Inertia core + helper to auto-resolve Vue page components
 import { createInertiaApp } from '@inertiajs/vue3'

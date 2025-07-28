@@ -9,6 +9,8 @@ import TdChipsContainer from "@/core/components/table/td/TdChipsContainer.vue";
 import TdLink from "@/core/components/table/td/TdLink.vue";
 import TogglableMaxLinesLimitedText from "@/core/components/misc/TogglableMaxLinesLimitedText.vue";
 import TdRecordCommentsLink from "@/core/components/table/td/TdRecordCommentsLink.vue";
+import TdAttachmentsList from "@/core/components/table/td/TdAttachmentsList.vue";
+import TdRecordAttachmentsLink from "@/core/components/table/td/TdRecordAttachmentsLink.vue";
 import { useDateFormat } from "@vueuse/core";
 
 const page = usePage();
@@ -65,7 +67,7 @@ console.log(records);
             <TdChip
                 :class="{
                     'bg-yellow-accent-4': item.category.name == 'УДС',
-                    'bg-light-blue-accent-4': item.category.name == 'НПП',
+                    'bg-blue-lighten-4': item.category.name == 'НПП',
                 }"
             >
                 {{ item.category.name }}
@@ -136,7 +138,32 @@ console.log(records);
         </template>
 
         <template v-slot:item.last_comment.created_at="{ item }">
-            {{ useDateFormat(item.last_comment?.created_at, 'DD MMM YYYY') }}
+            {{ useDateFormat(item.last_comment?.created_at, "DD MMM YYYY") }}
+        </template>
+
+        <template v-slot:item.created_at="{ item }">
+            {{ useDateFormat(item.created_at, "DD MMM YYYY") }}
+        </template>
+
+        <template v-slot:item.updated_at="{ item }">
+            {{ useDateFormat(item.updated_at, "DD MMM YYYY") }}
+        </template>
+
+        <template v-slot:item.meetings_count="{ item }">
+            <TdInertiaLink
+                :link="
+                    route('mad.meetings.index', {
+                        'manufacturer_id[]': item.id,
+                    })
+                "
+            >
+                {{ item.meetings_count }} meetings
+            </TdInertiaLink>
+        </template>
+
+        <template v-slot:item.attachments.filename="{ item }">
+            <TdRecordAttachmentsLink :record="item" />
+            <TdAttachmentsList :attachments="item.attachments" />
         </template>
     </v-data-table>
 </template>

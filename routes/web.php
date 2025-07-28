@@ -45,8 +45,9 @@ Route::middleware('auth', 'auth.session')->group(function () {
         CRUDRouteGenerator::defineDefaultRoutesOnly(['edit', 'store', 'update', 'destroy'], 'id', null, 'can:edit-comments');
     });
 
-    Route::prefix('model-attachments')->controller(AttachmentController::class)->name('attachments.')->group(function () {
-        Route::get('/view/{attachable_type}/{attachable_id}', 'index')->name('index');
+    Route::prefix('attachments')->controller(AttachmentController::class)->name('attachments.')->group(function () {
+        Route::get('/view-model-attachments/{attachable_type}/{attachable_id}', 'viewModelAttachments')->name('view-model-attachments');
+        Route::get('/show/{record}', 'show')->name('show');
         Route::delete('/destroy', 'destroy')->name('destroy');
     });
 

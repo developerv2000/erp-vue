@@ -1,0 +1,5 @@
+Attachments:
+1) file_path => folder
+2) file_type => removed!
+3) file_size => file_size_in_mb
+    string => decimal(6,2)

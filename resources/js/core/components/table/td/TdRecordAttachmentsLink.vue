@@ -17,9 +17,8 @@ defineProps({
             })
         "
         size="small"
-        color="orange"
+        color="deep-purple-lighten-5"
         class="mb-1 font-weight-regular"
-        variant="tonal"
     >
         {{ record.attachments_count }} attachments
     </InertiaLinkedButton>

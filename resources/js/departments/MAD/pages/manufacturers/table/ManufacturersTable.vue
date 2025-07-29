@@ -12,13 +12,45 @@ import TdRecordCommentsLink from "@/core/components/table/td/TdRecordCommentsLin
 import TdAttachmentsList from "@/core/components/table/td/TdAttachmentsList.vue";
 import TdRecordAttachmentsLink from "@/core/components/table/td/TdRecordAttachmentsLink.vue";
 import { useDateFormat } from "@vueuse/core";
+import { useMADManufacturerFilterStore } from "@/departments/MAD/stores/useManufacturerFilterStore";
+import { usePaginationSettingsStore } from "@/core/stores/usePaginationSettings";
+import { router } from "@inertiajs/vue3";
+import { onMounted, ref } from "vue";
+import axios from "axios";
 
 const page = usePage();
+const filterStore = useMADManufacturerFilterStore();
+const paginationSettingsStore = usePaginationSettingsStore();
 
 const headers = page.props.tableVisibleHeaders;
-const records = page.props.records.data;
+const records = ref([]);
+const loading = ref(false);
 
-console.log(records);
+function fetchRecords() {
+    loading.value = true;
+
+    axios
+        .get("/api/manufacturers", {
+            params: {
+                ...filterStore.toQuery(),
+                ...paginationSettingsStore.toQuery(),
+            },
+        })
+        .then((response) => {
+            console.log(response.data);
+            records.value = response.data.data;
+            paginationSettingsStore.totalRecords = response.data.total;
+        })
+        .finally(() => {
+            loading.value = false;
+        });
+}
+
+onMounted(() => {
+    filterStore.initFromQuery(page.props.query);
+    paginationSettingsStore.initFromQuery(page.props.query);
+    fetchRecords();
+});
 </script>
 
 <template>

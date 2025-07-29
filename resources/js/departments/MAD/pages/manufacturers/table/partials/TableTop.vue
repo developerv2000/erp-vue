@@ -6,15 +6,14 @@ import ColumnsListItem from "@/core/components/table/toolbar/more-action-items/C
 import FullscreenListItem from "@/core/components/table/toolbar/more-action-items/FullscreenListItem.vue";
 import ExportListItem from "@/core/components/table/toolbar/more-action-items/ExportListItem.vue";
 import TrashListItem from "@/core/components/table/toolbar/more-action-items/TrashListItem.vue";
-import { usePage } from "@inertiajs/vue3";
+import { usePaginationSettingsStore } from "@/core/stores/usePaginationSettings";
 
-const page = usePage();
-const totalRecords = page.props.records.total;
+const paginationSettings = usePaginationSettingsStore();
 </script>
 
 <template>
     <DefaultTableToolbar>
-        <template #title> Filtered records — {{ totalRecords }} </template>
+        <template #title> Filtered records — {{ paginationSettings.totalRecords }} </template>
 
         <template #actions>
             <NewRecordButton :link="route('mad.manufacturers.create')" />

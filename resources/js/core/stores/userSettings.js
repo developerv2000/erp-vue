@@ -18,7 +18,7 @@ export const useUserSettingsStore = defineStore('userSettings', {
     },
 
     actions: {
-        initializeFromServerProps(props, vuetifyTheme) {
+        initFromServerProps(props, vuetifyTheme) {
             this.theme = props.auth.user?.settings.theme ?? 'light';
             this.locale = props.locale ?? 'en';
             this.isLeftbarCollapsed = toBool(props.auth.user?.settings.is_leftbar_collapsed);

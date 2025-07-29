@@ -42,7 +42,6 @@ class MADManufacturerController extends Controller
         return inertia('departments/MAD/pages/manufacturers/Index', [
             'allTableHeaders' => $allTableHeaders,
             'tableVisibleHeaders' => $tableVisibleHeaders,
-            'records' => $records,
         ]);
     }
 

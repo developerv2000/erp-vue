@@ -1,4 +1,8 @@
 <script setup>
+import axios from "axios";
+
+// Initialize the CSRF token cookie used by Sanctum
+axios.get("/sanctum/csrf-cookie");
 </script>
 
 <template>

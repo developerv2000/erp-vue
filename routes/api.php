@@ -11,4 +11,4 @@ Route::get('/manufacturers', function (Request $request) {
     Manufacturer::appendBasicAttributes($records);
 
     return $records;
-})->middleware();
+})->middleware('auth:sanctum');

@@ -28,7 +28,6 @@ const loading = ref(false);
 
 function fetchRecords() {
     loading.value = true;
-
     axios
         .get("/api/manufacturers", {
             params: {

@@ -1,6 +1,5 @@
 <script setup>
 import { mdiRefresh } from "@mdi/js";
-import DefaultButton from "../buttons/DefaultButton.vue";
 
 function applyFilter() {
     console.log("Apply filter");
@@ -22,7 +21,7 @@ function applyFilter() {
             </v-card-text>
 
             <v-card-actions>
-                <DefaultButton variant="tonal" block>Apply</DefaultButton>
+                <slot name="applyButton" />
             </v-card-actions>
         </v-card>
     </v-sheet>

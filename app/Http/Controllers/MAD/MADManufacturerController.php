@@ -7,6 +7,8 @@ use App\Http\Requests\ManufacturerStoreRequest;
 use App\Http\Requests\ManufacturerUpdateRequest;
 use App\Models\Manufacturer;
 use App\Models\User;
+use App\Support\FilterDependencies\SimpleFilters\MAD\ManufacturersSimpleFilterDependencies;
+use App\Support\FilterDependencies\SmartFilters\MAD\ManufacturersSmartFilterDependencies;
 use App\Support\Helpers\UrlHelper;
 use App\Support\SmartFilters\MAD\MADManufacturersSmartFilter;
 use App\Support\Traits\Controller\DestroysModelRecords;
@@ -31,13 +33,14 @@ class MADManufacturerController extends Controller
 
     public function index(Request $request)
     {
-        // Get all and only visible table headers
-        $allTableHeaders = $request->user()->collectTableHeadersBySettingsKey(User::SETTINGS_KEY_OF_MAD_EPP_TABLE);
-        $tableVisibleHeaders = User::filterOnlyVisibleHeaders($allTableHeaders);
+        $getAllTableHeaders = fn() => $request->user()->collectTableHeadersBySettingsKey(User::SETTINGS_KEY_OF_MAD_EPP_TABLE);
+        $getVisibleHeaders = fn() => User::filterOnlyVisibleHeaders($getAllTableHeaders());
 
         return inertia('departments/MAD/pages/manufacturers/Index', [
-            'allTableHeaders' => $allTableHeaders,
-            'tableVisibleHeaders' => $tableVisibleHeaders,
+            'allTableHeaders' => $getAllTableHeaders,
+            'tableVisibleHeaders' => $getVisibleHeaders,
+            'simpleFilterDependencies' => fn() => ManufacturersSimpleFilterDependencies::getAllDependencies(),
+            'smartFilterDependencies' => fn() => ManufacturersSmartFilterDependencies::getAllDependencies(),
         ]);
     }
 

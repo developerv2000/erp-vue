@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Support\SmartFilters\MAD;
+namespace App\Support\FilterDependencies\SmartFilters\MAD;
 
 use App\Models\Country;
 use App\Models\Manufacturer;
 use App\Models\User;
 
-class MADManufacturersSmartFilter
+class ManufacturersSmartFilterDependencies
 {
     public static function getAllDependencies()
     {

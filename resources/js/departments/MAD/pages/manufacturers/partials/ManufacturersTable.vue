@@ -11,51 +11,52 @@ import TogglableMaxLinesLimitedText from "@/core/components/misc/TogglableThreeL
 import TdRecordCommentsLink from "@/core/components/table/td/TdRecordCommentsLink.vue";
 import TdAttachmentsList from "@/core/components/table/td/TdAttachmentsList.vue";
 import TdRecordAttachmentsLink from "@/core/components/table/td/TdRecordAttachmentsLink.vue";
-import { useMADManufacturerTableStore } from "@/departments/MAD/stores/useMADManufacturerTableStore";
+import { useMADManufacturerTable } from "@/departments/MAD/composables/useMadManufacturerTable";
 import { useDateFormat } from "@vueuse/core";
 import { usePage } from "@inertiajs/vue3";
 import { onMounted, ref } from "vue";
 import { getDefaultPerPageOptions } from "@/core/scripts/functions";
 import { router } from "@inertiajs/vue3";
-import axios from "axios";
 
 const page = usePage();
-const tableStore = useMADManufacturerTableStore();
 const headers = page.props.tableVisibleHeaders;
-const records = ref([]);
 const loading = ref(false);
 const perPageOptions = getDefaultPerPageOptions();
-
-function fetchRecords() {
-    loading.value = true;
-    console.log(tableStore.toQuery());
-    axios
-        .get("/api/manufacturers", {
-            params: tableStore.toQuery(),
-        })
-        .then((response) => {
-            records.value = response.data.data;
-            tableStore.updateAfterFetch(response);
-        })
-        .finally(() => {
-            loading.value = false;
-        });
-};
+const { store, fetchRecords } = useMADManufacturerTable();
 
 onMounted(() => {
-    tableStore.initFromQuery(page.props.query);
-    fetchRecords();
+    store.initFromQuery(page.props.query);
+    fetchRecords(loading);
 });
+
+function handleTableOptionsUpdate(options) {
+    store.pagination.page = options.page;
+    store.pagination.per_page = options.itemsPerPage;
+
+    if (options.sortBy?.length) {
+        store.pagination.order_by = options.sortBy[0].key;
+        store.pagination.order_direction = options.sortBy[0].order;
+    }
+
+    fetchRecords(loading);
+}
 </script>
 
 <template>
     <v-data-table-server
         class="main-table main-table--with-filter"
         :headers="headers"
-        :items="records"
-        :items-per-page="tableStore.pagination.per_page"
+        :items="store.records"
+        :items-per-page="store.pagination.per_page"
         :items-per-page-options="perPageOptions"
-        :items-length="tableStore.pagination.total_records"
+        :items-length="store.pagination.total_records"
+        :sort-by="[
+            {
+                key: store.pagination.order_by,
+                order: store.pagination.order_direction,
+            },
+        ]"
+        @update:options="handleTableOptionsUpdate"
         :show-select="true"
         :loading="loading"
     >

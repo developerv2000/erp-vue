@@ -368,6 +368,14 @@ class Manufacturer extends BaseModel
     |--------------------------------------------------------------------------
     */
 
+    /**
+     * Update self 'updated_at' field on comment store
+     */
+    public function updateSelfOnCommentCreate()
+    {
+        $this->updateQuietly(['updated_at' => now()]);
+    }
+
     public static function getDefaultMADTableHeadersForUser($user)
     {
         if (Gate::forUser($user)->denies('view-MAD-EPP')) {

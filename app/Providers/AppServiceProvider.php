@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use App\Support\Definers\GateDefiners\GlobalGatesDefiner;
-use App\Support\Definers\GateDefiners\MADGatesDefiner;
+use App\Support\GateDefiners\GlobalGatesDefiner;
+use App\Support\GateDefiners\MADGatesDefiner;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 

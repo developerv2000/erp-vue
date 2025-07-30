@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Support\Definers\GateDefiners;
+namespace App\Support\GateDefiners;
 
 use App\Models\Permission;
 use App\Models\User;

@@ -9,3 +9,7 @@ export function handleGlobalClickDelegates(event) {
     el.classList.toggle('max-lines-limited-text');
     event.stopPropagation();
 }
+
+export function getDefaultPerPageOptions() {
+    return [10, 25, 50, 100, 200, 400];
+}

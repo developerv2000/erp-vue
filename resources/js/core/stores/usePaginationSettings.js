@@ -2,37 +2,35 @@ import { defineStore } from "pinia";
 
 export const usePaginationSettingsStore = defineStore('paginationSettings', {
     state: () => ({
-        currentPage: null,
-        perPage: null,
-        totalRecords: null,
-        orderBy: null,
-        orderDirection: null,
+        page: null,
+        per_page: null,
+        order_by: null,
+        order_direction: null,
+        total_records: null,
     }),
     actions: {
         initFromQuery(query = {}) {
-            this.perPage = query.perPage ?? null;
-            this.currentPage = query.currentPage ?? null;
-            this.totalRecords = query.totalRecords ?? null;
-            this.orderBy = query.orderBy ?? null;
-            this.orderDirection = query.orderDirection ?? null;
+            this.page = query.page ?? null;
+            this.per_page = query.per_page ?? null;
+            this.order_by = query.order_by ?? null;
+            this.order_direction = query.order_direction ?? null;
         },
 
         toQuery() {
             return {
-                perPage: this.perPage,
-                currentPage: this.currentPage,
-                totalRecords: this.totalRecords,
-                orderBy: this.orderBy,
-                orderDirection: this.orderDirection,
+                page: this.page,
+                per_page: this.per_page,
+                order_by: this.order_by,
+                order_direction: this.order_direction,
             };
         },
 
         reest() {
-            $this.perPage = null;
-            $this.currentPage = null;
-            $this.totalRecords = null;
-            $this.orderBy = null;
-            $this.orderDirection = null;
+            $this.page = null;
+            $this.per_page = null;
+            $this.order_by = null;
+            $this.order_direction = null;
+            $this.total_records = null;
         },
     },
 });

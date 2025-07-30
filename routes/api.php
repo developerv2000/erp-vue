@@ -1,14 +1,8 @@
 <?php
 
-use App\Models\Manufacturer;
+use App\Http\Controllers\MAD\MADManufacturerController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/manufacturers', function (Request $request) {
-    $records = Manufacturer::withBasicRelations()
-        ->withBasicRelationCounts()
-        ->paginate(50);
-
-    Manufacturer::appendBasicAttributes($records);
-
-    return $records;
-})->middleware('auth:sanctum');
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/manufacturers', [MADManufacturerController::class, 'get']);
+});

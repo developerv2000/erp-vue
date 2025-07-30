@@ -1,5 +1,5 @@
 <template>
-    <div class="default-table-wrapper">
+    <div class="d-flex ga-6 align-start">
         <slot />
     </div>
 </template>

@@ -1,7 +1,8 @@
 <script setup>
 import MainLayout from "@/core/layouts/MainLayout.vue";
 import DefaultTableWrapper from "@/core/components/table/containers/DefaultTableWrapper.vue";
-import ManufacturersTable from "./table/ManufacturersTable.vue";
+import ManufacturersTable from "./partials/ManufacturersTable.vue";
+import ManufacturersFilter from "./partials/ManufacturersFilter.vue";
 import { useI18n } from "vue-i18n";
 import { computed } from "vue";
 
@@ -13,6 +14,7 @@ const title = computed(() => t("pages.EPP"));
     <MainLayout :title="title" :display-title-at-header="true">
         <DefaultTableWrapper>
             <ManufacturersTable />
+            <ManufacturersFilter />
         </DefaultTableWrapper>
     </MainLayout>
 </template>

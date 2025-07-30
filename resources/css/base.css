@@ -5,23 +5,41 @@
     --default-toolbar-height: 56px;
     --main-table-footer-height: 62px;
     --main-table-wrapper-max-height: calc(100vh - var(--app-bar-height) - var(--main-box-padding-top) - var(--default-toolbar-height) - var(--main-table-footer-height));
+    --main-filter-width: 200px;
 }
 
 /* ------------ /end Vars ------------ */
 
 
-/* ------------ Misc ------------ */
-.max-lines-limited-text {
+/* ------------ Max lines limited text ------------ */
+[data-on-click="toggle-text-max-lines"] {
+    cursor: pointer;
+}
+
+.max-lines-limited-text.one-lines-limited-text {
+    display: -webkit-box;
+    line-clamp: 1;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.max-lines-limited-text.three-lines-limited-text {
     display: -webkit-box;
     line-clamp: 3;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
+
 /* ------------ /end misc ------------ */
 
 
-/* ------------ Tables ------------ */
+/* ------------ Main table ------------ */
+.main-table.main-table--with-filter {
+    max-width: calc(100% - var(--main-filter-width));
+}
+
 .main-table .v-table__wrapper {
     max-height: var(--main-table-wrapper-max-height);
     overflow: auto;
@@ -56,3 +74,14 @@
 }
 
 /* ------------ /end Main table ------------ */
+
+
+/* ------------ Main filter ------------ */
+.main-filter {
+    width: var(--main-filter-width);
+    min-width: var(--main-filter-width);
+    max-height: calc(100vh - var(--app-bar-height));
+    overflow-y: auto;
+}
+
+/* ------------ /end Main filter ------------ */

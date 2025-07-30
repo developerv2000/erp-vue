@@ -15,7 +15,7 @@ trait FinalizesQueryForRequest
      * @param Request $request The request containing ordering and pagination parameters.
      * @param string $action Action to perform on the query: 'paginate', 'get', or 'query'.
      * @param string $defaultOrderBy Default column for ordering if none is specified.
-     * @param string $defaultOrderType Default ordering type ('asc' or 'desc').
+     * @param string $defaultOrderDirection Default ordering direction ('asc' or 'desc').
      * @return mixed
      */
     public static function finalizeQueryForRequest(
@@ -23,21 +23,21 @@ trait FinalizesQueryForRequest
         Request $request,
         string $action = 'query',
         string $defaultOrderBy = 'created_at',
-        string $defaultOrderType = 'desc',
+        string $defaultOrderDirection = 'desc',
     ) {
         // Apply primary and secondary ordering
-        $query->orderBy($request->input('order_by', $defaultOrderBy), $request->input('order_type', $defaultOrderType))
-            ->orderBy('id', $request->input('order_type', $defaultOrderType));
+        $query->orderBy($request->input('order_by', $defaultOrderBy), $request->input('order_direction', $defaultOrderDirection))
+            ->orderBy('id', $request->input('order_direction', $defaultOrderDirection));
 
         // Handle pagination or retrieval based on the action parameter
         switch ($action) {
             case 'paginate':
                 return $query->paginate(
-                    $request->input('pagination_limit', 20),
+                    $request->input('per_page', 20),
                     ['*'],
                     'page',
                     $request->input('page', 1)
-                )->appends($request->except(['page', 'reversed_order_url']));
+                )->appends($request->except(['page']));
 
             case 'get':
                 return $query->get();

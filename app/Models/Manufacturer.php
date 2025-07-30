@@ -3,8 +3,6 @@
 namespace App\Models;
 
 use App\Support\Abstracts\BaseModel;
-use App\Support\Contracts\Model\CanExportRecordsAsExcel;
-use App\Support\Contracts\Model\HasTitle;
 use App\Support\Helpers\QueryFilterHelper;
 use App\Support\Traits\Model\Commentable;
 use App\Support\Traits\Model\ExportsRecordsAsExcel;
@@ -15,7 +13,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Gate;
 
-class Manufacturer extends BaseModel implements HasTitle, CanExportRecordsAsExcel
+class Manufacturer extends BaseModel
 {
     /** @use HasFactory<\Database\Factories\ManufacturerFactory> */
     use HasFactory;
@@ -35,8 +33,8 @@ class Manufacturer extends BaseModel implements HasTitle, CanExportRecordsAsExce
     const SETTINGS_MAD_TABLE_COLUMNS_KEY = 'MAD_EPP_table_columns';
 
     const DEFAULT_ORDER_BY = 'updated_at';
-    const DEFAULT_ORDER_TYPE = 'desc';
-    const DEFAULT_PAGINATION_LIMIT = 50;
+    const DEFAULT_ORDER_DIRECTION = 'desc';
+    const DEFAULT_PER_PAGE = 50;
 
     const LIMITED_EXCEL_RECORDS_COUNT_FOR_EXPORT = 5;
     const STORAGE_PATH_OF_EXCEL_TEMPLATE_FILE_FOR_EXPORT = 'app/excel/export-templates/epp.xlsx';
@@ -140,7 +138,7 @@ class Manufacturer extends BaseModel implements HasTitle, CanExportRecordsAsExce
             ]);
         }
     }
-    
+
     /*
     |--------------------------------------------------------------------------
     | Events
@@ -225,75 +223,45 @@ class Manufacturer extends BaseModel implements HasTitle, CanExportRecordsAsExce
         ]);
     }
 
-    public function scopeOnlyRecordsWithProcessesReadyForOrder($query)
-    {
-        return $query->whereHas('processes', function ($processesQuery) {
-            $processesQuery->whereNotNull('readiness_for_order_date');
-        });
-    }
-
     /*
     |--------------------------------------------------------------------------
     | Contracts
     |--------------------------------------------------------------------------
     */
 
-    // Implement method defined in BaseModel abstract class
     public function generateBreadcrumbs($department = null): array
     {
-        $breadcrumbs = [
-            ['link' => route('mad.manufacturers.index'), 'text' => __('EPP')],
-        ];
+        return [];
+    }
 
-        if ($this->trashed()) {
-            $breadcrumbs[] = ['link' => route('mad.manufacturers.trash'), 'text' => __('Trash')];
+    /*
+    |--------------------------------------------------------------------------
+    | Queries
+    |--------------------------------------------------------------------------
+    */
+
+    public static function getRecordsForRequest($request)
+    {
+        $query = self::withBasicRelations()->withBasicRelationCounts();
+
+        // Apply trashed
+        if ($request->input('only_trashed')) {
+            $query->onlyTrashed();
         }
 
-        $breadcrumbs[] = ['link' => route('mad.manufacturers.edit', $this->id), 'text' => $this->title];
+        // Preapare request for valid model querying
+        self::addDefaultQueryParamsToRequest($request);
 
-        return $breadcrumbs;
-    }
+        // Apply filters
+        self::filterQueryForRequest($query, $request);
 
-    // Implement method declared in HasTitle Interface
-    public function getTitleAttribute(): string
-    {
-        return $this->name;
-    }
+        // Apply sorting & pagination
+        $records = self::finalizeQueryForRequest($query, $request, 'paginate');
 
-    // Implement method declared in CanExportRecordsAsExcel Interface
-    public function scopeWithRelationsForExport($query)
-    {
-        return $query->withBasicRelations()
-            ->withBasicRelationCounts()
-            ->with(['comments']);
-    }
+        // Append basic attributes
+        self::appendBasicAttributes($records);
 
-    // Implement method declared in CanExportRecordsAsExcel Interface
-    public function getExcelColumnValuesForExport(): array
-    {
-        return [
-            $this->id,
-            $this->bdm->name,
-            $this->analyst->name,
-            $this->country->name,
-            $this->products_count,
-            $this->name,
-            $this->category->name,
-            $this->active ? __('Active') : __('Stoped'),
-            $this->important ? __('Important') : '',
-            $this->productClasses->pluck('name')->implode(' '),
-            $this->zones->pluck('name')->implode(' '),
-            $this->blacklists->pluck('name')->implode(' '),
-            $this->presences->pluck('name')->implode(' '),
-            $this->website,
-            $this->about,
-            $this->relationship,
-            $this->comments->pluck('plain_text')->implode(' / '),
-            $this->lastComment?->created_at,
-            $this->created_at,
-            $this->updated_at,
-            $this->meetings_count,
-        ];
+        return $records;
     }
 
     /*
@@ -313,6 +281,16 @@ class Manufacturer extends BaseModel implements HasTitle, CanExportRecordsAsExce
         self::applyHasActiveProcessesForMonthFilter($query, $request);
 
         return $query;
+    }
+
+    private static function getFilterConfig(): array
+    {
+        return [
+            'whereEqual' => ['analyst_user_id', 'bdm_user_id', 'category_id', 'active', 'important'],
+            'whereIn' => ['id', 'country_id'],
+            'belongsToMany' => ['productClasses', 'zones', 'blacklists'],
+            'dateRange' => ['created_at', 'updated_at'],
+        ];
     }
 
     /**
@@ -384,121 +362,11 @@ class Manufacturer extends BaseModel implements HasTitle, CanExportRecordsAsExce
         }
     }
 
-    private static function getFilterConfig(): array
-    {
-        return [
-            'whereEqual' => ['analyst_user_id', 'bdm_user_id', 'category_id', 'active', 'important'],
-            'whereIn' => ['id', 'country_id'],
-            'belongsToMany' => ['productClasses', 'zones', 'blacklists'],
-            'dateRange' => ['created_at', 'updated_at'],
-        ];
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Create & Update
-    |--------------------------------------------------------------------------
-    */
-
-    public static function createFromRequest($request)
-    {
-        $record = self::create($request->all());
-
-        // BelongsToMany relations
-        $record->zones()->attach($request->input('zones'));
-        $record->productClasses()->attach($request->input('productClasses'));
-        $record->blacklists()->attach($request->input('blacklists'));
-
-        // HasMany relations
-        $record->storePresencesOnCreate($request->input('presences'));
-        $record->storeCommentFromRequest($request);
-        $record->storeAttachmentsFromRequest($request);
-    }
-
-    private function storePresencesOnCreate($presences)
-    {
-        if (!$presences) return;
-
-        foreach ($presences as $name) {
-            $this->presences()->create(['name' => $name]);
-        }
-    }
-
-    public function updateFromRequest($request)
-    {
-        $this->update($request->all());
-
-        // BelongsToMany relations
-        $this->zones()->sync($request->input('zones'));
-        $this->productClasses()->sync($request->input('productClasses'));
-        $this->blacklists()->sync($request->input('blacklists'));
-
-        // HasMany relations
-        $this->syncPresencesOnEdit($request);
-        $this->storeCommentFromRequest($request);
-        $this->storeAttachmentsFromRequest($request);
-    }
-
-    private function syncPresencesOnEdit($request)
-    {
-        $presences = $request->input('presences');
-
-        // Remove existing presences if $presences is empty
-        if (!$presences) {
-            $this->presences()->delete();
-            return;
-        }
-
-        // Add new presences
-        foreach ($presences as $name) {
-            if (!$this->presences->contains('name', $name)) {
-                $this->presences()->create(['name' => $name]);
-            }
-        }
-
-        // Delete removed presences
-        $this->presences()->whereNotIn('name', $presences)->delete();
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Order part
-    |--------------------------------------------------------------------------
-    */
-
-    public static function getMinifiedRecordsWithProcessesReadyForOrder()
-    {
-        return self::onlyRecordsWithProcessesReadyForOrder()->minifiedRecordsWithName()->get();
-    }
-
     /*
     |--------------------------------------------------------------------------
     | Misc
     |--------------------------------------------------------------------------
     */
-
-    /**
-     * Update self 'updated_at' field on comment store
-     */
-    public function updateSelfOnCommentCreate()
-    {
-        $this->updateQuietly(['updated_at' => now()]);
-    }
-
-    /**
-     * Return an array of status options
-     *
-     * Used on records create/update as radiogroups options
-     *
-     * @return array
-     */
-    public static function getStatusOptions()
-    {
-        return [
-            (object) ['caption' => trans('Active'), 'value' => 1],
-            (object) ['caption' => trans('Stopped'), 'value' => 0],
-        ];
-    }
 
     public static function getDefaultMADTableHeadersForUser($user)
     {
@@ -541,60 +409,6 @@ class Manufacturer extends BaseModel implements HasTitle, CanExportRecordsAsExce
             ['title' => 'Meetings', 'key' => 'meetings_count', 'order' => $order++, 'width' => 86, 'visible' => 1, 'sortable' => true],
             ['title' => 'ID', 'key' => 'id', 'order' => $order++, 'width' => 62, 'visible' => 1, 'sortable' => true],
             ['title' => 'Attachments', 'key' => 'attachments.filename', 'order' => $order++, 'width' => 260, 'visible' => 1, 'sortable' => true],
-        );
-
-        return $columns;
-    }
-
-    /**
-     * Provides the default MAD table columns along with their properties.
-     *
-     * These columns are typically used to display data in tables,
-     * such as on index and trash pages, and are iterated over in a loop.
-     *
-     * @return array
-     */
-    public static function getDefaultMADTableSettingsForUser($user)
-    {
-        if (Gate::forUser($user)->denies('view-MAD-EPP')) {
-            return null;
-        }
-
-        $order = 1;
-        $columns = array();
-
-        if (Gate::forUser($user)->allows('edit-MAD-EPP')) {
-            array_push(
-                $columns,
-                ['name' => 'Edit', 'order' => $order++, 'width' => 40, 'visible' => 1],
-            );
-        }
-
-        array_push(
-            $columns,
-            ['name' => 'BDM', 'order' => $order++, 'width' => 142, 'visible' => 1],
-            ['name' => 'Analyst', 'order' => $order++, 'width' => 142, 'visible' => 1],
-            ['name' => 'Country', 'order' => $order++, 'width' => 144, 'visible' => 1],
-            ['name' => 'IVP', 'order' => $order++, 'width' => 104, 'visible' => 1],
-            ['name' => 'Manufacturer', 'order' => $order++, 'width' => 140, 'visible' => 1],
-            ['name' => 'Category', 'order' => $order++, 'width' => 104, 'visible' => 1],
-            ['name' => 'Status', 'order' => $order++, 'width' => 106, 'visible' => 1],
-            ['name' => 'Important', 'order' => $order++, 'width' => 100, 'visible' => 1],
-            ['name' => 'Product class', 'order' => $order++, 'width' => 114, 'visible' => 1],
-            ['name' => 'Zones', 'order' => $order++, 'width' => 54, 'visible' => 1],
-            ['name' => 'Blacklist', 'order' => $order++, 'width' => 120, 'visible' => 1],
-            ['name' => 'Presence', 'order' => $order++, 'width' => 128, 'visible' => 1],
-            ['name' => 'Website', 'order' => $order++, 'width' => 180, 'visible' => 1],
-            ['name' => 'About company', 'order' => $order++, 'width' => 240, 'visible' => 1],
-            ['name' => 'Relationship', 'order' => $order++, 'width' => 200, 'visible' => 1],
-            ['name' => 'Comments', 'order' => $order++, 'width' => 132, 'visible' => 1],
-            ['name' => 'Last comment', 'order' => $order++, 'width' => 240, 'visible' => 1],
-            ['name' => 'Comments date', 'order' => $order++, 'width' => 116, 'visible' => 1],
-            ['name' => 'Date of creation', 'order' => $order++, 'width' => 130, 'visible' => 1],
-            ['name' => 'Update date', 'order' => $order++, 'width' => 150, 'visible' => 1],
-            ['name' => 'Meetings', 'order' => $order++, 'width' => 86, 'visible' => 1],
-            ['name' => 'ID', 'order' => $order++, 'width' => 62, 'visible' => 1],
-            ['name' => 'Attachments', 'order' => $order++, 'width' => 260, 'visible' => 1],
         );
 
         return $columns;

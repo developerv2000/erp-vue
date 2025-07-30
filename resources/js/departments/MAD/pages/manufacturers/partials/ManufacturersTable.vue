@@ -1,72 +1,72 @@
 <script setup>
-import TableTop from "./partials/TableTop.vue";
-import { usePage } from "@inertiajs/vue3";
+import ManufacturersTableTop from "./ManufacturersTableTop.vue";
+import TableDefaultSkeleton from "@/core/components/table/misc/TableDefaultSkeleton.vue";
 import TdEditButton from "@/core/components/table/td/TdEditButton.vue";
 import TdAva from "@/core/components/table/td/TdAva.vue";
 import TdInertiaLink from "@/core/components/table/td/TdInertiaLink.vue";
-import TdChip from "@/core/components/table/td/TdChip.vue";
 import TdChipsContainer from "@/core/components/table/td/TdChipsContainer.vue";
+import TdChip from "@/core/components/table/td/TdChip.vue";
 import TdLink from "@/core/components/table/td/TdLink.vue";
-import TogglableMaxLinesLimitedText from "@/core/components/misc/TogglableMaxLinesLimitedText.vue";
+import TogglableMaxLinesLimitedText from "@/core/components/misc/TogglableThreeLinesLimitedText.vue";
 import TdRecordCommentsLink from "@/core/components/table/td/TdRecordCommentsLink.vue";
 import TdAttachmentsList from "@/core/components/table/td/TdAttachmentsList.vue";
 import TdRecordAttachmentsLink from "@/core/components/table/td/TdRecordAttachmentsLink.vue";
+import { useMADManufacturerTableStore } from "@/departments/MAD/stores/useMADManufacturerTableStore";
 import { useDateFormat } from "@vueuse/core";
-import { useMADManufacturerFilterStore } from "@/departments/MAD/stores/useManufacturerFilterStore";
-import { usePaginationSettingsStore } from "@/core/stores/usePaginationSettings";
-import { router } from "@inertiajs/vue3";
+import { usePage } from "@inertiajs/vue3";
 import { onMounted, ref } from "vue";
+import { getDefaultPerPageOptions } from "@/core/scripts/functions";
+import { router } from "@inertiajs/vue3";
 import axios from "axios";
 
 const page = usePage();
-const filterStore = useMADManufacturerFilterStore();
-const paginationSettingsStore = usePaginationSettingsStore();
-
+const tableStore = useMADManufacturerTableStore();
 const headers = page.props.tableVisibleHeaders;
 const records = ref([]);
 const loading = ref(false);
+const perPageOptions = getDefaultPerPageOptions();
 
 function fetchRecords() {
     loading.value = true;
+    console.log(tableStore.toQuery());
     axios
         .get("/api/manufacturers", {
-            params: {
-                ...filterStore.toQuery(),
-                ...paginationSettingsStore.toQuery(),
-            },
+            params: tableStore.toQuery(),
         })
         .then((response) => {
-            console.log(response.data);
             records.value = response.data.data;
-            paginationSettingsStore.totalRecords = response.data.total;
+            tableStore.updateAfterFetch(response);
         })
         .finally(() => {
             loading.value = false;
         });
-}
+};
 
 onMounted(() => {
-    filterStore.initFromQuery(page.props.query);
-    paginationSettingsStore.initFromQuery(page.props.query);
+    tableStore.initFromQuery(page.props.query);
     fetchRecords();
 });
 </script>
 
 <template>
-    <v-data-table
+    <v-data-table-server
+        class="main-table main-table--with-filter"
         :headers="headers"
         :items="records"
+        :items-per-page="tableStore.pagination.per_page"
+        :items-per-page-options="perPageOptions"
+        :items-length="tableStore.pagination.total_records"
         :show-select="true"
-        class="main-table"
+        :loading="loading"
     >
         <!-- Top slot -->
         <template #top>
-            <TableTop />
+            <ManufacturersTableTop />
         </template>
 
         <!-- Loading slot -->
         <template v-slot:loading>
-            <v-skeleton-loader type="table-row@10"></v-skeleton-loader>
+            <TableDefaultSkeleton />
         </template>
 
         <!-- Item slots -->
@@ -127,7 +127,7 @@ onMounted(() => {
                 <TdChip
                     v-for="obj in item.product_classes"
                     :key="obj.id"
-                    class="bg-green-accent-2"
+                    class="bg-teal-accent-2"
                 >
                     {{ obj.name }}
                 </TdChip>
@@ -196,5 +196,5 @@ onMounted(() => {
             <TdRecordAttachmentsLink :record="item" />
             <TdAttachmentsList :attachments="item.attachments" />
         </template>
-    </v-data-table>
+    </v-data-table-server>
 </template>

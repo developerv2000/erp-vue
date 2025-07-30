@@ -6,14 +6,14 @@ import ColumnsListItem from "@/core/components/table/toolbar/more-action-items/C
 import FullscreenListItem from "@/core/components/table/toolbar/more-action-items/FullscreenListItem.vue";
 import ExportListItem from "@/core/components/table/toolbar/more-action-items/ExportListItem.vue";
 import TrashListItem from "@/core/components/table/toolbar/more-action-items/TrashListItem.vue";
-import { usePaginationSettingsStore } from "@/core/stores/usePaginationSettings";
+import { useMADManufacturerTableStore } from "@/departments/MAD/stores/useMADManufacturerTableStore";
 
-const paginationSettings = usePaginationSettingsStore();
+const tableStore = useMADManufacturerTableStore();
 </script>
 
 <template>
     <DefaultTableToolbar>
-        <template #title> Filtered records — {{ paginationSettings.totalRecords }} </template>
+        <template #title> Filtered records — {{ tableStore.pagination.total_records }} </template>
 
         <template #actions>
             <NewRecordButton :link="route('mad.manufacturers.create')" />

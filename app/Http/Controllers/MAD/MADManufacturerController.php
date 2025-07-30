@@ -21,20 +21,16 @@ class MADManufacturerController extends Controller
     // used in multiple destroy/restore traits
     public static $model = Manufacturer::class;
 
+    /**
+     * API request
+     */
+    public function get(Request $request)
+    {
+        return Manufacturer::getRecordsForRequest($request);
+    }
+
     public function index(Request $request)
     {
-        // Preapare request for valid model querying
-        // Manufacturer::addDefaultQueryParamsToRequest($request);
-        // UrlHelper::addUrlWithReversedOrderTypeToRequest($request);
-
-        // Get finalized records paginated
-        $query = Manufacturer::withBasicRelations()->withBasicRelationCounts();
-        $filteredQuery = Manufacturer::filterQueryForRequest($query, $request);
-        $records = Manufacturer::finalizeQueryForRequest($filteredQuery, $request, 'paginate');
-
-        // Append basic attributes
-        Manufacturer::appendBasicAttributes($records);
-
         // Get all and only visible table headers
         $allTableHeaders = $request->user()->collectTableHeadersBySettingsKey(User::SETTINGS_KEY_OF_MAD_EPP_TABLE);
         $tableVisibleHeaders = User::filterOnlyVisibleHeaders($allTableHeaders);

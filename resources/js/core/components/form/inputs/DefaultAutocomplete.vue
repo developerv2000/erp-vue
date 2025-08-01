@@ -25,6 +25,9 @@ const inputAttrs = useAttrs();
             density="compact"
             item-value="id"
             item-title="name"
+            :list-props="{ density: 'compact' }"
+            autocomplete="off"
+            clearable
             v-bind="inputAttrs"
         />
     </WrappedLabelGroup>

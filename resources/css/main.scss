@@ -5,7 +5,12 @@
 @use 'vuetify' as *;
 
 // Components
-// .v-field__input of v-text-field, v-autocomplete etc
+// 'v-field__input' of v-text-field, v-autocomplete etc
 .v-text-field .v-field__input {
+    font-size: 14px;
+}
+
+// v-autocomplete
+.v-overlay .v-autocomplete__content .v-list-item-title {
     font-size: 14px;
 }

@@ -84,11 +84,4 @@
     overflow-y: auto;
 }
 
-.main-filter .v-autocomplete--highlight .v-field__outline {
-    color: #ff9800;
-    --v-field-border-width: 2px;
-}
-
-
-
 /* ------------ /end Main filter ------------ */

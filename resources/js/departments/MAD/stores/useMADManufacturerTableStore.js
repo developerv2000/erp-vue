@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { router } from '@inertiajs/vue3'
+import { resolveSelectedOptions } from '@/core/scripts/utilities';
 
 export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', {
     state: () => ({
@@ -22,8 +23,9 @@ export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', 
     }),
 
     actions: {
-        initFromQuery(query = {}) {
+        initFromServer(page) {
             this.records = [];
+            const query = page.props.query;
 
             this.pagination.page = query.page ?? 1;
             this.pagination.per_page = query.per_page ?? 50;
@@ -32,9 +34,18 @@ export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', 
             this.pagination.total_records = query.total_records ?? 0;
 
             this.filters.analyst_user_id = query.analyst_user_id ?? null
-            this.filters.country_id = query.country_id ?? null
-            this.filters.id = query.id ?? null
             this.filters.bdm_user_id = query.bdm_user_id ?? null
+
+            // Resolve multiple selections
+            this.filters.country_id = resolveSelectedOptions(
+                query.country_id,
+                page.props.smartFilterDependencies.countriesOrderedByName
+            )
+
+            this.filters.id = resolveSelectedOptions(
+                query.id,
+                page.props.smartFilterDependencies.manufacturers
+            )
         },
 
         toQuery() {
@@ -45,9 +56,11 @@ export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', 
                 order_direction: this.pagination.order_direction,
 
                 analyst_user_id: this.filters.analyst_user_id,
-                country_id: this.filters.country_id,
-                id: this.filters.id,
                 bdm_user_id: this.filters.bdm_user_id,
+
+                // Only send IDs
+                country_id: this.filters.country_id.map(option => option.id),
+                id: this.filters.id.map(option => option.id),
             }
         },
 

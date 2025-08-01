@@ -7,7 +7,6 @@ import { useMADManufacturerTable } from "@/departments/MAD/composables/useMadMan
 
 const page = usePage();
 const { store, fetchRecords } = useMADManufacturerTable();
-const arr = [];
 
 function applyFilter() {
     store.pagination.page = 1;
@@ -18,6 +17,29 @@ function applyFilter() {
 
 <template>
     <MainFilter>
+        <FilterAutocomplete
+            label="Analyst"
+            name="analyst_user_id"
+            v-model="store.filters.analyst_user_id"
+            :items="page.props.smartFilterDependencies.analystUsers"
+        />
+
+        <FilterAutocomplete
+            label="Country"
+            name="country_id[]"
+            v-model="store.filters.country_id"
+            :items="page.props.smartFilterDependencies.countriesOrderedByName"
+            multiple
+        />
+
+        <FilterAutocomplete
+            label="Manufacturer"
+            name="id[]"
+            v-model="store.filters.id"
+            :items="page.props.smartFilterDependencies.manufacturers"
+            multiple
+        />
+
         <FilterAutocomplete
             label="BDM"
             name="bdm_user_id"

@@ -16,7 +16,6 @@ import { useDateFormat } from "@vueuse/core";
 import { usePage } from "@inertiajs/vue3";
 import { onMounted, ref } from "vue";
 import { getDefaultPerPageOptions } from "@/core/scripts/functions";
-import { router } from "@inertiajs/vue3";
 
 const page = usePage();
 const headers = page.props.tableVisibleHeaders;
@@ -25,7 +24,7 @@ const perPageOptions = getDefaultPerPageOptions();
 const { store, fetchRecords } = useMADManufacturerTable();
 
 onMounted(() => {
-    store.initFromQuery(page.props.query);
+    store.initFromServer(page);
     fetchRecords(loading);
 });
 
@@ -56,7 +55,7 @@ function handleTableOptionsUpdate(options) {
                 order: store.pagination.order_direction,
             },
         ]"
-        @update:options="handleTableOptionsUpdate"
+
         :show-select="true"
         :loading="loading"
     >

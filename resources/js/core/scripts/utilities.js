@@ -2,10 +2,20 @@ export function toBool(value) {
     return value === true || value === 'true' || value === 1 || value === '1';
 }
 
-// Resolve selected IDs of v-autocomplete with multiple selection after hydration
-export function resolveSelectedOptions(ids = [], options, itemValue = 'id') {
-    if (!Array.isArray(ids) || !Array.isArray(options)) return [];
+export function normalizeSingleID(input) {
+    if (input === undefined || input === null || input === '') {
+        return null;
+    }
 
-    const normalizedIds = ids.map(id => Number(id));
-    return options.filter(option => normalizedIds.includes(option[itemValue]));
+    const parsed = Number(input);
+    return isNaN(parsed) ? null : parsed;
 }
+
+export function normalizeMultiIDs(input) {
+    if (!Array.isArray(input)) return [];
+
+    return input
+        .map(id => Number(id))
+        .filter(id => !isNaN(id));
+}
+

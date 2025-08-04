@@ -10,6 +10,7 @@ const { store, fetchRecords } = useMADManufacturerTable();
 
 function applyFilter() {
     store.pagination.page = 1;
+    console.log(store.filters);
     fetchRecords();
     store.updateUrlWithFilterParams();
 }

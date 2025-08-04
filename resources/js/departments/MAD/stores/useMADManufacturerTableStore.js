@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { router } from '@inertiajs/vue3'
-import { resolveSelectedOptions } from '@/core/scripts/utilities';
+import { normalizeSingleID, normalizeMultiIDs } from '@/core/scripts/utilities';
 
 export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', {
     state: () => ({
@@ -33,19 +33,13 @@ export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', 
             this.pagination.order_direction = query.order_direction ?? 'desc';
             this.pagination.total_records = query.total_records ?? 0;
 
-            this.filters.analyst_user_id = query.analyst_user_id ?? null
-            this.filters.bdm_user_id = query.bdm_user_id ?? null
+            // Normalize singular autocompletes
+            this.filters.analyst_user_id = normalizeSingleID(query.analyst_user_id);
+            this.filters.bdm_user_id = normalizeSingleID(query.bdm_user_id);
 
-            // Resolve multiple selections
-            this.filters.country_id = resolveSelectedOptions(
-                query.country_id,
-                page.props.smartFilterDependencies.countriesOrderedByName
-            )
-
-            this.filters.id = resolveSelectedOptions(
-                query.id,
-                page.props.smartFilterDependencies.manufacturers
-            )
+            // Normalize multiple autocompletes
+            this.filters.country_id = normalizeMultiIDs(query.country_id);
+            this.filters.id = normalizeMultiIDs(query.id);
         },
 
         toQuery() {
@@ -58,9 +52,8 @@ export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', 
                 analyst_user_id: this.filters.analyst_user_id,
                 bdm_user_id: this.filters.bdm_user_id,
 
-                // Only send IDs
-                country_id: this.filters.country_id.map(option => option.id),
-                id: this.filters.id.map(option => option.id),
+                country_id: this.filters.country_id,
+                id: this.filters.id,
             }
         },
 
@@ -70,12 +63,14 @@ export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', 
         },
 
         updateUrlWithFilterParams() {
+            console.log(this.toQuery());
+
             router.get(route('mad.manufacturers.index'), this.toQuery(), {
                 preserveState: true,
                 preserveScroll: true,
                 replace: true,
                 only: [],
-            })
+            });
         }
     }
 })

@@ -1,18 +1,11 @@
-<script setup>
-import { mdiRefresh } from "@mdi/js";
-
-function applyFilter() {
-    console.log("Apply filter");
-}
-</script>
-
 <template>
     <v-sheet class="main-filter" rounded="lg">
         <v-card>
             <v-card-item class="pb-3 border-b-sm">
                 <div class="d-flex justify-space-between">
                     <span class="text-subtitle-1">Filter</span>
-                    <v-icon :icon="mdiRefresh" @click="applyFilter" />
+
+                    <slot name="resetButton" />
                 </div>
             </v-card-item>
 

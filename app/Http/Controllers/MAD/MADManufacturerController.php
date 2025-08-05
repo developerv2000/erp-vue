@@ -14,6 +14,7 @@ use App\Support\SmartFilters\MAD\MADManufacturersSmartFilter;
 use App\Support\Traits\Controller\DestroysModelRecords;
 use App\Support\Traits\Controller\RestoresModelRecords;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class MADManufacturerController extends Controller
 {
@@ -36,11 +37,11 @@ class MADManufacturerController extends Controller
         $getAllTableHeaders = fn() => $request->user()->collectTableHeadersBySettingsKey(User::SETTINGS_KEY_OF_MAD_EPP_TABLE);
         $getVisibleHeaders = fn() => User::filterOnlyVisibleHeaders($getAllTableHeaders());
 
-        return inertia('departments/MAD/pages/manufacturers/Index', [
-            'allTableHeaders' => $getAllTableHeaders,
-            'tableVisibleHeaders' => $getVisibleHeaders,
-            'simpleFilterDependencies' => fn() => ManufacturersSimpleFilterDependencies::getAllDependencies(),
-            'smartFilterDependencies' => fn() => ManufacturersSmartFilterDependencies::getAllDependencies(),
+        return Inertia::render('departments/MAD/pages/manufacturers/Index', [
+            'allTableHeaders' => $getAllTableHeaders, // Lazy load
+            'tableVisibleHeaders' => $getVisibleHeaders, // Lazy load
+            'simpleFilterDependencies' => fn() => ManufacturersSimpleFilterDependencies::getAllDependencies(), // Lazy load
+            'smartFilterDependencies' => ManufacturersSmartFilterDependencies::getAllDependencies(),
         ]);
     }
 

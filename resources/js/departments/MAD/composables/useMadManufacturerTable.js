@@ -4,17 +4,18 @@ import axios from "axios"
 export function useMADManufacturerTable() {
     const store = useMADManufacturerTableStore()
 
-    async function fetchRecords(loadingRef) {
-        if (loadingRef) loadingRef.value = true
+    function fetchRecords() {
+        store.loading = true;
 
-        try {
-            const response = await axios.get('/api/manufacturers', {
-                params: store.toQuery(),
+        axios.get('/api/manufacturers', {
+            params: store.toQuery(),
+        })
+            .then(response => {
+                store.updateStateAfterFetch(response);
             })
-            store.updateAfterFetch(response)
-        } finally {
-            if (loadingRef) loadingRef.value = false
-        }
+            .finally(() => {
+                store.loading = false;
+            })
     }
 
     return {

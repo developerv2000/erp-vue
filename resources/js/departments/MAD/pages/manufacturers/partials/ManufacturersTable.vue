@@ -14,18 +14,18 @@ import TdRecordAttachmentsLink from "@/core/components/table/td/TdRecordAttachme
 import { useMADManufacturerTable } from "@/departments/MAD/composables/useMadManufacturerTable";
 import { useDateFormat } from "@vueuse/core";
 import { usePage } from "@inertiajs/vue3";
-import { onMounted, ref } from "vue";
+import { onMounted } from "vue";
 import { getDefaultPerPageOptions } from "@/core/scripts/functions";
 
 const page = usePage();
 const headers = page.props.tableVisibleHeaders;
-const loading = ref(false);
 const perPageOptions = getDefaultPerPageOptions();
 const { store, fetchRecords } = useMADManufacturerTable();
 
 onMounted(() => {
     store.initFromServer(page);
-    fetchRecords(loading);
+    fetchRecords();
+    console.log('on table mounted');
 });
 
 function handleTableOptionsUpdate(options) {
@@ -37,7 +37,7 @@ function handleTableOptionsUpdate(options) {
         store.pagination.order_direction = options.sortBy[0].order;
     }
 
-    fetchRecords(loading);
+    fetchRecords();
 }
 </script>
 
@@ -57,7 +57,7 @@ function handleTableOptionsUpdate(options) {
         ]"
 
         :show-select="true"
-        :loading="loading"
+        :loading="store.loading"
     >
         <!-- Top slot -->
         <template #top>

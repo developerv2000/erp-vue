@@ -1,6 +1,7 @@
 <script setup>
 import MainFilter from "@/core/components/filters/MainFilter.vue";
-import FilterApplyButton from "@/core/components/form/buttons/FilterApplyButton.vue";
+import FilterApplyButton from "@/core/components/filters/buttons/FilterApplyButton.vue";
+import FilterResetButton from "@/core/components/filters/buttons/FilterResetButton.vue";
 import FilterAutocomplete from "@/core/components/filters/inputs/FilterAutocomplete.vue";
 import { usePage } from "@inertiajs/vue3";
 import { useMADManufacturerTable } from "@/departments/MAD/composables/useMadManufacturerTable";
@@ -8,16 +9,25 @@ import { useMADManufacturerTable } from "@/departments/MAD/composables/useMadMan
 const page = usePage();
 const { store, fetchRecords } = useMADManufacturerTable();
 
+function resetFilter() {
+    store.resetState();
+    store.resetUrl();
+    fetchRecords();
+}
+
 function applyFilter() {
     store.pagination.page = 1;
-    console.log(store.filters);
     fetchRecords();
-    store.updateUrlWithFilterParams();
+    store.updateUrlAfterFetch();
 }
 </script>
 
 <template>
     <MainFilter>
+        <template #resetButton>
+            <FilterResetButton @click="resetFilter" :disabled="store.loading" />
+        </template>
+
         <FilterAutocomplete
             label="Analyst"
             name="analyst_user_id"
@@ -49,7 +59,7 @@ function applyFilter() {
         />
 
         <template #applyButton>
-            <FilterApplyButton @click="applyFilter" />
+            <FilterApplyButton @click="applyFilter" :loading="store.loading" />
         </template>
     </MainFilter>
 </template>

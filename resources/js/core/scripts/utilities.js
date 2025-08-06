@@ -19,3 +19,11 @@ export function normalizeMultiIDs(input) {
         .filter(id => !isNaN(id));
 }
 
+export function cleanQueryParams(obj) {
+    return Object.fromEntries(
+        Object.entries(obj).filter(([_, value]) => {
+            if (Array.isArray(value)) return value.length > 0;
+            return value !== null && value !== undefined && value !== '';
+        })
+    );
+}

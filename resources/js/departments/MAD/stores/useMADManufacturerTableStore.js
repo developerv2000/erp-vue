@@ -1,11 +1,13 @@
 import { defineStore } from 'pinia'
 import { router } from '@inertiajs/vue3'
-import { normalizeSingleID, normalizeMultiIDs } from '@/core/scripts/utilities';
+import { normalizeSingleID, normalizeMultiIDs, cleanQueryParams } from '@/core/scripts/utilities';
+import axios from 'axios';
 
 export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', {
     state: () => ({
         records: [],
         loading: false,
+        initializedFromServer: false,
 
         pagination: {
             page: 1,
@@ -32,11 +34,10 @@ export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', 
             const query = page.props.query;
 
             // Pagination
-            this.pagination.page = query.page ?? 1;
-            this.pagination.per_page = query.per_page ?? 50;
+            this.pagination.page = Number(query.page ?? 1);
+            this.pagination.per_page = Number(query.per_page ?? 50);
             this.pagination.order_by = query.order_by ?? 'updated_at';
             this.pagination.order_direction = query.order_direction ?? 'desc';
-            this.pagination.total_records = query.total_records ?? 0;
 
             // Normalize singular autocompletes
             this.filters.analyst_user_id = normalizeSingleID(query.analyst_user_id);
@@ -45,36 +46,54 @@ export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', 
             // Normalize multiple autocompletes
             this.filters.country_id = normalizeMultiIDs(query.country_id);
             this.filters.id = normalizeMultiIDs(query.id);
+
+            // Mark as initialized
+            this.initializedFromServer = true;
         },
 
         toQuery() {
-            return {
+            const rawQuery = {
                 // Pagination
                 page: this.pagination.page,
                 per_page: this.pagination.per_page,
                 order_by: this.pagination.order_by,
                 order_direction: this.pagination.order_direction,
 
-                // Singular autocompletes
+                // Filters
                 analyst_user_id: this.filters.analyst_user_id,
                 bdm_user_id: this.filters.bdm_user_id,
-
-                // Multiple autocompletes
                 country_id: this.filters.country_id,
                 id: this.filters.id,
-            }
+            };
+
+            return cleanQueryParams(rawQuery);
         },
 
-        updateStateAfterFetch(response) {
-            this.records = response.data.data;
-            this.pagination.total_records = response.data.total;
+        fetchRecords(updateUrl = true) {
+            this.loading = true;
+
+            axios.get('/api/manufacturers', {
+                params: this.toQuery(),
+            })
+                .then(response => {
+                    this.records = response.data.data;
+                    this.pagination.total_records = response.data.total;
+
+                    if (updateUrl) {
+                        this.updateUrlAfterFetch();
+                    }
+                })
+                .finally(() => {
+                    this.loading = false;
+                })
         },
 
         updateUrlAfterFetch() {
-            router.reload({
-                data: this.toQuery(),
+            router.get(route('mad.manufacturers.index'), this.toQuery(), {
                 only: ['smartFilterDependencies'],
                 replace: true,
+                preserveState: true,
+                preserveScroll: true,
             });
         },
 
@@ -99,7 +118,7 @@ export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', 
         },
 
         resetUrl() {
-            router.get(route('mad.manufacturers.index'), this.toQuery(), {
+            router.get(route('mad.manufacturers.index'), {}, {
                 only: ['smartFilterDependencies'],
                 replace: true,
                 preserveState: true,

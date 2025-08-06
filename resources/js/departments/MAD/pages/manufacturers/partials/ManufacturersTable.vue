@@ -11,33 +11,49 @@ import TogglableMaxLinesLimitedText from "@/core/components/misc/TogglableThreeL
 import TdRecordCommentsLink from "@/core/components/table/td/TdRecordCommentsLink.vue";
 import TdAttachmentsList from "@/core/components/table/td/TdAttachmentsList.vue";
 import TdRecordAttachmentsLink from "@/core/components/table/td/TdRecordAttachmentsLink.vue";
-import { useMADManufacturerTable } from "@/departments/MAD/composables/useMadManufacturerTable";
+import { useMADManufacturerTableStore } from "@/departments/MAD/stores/useMADManufacturerTableStore";
 import { useDateFormat } from "@vueuse/core";
 import { usePage } from "@inertiajs/vue3";
-import { onMounted } from "vue";
 import { getDefaultPerPageOptions } from "@/core/scripts/functions";
+import { onMounted } from "vue";
 
 const page = usePage();
 const headers = page.props.tableVisibleHeaders;
 const perPageOptions = getDefaultPerPageOptions();
-const { store, fetchRecords } = useMADManufacturerTable();
+const store = useMADManufacturerTableStore();
 
 onMounted(() => {
-    store.initFromServer(page);
-    fetchRecords();
-    console.log('on table mounted');
+    // Fetch records for the first time, because handleTableOptionsUpdate
+    // won`t fetch records on the first time
+    store.fetchRecords(false);
 });
 
 function handleTableOptionsUpdate(options) {
+    // Initialize store from server because @update:options is fired before onMounted
+    // and avoid fetching records for the first time
+    if (!store.initializedFromServer) {
+        store.initFromServer(page);
+        console.log('Store initialized from server');
+        return;
+    }
+
+    console.log("handleTableOptionsUpdate store before update: ", store.pagination);
+
+    // Update pagination
     store.pagination.page = options.page;
     store.pagination.per_page = options.itemsPerPage;
 
+    // Update sorting
     if (options.sortBy?.length) {
         store.pagination.order_by = options.sortBy[0].key;
         store.pagination.order_direction = options.sortBy[0].order;
     }
 
-    fetchRecords();
+    console.log("handleTableOptionsUpdate options: ", options);
+    console.log("handleTableOptionsUpdate store after update: ", store.pagination);
+
+    console.log("handleTableOptionsUpdate fetching!");
+    store.fetchRecords(false);
 }
 </script>
 
@@ -49,15 +65,16 @@ function handleTableOptionsUpdate(options) {
         :items-per-page="store.pagination.per_page"
         :items-per-page-options="perPageOptions"
         :items-length="store.pagination.total_records"
+        :page="store.pagination.page"
         :sort-by="[
             {
                 key: store.pagination.order_by,
                 order: store.pagination.order_direction,
             },
         ]"
-
         :show-select="true"
         :loading="store.loading"
+        @update:options="handleTableOptionsUpdate"
     >
         <!-- Top slot -->
         <template #top>

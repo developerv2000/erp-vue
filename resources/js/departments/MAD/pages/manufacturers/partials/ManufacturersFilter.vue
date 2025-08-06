@@ -4,21 +4,20 @@ import FilterApplyButton from "@/core/components/filters/buttons/FilterApplyButt
 import FilterResetButton from "@/core/components/filters/buttons/FilterResetButton.vue";
 import FilterAutocomplete from "@/core/components/filters/inputs/FilterAutocomplete.vue";
 import { usePage } from "@inertiajs/vue3";
-import { useMADManufacturerTable } from "@/departments/MAD/composables/useMadManufacturerTable";
+import { useMADManufacturerTableStore } from "@/departments/MAD/stores/useMADManufacturerTableStore";
 
 const page = usePage();
-const { store, fetchRecords } = useMADManufacturerTable();
+const store = useMADManufacturerTableStore();
 
 function resetFilter() {
     store.resetState();
     store.resetUrl();
-    fetchRecords();
+    store.fetchRecords();
 }
 
 function applyFilter() {
-    store.pagination.page = 1;
-    fetchRecords();
-    store.updateUrlAfterFetch();
+    store.pagination.current_page = 1;
+    store.fetchRecords();
 }
 </script>
 
@@ -27,6 +26,12 @@ function applyFilter() {
         <template #resetButton>
             <FilterResetButton @click="resetFilter" :disabled="store.loading" />
         </template>
+
+        <template #applyButton>
+            <FilterApplyButton @click="applyFilter" :loading="store.loading" />
+        </template>
+
+        <v-btn @click="console.log(store.pagination)">Log pagination</v-btn>
 
         <FilterAutocomplete
             label="Analyst"
@@ -57,9 +62,5 @@ function applyFilter() {
             v-model="store.filters.bdm_user_id"
             :items="page.props.simpleFilterDependencies.bdmUsers"
         />
-
-        <template #applyButton>
-            <FilterApplyButton @click="applyFilter" :loading="store.loading" />
-        </template>
     </MainFilter>
 </template>

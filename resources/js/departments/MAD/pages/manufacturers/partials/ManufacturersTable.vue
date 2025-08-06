@@ -33,11 +33,8 @@ function handleTableOptionsUpdate(options) {
     // and avoid fetching records for the first time
     if (!store.initializedFromServer) {
         store.initFromServer(page);
-        console.log('Store initialized from server');
         return;
     }
-
-    console.log("handleTableOptionsUpdate store before update: ", store.pagination);
 
     // Update pagination
     store.pagination.page = options.page;
@@ -49,11 +46,7 @@ function handleTableOptionsUpdate(options) {
         store.pagination.order_direction = options.sortBy[0].order;
     }
 
-    console.log("handleTableOptionsUpdate options: ", options);
-    console.log("handleTableOptionsUpdate store after update: ", store.pagination);
-
-    console.log("handleTableOptionsUpdate fetching!");
-    store.fetchRecords(false);
+    store.fetchRecords();
 }
 </script>
 
@@ -65,15 +58,17 @@ function handleTableOptionsUpdate(options) {
         :items-per-page="store.pagination.per_page"
         :items-per-page-options="perPageOptions"
         :items-length="store.pagination.total_records"
-        :page="store.pagination.page"
+        :page="page.props.query.page"
         :sort-by="[
             {
                 key: store.pagination.order_by,
                 order: store.pagination.order_direction,
             },
         ]"
-        :show-select="true"
         :loading="store.loading"
+        show-select
+        show-current-page
+        fixed-header
         @update:options="handleTableOptionsUpdate"
     >
         <!-- Top slot -->

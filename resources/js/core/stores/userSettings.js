@@ -24,17 +24,18 @@ export const useUserSettingsStore = defineStore('userSettings', {
             this.isLeftbarCollapsed = toBool(props.auth.user?.settings.is_leftbar_collapsed);
 
             i18n.global.locale.value = this.locale;
-            vuetifyTheme.global.name.value = this.theme;
+            vuetifyTheme.change(this.theme);
         },
 
         toggleTheme(vuetifyTheme) {
             this.theme = this.theme === 'light' ? 'dark' : 'light';
-            vuetifyTheme.global.name.value = this.theme;
+            vuetifyTheme.change(this.theme);
         },
 
         setTheme(vuetifyTheme, newTheme) {
             this.theme = newTheme;
             vuetifyTheme.global.name.value = newTheme;
+            vuetifyTheme.change(newTheme);
         },
 
         setLocale(locale) {

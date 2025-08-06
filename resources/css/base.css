@@ -50,13 +50,6 @@
 }
 
 /* Thead */
-.main-table thead th {
-    position: sticky;
-    top: 0;
-    background-color: rgb(var(--v-theme-surface));
-    z-index: 1;
-}
-
 .main-table th {
     padding-left: 8px !important;
     padding-right: 8px !important;

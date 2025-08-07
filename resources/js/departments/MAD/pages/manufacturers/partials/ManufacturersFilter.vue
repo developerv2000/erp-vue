@@ -31,8 +31,6 @@ function applyFilter() {
             <FilterApplyButton @click="applyFilter" :loading="store.loading" />
         </template>
 
-        <v-btn @click="console.log(store.pagination)">Log pagination</v-btn>
-
         <FilterAutocomplete
             label="Analyst"
             name="analyst_user_id"

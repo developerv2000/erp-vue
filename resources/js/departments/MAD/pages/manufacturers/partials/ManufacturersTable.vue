@@ -15,37 +15,23 @@ import { useMADManufacturerTableStore } from "@/departments/MAD/stores/useMADMan
 import { useDateFormat } from "@vueuse/core";
 import { usePage } from "@inertiajs/vue3";
 import { getDefaultPerPageOptions } from "@/core/scripts/functions";
-import { onMounted } from "vue";
 
 const page = usePage();
 const headers = page.props.tableVisibleHeaders;
 const perPageOptions = getDefaultPerPageOptions();
 const store = useMADManufacturerTableStore();
 
-onMounted(() => {
-    // Fetch records for the first time, because handleTableOptionsUpdate
-    // won`t fetch records on the first time
-    store.fetchRecords(false);
-});
-
 function handleTableOptionsUpdate(options) {
-    // Initialize store from server because @update:options is fired before onMounted
-    // and avoid fetching records for the first time
+    // Initialize store from inertia page only once, on the first visit.
+    // @update:options of table is always fired before onMounted.
+    // Table page-related params not binded with store, to avoid double fetching.
     if (!store.initializedFromServer) {
-        store.initFromServer(page);
+        store.initFromInertiaPage(page);
+        store.fetchRecords({ updateUrl: false });
         return;
     }
 
-    // Update pagination
-    store.pagination.page = options.page;
-    store.pagination.per_page = options.itemsPerPage;
-
-    // Update sorting
-    if (options.sortBy?.length) {
-        store.pagination.order_by = options.sortBy[0].key;
-        store.pagination.order_direction = options.sortBy[0].order;
-    }
-
+    store.updateFromTablePageOptions(options);
     store.fetchRecords();
 }
 </script>
@@ -55,21 +41,21 @@ function handleTableOptionsUpdate(options) {
         class="main-table main-table--with-filter"
         :headers="headers"
         :items="store.records"
-        :items-per-page="store.pagination.per_page"
-        :items-per-page-options="perPageOptions"
         :items-length="store.pagination.total_records"
+        :items-per-page-options="perPageOptions"
         :page="page.props.query.page"
+        :items-per-page="page.props.query.per_page ?? 50"
         :sort-by="[
             {
-                key: store.pagination.order_by,
-                order: store.pagination.order_direction,
+                key: page.props.query.order_by ?? 'updated_at',
+                order: page.props.query.order_direction ?? 'desc',
             },
         ]"
+        @update:options="handleTableOptionsUpdate"
         :loading="store.loading"
         show-select
         show-current-page
         fixed-header
-        @update:options="handleTableOptionsUpdate"
     >
         <!-- Top slot -->
         <template #top>

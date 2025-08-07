@@ -29,7 +29,7 @@ export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', 
     }),
 
     actions: {
-        initFromServer(page) {
+        initFromInertiaPage(page) {
             this.records = [];
             const query = page.props.query;
 
@@ -51,6 +51,18 @@ export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', 
             this.initializedFromServer = true;
         },
 
+        updateFromTablePageOptions(options) {
+            // Update pagination
+            this.pagination.page = options.page;
+            this.pagination.per_page = options.itemsPerPage;
+
+            // Update sorting
+            if (options.sortBy?.length) {
+                this.pagination.order_by = options.sortBy[0].key;
+                this.pagination.order_direction = options.sortBy[0].order;
+            }
+        },
+
         toQuery() {
             const rawQuery = {
                 // Pagination
@@ -69,7 +81,7 @@ export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', 
             return cleanQueryParams(rawQuery);
         },
 
-        fetchRecords(updateUrl = true) {
+        fetchRecords({ updateUrl = true } = {}) {
             this.loading = true;
 
             axios.get('/api/manufacturers', {

@@ -14,25 +14,23 @@ import TdRecordAttachmentsLink from "@/core/components/table/td/TdRecordAttachme
 import { useMADManufacturerTableStore } from "@/departments/MAD/stores/useMADManufacturerTableStore";
 import { useDateFormat } from "@vueuse/core";
 import { usePage } from "@inertiajs/vue3";
-import { getDefaultPerPageOptions } from "@/core/scripts/functions";
+import { onMounted } from "vue";
+import { DEFAULT_PER_PAGE_OPTIONS } from "@/core/scripts/constants";
 
 const page = usePage();
 const headers = page.props.tableVisibleHeaders;
-const perPageOptions = getDefaultPerPageOptions();
 const store = useMADManufacturerTableStore();
 
-function handleTableOptionsUpdate(options) {
-    // Initialize store from inertia page only once, on the first visit.
-    // @update:options of table is always fired before onMounted.
-    // Table page-related params not binded with store, to avoid double fetching.
-    if (!store.initializedFromServer) {
-        store.initFromInertiaPage(page);
-        store.fetchRecords({ updateUrl: false });
-        return;
-    }
+if (!store.initializedFromInertiaPage) {
+    store.initFromInertiaPage(page);
+}
 
-    store.updateFromTablePageOptions(options);
-    store.fetchRecords();
+onMounted(() => {
+    store.fetchRecords({ updateUrl: false });
+});
+
+function handleTableOptionsUpdate(options) {
+    store.fetchRecordsIfOptionsChanged(options);
 }
 </script>
 
@@ -42,17 +40,18 @@ function handleTableOptionsUpdate(options) {
         :headers="headers"
         :items="store.records"
         :items-length="store.pagination.total_records"
-        :items-per-page-options="perPageOptions"
-        :page="page.props.query.page"
-        :items-per-page="page.props.query.per_page ?? 50"
+        :items-per-page-options="DEFAULT_PER_PAGE_OPTIONS"
+        :page="store.pagination.page"
+        :items-per-page="store.pagination.per_page"
         :sort-by="[
             {
-                key: page.props.query.order_by ?? 'updated_at',
-                order: page.props.query.order_direction ?? 'desc',
+                key: store.pagination.order_by,
+                order: store.pagination.order_direction,
             },
         ]"
         @update:options="handleTableOptionsUpdate"
         :loading="store.loading"
+        :must-sort="true"
         show-select
         show-current-page
         fixed-header
@@ -72,11 +71,11 @@ function handleTableOptionsUpdate(options) {
             <TdEditButton :link="route('mad.manufacturers.edit', item.id)" />
         </template>
 
-        <template v-slot:item.bdm.name="{ item }">
+        <template v-slot:item.bdm_user_id="{ item }">
             <TdAva :user="item.bdm" />
         </template>
 
-        <template v-slot:item.analyst.name="{ item }">
+        <template v-slot:item.analyst_user_id="{ item }">
             <TdAva :user="item.analyst" />
         </template>
 

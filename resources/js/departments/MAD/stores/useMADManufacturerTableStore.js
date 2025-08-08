@@ -7,7 +7,7 @@ export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', 
     state: () => ({
         records: [],
         loading: false,
-        initializedFromServer: false,
+        initializedFromInertiaPage: false,
 
         pagination: {
             page: 1,
@@ -48,19 +48,7 @@ export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', 
             this.filters.id = normalizeMultiIDs(query.id);
 
             // Mark as initialized
-            this.initializedFromServer = true;
-        },
-
-        updateFromTablePageOptions(options) {
-            // Update pagination
-            this.pagination.page = options.page;
-            this.pagination.per_page = options.itemsPerPage;
-
-            // Update sorting
-            if (options.sortBy?.length) {
-                this.pagination.order_by = options.sortBy[0].key;
-                this.pagination.order_direction = options.sortBy[0].order;
-            }
+            this.initializedFromInertiaPage = true;
         },
 
         toQuery() {
@@ -98,6 +86,25 @@ export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', 
                 .finally(() => {
                     this.loading = false;
                 })
+        },
+
+        fetchRecordsIfOptionsChanged(options) {
+            const sortBy = options.sortBy?.[0] ?? {};
+
+            const hasChanged =
+                options.page !== this.pagination.page ||
+                options.itemsPerPage !== this.pagination.per_page ||
+                sortBy.key !== this.pagination.order_by ||
+                sortBy.order !== this.pagination.order_direction;
+
+            if (!hasChanged) return;
+
+            this.pagination.page = options.page;
+            this.pagination.per_page = options.itemsPerPage;
+            this.pagination.order_by = sortBy.key ?? this.pagination.order_by;
+            this.pagination.order_direction = sortBy.order ?? this.pagination.order_direction;
+
+            this.fetchRecords({ updateUrl: true });
         },
 
         updateUrlAfterFetch() {

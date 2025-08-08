@@ -394,8 +394,8 @@ class Manufacturer extends BaseModel
 
         array_push(
             $columns,
-            ['title' => 'BDM', 'key' => 'bdm.name', 'order' => $order++, 'width' => 146, 'visible' => 1, 'sortable' => true],
-            ['title' => 'Analyst', 'key' => 'analyst.name', 'order' => $order++, 'width' => 146, 'visible' => 1, 'sortable' => true],
+            ['title' => 'BDM', 'key' => 'bdm_user_id', 'order' => $order++, 'width' => 146, 'visible' => 1, 'sortable' => true],
+            ['title' => 'Analyst', 'key' => 'analyst_user_id', 'order' => $order++, 'width' => 146, 'visible' => 1, 'sortable' => true],
             ['title' => 'Country', 'key' => 'country.name', 'order' => $order++, 'width' => 144, 'visible' => 1, 'sortable' => true],
             ['title' => 'IVP', 'key' => 'products_count', 'order' => $order++, 'width' => 104, 'visible' => 1, 'sortable' => true],
             ['title' => 'Manufacturer', 'key' => 'name', 'order' => $order++, 'width' => 140, 'visible' => 1, 'sortable' => true],
@@ -416,7 +416,7 @@ class Manufacturer extends BaseModel
             ['title' => 'Update date', 'key' => 'updated_at', 'order' => $order++, 'width' => 150, 'visible' => 1, 'sortable' => true],
             ['title' => 'Meetings', 'key' => 'meetings_count', 'order' => $order++, 'width' => 86, 'visible' => 1, 'sortable' => true],
             ['title' => 'ID', 'key' => 'id', 'order' => $order++, 'width' => 62, 'visible' => 1, 'sortable' => true],
-            ['title' => 'Attachments', 'key' => 'attachments.filename', 'order' => $order++, 'width' => 260, 'visible' => 1, 'sortable' => true],
+            ['title' => 'Attachments', 'key' => 'attachments.filename', 'order' => $order++, 'width' => 260, 'visible' => 1, 'sortable' => false],
         );
 
         return $columns;

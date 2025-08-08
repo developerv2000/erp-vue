@@ -16,7 +16,7 @@ function resetFilter() {
 }
 
 function applyFilter() {
-    store.pagination.current_page = 1;
+    store.pagination.page = 1;
     store.fetchRecords();
 }
 </script>

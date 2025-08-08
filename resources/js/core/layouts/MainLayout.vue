@@ -1,7 +1,6 @@
 <script setup>
 import Leftbar from "./Leftbar.vue";
 import Header from "./Header.vue";
-import { useTheme } from "vuetify";
 import { useUserSettingsStore } from "@/core/stores/userSettings";
 import { usePage } from "@inertiajs/vue3";
 import { Head } from "@inertiajs/vue3";
@@ -20,11 +19,10 @@ defineProps({
 });
 
 const page = usePage();
-const vuetifyTheme = useTheme();
 const userSettings = useUserSettingsStore();
 
-// Initialize user settings from server props
-userSettings.initFromServerProps(page.props, vuetifyTheme);
+// Initialize user settings from inertia page
+userSettings.initFromInertiaPage(page);
 
 // Initialize the CSRF token cookie used by Sanctum
 axios.get('/sanctum/csrf-cookie');

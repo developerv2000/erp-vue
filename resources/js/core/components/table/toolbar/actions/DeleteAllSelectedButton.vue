@@ -3,7 +3,18 @@ import { ref } from "vue";
 import { mdiDelete } from "@mdi/js";
 import DefaultButton from "../../../buttons/DefaultButton.vue";
 
+const props = defineProps({
+    selected: {
+        type: Array,
+        required: true,
+    },
+});
+
 const deleteAllSelectedModal = ref(false);
+
+function submit() {
+    console.log(props.selected);
+}
 </script>
 
 <template>
@@ -46,7 +57,7 @@ const deleteAllSelectedModal = ref(false);
                     <DefaultButton
                         class="px-6"
                         color="error"
-                        @click="isActive.value = false"
+                        @click="submit"
                     >
                         Delete
                     </DefaultButton>

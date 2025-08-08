@@ -8,6 +8,7 @@ export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', 
         records: [],
         loading: false,
         initializedFromInertiaPage: false,
+        selected: [],
 
         pagination: {
             page: 1,
@@ -85,6 +86,7 @@ export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', 
                 })
                 .finally(() => {
                     this.loading = false;
+                    this.selected = [];
                 })
         },
 
@@ -118,7 +120,8 @@ export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', 
 
         resetState() {
             this.records = [];
-            this.loading = false
+            this.loading = false;
+            this.selected = [];
 
             // Pagination
             this.pagination.page = 1;

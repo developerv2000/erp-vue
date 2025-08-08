@@ -17,7 +17,7 @@ const tableStore = useMADManufacturerTableStore();
 
         <template #actions>
             <NewRecordButton :link="route('mad.manufacturers.create')" />
-            <DeleteAllSelectedButton />
+            <DeleteAllSelectedButton :selected="tableStore.selected" />
         </template>
 
         <template #moreActions>

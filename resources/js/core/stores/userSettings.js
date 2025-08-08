@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import i18n from "@/core/boot/i18n";
+import vuetify from "@/core/boot/vuetify";
 import { toBool } from "@/core/scripts/utilities";
 
 export const useUserSettingsStore = defineStore('userSettings', {
@@ -18,29 +19,34 @@ export const useUserSettingsStore = defineStore('userSettings', {
     },
 
     actions: {
-        initFromServerProps(props, vuetifyTheme) {
-            this.theme = props.auth.user?.settings.theme ?? 'light';
-            this.locale = props.locale ?? 'en';
-            this.isLeftbarCollapsed = toBool(props.auth.user?.settings.is_leftbar_collapsed);
+        initFromInertiaPage(page) {
+            // Set theme
+            const theme = page.props.auth.user?.settings.theme ?? this.theme;
+            this.setTheme(theme);
 
-            i18n.global.locale.value = this.locale;
-            vuetifyTheme.change(this.theme);
+            // Set locale
+            const locale = page.props.locale ?? this.locale;
+            this.setLocale(locale);
+
+            // Set leftbar collapsed state
+            const isLeftbarCollapsed = toBool(page.props.auth.user?.settings.is_leftbar_collapsed);
+            this.setLeftbarCollapsed(isLeftbarCollapsed);
         },
 
-        toggleTheme(vuetifyTheme) {
+        toggleTheme() {
             this.theme = this.theme === 'light' ? 'dark' : 'light';
-            vuetifyTheme.change(this.theme);
+            vuetify.theme.change(this.theme);
         },
 
-        setTheme(vuetifyTheme, newTheme) {
+        setTheme(newTheme) {
             this.theme = newTheme;
-            vuetifyTheme.global.name.value = newTheme;
-            vuetifyTheme.change(newTheme);
+            vuetify.theme.change(newTheme);
         },
 
         setLocale(locale) {
             this.locale = locale;
             i18n.global.locale.value = locale;
+            vuetify.locale.current.value = this.locale;
         },
 
         toggleLeftbar() {

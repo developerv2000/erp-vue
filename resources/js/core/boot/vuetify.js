@@ -5,14 +5,14 @@ import { createVuetify } from 'vuetify'
 import { aliases, mdi } from 'vuetify/iconsets/mdi-svg'
 
 // Optional: import specific locales
-import { en } from 'vuetify/locale'
+import { en, ru } from 'vuetify/locale'
 
 export default createVuetify({
     // Global locale settings
     locale: {
         locale: 'en',        // Default language
         fallback: 'en',      // Fallback if translation not found
-        messages: { en },    // Language messages (you can add more later)
+        messages: { en, ru },    // Language messages
     },
 
     // Icon settings

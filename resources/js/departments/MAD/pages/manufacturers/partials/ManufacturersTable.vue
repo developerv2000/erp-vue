@@ -4,7 +4,6 @@ import TableDefaultSkeleton from "@/core/components/table/misc/TableDefaultSkele
 import TdEditButton from "@/core/components/table/td/TdEditButton.vue";
 import TdAva from "@/core/components/table/td/TdAva.vue";
 import TdInertiaLink from "@/core/components/table/td/TdInertiaLink.vue";
-import TdChipsContainer from "@/core/components/table/td/TdChipsContainer.vue";
 import TdChip from "@/core/components/table/td/TdChip.vue";
 import TdLink from "@/core/components/table/td/TdLink.vue";
 import TogglableMaxLinesLimitedText from "@/core/components/misc/TogglableThreeLinesLimitedText.vue";
@@ -38,6 +37,7 @@ function handleTableOptionsUpdate(options) {
     <v-data-table-server
         class="main-table main-table--with-filter"
         :headers="headers"
+        v-model="store.selected"
         :items="store.records"
         :items-length="store.pagination.total_records"
         :items-per-page-options="DEFAULT_PER_PAGE_OPTIONS"
@@ -55,6 +55,7 @@ function handleTableOptionsUpdate(options) {
         show-select
         show-current-page
         fixed-header
+        hover
     >
         <!-- Top slot -->
         <template #top>
@@ -120,15 +121,9 @@ function handleTableOptionsUpdate(options) {
         </template>
 
         <template v-slot:item.product_classes.name="{ item }">
-            <TdChipsContainer v-if="item.product_classes.length">
-                <TdChip
-                    v-for="obj in item.product_classes"
-                    :key="obj.id"
-                    class="bg-teal-accent-2"
-                >
-                    {{ obj.name }}
-                </TdChip>
-            </TdChipsContainer>
+            <span>{{
+                item.product_classes.map((obj) => obj.name).join(" ")
+            }}</span>
         </template>
 
         <template v-slot:item.zones.name="{ item }">

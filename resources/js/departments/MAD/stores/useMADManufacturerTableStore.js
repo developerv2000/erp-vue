@@ -16,6 +16,8 @@ export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', 
             order_by: 'updated_at',
             order_direction: 'desc',
             total_records: 0,
+            last_page: 1,
+            navigate_to_page: 1,
         },
 
         filters: {
@@ -39,6 +41,7 @@ export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', 
             this.pagination.per_page = Number(query.per_page ?? 50);
             this.pagination.order_by = query.order_by ?? 'updated_at';
             this.pagination.order_direction = query.order_direction ?? 'desc';
+            this.navigate_to_page = this.pagination.page;
 
             // Normalize singular autocompletes
             this.filters.analyst_user_id = normalizeSingleID(query.analyst_user_id);
@@ -79,6 +82,8 @@ export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', 
                 .then(response => {
                     this.records = response.data.data;
                     this.pagination.total_records = response.data.total;
+                    this.pagination.last_page = response.data.last_page;
+                    this.pagination.navigate_to_page = response.data.current_page;
 
                     if (updateUrl) {
                         this.updateUrlAfterFetch();
@@ -118,6 +123,11 @@ export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', 
             });
         },
 
+        handleNavigateToPage() {
+            this.pagination.page = this.pagination.navigate_to_page;
+            this.fetchRecords({ updateUrl: true });
+        },
+
         resetState() {
             this.records = [];
             this.loading = false;
@@ -129,9 +139,11 @@ export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', 
             this.pagination.order_by = 'updated_at';
             this.pagination.order_direction = 'desc';
             this.pagination.total_records = 0;
+            this.last_page = 1;
+            this.navigate_to_page = 1,
 
-            // Singular autocompletes
-            this.filters.analyst_user_id = null;
+                // Singular autocompletes
+                this.filters.analyst_user_id = null;
             this.filters.bdm_user_id = null;
 
             // Multiple autocompletes

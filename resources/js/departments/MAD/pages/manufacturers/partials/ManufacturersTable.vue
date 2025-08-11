@@ -10,6 +10,7 @@ import TogglableMaxLinesLimitedText from "@/core/components/misc/TogglableThreeL
 import TdRecordCommentsLink from "@/core/components/table/td/TdRecordCommentsLink.vue";
 import TdAttachmentsList from "@/core/components/table/td/TdAttachmentsList.vue";
 import TdRecordAttachmentsLink from "@/core/components/table/td/TdRecordAttachmentsLink.vue";
+import TableNavigateToPage from "@/core/components/table/misc/TableNavigateToPage.vue";
 import { useMADManufacturerTableStore } from "@/departments/MAD/stores/useMADManufacturerTableStore";
 import { useDateFormat } from "@vueuse/core";
 import { usePage } from "@inertiajs/vue3";
@@ -65,6 +66,11 @@ function handleTableOptionsUpdate(options) {
         <!-- Loading slot -->
         <template v-slot:loading>
             <TableDefaultSkeleton />
+        </template>
+
+        <!-- Custom footer slot -->
+        <template #footer.prepend>
+            <TableNavigateToPage :store="store" />
         </template>
 
         <!-- Item slots -->

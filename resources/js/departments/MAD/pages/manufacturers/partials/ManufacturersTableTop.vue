@@ -8,16 +8,16 @@ import ExportListItem from "@/core/components/table/toolbar/more-action-items/Ex
 import TrashListItem from "@/core/components/table/toolbar/more-action-items/TrashListItem.vue";
 import { useMADManufacturerTableStore } from "@/departments/MAD/stores/useMADManufacturerTableStore";
 
-const tableStore = useMADManufacturerTableStore();
+const store = useMADManufacturerTableStore();
 </script>
 
 <template>
     <DefaultTableToolbar>
-        <template #title> Filtered records — {{ tableStore.pagination.total_records }} </template>
+        <template #title> Filtered records — {{ store.pagination.total_records }} </template>
 
         <template #actions>
             <NewRecordButton :link="route('mad.manufacturers.create')" />
-            <DeleteAllSelectedButton :selected="tableStore.selected" />
+            <DeleteAllSelectedButton :selected="store.selected" />
         </template>
 
         <template #moreActions>

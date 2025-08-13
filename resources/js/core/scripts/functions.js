@@ -9,3 +9,21 @@ export function handleGlobalClickDelegates(event) {
     el.classList.toggle('max-lines-limited-text');
     event.stopPropagation();
 }
+
+export function enterFullscreen(target) {
+    if (target.requestFullscreen) {
+        target.requestFullscreen();
+    } else if (target.webkitRequestFullscreen) {
+        target.webkitRequestFullscreen();
+    } else if (target.msRequestFullscreen) {
+        target.msRequestFullscreen();
+    }
+};
+
+export function toggleFullscreenClass(target) {
+    if (document.fullscreenElement) {
+        target.classList.add('fullscreen');
+    } else {
+        target.classList.remove('fullscreen');
+    }
+};

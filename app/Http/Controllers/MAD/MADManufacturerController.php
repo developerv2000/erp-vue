@@ -9,7 +9,6 @@ use App\Models\Manufacturer;
 use App\Models\User;
 use App\Support\FilterDependencies\SimpleFilters\MAD\ManufacturersSimpleFilterDependencies;
 use App\Support\FilterDependencies\SmartFilters\MAD\ManufacturersSmartFilterDependencies;
-use App\Support\Helpers\UrlHelper;
 use App\Support\Traits\Controller\DestroysModelRecords;
 use App\Support\Traits\Controller\RestoresModelRecords;
 use Illuminate\Http\Request;

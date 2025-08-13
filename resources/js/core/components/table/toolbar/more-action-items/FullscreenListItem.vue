@@ -1,8 +1,10 @@
 <script setup>
 import { mdiFullscreen } from '@mdi/js';
+import { enterFullscreen } from '@/core/scripts/functions';
 
 const action = () => {
-    console.log('fullscreen');
+    const tableWrapper = document.querySelector('.default-table-wrapper');
+    enterFullscreen(tableWrapper);
 };
 </script>
 

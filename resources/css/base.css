@@ -4,8 +4,13 @@
     --main-box-padding-top: 24px;
     --default-toolbar-height: 56px;
     --main-table-footer-height: 62px;
+
     --main-table-wrapper-max-height: calc(100vh - var(--app-bar-height) - var(--main-box-padding-top) - var(--default-toolbar-height) - var(--main-table-footer-height));
+    --main-table-wrapper-fullscreened-max-height: calc(100vh - var(--default-toolbar-height) - var(--main-table-footer-height));
+
     --main-filter-width: 200px;
+    --main-filter-max-height: calc(100vh - var(--app-bar-height));
+    --main-filter-fullscreened-max-height: 100vh;
 }
 
 /* ------------ /end Vars ------------ */
@@ -37,12 +42,18 @@
 
 /* ------------ Main table ------------ */
 .main-table.main-table--with-filter {
-    max-width: calc(100% - var(--main-filter-width));
+    /* 100% - .default-table-wrapper:gap - .main-filter:width */
+    max-width: calc(100% - 24px - var(--main-filter-width));
 }
 
 .main-table .v-table__wrapper {
     max-height: var(--main-table-wrapper-max-height);
     overflow: auto;
+}
+
+/* Fullscreen mode */
+.default-table-wrapper.fullscreen .main-table .v-table__wrapper {
+    max-height: var(--main-table-wrapper-fullscreened-max-height);
 }
 
 .main-table table {
@@ -73,8 +84,13 @@
 .main-filter {
     width: var(--main-filter-width);
     min-width: var(--main-filter-width);
-    max-height: calc(100vh - var(--app-bar-height));
+    max-height: var(--main-filter-max-height);
     overflow-y: auto;
+}
+
+/* Fullscreen mode */
+.default-table-wrapper.fullscreen .main-filter {
+    max-height: var(--main-filter-fullscreened-max-height);
 }
 
 /* ------------ /end Main filter ------------ */

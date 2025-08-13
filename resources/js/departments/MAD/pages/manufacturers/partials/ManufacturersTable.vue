@@ -31,7 +31,7 @@ onMounted(() => {
 });
 
 function handleTableOptionsUpdate(options) {
-    store.fetchRecordsIfOptionsChanged(options); // doesn`t fire on mount
+    store.fetchRecordsIfOptionsChanged(options); // Doesn`t fire on mount
 }
 </script>
 

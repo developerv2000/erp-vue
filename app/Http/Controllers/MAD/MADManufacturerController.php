@@ -10,7 +10,6 @@ use App\Models\User;
 use App\Support\FilterDependencies\SimpleFilters\MAD\ManufacturersSimpleFilterDependencies;
 use App\Support\FilterDependencies\SmartFilters\MAD\ManufacturersSmartFilterDependencies;
 use App\Support\Helpers\UrlHelper;
-use App\Support\SmartFilters\MAD\MADManufacturersSmartFilter;
 use App\Support\Traits\Controller\DestroysModelRecords;
 use App\Support\Traits\Controller\RestoresModelRecords;
 use Illuminate\Http\Request;
@@ -23,14 +22,6 @@ class MADManufacturerController extends Controller
 
     // used in multiple destroy/restore traits
     public static $model = Manufacturer::class;
-
-    /**
-     * API request
-     */
-    public function get(Request $request)
-    {
-        return Manufacturer::getRecordsForRequest($request);
-    }
 
     public function index(Request $request)
     {
@@ -45,27 +36,17 @@ class MADManufacturerController extends Controller
         ]);
     }
 
-    public function getSmartFilterDependencies()
-    {
-        return MADManufacturersSmartFilter::getAllDependencies();
-    }
-
     public function trash(Request $request)
     {
-        // Preapare request for valid model querying
-        Manufacturer::addDefaultQueryParamsToRequest($request);
-        UrlHelper::addUrlWithReversedOrderTypeToRequest($request);
+        $getAllTableHeaders = fn() => $request->user()->collectTableHeadersBySettingsKey(User::SETTINGS_KEY_OF_MAD_EPP_TABLE);
+        $getVisibleHeaders = fn() => User::filterOnlyVisibleHeaders($getAllTableHeaders());
 
-        // Get trashed finalized records paginated
-        $query = Manufacturer::onlyTrashed()->withBasicRelations()->withBasicRelationCounts();
-        $filteredQuery = Manufacturer::filterQueryForRequest($query, $request);
-        $records = Manufacturer::finalizeQueryForRequest($filteredQuery, $request, 'paginate');
-
-        // Get all and only visible table columns
-        $allTableColumns = $request->user()->collectTableColumnsBySettingsKey(Manufacturer::SETTINGS_MAD_TABLE_COLUMNS_KEY);
-        $visibleTableColumns = User::filterOnlyVisibleColumns($allTableColumns);
-
-        return view('MAD.manufacturers.trash', compact('request', 'records', 'allTableColumns', 'visibleTableColumns'));
+        return Inertia::render('departments/MAD/pages/manufacturers/Trash', [
+            'allTableHeaders' => $getAllTableHeaders, // Lazy load
+            'tableVisibleHeaders' => $getVisibleHeaders, // Lazy load
+            'simpleFilterDependencies' => fn() => ManufacturersSimpleFilterDependencies::getAllDependencies(), // Lazy load
+            'smartFilterDependencies' => ManufacturersSmartFilterDependencies::getAllDependencies(),
+        ]);
     }
 
     public function create()

@@ -3,21 +3,28 @@ import { router } from '@inertiajs/vue3'
 import { normalizeSingleID, normalizeMultiIDs, cleanQueryParams } from '@/core/scripts/utilities';
 import axios from 'axios';
 
+const DEFAULT_PER_PAGE = 50;
+const DEFAULT_ORDER_BY = 'updated_at';
+const DEFAULT_ORDER_DIRECTION = 'desc';
+
+const API_URL = '/api/manufacturers';
+
 export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', {
     state: () => ({
         records: [],
         loading: false,
         initializedFromInertiaPage: false,
         selected: [],
+        isTrashPage: false,
 
         pagination: {
             page: 1,
-            per_page: 50,
-            order_by: 'updated_at',
-            order_direction: 'desc',
+            per_page: DEFAULT_PER_PAGE,
+            order_by: DEFAULT_ORDER_BY,
+            order_direction: DEFAULT_ORDER_DIRECTION,
             total_records: 0,
             last_page: 1,
-            navigate_to_page: 1,
+            navigate_to_page: 1, // Prepended navigation
         },
 
         filters: {
@@ -32,15 +39,20 @@ export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', 
     }),
 
     actions: {
+        detectTrashPage() {
+            this.isTrashPage = route().current('*.trash');
+        },
+
         initFromInertiaPage(page) {
+            this.detectTrashPage(); // Set isTrashPage
             this.records = [];
             const query = page.props.query;
 
             // Pagination
             this.pagination.page = Number(query.page ?? 1);
-            this.pagination.per_page = Number(query.per_page ?? 50);
-            this.pagination.order_by = query.order_by ?? 'updated_at';
-            this.pagination.order_direction = query.order_direction ?? 'desc';
+            this.pagination.per_page = Number(query.per_page ?? DEFAULT_PER_PAGE);
+            this.pagination.order_by = query.order_by ?? DEFAULT_ORDER_BY;
+            this.pagination.order_direction = query.order_direction ?? DEFAULT_ORDER_DIRECTION;
             this.navigate_to_page = this.pagination.page;
 
             // Normalize singular autocompletes
@@ -57,6 +69,9 @@ export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', 
 
         toQuery() {
             const rawQuery = {
+                // Only trashed
+                only_trashed: this.isTrashPage ? true : null, // null -> remove from query
+
                 // Pagination
                 page: this.pagination.page,
                 per_page: this.pagination.per_page,
@@ -76,7 +91,7 @@ export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', 
         fetchRecords({ updateUrl = true } = {}) {
             this.loading = true;
 
-            axios.get('/api/manufacturers', {
+            axios.get(API_URL, {
                 params: this.toQuery(),
             })
                 .then(response => {
@@ -115,7 +130,7 @@ export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', 
         },
 
         updateUrlAfterFetch() {
-            router.get(route('mad.manufacturers.index'), this.toQuery(), {
+            router.get(route(route().current()), this.toQuery(), {
                 only: ['smartFilterDependencies'],
                 replace: true,
                 preserveState: true,
@@ -135,15 +150,15 @@ export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', 
 
             // Pagination
             this.pagination.page = 1;
-            this.pagination.per_page = 50;
-            this.pagination.order_by = 'updated_at';
-            this.pagination.order_direction = 'desc';
+            this.pagination.per_page = DEFAULT_PER_PAGE;
+            this.pagination.order_by = DEFAULT_ORDER_BY;
+            this.pagination.order_direction = DEFAULT_ORDER_DIRECTION;
             this.pagination.total_records = 0;
             this.last_page = 1;
-            this.navigate_to_page = 1,
+            this.navigate_to_page = 1;
 
-                // Singular autocompletes
-                this.filters.analyst_user_id = null;
+            // Singular autocompletes
+            this.filters.analyst_user_id = null;
             this.filters.bdm_user_id = null;
 
             // Multiple autocompletes
@@ -152,7 +167,7 @@ export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', 
         },
 
         resetUrl() {
-            router.get(route('mad.manufacturers.index'), {}, {
+            router.get(route(route().current()), {}, {
                 only: ['smartFilterDependencies'],
                 replace: true,
                 preserveState: true,

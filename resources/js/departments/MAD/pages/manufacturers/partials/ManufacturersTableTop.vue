@@ -24,7 +24,7 @@ const store = useMADManufacturerTableStore();
             <ColumnsListItem />
             <FullscreenListItem />
             <ExportListItem />
-            <TrashListItem />
+            <TrashListItem route-name="mad.manufacturers.trash" />
         </template>
     </DefaultTableToolbar>
 </template>

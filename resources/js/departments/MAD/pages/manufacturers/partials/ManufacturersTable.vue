@@ -26,11 +26,12 @@ if (!store.initializedFromInertiaPage) {
 }
 
 onMounted(() => {
+    store.detectTrashPage();
     store.fetchRecords({ updateUrl: false });
 });
 
 function handleTableOptionsUpdate(options) {
-    store.fetchRecordsIfOptionsChanged(options);
+    store.fetchRecordsIfOptionsChanged(options); // doesn`t fire on mount
 }
 </script>
 

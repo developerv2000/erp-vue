@@ -59,7 +59,7 @@ const submit = handleSubmit((values) => {
         },
         onSuccess: () => {
             setFieldValue("photo", null);
-            messages.addUpdatedSuccessfullyMessage(t);
+            messages.addUpdatedSuccessfullyMessage();
         },
         onFinish: () => {
             loading.value = false;

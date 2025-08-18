@@ -38,8 +38,6 @@ const { value: newPassword, errorMessage: newPasswordError } =
 
 // Inertia update password request
 const submit = handleSubmit((values) => {
-    // console.log(values);
-    // return;
     router.post(route("profile.update-password"), values, {
         only: [],
         preserveScroll: true,
@@ -51,7 +49,7 @@ const submit = handleSubmit((values) => {
         },
         onSuccess: () => {
             resetForm();
-            messages.addUpdatedSuccessfullyMessage(t);
+            messages.addUpdatedSuccessfullyMessage();
         },
         onFinish: () => {
             loading.value = false;

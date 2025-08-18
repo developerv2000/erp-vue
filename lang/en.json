@@ -44,7 +44,7 @@
 
     "messages.Updated successfully": "Updated successfully!",
     "messages.Submition failed": "Something went wrong, please try again later!",
-    "messages.Successefully deleted": ":count records successefully deleted!",
+    "messages.Successefully deleted": "{count} records successefully deleted!",
 
     "fields.Email": "Email",
     "fields.Password": "Password",

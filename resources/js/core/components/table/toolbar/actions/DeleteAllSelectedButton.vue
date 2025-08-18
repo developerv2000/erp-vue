@@ -4,7 +4,6 @@ import { mdiDelete } from "@mdi/js";
 import DefaultButton from "../../../buttons/DefaultButton.vue";
 import axios from "axios";
 import { useMessagesStore } from "@/core/stores/useMessages";
-import { useI18n } from "vue-i18n";
 
 const props = defineProps({
     deleteLink: String,
@@ -12,7 +11,6 @@ const props = defineProps({
 });
 
 const messages = useMessagesStore();
-const { t } = useI18n();
 const showModal = ref(false);
 
 function submit() {
@@ -22,7 +20,7 @@ function submit() {
         })
         .then((response) => {
             showModal.value = false;
-            messages.addSuccessefullyDeletedMessage(t, response.data.count);
+            messages.addSuccessefullyDeletedMessage(response.data.count);
             props.store.fetchRecords({ updateUrl: false });
         })
         .catch((error) => {

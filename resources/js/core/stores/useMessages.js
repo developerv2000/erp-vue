@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import i18n from "../boot/i18n";
 
 export const useMessagesStore = defineStore('messages', {
     state: () => ({
@@ -8,21 +9,21 @@ export const useMessagesStore = defineStore('messages', {
         add(message) {
             this.queue.push(message);
         },
-        addUpdatedSuccessfullyMessage(t) {
+        addUpdatedSuccessfullyMessage() {
             this.add({
-                text: t('messages.Updated successfully'),
+                text: i18n.global.t('messages.Updated successfully'),
                 color: 'success',
             });
         },
-        addSubmitionFailedMessage(t) {
+        addSubmitionFailedMessage() {
             this.add({
-                text: t('messages.Submition failed'),
+                text: i18n.global.t('messages.Submition failed'),
                 color: 'error',
             });
         },
-        addSuccessefullyDeletedMessage(t, count) {
+        addSuccessefullyDeletedMessage(count) {
             this.add({
-                text: t('messages.Successefully deleted', { count: count }),
+                text: i18n.global.t('messages.Successefully deleted', { count: count }),
                 color: 'success',
             });
         },

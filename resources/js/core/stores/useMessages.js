@@ -27,5 +27,11 @@ export const useMessagesStore = defineStore('messages', {
                 color: 'success',
             });
         },
+        addSuccessefullyRestoredMessage(count) {
+            this.add({
+                text: i18n.global.t('messages.Successefully restored', { count: count }),
+                color: 'success',
+            });
+        },
     },
 });

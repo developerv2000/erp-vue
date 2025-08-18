@@ -16,12 +16,6 @@ use Illuminate\Http\Request;
  */
 trait RestoresModelRecords
 {
-    /**
-     * Restore model records from trash based on the request parameters.
-     *
-     * @param Request $request The request object.
-     * @return \Illuminate\Http\RedirectResponse Redirect back to the previous page.
-     */
     public function restore(Request $request)
     {
         // Extract id or ids from request as array to restore through loop
@@ -36,6 +30,8 @@ trait RestoresModelRecords
             }
         }
 
-        return redirect()->back();
+        return response()->json([
+            'count' => count($ids),
+        ]);
     }
 }

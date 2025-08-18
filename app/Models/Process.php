@@ -323,9 +323,9 @@ class Process extends BaseModel implements HasTitle, CanExportRecordsAsExcel, Pr
                 $history->delete();
             }
 
-            foreach ($record->orderProducts as $orderProduct) {
-                $orderProduct->delete();
-            }
+            // foreach ($record->orderProducts as $orderProduct) {
+            //     $orderProduct->delete();
+            // }
         });
     }
 

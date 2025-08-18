@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Support\FilterDependencies\SimpleFilters\MAD\ManufacturersSimpleFilterDependencies;
 use App\Support\FilterDependencies\SmartFilters\MAD\ManufacturersSmartFilterDependencies;
 use App\Support\Traits\Controller\DestroysModelRecords;
+use App\Support\Traits\Controller\PrependsTrashPageTableHeaders;
 use App\Support\Traits\Controller\RestoresModelRecords;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -16,6 +17,7 @@ class MADManufacturerController extends Controller
 {
     use DestroysModelRecords;
     use RestoresModelRecords;
+    use PrependsTrashPageTableHeaders;
 
     // used in multiple destroy/restore traits
     public static $model = Manufacturer::class;
@@ -35,7 +37,10 @@ class MADManufacturerController extends Controller
 
     public function trash(Request $request)
     {
-        $getAllTableHeaders = fn() => $request->user()->collectTableHeadersBySettingsKey(User::SETTINGS_KEY_OF_MAD_EPP_TABLE);
+        $getAllTableHeaders = fn() => $this->prependTrashPageTableHeaders(
+            $request->user()->collectTableHeadersBySettingsKey(User::SETTINGS_KEY_OF_MAD_EPP_TABLE)
+        );
+
         $getVisibleHeaders = fn() => User::filterOnlyVisibleHeaders($getAllTableHeaders());
 
         return Inertia::render('departments/MAD/pages/manufacturers/Trash', [

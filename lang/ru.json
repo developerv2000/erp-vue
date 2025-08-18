@@ -44,7 +44,8 @@
 
     "messages.Updated successfully": "Обновлено успешно!",
     "messages.Submition failed": "Что-то пошло не так. Пожалуйста, попробуйте позже!",
-    "messages.Successefully deleted": "{count} записи успешно удалены!",
+    "messages.Successefully deleted": "{count} записей успешно удалены!",
+    "messages.Successefully restored": "{count} записей успешно востановлены!",
 
     "fields.Email": "Электронная почта",
     "fields.Password": "Пароль",

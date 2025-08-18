@@ -17,14 +17,12 @@ function submit() {
     axios
         .post(props.deleteLink, {
             ids: props.store.selected,
+            force_delete: true,
         })
         .then((response) => {
             showModal.value = false;
             messages.addSuccessefullyDeletedMessage(response.data.count);
             props.store.fetchRecords({ updateUrl: false });
-        })
-        .catch((error) => {
-            console.error(error.response);
         });
 }
 </script>
@@ -38,21 +36,22 @@ function submit() {
                 size="default"
                 v-bind="activatorProps"
                 variant="tonal"
+                :disabled="store.selected.length == 0"
             >
-                Delete
+                Permanent delete
             </DefaultButton>
         </template>
 
         <template v-slot:default="{ isActive }">
             <v-card>
                 <v-card-item class="pa-4" :prepend-icon="mdiDelete">
-                    <v-card-title>Delete selected</v-card-title>
+                    <v-card-title>Delete selected permanently</v-card-title>
                 </v-card-item>
 
                 <v-divider />
 
                 <v-card-text class="pa-4 py-6">
-                    Are you sure you want to delete selected?
+                    Are you sure you want to delete selected permanently?
                 </v-card-text>
 
                 <v-divider></v-divider>

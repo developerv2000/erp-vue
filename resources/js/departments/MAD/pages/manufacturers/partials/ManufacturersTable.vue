@@ -75,6 +75,10 @@ function handleTableOptionsUpdate(options) {
         </template>
 
         <!-- Item slots -->
+        <template v-slot:item.deleted_at="{ item }">
+            {{ useDateFormat(item.deleted_at, "DD MMM YYYY") }}
+        </template>
+
         <template v-slot:item.edit="{ item }">
             <TdEditButton :link="route('mad.manufacturers.edit', item.id)" />
         </template>

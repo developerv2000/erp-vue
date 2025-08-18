@@ -6,6 +6,12 @@ import { fileURLToPath } from 'url'
 
 // This is the Vite config file, used to configure how the frontend is built
 export default defineConfig({
+    build: {
+        // Enables top-level await (needed for `await axios.get(...)`).
+        // Avoids unnecessary polyfills for dead browsers (< Chrome 89, < Firefox 89).
+        // Smaller, faster builds.
+        target: 'esnext',
+    },
     plugins: [
         // Enables Laravel Vite support (for hot reloads, asset building, etc.)
         laravel({

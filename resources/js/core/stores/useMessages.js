@@ -14,10 +14,16 @@ export const useMessagesStore = defineStore('messages', {
                 color: 'success',
             });
         },
-        addSubmititionFailedMessage(t) {
+        addSubmitionFailedMessage(t) {
             this.add({
                 text: t('messages.Submition failed'),
                 color: 'error',
+            });
+        },
+        addSuccessefullyDeletedMessage(t, count) {
+            this.add({
+                text: t('messages.Successefully deleted', { count: count }),
+                color: 'success',
             });
         },
     },

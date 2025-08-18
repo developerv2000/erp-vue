@@ -13,18 +13,27 @@ const store = useMADManufacturerTableStore();
 
 <template>
     <DefaultTableToolbar>
-        <template #title> Filtered records — {{ store.pagination.total_records }} </template>
+        <template #title>
+            Filtered records — {{ store.pagination.total_records }}
+        </template>
 
         <template #actions>
             <NewRecordButton :link="route('mad.manufacturers.create')" />
-            <DeleteAllSelectedButton :selected="store.selected" />
+
+            <DeleteAllSelectedButton
+                :delete-link="route('mad.manufacturers.destroy')"
+                :store="store"
+            />
         </template>
 
         <template #moreActions>
             <ColumnsListItem />
             <FullscreenListItem />
             <ExportListItem />
-            <TrashListItem v-if="!store.isTrashPage" route-name="mad.manufacturers.trash" />
+            <TrashListItem
+                v-if="!store.isTrashPage"
+                route-name="mad.manufacturers.trash"
+            />
         </template>
     </DefaultTableToolbar>
 </template>

@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\MAD;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\ManufacturerStoreRequest;
-use App\Http\Requests\ManufacturerUpdateRequest;
 use App\Models\Manufacturer;
 use App\Models\User;
 use App\Support\FilterDependencies\SimpleFilters\MAD\ManufacturersSimpleFilterDependencies;
@@ -46,55 +44,5 @@ class MADManufacturerController extends Controller
             'simpleFilterDependencies' => fn() => ManufacturersSimpleFilterDependencies::getAllDependencies(), // Lazy load
             'smartFilterDependencies' => ManufacturersSmartFilterDependencies::getAllDependencies(),
         ]);
-    }
-
-    public function create()
-    {
-        return view('MAD.manufacturers.create');
-    }
-
-    public function store(ManufacturerStoreRequest $request)
-    {
-        Manufacturer::createFromRequest($request);
-
-        return to_route('mad.manufacturers.index');
-    }
-
-    /**
-     * Route model binding is not used, because trashed records can also be edited.
-     * Route model binding looks only for untrashed records!
-     */
-    public function edit(Request $request, $record)
-    {
-        $record = Manufacturer::withTrashed()->findOrFail($record);
-
-        return view('MAD.manufacturers.edit', compact('record'));
-    }
-
-    /**
-     * Route model binding is not used, because trashed records can also be edited.
-     * Route model binding looks only for untrashed records!
-     */
-    public function update(ManufacturerUpdateRequest $request, $record)
-    {
-        $record = Manufacturer::withTrashed()->findOrFail($record);
-        $record->updateFromRequest($request);
-
-        return redirect($request->input('previous_url'));
-    }
-
-    public function exportAsExcel(Request $request)
-    {
-        // Preapare request for valid model querying
-        Manufacturer::addRefererQueryParamsToRequest($request);
-        Manufacturer::addDefaultQueryParamsToRequest($request);
-
-        // Get finalized records query
-        $query = Manufacturer::withRelationsForExport();
-        $filteredQuery = Manufacturer::filterQueryForRequest($query, $request);
-        $records = Manufacturer::finalizeQueryForRequest($filteredQuery, $request, 'query');
-
-        // Export records
-        return Manufacturer::exportRecordsAsExcel($records);
     }
 }

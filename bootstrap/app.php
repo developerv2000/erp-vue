@@ -15,12 +15,27 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // Ensure API stateful requests are handled first (Sanctum + CSRF cookies)
         $middleware->statefulApi();
+
+        // Apply web middleware stack
         $middleware->web(append: [
+            // a) Custom CSRF handler: catch invalid CSRF tokens early
+            \App\Http\Middleware\HandleInvalidCsrf::class,
+
+            // b) Authentication-dependent logic (ensure user relations are loaded)
             \App\Http\Middleware\EnsureUserRelationsAreLoaded::class,
+
+            // c) Locale validator / setter
             \App\Http\Middleware\ValidateLocale::class,
+
+            // d) Inertia request handler (shared props, flash messages)
             \App\Http\Middleware\HandleInertiaRequests::class,
+
+            // e) Custom Inertia GET-only encryption
             \App\Http\Middleware\EncryptInertiaHistoryOnlyOnGetRequests::class,
+
+            // f) Preload asset link headers
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
         ]);
     })

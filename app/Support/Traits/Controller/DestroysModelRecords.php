@@ -19,11 +19,8 @@ trait DestroysModelRecords
     /**
      * Destroy model records based on the request parameters.
      *
-     * If the 'force_delete' parameter is provided and the user is an admin,
-     * the records will be force deleted. Otherwise, they will be soft deleted.
-     *
-     * @param Request $request The request object.
-     * @return \Illuminate\Http\RedirectResponse Redirect back to the previous page.
+     * If the 'force_delete' parameter is provided, the records will be force deleted.
+     * Otherwise, they will be soft deleted.
      */
     public function destroy(Request $request)
     {
@@ -43,13 +40,14 @@ trait DestroysModelRecords
             foreach ($ids as $id) {
                 // Check if model exists before soft deleting
                 $record = static::$model::find($id);
-
                 if ($record) {
                     $record->delete();
                 }
             }
         }
 
-        return redirect()->back();
+        return response()->json([
+            'count' => count($ids),
+        ]);
     }
 }

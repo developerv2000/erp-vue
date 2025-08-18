@@ -2,23 +2,37 @@
 import { ref } from "vue";
 import { mdiDelete } from "@mdi/js";
 import DefaultButton from "../../../buttons/DefaultButton.vue";
+import axios from "axios";
+import { useMessagesStore } from "@/core/stores/useMessages";
+import { useI18n } from "vue-i18n";
 
 const props = defineProps({
-    selected: {
-        type: Array,
-        required: true,
-    },
+    deleteLink: String,
+    store: Object,
 });
 
-const deleteAllSelectedModal = ref(false);
+const messages = useMessagesStore();
+const { t } = useI18n();
+const showModal = ref(false);
 
 function submit() {
-    console.log(props.selected);
+    axios
+        .post(props.deleteLink, {
+            ids: props.store.selected,
+        })
+        .then((response) => {
+            showModal.value = false;
+            messages.addSuccessefullyDeletedMessage(t, response.data.count);
+            props.store.fetchRecords({ updateUrl: false });
+        })
+        .catch((error) => {
+            console.error(error.response);
+        });
 }
 </script>
 
 <template>
-    <v-dialog v-model="deleteAllSelectedModal" max-width="400">
+    <v-dialog v-model="showModal" max-width="400">
         <template v-slot:activator="{ props: activatorProps }">
             <DefaultButton
                 :prepend-icon="mdiDelete"
@@ -54,11 +68,7 @@ function submit() {
                         Cancel
                     </DefaultButton>
 
-                    <DefaultButton
-                        class="px-6"
-                        color="error"
-                        @click="submit"
-                    >
+                    <DefaultButton class="px-6" color="error" @click="submit">
                         Delete
                     </DefaultButton>
                 </v-card-actions>

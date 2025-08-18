@@ -1,10 +1,36 @@
 import axios from 'axios';
 
+// -----------------------------
+// Axios Config
+// -----------------------------
 window.axios = axios;
-
 // Required by Laravel to detect AJAX requests
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-
 // Required to send session cookies (for Sanctum's web-based auth)
 window.axios.defaults.withCredentials = true;
+// Enable XSRF token detection from <meta name="csrf-token">
 window.axios.defaults.withXSRFToken = true;
+
+// -----------------------------
+// CSRF Auto-refresh Interceptor
+// -----------------------------
+axios.interceptors.response.use(
+    response => response,
+    async error => {
+        if (error.response && error.response.status === 419) {
+            console.warn('CSRF token expired, refreshing...');
+
+            try {
+                // Refresh CSRF cookie (Sanctum or session-based)
+                await axios.get('/sanctum/csrf-cookie');
+
+                // Retry the original request
+                return axios(error.config);
+            } catch (e) {
+                console.error('Failed to refresh CSRF token', e);
+            }
+        }
+
+        return Promise.reject(error);
+    }
+);

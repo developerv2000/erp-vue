@@ -5,7 +5,6 @@ import { useUserSettingsStore } from "@/core/stores/userSettings";
 import { usePage } from "@inertiajs/vue3";
 import { Head } from "@inertiajs/vue3";
 import SnackbarQueue from "../components/misc/SnackbarQueue.vue";
-import axios from "axios";
 
 defineProps({
     title: {
@@ -23,9 +22,6 @@ const userSettings = useUserSettingsStore();
 
 // Initialize user settings from inertia page
 userSettings.initFromInertiaPage(page);
-
-// Initialize the CSRF token cookie used by Sanctum
-axios.get('/sanctum/csrf-cookie');
 </script>
 
 <template>

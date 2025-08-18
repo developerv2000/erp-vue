@@ -8,6 +8,8 @@ window.axios = axios;
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 // Required to send session cookies (for Sanctum's web-based auth)
 window.axios.defaults.withCredentials = true;
+// Initialize the CSRF token cookie used by Sanctum
+await window.axios.get('/sanctum/csrf-cookie');
 // Enable XSRF token detection from <meta name="csrf-token">
 window.axios.defaults.withXSRFToken = true;
 

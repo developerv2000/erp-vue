@@ -49,7 +49,7 @@ function submit() {
 
                 <v-divider />
 
-                <v-card-text class="pa-4 py-6">
+                <v-card-text class="px-4 py-6">
                     Are you sure you want to restore selected?
                 </v-card-text>
 

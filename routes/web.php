@@ -24,8 +24,8 @@ Route::middleware('auth', 'auth.session')->group(function () {
     });
 
     Route::controller(SettingController::class)->prefix('/settings')->name('settings.')->group(function () {
-        Route::patch('update/{key}/{value}', 'updateByKey')->name('update-by-key'); // ajax request
-        Route::patch('table-columns/{key}', 'updateTableColumns')->name('update-table-columns');
+        Route::patch('by-key/{key}/{value}', 'updateByKey')->name('update-by-key'); // ajax request
+        Route::patch('table-headers/{key}', 'updateTableHeaders')->name('table-headers.update'); // ajax request
     });
 
     Route::prefix('notifications')->controller(NotificationController::class)->name('notifications.')->group(function () {

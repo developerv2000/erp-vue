@@ -18,7 +18,6 @@ import { onMounted } from "vue";
 import { DEFAULT_PER_PAGE_OPTIONS } from "@/core/scripts/constants";
 
 const page = usePage();
-const headers = page.props.tableVisibleHeaders;
 const store = useMADManufacturerTableStore();
 
 if (!store.initializedFromInertiaPage) {
@@ -38,7 +37,7 @@ function handleTableOptionsUpdate(options) {
 <template>
     <v-data-table-server
         class="main-table main-table--with-filter"
-        :headers="headers"
+        :headers="page.props.tableVisibleHeaders"
         v-model="store.selected"
         :items="store.records"
         :items-length="store.pagination.total_records"

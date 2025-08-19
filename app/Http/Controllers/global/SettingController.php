@@ -66,4 +66,16 @@ class SettingController extends Controller
             'success' => true,
         ]);
     }
+
+    /**
+     * Reset table headers including orders, widths, and visibility.
+     */
+    public function resetTableHeaders(Request $request, $key)
+    {
+        auth()->user()->resetSpecificTableHeaders($key);
+
+        return response()->json([
+            'success' => true,
+        ]);
+    }
 }

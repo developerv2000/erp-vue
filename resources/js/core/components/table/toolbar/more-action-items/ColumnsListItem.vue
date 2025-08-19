@@ -6,11 +6,19 @@ import draggable from "vuedraggable";
 import DefaultButton from "@/core/components/buttons/DefaultButton.vue";
 import axios from "axios";
 
+const props = defineProps({
+    settingsKey: String,
+});
+
 const page = usePage();
 const headers = ref([...page.props.allTableHeaders]);
 const showModal = ref(false);
+const loading = ref(false);
 
 function updateHeaders() {
+    // Set loading state
+    loading.value = true;
+
     // Update header orders to match drag/drop
     headers.value = headers.value.map((header, index) => ({
         ...header,
@@ -19,15 +27,33 @@ function updateHeaders() {
 
     // Update table headers
     axios
-        .patch(route("settings.table-headers.update", { key: "MAD_EPP" }), {
+        .patch(route("settings.table-headers.update", { key: props.settingsKey }), {
             headers: headers.value,
         })
         .then(() => {
+            loading.value = false;
             showModal.value = false;
 
             router.reload({
                 only: ["allTableHeaders", "tableVisibleHeaders"],
-                preserveScroll: true,
+                onFinish: () => {
+                    headers.value = [...page.props.allTableHeaders];
+                },
+            });
+        });
+}
+
+function resetHeaders() {
+    loading.value = true;
+
+    axios
+        .patch(route("settings.table-headers.reset", { key: props.settingsKey }))
+        .then(() => {
+            loading.value = false;
+            showModal.value = false;
+
+            router.reload({
+                only: ["allTableHeaders", "tableVisibleHeaders"],
                 onFinish: () => {
                     headers.value = [...page.props.allTableHeaders];
                 },
@@ -118,8 +144,18 @@ function updateHeaders() {
                 >
                     <DefaultButton
                         class="px-6"
+                        color="warning"
+                        @click="resetHeaders"
+                        :loading="loading"
+                    >
+                        Reset
+                    </DefaultButton>
+
+                    <DefaultButton
+                        class="px-6"
                         color="grey-lighten-2"
                         @click="isActive.value = false"
+                        :loading="loading"
                     >
                         Cancel
                     </DefaultButton>
@@ -128,6 +164,7 @@ function updateHeaders() {
                         class="px-6"
                         color="success"
                         @click="updateHeaders"
+                        :loading="loading"
                     >
                         Update
                     </DefaultButton>

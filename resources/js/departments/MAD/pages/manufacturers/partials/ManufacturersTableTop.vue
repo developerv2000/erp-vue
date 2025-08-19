@@ -45,7 +45,7 @@ const store = useMADManufacturerTableStore();
         </template>
 
         <template #moreActions>
-            <ColumnsListItem v-if="!store.isTrashPage" />
+            <ColumnsListItem v-if="!store.isTrashPage" settings-key="MAD_EPP" />
             <FullscreenListItem />
             <ExportListItem />
 

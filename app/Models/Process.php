@@ -23,13 +23,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
-class Process extends BaseModel implements HasTitle, CanExportRecordsAsExcel, PreparesFetchedRecordsForExport, ExportsProductSelection
+class Process extends BaseModel implements HasTitle, PreparesFetchedRecordsForExport, ExportsProductSelection
 {
     /** @use HasFactory<\Database\Factories\ProcessFactory> */
     use HasFactory;
     use SoftDeletes;
     use Commentable;
-    use ExportsRecordsAsExcel;
 
     /*
     |--------------------------------------------------------------------------

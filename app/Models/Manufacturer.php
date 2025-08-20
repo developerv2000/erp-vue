@@ -3,17 +3,19 @@
 namespace App\Models;
 
 use App\Support\Abstracts\BaseModel;
+use App\Support\Contracts\Model\ExportsRecordsAsExcel;
 use App\Support\Helpers\QueryFilterHelper;
 use App\Support\Traits\Model\Commentable;
-use App\Support\Traits\Model\ExportsRecordsAsExcel;
 use App\Support\Traits\Model\GetsMinifiedRecordsWithName;
 use App\Support\Traits\Model\HasAttachments;
 use App\Support\Traits\Model\HasModelNamespace;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
-class Manufacturer extends BaseModel
+class Manufacturer extends BaseModel implements ExportsRecordsAsExcel
 {
     /** @use HasFactory<\Database\Factories\ManufacturerFactory> */
     use HasFactory;
@@ -21,7 +23,6 @@ class Manufacturer extends BaseModel
     use Commentable;
     use HasAttachments;
     use GetsMinifiedRecordsWithName;
-    use ExportsRecordsAsExcel;
     use HasModelNamespace;
 
     /*
@@ -30,15 +31,13 @@ class Manufacturer extends BaseModel
     |--------------------------------------------------------------------------
     */
 
-    const SETTINGS_MAD_TABLE_COLUMNS_KEY = 'MAD_EPP_table_columns';
-
     const DEFAULT_ORDER_BY = 'updated_at';
     const DEFAULT_ORDER_DIRECTION = 'desc';
     const DEFAULT_PER_PAGE = 50;
 
     const LIMITED_EXCEL_RECORDS_COUNT_FOR_EXPORT = 5;
-    const STORAGE_PATH_OF_EXCEL_TEMPLATE_FILE_FOR_EXPORT = 'app/excel/export-templates/epp.xlsx';
-    const STORAGE_PATH_FOR_EXPORTING_EXCEL_FILES = 'app/excel/exports/epp';
+    const STORAGE_PATH_OF_EXCEL_TEMPLATE_FILE_FOR_EXPORT = 'app/private/excel/export-templates/epp.xlsx';
+    const STORAGE_PATH_OF_EXPORTED_EXCEL_FILES = 'app/private/excel/exports/epp';
 
     /*
     |--------------------------------------------------------------------------
@@ -229,9 +228,31 @@ class Manufacturer extends BaseModel
     |--------------------------------------------------------------------------
     */
 
+    // Implement method declared in Breadcrumbable Interface
     public function generateBreadcrumbs($department = null): array
     {
         return [];
+    }
+
+    // Implement method declared in CanExportRecordsAsExcel Interface
+    public static function queryForExport(Request $request): Builder
+    {
+        $query = self::withBasicRelations()
+            ->withBasicRelationCounts()
+            ->with('comments');
+
+        self::addDefaultQueryParamsToRequest($request);
+        self::filterQueryForRequest($query, $request);
+
+        return self::finalizeQueryForRequest($query, $request, 'query');
+    }
+
+    // Implement method declared in CanExportRecordsAsExcel Interface
+    public function getExcelColumnValuesForExport(): array
+    {
+        return [
+            $this->id,
+        ];
     }
 
     /*
@@ -240,26 +261,43 @@ class Manufacturer extends BaseModel
     |--------------------------------------------------------------------------
     */
 
-    public static function getRecordsForRequest($request)
+    /**
+     * Build and execute a model query based on request parameters.
+     *
+     * Steps:
+     *  - Apply default relations & counts
+     *  - Apply soft delete scope (if requested)
+     *  - Normalize query params (pagination, sorting, etc.)
+     *  - Apply filters
+     *  - Finalize query with sorting & pagination
+     *  - Append basic attributes (unless returning raw query)
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $action  ('paginate', 'get' or 'query')
+     * @return mixed
+     */
+    public static function queryFromRequest(Request $request, string $action = 'paginate')
     {
         $query = self::withBasicRelations()->withBasicRelationCounts();
 
-        // Apply trashed
-        if ($request->input('only_trashed')) {
+        // Apply trashed filter
+        if ($request->boolean('only_trashed')) {
             $query->onlyTrashed();
         }
 
-        // Preapare request for valid model querying
+        // Normalize request parameters
         self::addDefaultQueryParamsToRequest($request);
 
         // Apply filters
         self::filterQueryForRequest($query, $request);
 
-        // Apply sorting & pagination
-        $records = self::finalizeQueryForRequest($query, $request, 'paginate');
+        // Finalize (sorting & pagination)
+        $records = self::finalizeQueryForRequest($query, $request, $action);
 
-        // Append basic attributes
-        self::appendBasicAttributes($records);
+        // Append attributes unless raw query is requested
+        if ($action !== 'query') {
+            self::appendBasicAttributes($records);
+        }
 
         return $records;
     }

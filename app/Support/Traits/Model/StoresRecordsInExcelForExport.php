@@ -8,27 +8,27 @@ use Illuminate\Support\Facades\Gate;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 /**
- * Trait ExportsRecordsAsExcel
+ * Trait StoresRecordsInExcelForExport
  *
- * Provides functionality to export model records to an Excel file using a predefined template.
+ * Provides functionality to store model records in Excel file using a predefined template for export.
  * The trait supports exporting records for both privileged users and non privileged users, where privileged users
  * can export all records using chunking and non-privileged users are limited to a specified number of records.
  *
  * @package App\Support\Traits
  */
-trait ExportsRecordsAsExcel
+trait StoresRecordsInExcelForExport
 {
     /**
-     * Export model records to an Excel file.
+     * Store model records in Excel file.
      *
-     * Exports the provided records query to an Excel file using a predefined template.
-     * Privileged users users will export the records in chunks to avoid memory issues,
-     * while non-privileged users will only export a limited number of records.
+     * Stores the provided records query in Excel file using a predefined template.
+     * Privileged users users will store the records in chunks to avoid memory issues,
+     * while non-privileged users will only store a limited number of records.
      *
      * @param \Illuminate\Database\Eloquent\Builder $query The query containing the records to export.
-     * @return \Illuminate\Http\Response The response to download the Excel file.
+     * @return String Filename of new generated Excel file.
      */
-    public static function exportRecordsAsExcel($query)
+    public static function storeRecordsInExcel($query)
     {
         $priviligedUser = Gate::allows('export-unlimited-records-as-excel');
 
@@ -46,8 +46,8 @@ trait ExportsRecordsAsExcel
             static::fillSheetByLimitedRecords($query, $sheet);
         }
 
-        // Save and return the Excel file
-        return static::saveAndDownloadExcel($spreadsheet);
+        // Save and return generated Excel filename
+        return static::saveExcelFile($spreadsheet);
     }
 
     /**
@@ -127,27 +127,29 @@ trait ExportsRecordsAsExcel
     }
 
     /**
-     * Save the Excel file and return a download response.
+     * Save the Excel file and return filename.
      *
-     * Saves the generated Excel file to the appropriate storage path and returns a response
-     * that prompts the user to download the file.
+     * Saves the generated Excel file to the appropriate storage path and returns filename.
      *
      * @param \PhpOffice\PhpSpreadsheet\Spreadsheet $spreadsheet The generated spreadsheet.
-     * @return \Illuminate\Http\Response The response to download the Excel file.
+     * @return String Filename of new generated Excel file.
      */
-    private static function saveAndDownloadExcel($spreadsheet)
+    private static function saveExcelFile($spreadsheet)
     {
         // Create a writer and generate a unique filename for the export
         $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
         $filename = date('Y-m-d H-i-s') . '.xlsx';
 
-        $filename = FileHelper::ensureUniqueFilename($filename, storage_path(static::STORAGE_PATH_FOR_EXPORTING_EXCEL_FILES));
-        $filePath = storage_path(static::STORAGE_PATH_FOR_EXPORTING_EXCEL_FILES . '/' . $filename);
+        $filename = FileHelper::ensureUniqueFilename($filename, storage_path(static::STORAGE_PATH_OF_EXPORTED_EXCEL_FILES));
+        $filePath = storage_path(static::STORAGE_PATH_OF_EXPORTED_EXCEL_FILES . '/' . $filename);
 
         // Save the Excel file
         $writer->save($filePath);
 
-        // Return a download response
-        return response()->download($filePath);
+        // Return filename
+        return response()->json([
+            'filename' => $filename,
+            'classBasename' => class_basename(static::class),
+        ]);
     }
 }

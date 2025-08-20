@@ -6,9 +6,9 @@ import PermanentDeleteSelectedButton from "@/core/components/table/toolbar/actio
 import RestoreSelectedButton from "@/core/components/table/toolbar/actions/RestoreSelectedButton.vue";
 import ColumnsListItem from "@/core/components/table/toolbar/more-action-items/ColumnsListItem.vue";
 import FullscreenListItem from "@/core/components/table/toolbar/more-action-items/FullscreenListItem.vue";
-import ExportListItem from "@/core/components/table/toolbar/more-action-items/ExportListItem.vue";
 import TrashListItem from "@/core/components/table/toolbar/more-action-items/TrashListItem.vue";
 import { useMADManufacturerTableStore } from "@/departments/MAD/stores/useMADManufacturerTableStore";
+import ExportButton from "@/core/components/table/toolbar/actions/ExportButton.vue";
 
 const store = useMADManufacturerTableStore();
 </script>
@@ -42,12 +42,13 @@ const store = useMADManufacturerTableStore();
                 :delete-link="route('mad.manufacturers.destroy')"
                 :store="store"
             />
+
+            <ExportButton v-if="!store.isTrashPage" model="Manufacturer" />
         </template>
 
         <template #moreActions>
             <ColumnsListItem v-if="!store.isTrashPage" settings-key="MAD_EPP" />
             <FullscreenListItem />
-            <ExportListItem />
 
             <TrashListItem
                 v-if="!store.isTrashPage"

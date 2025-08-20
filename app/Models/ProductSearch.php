@@ -14,14 +14,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Gate;
 
-class ProductSearch extends BaseModel implements HasTitle, CanExportRecordsAsExcel
+class ProductSearch extends BaseModel implements HasTitle
 {
     /** @use HasFactory<\Database\Factories\ProductSearchFactory> */
     use HasFactory;
     use SoftDeletes;
     use Commentable;
     use HasAttachments;
-    use ExportsRecordsAsExcel;
 
     /*
     |--------------------------------------------------------------------------

@@ -1,9 +1,13 @@
 <script setup>
-import MoreActionsMenu from './actions/MoreActionsMenu.vue';
+import MoreActionsMenu from "./actions/MoreActionsMenu.vue";
 </script>
 
 <template>
-    <v-toolbar color="surface" class="default-toolbar border-b-sm pr-5" height="56">
+    <v-toolbar
+        color="surface"
+        class="default-toolbar border-b-sm pr-5"
+        height="56"
+    >
         <v-toolbar-title>
             <span class="text-subtitle-1">
                 <slot name="title" />

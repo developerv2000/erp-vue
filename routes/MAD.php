@@ -18,7 +18,6 @@ Route::middleware('auth', 'auth.session')->prefix('mad')->name('mad.')->group(fu
     Route::prefix('/manufacturers')->controller(MADManufacturerController::class)->name('manufacturers.')->group(function () {
         CRUDRouteGenerator::defineDefaultRoutesExcept(['show'], 'id', 'can:view-MAD-EPP', 'can:edit-MAD-EPP');
 
-        Route::post('/export-as-excel', 'exportAsExcel')->name('export-as-excel')->middleware('can:export-records-as-excel');
         Route::post('/get-smart-filter-dependencies', 'getSmartFilterDependencies');  // AJAX request on smart filter
     });
 

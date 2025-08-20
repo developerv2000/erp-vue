@@ -12,12 +12,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Gate;
 
-class Meeting extends BaseModel implements HasTitle, CanExportRecordsAsExcel
+class Meeting extends BaseModel implements HasTitle
 {
     /** @use HasFactory<\Database\Factories\MeetingFactory> */
     use HasFactory;
     use SoftDeletes;
-    use ExportsRecordsAsExcel;
 
     /*
     |--------------------------------------------------------------------------

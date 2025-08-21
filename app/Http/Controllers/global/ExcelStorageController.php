@@ -39,7 +39,11 @@ class ExcelStorageController extends Controller
         }
 
         // Save and return the generated filename
-        return $this->saveExcelFile($modelClass, $spreadsheet);
+        $filename = $this->saveExcelFile($modelClass, $spreadsheet);
+
+        return response()->json([
+            'filename' => $filename
+        ]);
     }
 
     /**
@@ -94,7 +98,7 @@ class ExcelStorageController extends Controller
     }
 
     /**
-     * Save Excel file to storage.
+     * Save Excel file to storage and return filename.
      */
     private function saveExcelFile($modelClass, $spreadsheet)
     {
@@ -105,9 +109,7 @@ class ExcelStorageController extends Controller
 
         $writer->save($filePath);
 
-        return response()->json([
-            'filename' => $filename,
-        ]);
+        return $filename;
     }
 
     /**

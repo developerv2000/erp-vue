@@ -1,5 +1,7 @@
-// Load any necessary base dependencies like axios and Inertia progress bar
+// Load any necessary base dependencies like axios/Sanctum/CSRF
 import './bootstrap'
+
+// Main script
 import '../scripts/main'
 
 // Import Inertia core + helper to auto-resolve Vue page components

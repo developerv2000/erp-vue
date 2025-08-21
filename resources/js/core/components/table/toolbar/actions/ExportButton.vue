@@ -1,47 +1,57 @@
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, ref } from "vue";
 import { mdiDownload, mdiClose } from "@mdi/js";
 import DefaultButton from "../../../buttons/DefaultButton.vue";
 import axios from "axios";
+import { useTemplateRef } from "vue";
+import { nextTick } from "vue";
+import { getCSRFToken } from "@/core/scripts/functions";
 
 const props = defineProps({
     model: String,
+    store: Object,
 });
 
-onMounted(() => {
-    csrf.value = document.querySelector("meta[name=csrf-token]").content;
-});
-
-const csrf = ref(null);
+const csrf = getCSRFToken();
+const downloadForm = useTemplateRef("downloadForm");
 const snackbar = ref(false);
 const generatingFile = ref(false);
-const fileGenerated = ref(false);
-const filename = ref("");
-const disableDownloadButton = ref(true);
+const downloadStarted = ref(false);
+const filename = ref("name");
+const snackbarTimeout = ref(-1);
 
-const color = computed(() => {
-    return fileGenerated.value ? "success" : "warning";
+const snackbarColor = computed(() => {
+    return downloadStarted.value ? "success" : "warning";
+});
+
+const downloadLink = computed(() => {
+    return route("excel-storage.download", {
+        model: props.model,
+        filename: filename.value,
+    });
 });
 
 function exportRecords() {
+    snackbarTimeout.value = -1;
     snackbar.value = true;
     generatingFile.value = true;
-    fileGenerated.value = false;
-    filename.value = "";
-    disableDownloadButton.value = true;
-
-    const params = new URLSearchParams(window.location.search);
-    const query = Object.fromEntries(params.entries());
+    downloadStarted.value = false;
 
     axios
-        .post(route("excel-storage.generate", { model: props.model }), query)
-        .then((response) => {
+        .post(
+            route("excel-storage.generate", { model: props.model }),
+            props.store.toQuery()
+        )
+        .then(async (response) => {
             filename.value = response.data.filename;
-            disableDownloadButton.value = false;
+            downloadStarted.value = true;
+
+            await nextTick(); // wait for DOM to update form action
+            snackbarTimeout.value = 5000;
+            downloadForm.value.submit();
         })
         .finally(() => {
             generatingFile.value = false;
-            fileGenerated.value = true;
         });
 }
 </script>
@@ -61,49 +71,29 @@ function exportRecords() {
     <v-snackbar
         class="text-body-2"
         v-model="snackbar"
-        timeout="-1"
-        :color="color"
+        :timeout="snackbarTimeout"
+        :color="snackbarColor"
         density="compact"
         location="top right"
     >
-        <template v-if="fileGenerated" #actions>
+        <template v-if="downloadStarted" #actions>
             <v-btn icon variant="text" @click="snackbar = false">
                 <v-icon :icon="mdiClose" />
             </v-btn>
         </template>
 
-        <p v-if="generatingFile">Generating file...</p>
+        <div v-if="generatingFile" class="d-flex ga-4 align-center">
+            <v-progress-circular size="20" indeterminate />
+            <p>Generating file...</p>
+        </div>
 
-        <form
-            v-if="fileGenerated"
-            :action="
-                route('excel-storage.download', {
-                    model: model,
-                    filename: filename,
-                })
-            "
-            method="POST"
-        >
-            <div class="d-flex ga-4 align-center">
-                <input type="hidden" name="_token" :value="csrf" />
+        <div v-else class="d-flex ga-4 align-center">
+            <v-icon :icon="mdiDownload" />
+            <p>Download started!</p>
+        </div>
 
-                <p>File generated:</p>
-
-                <DefaultButton
-                    :prepend-icon="mdiDownload"
-                    color="inherit"
-                    size="default"
-                    variant="outlined"
-                    type="submit"
-                    :disabled="disableDownloadButton"
-                    @click="
-                        disableDownloadButton = true;
-                        $event.target.closest('form').submit();
-                    "
-                >
-                    Download
-                </DefaultButton>
-            </div>
+        <form :action="downloadLink" ref="downloadForm" method="POST">
+            <input type="hidden" name="_token" :value="csrf" />
         </form>
     </v-snackbar>
 </template>

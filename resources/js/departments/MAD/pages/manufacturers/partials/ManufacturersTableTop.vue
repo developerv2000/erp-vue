@@ -43,7 +43,7 @@ const store = useMADManufacturerTableStore();
                 :store="store"
             />
 
-            <ExportButton v-if="!store.isTrashPage" model="Manufacturer" />
+            <ExportButton v-if="!store.isTrashPage" model="Manufacturer" :store="store" />
         </template>
 
         <template #moreActions>

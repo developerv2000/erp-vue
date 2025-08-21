@@ -38,14 +38,40 @@
     "actions.Logout": "Logout",
     "actions.Update": "Update",
     "actions.Reset": "Reset",
+    "actions.New": "New",
+    "actions.Delete": "Delete",
+    "actions.Permanent delete": "Permanent delete",
+    "actions.Restore": "Restore",
+    "actions.Export": "Export",
+    "actions.More": "More",
+    "actions.Cancel": "Cancel",
+    "actions.Columns": "Columns",
+    "actions.Fullscreen": "Fullscreen",
+    "actions.Filter": "Filter",
+    "actions.Apply": "Apply",
+    "actions.Go to page": "Go to page",
 
     "forms.Personal data": "Personal data",
     "forms.Password update": "Password update",
+
+    "filter.Filtered records": "Filtered records",
 
     "messages.Updated successfully": "Updated successfully!",
     "messages.Submition failed": "Something went wrong, please try again later!",
     "messages.Successefully deleted": "{count} records successefully deleted!",
     "messages.Successefully restored": "{count} records successefully restored!",
+
+    "modals.Delete selected": "Delete selected",
+    "modals.Delete selected question": "Are you sure you want to delete selected",
+    "modals.Restore selected": "Restore selected",
+    "modals.Restore selected question": "Are you sure you want to restore selected",
+    "modals.Delete selected permanently": "Delete selected permanently",
+    "modals.Delete selected permanently question": "Are you sure you want to delete selected permanently",
+    "modals.Customize Columns": "Customize Columns",
+    "modals.Drag and drop columns": "Drag and drop columns for sorting",
+
+    "file.Generating file": "Generating file",
+    "file.Download started": "Download started",
 
     "fields.Email": "Email",
     "fields.Password": "Password",
@@ -53,6 +79,7 @@
     "fields.Photo": "Photo",
     "fields.Current password": "Current password",
     "fields.New password": "New password",
+
 
     "AAAAAAAAAAAAAA": "AAAAAAAAAAAAAA"
 }

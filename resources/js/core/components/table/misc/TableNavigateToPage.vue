@@ -1,12 +1,16 @@
 <script setup>
+import { useI18n } from 'vue-i18n';
+
 defineProps({
     store: Object,
 });
+
+const { t } = useI18n();
 </script>
 
 <template>
     <div class="d-flex align-center ga-2 mr-auto ml-4">
-        <span>Go to page:</span>
+        <span>{{ t('actions.Go to page') }}:</span>
 
         <v-text-field
             v-model.number="store.pagination.navigate_to_page"

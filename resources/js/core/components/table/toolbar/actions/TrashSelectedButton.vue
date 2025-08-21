@@ -4,12 +4,14 @@ import { mdiDelete } from "@mdi/js";
 import DefaultButton from "../../../buttons/DefaultButton.vue";
 import axios from "axios";
 import { useMessagesStore } from "@/core/stores/useMessages";
+import { useI18n } from "vue-i18n";
 
 const props = defineProps({
     deleteLink: String,
     store: Object,
 });
 
+const { t } = useI18n();
 const messages = useMessagesStore();
 const showModal = ref(false);
 
@@ -37,20 +39,20 @@ function submit() {
                 variant="tonal"
                 :disabled="store.selected.length == 0"
             >
-                Delete
+                {{ t("actions.Delete") }}
             </DefaultButton>
         </template>
 
         <template v-slot:default="{ isActive }">
             <v-card>
                 <v-card-item class="pa-4" :prepend-icon="mdiDelete">
-                    <v-card-title>Delete selected</v-card-title>
+                    <v-card-title>{{ t("modals.Delete selected") }}</v-card-title>
                 </v-card-item>
 
                 <v-divider />
 
                 <v-card-text class="px-4 py-6">
-                    Are you sure you want to delete selected?
+                    {{ t("modals.Delete selected question") }}?
                 </v-card-text>
 
                 <v-divider></v-divider>
@@ -61,11 +63,11 @@ function submit() {
                         color="grey-lighten-2"
                         @click="isActive.value = false"
                     >
-                        Cancel
+                        {{ t("actions.Cancel") }}
                     </DefaultButton>
 
                     <DefaultButton class="px-6" color="error" @click="submit">
-                        Delete
+                        {{ t("actions.Delete") }}
                     </DefaultButton>
                 </v-card-actions>
             </v-card>

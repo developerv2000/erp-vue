@@ -90,6 +90,10 @@ function handleTableOptionsUpdate(options) {
             <TdAva :user="item.analyst" />
         </template>
 
+        <template v-slot:item.country_id="{ item }">
+            {{ item.country.name }}
+        </template>
+
         <template v-slot:item.products_count="{ item }">
             <TdInertiaLink
                 :link="
@@ -102,7 +106,11 @@ function handleTableOptionsUpdate(options) {
             </TdInertiaLink>
         </template>
 
-        <template v-slot:item.category.name="{ item }">
+        <template v-slot:item.name="{ item }">
+            {{ item.name }}
+        </template>
+
+        <template v-slot:item.category_id="{ item }">
             <TdChip
                 :class="{
                     'bg-yellow-accent-4': item.category.name == 'УДС',
@@ -113,7 +121,7 @@ function handleTableOptionsUpdate(options) {
             </TdChip>
         </template>
 
-        <template v-slot:item.status="{ item }">
+        <template v-slot:item.active="{ item }">
             <TdChip
                 :class="{
                     'bg-orange-accent-3': item.active,
@@ -130,21 +138,21 @@ function handleTableOptionsUpdate(options) {
             </TdChip>
         </template>
 
-        <template v-slot:item.product_classes.name="{ item }">
+        <template v-slot:item.product_classes_name="{ item }">
             <span>{{
                 item.product_classes.map((obj) => obj.name).join(" ")
             }}</span>
         </template>
 
-        <template v-slot:item.zones.name="{ item }">
+        <template v-slot:item.zones_name="{ item }">
             <span>{{ item.zones.map((obj) => obj.name).join(" ") }}</span>
         </template>
 
-        <template v-slot:item.blacklists.name="{ item }">
+        <template v-slot:item.blacklists_name="{ item }">
             <span>{{ item.blacklists.map((obj) => obj.name).join(" ") }}</span>
         </template>
 
-        <template v-slot:item.presences.name="{ item }">
+        <template v-slot:item.presences_name="{ item }">
             <span>{{ item.presences.map((obj) => obj.name).join(" ") }}</span>
         </template>
 
@@ -166,11 +174,11 @@ function handleTableOptionsUpdate(options) {
             <TdRecordCommentsLink :record="item" />
         </template>
 
-        <template v-slot:item.last_comment.body="{ item }">
+        <template v-slot:item.last_comment_body="{ item }">
             <TogglableMaxLinesLimitedText :text="item.last_comment?.body" />
         </template>
 
-        <template v-slot:item.last_comment.created_at="{ item }">
+        <template v-slot:item.last_comment_created_at="{ item }">
             {{ useDateFormat(item.last_comment?.created_at, "DD MMM YYYY") }}
         </template>
 
@@ -194,7 +202,7 @@ function handleTableOptionsUpdate(options) {
             </TdInertiaLink>
         </template>
 
-        <template v-slot:item.attachments.filename="{ item }">
+        <template v-slot:item.attachments_count="{ item }">
             <TdRecordAttachmentsLink :record="item" />
             <TdAttachmentsList :attachments="item.attachments" />
         </template>

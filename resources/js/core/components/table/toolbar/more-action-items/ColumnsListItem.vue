@@ -5,11 +5,13 @@ import { mdiCog, mdiDrag, mdiSort } from "@mdi/js";
 import draggable from "vuedraggable";
 import DefaultButton from "@/core/components/buttons/DefaultButton.vue";
 import axios from "axios";
+import { useI18n } from "vue-i18n";
 
 const props = defineProps({
     settingsKey: String,
 });
 
+const { t } = useI18n();
 const page = usePage();
 const headers = ref([...page.props.allTableHeaders]);
 const showModal = ref(false);
@@ -69,7 +71,7 @@ function resetHeaders() {
     <v-dialog v-model="showModal" max-width="650px">
         <template v-slot:activator="{ props: activatorProps }">
             <v-list-item
-                title="Columns"
+                :title="t('actions.Columns')"
                 :prepend-icon="mdiCog"
                 @click="showModal = true"
                 v-bind="activatorProps"
@@ -79,7 +81,7 @@ function resetHeaders() {
         <template v-slot:default="{ isActive }">
             <v-card>
                 <v-card-item class="pa-4" :prepend-icon="mdiCog">
-                    <v-card-title>Customize Columns</v-card-title>
+                    <v-card-title>{{ t("modals.Customize Columns") }}</v-card-title>
                 </v-card-item>
 
                 <v-divider />
@@ -92,7 +94,7 @@ function resetHeaders() {
                         :icon="mdiSort"
                         variant="tonal"
                     >
-                        Drag and drop headers for sorting!
+                        {{ t("modals.Drag and drop columns") }}
                     </v-alert>
 
                     <draggable
@@ -148,7 +150,7 @@ function resetHeaders() {
                         @click="resetHeaders"
                         :loading="loading"
                     >
-                        Reset
+                        {{ t("actions.Reset") }}
                     </DefaultButton>
 
                     <DefaultButton
@@ -157,7 +159,7 @@ function resetHeaders() {
                         @click="isActive.value = false"
                         :loading="loading"
                     >
-                        Cancel
+                        {{ t("actions.Cancel") }}
                     </DefaultButton>
 
                     <DefaultButton
@@ -166,7 +168,7 @@ function resetHeaders() {
                         @click="updateHeaders"
                         :loading="loading"
                     >
-                        Update
+                        {{ t("actions.Update") }}
                     </DefaultButton>
                 </v-card-actions>
             </v-card>

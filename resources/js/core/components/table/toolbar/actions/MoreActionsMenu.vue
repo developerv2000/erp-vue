@@ -1,6 +1,9 @@
 <script setup>
 import { mdiChevronDown } from "@mdi/js";
 import DefaultButton from "../../../buttons/DefaultButton.vue";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 </script>
 
 <template>
@@ -13,7 +16,7 @@ import DefaultButton from "../../../buttons/DefaultButton.vue";
                 v-bind="props"
                 variant="tonal"
             >
-                More
+                {{ t("actions.More") }}
             </DefaultButton>
         </template>
 

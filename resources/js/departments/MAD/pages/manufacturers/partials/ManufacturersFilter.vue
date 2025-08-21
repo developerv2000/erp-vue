@@ -5,7 +5,9 @@ import FilterResetButton from "@/core/components/filters/buttons/FilterResetButt
 import FilterAutocomplete from "@/core/components/filters/inputs/FilterAutocomplete.vue";
 import { usePage } from "@inertiajs/vue3";
 import { useMADManufacturerTableStore } from "@/departments/MAD/stores/useMADManufacturerTableStore";
+import { useI18n } from "vue-i18n";
 
+const { t } = useI18n();
 const page = usePage();
 const store = useMADManufacturerTableStore();
 

@@ -1,6 +1,9 @@
 <script setup>
 import InertiaLinkedButton from "../../../inertia/InertiaLinkedButton.vue";
 import { mdiPlus } from "@mdi/js";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 </script>
 
 <template>
@@ -10,6 +13,6 @@ import { mdiPlus } from "@mdi/js";
         size="default"
         variant="tonal"
     >
-        New
+        {{ t("actions.New") }}
     </InertiaLinkedButton>
 </template>

@@ -6,12 +6,14 @@ import axios from "axios";
 import { useTemplateRef } from "vue";
 import { nextTick } from "vue";
 import { getCSRFToken } from "@/core/scripts/functions";
+import { useI18n } from "vue-i18n";
 
 const props = defineProps({
     model: String,
     store: Object,
 });
 
+const { t } = useI18n();
 const csrf = getCSRFToken();
 const downloadForm = useTemplateRef("downloadForm");
 const snackbar = ref(false);
@@ -65,7 +67,7 @@ function exportRecords() {
         :loading="generatingFile"
         @click="exportRecords"
     >
-        Export
+        {{ t("actions.Export") }}
     </DefaultButton>
 
     <v-snackbar
@@ -84,12 +86,12 @@ function exportRecords() {
 
         <div v-if="generatingFile" class="d-flex ga-4 align-center">
             <v-progress-circular size="20" indeterminate />
-            <p>Generating file...</p>
+            <p>{{ t("file.Generating file") }}...</p>
         </div>
 
         <div v-else class="d-flex ga-4 align-center">
             <v-icon :icon="mdiDownload" />
-            <p>Download started!</p>
+            <p>{{ t("file.Download started") }}!</p>
         </div>
 
         <form :action="downloadLink" ref="downloadForm" method="POST">

@@ -1,9 +1,15 @@
+<script setup>
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
+</script>
+
 <template>
     <v-sheet class="main-filter" rounded="lg">
         <v-card>
             <v-card-item class="pb-3 border-b-sm">
                 <div class="d-flex justify-space-between">
-                    <span class="text-subtitle-1">Filter</span>
+                    <span class="text-subtitle-1">{{ t('actions.Filter') }}</span>
 
                     <slot name="resetButton" />
                 </div>

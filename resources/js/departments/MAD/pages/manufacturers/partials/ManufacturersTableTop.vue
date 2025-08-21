@@ -9,14 +9,16 @@ import FullscreenListItem from "@/core/components/table/toolbar/more-action-item
 import TrashListItem from "@/core/components/table/toolbar/more-action-items/TrashListItem.vue";
 import { useMADManufacturerTableStore } from "@/departments/MAD/stores/useMADManufacturerTableStore";
 import ExportButton from "@/core/components/table/toolbar/actions/ExportButton.vue";
+import { useI18n } from "vue-i18n";
 
 const store = useMADManufacturerTableStore();
+const { t } = useI18n();
 </script>
 
 <template>
     <DefaultTableToolbar>
         <template #title>
-            Filtered records — {{ store.pagination.total_records }}
+            {{ t('filter.Filtered records') }} — {{ store.pagination.total_records }}
         </template>
 
         <template #actions>

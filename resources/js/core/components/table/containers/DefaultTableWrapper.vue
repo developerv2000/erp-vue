@@ -1,5 +1,4 @@
 <script setup>
-import { useTemplateRef } from "vue";
 import { toggleFullscreenClass } from "@/core/scripts/functions";
 
 function handleFullscreenChange() {

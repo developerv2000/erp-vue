@@ -24,7 +24,7 @@ class MADManufacturerController extends Controller
 
     public function index(Request $request)
     {
-        $getAllTableHeaders = fn() => $request->user()->collectTableHeadersBySettingsKey(User::SETTINGS_KEY_OF_MAD_EPP_TABLE);
+        $getAllTableHeaders = fn() => $request->user()->collectTableHeadersTranslatedFromSettings(User::SETTINGS_KEY_OF_MAD_EPP_TABLE);
         $getVisibleHeaders = fn() => User::filterOnlyVisibleHeaders($getAllTableHeaders());
 
         return Inertia::render('departments/MAD/pages/manufacturers/Index', [

@@ -16,7 +16,9 @@ import { useDateFormat } from "@vueuse/core";
 import { usePage } from "@inertiajs/vue3";
 import { onMounted } from "vue";
 import { DEFAULT_PER_PAGE_OPTIONS } from "@/core/scripts/constants";
+import { useI18n } from "vue-i18n";
 
+const { t } = useI18n();
 const page = usePage();
 const store = useMADManufacturerTableStore();
 
@@ -102,7 +104,8 @@ function handleTableOptionsUpdate(options) {
                     })
                 "
             >
-                {{ item.products_count }} products
+                {{ item.products_count }}
+                <span class="text-lowercase">{{ t("Products") }}</span>
             </TdInertiaLink>
         </template>
 
@@ -128,13 +131,17 @@ function handleTableOptionsUpdate(options) {
                     'bg-grey-lighten-2': !item.active,
                 }"
             >
-                {{ item.active ? "Active" : "Inactive" }}
+                {{
+                    item.active
+                        ? t("properties.Active")
+                        : t("properties.Stopped")
+                }}
             </TdChip>
         </template>
 
         <template v-slot:item.important="{ item }">
             <TdChip v-if="item.important" class="bg-pink-lighten-3">
-                Important
+                {{ t("properties.Important") }}
             </TdChip>
         </template>
 
@@ -198,7 +205,8 @@ function handleTableOptionsUpdate(options) {
                     })
                 "
             >
-                {{ item.meetings_count }} meetings
+                {{ item.meetings_count }}
+                <span class="text-lowercase">{{ t("pages.Meetings") }}</span>
             </TdInertiaLink>
         </template>
 

@@ -73,12 +73,47 @@
     "file.Generating file": "Генерация файла",
     "file.Download started": "Загрузка началась",
 
+    "properties.Important": "Важный",
+    "properties.Active": "Активный",
+    "properties.Stopped": "Остановлен",
+
+    "Comments": "Комментарии",
+    "comments.Last comment": "Последний комментарий",
+    "comments.Comments date": "Дата коммент.",
+
+    "Attachments": "Вложения",
+    "Products": "Продукты",
+
+    "dates.Date of creation": "Дата создания",
+    "dates.Update date": "Дата обновления",
+    "dates.Deletion date": "Дата удаления",
+
     "fields.Email": "Электронная почта",
     "fields.Password": "Пароль",
     "fields.Name": "Имя",
     "fields.Photo": "Фото",
     "fields.Current password": "Текущий пароль",
     "fields.New password": "Новый пароль",
+
+    "fields.Created at": "Новый пароль",
+    "fields.Updated at": "Новый пароль",
+    "fields.Deleted at": "Новый пароль",
+
+    "fields.Analyst": "Аналитик",
+    "fields.BDM": "БДМ",
+    "fields.Country": "Страна",
+    "fields.Manufacturer": "Производитель",
+    "fields.Category": "Категория",
+    "fields.Product class": "Класс Пд",
+    "fields.ATX": "ATX",
+    "fields.Our ATX": "Наш ATX",
+    "fields.Zones": "Зоны",
+    "fields.Blacklist": "Чёрный список",
+    "fields.Presence": "Присутствие",
+    "fields.Website": "Сайт",
+    "fields.About company": "О компании",
+    "fields.Relationship": "Отношения",
+    "fields.Status": "Статус",
 
     "AAAAAAAAAAAAAA": "AAAAAAAAAAAAAA"
 }

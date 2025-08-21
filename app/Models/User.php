@@ -451,25 +451,33 @@ class User extends Authenticatable
     }
 
     /**
-     * Collects all table headers for a given key from user settings.
+     * Collect all table headers for a given key, from user settings
+     * and translate their titles.
      *
      * @param  string  $key
      * @return \Illuminate\Support\Collection
      */
-    public function collectTableHeadersBySettingsKey($key): Collection
+    public function collectTableHeadersTranslatedFromSettings($key): Collection
     {
-        return collect($this->settings['tables'][$key])->sortBy('order');
+        $headers = collect($this->settings['tables'][$key])->sortBy('order');
+
+        $headers->transform(function ($header) {
+            $header['title'] = trans($header['title']);
+            return $header;
+        });
+
+        return $headers;
     }
 
     /**
-     * Filters out only the visible headers from the provided collection.
+     * Filters out only the visible headers from all headers collection
      *
      * @param  \Illuminate\Support\Collection  $columns
      * @return array
      */
-    public static function filterOnlyVisibleHeaders($columns): array
+    public static function filterOnlyVisibleHeaders($headers): array
     {
-        return $columns->filter(fn($column) => $column['visible'] ?? false)
+        return $headers->filter(fn($header) => $header['visible'] ?? false)
             ->sortBy('order')
             ->values()
             ->all();

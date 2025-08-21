@@ -54,8 +54,6 @@
     "forms.Personal data": "Personal data",
     "forms.Password update": "Password update",
 
-    "filter.Filtered records": "Filtered records",
-
     "messages.Updated successfully": "Updated successfully!",
     "messages.Submition failed": "Something went wrong, please try again later!",
     "messages.Successefully deleted": "{count} records successefully deleted!",
@@ -73,6 +71,23 @@
     "file.Generating file": "Generating file",
     "file.Download started": "Download started",
 
+    "properties.Important": "Important",
+    "properties.Active": "Active",
+    "properties.Stopped": "Stopped",
+
+    "Comments": "Comments",
+    "comments.Last comment": "Last comment",
+    "comments.Comments date": "Comments date",
+
+    "Attachments": "Вложения",
+    "Products": "Products",
+
+    "dates.Date of creation": "Date of creation",
+    "dates.Update date": "Update date",
+    "dates.Deletion date": "Deletion date",
+
+    "filter.Filtered records": "Filtered records",
+
     "fields.Email": "Email",
     "fields.Password": "Password",
     "fields.Name": "Name",
@@ -80,6 +95,21 @@
     "fields.Current password": "Current password",
     "fields.New password": "New password",
 
+    "fields.Analyst": "Analyst",
+    "fields.BDM": "BDM",
+    "fields.Country": "Country",
+    "fields.Manufacturer": "Manufacturer",
+    "fields.Category": "Category",
+    "fields.Product class": "Product class",
+    "fields.ATX": "ATX",
+    "fields.Our ATX": "Our ATX",
+    "fields.Zones": "Zones",
+    "fields.Blacklist": "Blacklist",
+    "fields.Presence": "Presence",
+    "fields.Website": "Website",
+    "fields.About company": "About company",
+    "fields.Relationship": "Relationship",
+    "fields.Status": "Status",
 
     "AAAAAAAAAAAAAA": "AAAAAAAAAAAAAA"
 }

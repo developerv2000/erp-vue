@@ -1,9 +1,12 @@
 <script setup>
 import TdInertiaLink from './TdInertiaLink.vue';
+import { useI18n } from 'vue-i18n';
 
 defineProps({
     record: Object,
 });
+
+const { t } = useI18n();
 </script>
 
 <template>
@@ -15,6 +18,7 @@ defineProps({
             })
         "
     >
-        {{ record.comments_count }} comments
+        {{ record.comments_count }}
+        <span class="text-lowercase">{{ t("Comments") }}</span>
     </TdInertiaLink>
 </template>

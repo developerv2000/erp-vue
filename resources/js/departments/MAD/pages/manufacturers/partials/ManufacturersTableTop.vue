@@ -18,19 +18,20 @@ const { t } = useI18n();
 <template>
     <DefaultTableToolbar>
         <template #title>
-            {{ t('filter.Filtered records') }} — {{ store.pagination.total_records }}
+            {{ t("filter.Filtered records") }} —
+            {{ store.pagination.total_records }}
         </template>
 
         <template #actions>
-            <NewRecordButton
-                v-if="!store.isTrashPage"
-                :link="route('mad.manufacturers.create')"
-            />
-
             <TrashSelectedButton
                 v-if="!store.isTrashPage"
                 :delete-link="route('mad.manufacturers.destroy')"
                 :store="store"
+            />
+
+            <NewRecordButton
+                v-if="!store.isTrashPage"
+                :link="route('mad.manufacturers.create')"
             />
 
             <RestoreSelectedButton
@@ -45,7 +46,11 @@ const { t } = useI18n();
                 :store="store"
             />
 
-            <ExportButton v-if="!store.isTrashPage" model="Manufacturer" :store="store" />
+            <ExportButton
+                v-if="!store.isTrashPage"
+                model="Manufacturer"
+                :store="store"
+            />
         </template>
 
         <template #moreActions>

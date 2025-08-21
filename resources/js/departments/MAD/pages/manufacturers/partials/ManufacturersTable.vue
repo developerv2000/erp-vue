@@ -125,12 +125,7 @@ function handleTableOptionsUpdate(options) {
         </template>
 
         <template v-slot:item.active="{ item }">
-            <TdChip
-                :class="{
-                    'bg-orange-accent-3': item.active,
-                    'bg-grey-lighten-2': !item.active,
-                }"
-            >
+            <TdChip :color="item.active ? 'green-accent-2' : 'grey-lighten-2'">
                 {{
                     item.active
                         ? t("properties.Active")
@@ -140,7 +135,7 @@ function handleTableOptionsUpdate(options) {
         </template>
 
         <template v-slot:item.important="{ item }">
-            <TdChip v-if="item.important" class="bg-pink-lighten-3">
+            <TdChip v-if="item.important" color="purple-lighten-4">
                 {{ t("properties.Important") }}
             </TdChip>
         </template>

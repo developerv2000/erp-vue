@@ -38,7 +38,7 @@ class MADManufacturerController extends Controller
     public function trash(Request $request)
     {
         $getAllTableHeaders = fn() => $this->prependTrashPageTableHeaders(
-            $request->user()->collectTableHeadersBySettingsKey(User::SETTINGS_KEY_OF_MAD_EPP_TABLE)
+            $request->user()->collectTableHeadersTranslatedFromSettings(User::SETTINGS_KEY_OF_MAD_EPP_TABLE)
         );
 
         $getVisibleHeaders = fn() => User::filterOnlyVisibleHeaders($getAllTableHeaders());

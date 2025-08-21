@@ -13,7 +13,7 @@ trait PrependsTrashPageTableHeaders
     public function prependTrashPageTableHeaders($headers)
     {
         return $headers->prepend([
-            'title'    => 'Deleted at',
+            'title'    => trans('dates.Deletion date'),
             'key'      => 'deleted_at',
             'order'    => 0,
             'width'    => 130,

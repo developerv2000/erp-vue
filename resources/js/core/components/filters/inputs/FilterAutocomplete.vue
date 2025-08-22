@@ -18,7 +18,11 @@ const isHighlighted = computed(() => {
     if (isMultiple.value) {
         return Array.isArray(modelValue.value) && modelValue.value.length > 0;
     }
-    return modelValue.value !== null && modelValue.value !== "";
+    return (
+        modelValue.value !== undefined &&
+        modelValue.value !== null &&
+        modelValue.value !== ""
+    );
 });
 
 // Build dynamic classes

@@ -414,6 +414,21 @@ class Manufacturer extends BaseModel implements ExportsRecordsAsExcel
         $this->updateQuietly(['updated_at' => now()]);
     }
 
+    /**
+     * Return an array of status options
+     *
+     * Used on records filter and on create/update as radiogroups options
+     *
+     * @return array
+     */
+    public static function getStatusOptions()
+    {
+        return [
+            (object) ['caption' => trans('Active'), 'value' => 1],
+            (object) ['caption' => trans('Stopped'), 'value' => 0],
+        ];
+    }
+
     public static function getDefaultMADTableHeadersForUser($user)
     {
         if (Gate::forUser($user)->denies('view-MAD-EPP')) {

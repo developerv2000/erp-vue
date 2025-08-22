@@ -23,7 +23,7 @@ const page = usePage();
 const store = useMADManufacturerTableStore();
 
 if (!store.initializedFromInertiaPage) {
-    store.initFromInertiaPage(page);
+    store.initFromInertiaPage(page); // Initialize store from inertia page only once.
 }
 
 onMounted(() => {

@@ -1,8 +1,7 @@
 <script setup>
-import MainFilter from "@/core/components/filters/MainFilter.vue";
-import FilterApplyButton from "@/core/components/filters/buttons/FilterApplyButton.vue";
-import FilterResetButton from "@/core/components/filters/buttons/FilterResetButton.vue";
+import StoreBindedFilter from "@/core/components/filters/StoreBindedFilter.vue";
 import FilterAutocomplete from "@/core/components/filters/inputs/FilterAutocomplete.vue";
+import FilterBooleanAutocomplete from "@/core/components/filters/inputs/FilterBooleanAutocomplete.vue";
 import { usePage } from "@inertiajs/vue3";
 import { useMADManufacturerTableStore } from "@/departments/MAD/stores/useMADManufacturerTableStore";
 import { useI18n } from "vue-i18n";
@@ -10,38 +9,19 @@ import { useI18n } from "vue-i18n";
 const { t } = useI18n();
 const page = usePage();
 const store = useMADManufacturerTableStore();
-
-function resetFilter() {
-    store.resetState();
-    store.resetUrl();
-    store.fetchRecords();
-}
-
-function applyFilter() {
-    store.pagination.page = 1;
-    store.fetchRecords();
-}
 </script>
 
 <template>
-    <MainFilter>
-        <template #resetButton>
-            <FilterResetButton @click="resetFilter" :disabled="store.loading" />
-        </template>
-
-        <template #applyButton>
-            <FilterApplyButton @click="applyFilter" :loading="store.loading" />
-        </template>
-
+    <StoreBindedFilter :store="store">
         <FilterAutocomplete
-            label="Analyst"
+            :label="'* ' + t('fields.Analyst')"
             name="analyst_user_id"
             v-model="store.filters.analyst_user_id"
             :items="page.props.smartFilterDependencies.analystUsers"
         />
 
         <FilterAutocomplete
-            label="Country"
+            :label="'* ' + t('fields.Country')"
             name="country_id[]"
             v-model="store.filters.country_id"
             :items="page.props.smartFilterDependencies.countriesOrderedByName"
@@ -49,7 +29,7 @@ function applyFilter() {
         />
 
         <FilterAutocomplete
-            label="Manufacturer"
+            :label="'* ' + t('fields.Manufacturer')"
             name="id[]"
             v-model="store.filters.id"
             :items="page.props.smartFilterDependencies.manufacturers"
@@ -57,10 +37,30 @@ function applyFilter() {
         />
 
         <FilterAutocomplete
-            label="BDM"
+            :label="t('fields.BDM')"
             name="bdm_user_id"
             v-model="store.filters.bdm_user_id"
             :items="page.props.simpleFilterDependencies.bdmUsers"
         />
-    </MainFilter>
+
+        <FilterAutocomplete
+            :label="t('filter.Region')"
+            name="region"
+            v-model="store.filters.region"
+            :items="page.props.simpleFilterDependencies.regions"
+        />
+
+        <FilterAutocomplete
+            :label="t('fields.Category')"
+            name="category_id"
+            v-model="store.filters.category_id"
+            :items="page.props.simpleFilterDependencies.categories"
+        />
+
+        <FilterBooleanAutocomplete
+            :label="t('fields.Status')"
+            name="active"
+            v-model="store.filters.active"
+        />
+    </StoreBindedFilter>
 </template>

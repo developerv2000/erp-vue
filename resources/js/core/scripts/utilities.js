@@ -2,6 +2,12 @@ export function toBool(value) {
     return value === true || value === 'true' || value === 1 || value === '1';
 }
 
+/**
+ * Normalize a single ID from query string for filters.
+ *
+ * @param {*} input
+ * @returns {number|null}
+ */
 export function normalizeSingleID(input) {
     if (input === undefined || input === null || input === '') {
         return null;
@@ -11,6 +17,12 @@ export function normalizeSingleID(input) {
     return isNaN(parsed) ? null : parsed;
 }
 
+/**
+ * Normalize multiple IDs from query string for filters.
+ *
+ * @param {*} input
+ * @returns {number[]}
+ */
 export function normalizeMultiIDs(input) {
     if (!Array.isArray(input)) return [];
 
@@ -19,6 +31,12 @@ export function normalizeMultiIDs(input) {
         .filter(id => !isNaN(id));
 }
 
+/**
+ * Remove empty values from query params.
+ *
+ * @param {object} obj
+ * @returns {object}
+ */
 export function cleanQueryParams(obj) {
     return Object.fromEntries(
         Object.entries(obj).filter(([_, value]) => {

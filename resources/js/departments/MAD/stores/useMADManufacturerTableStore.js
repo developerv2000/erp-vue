@@ -3,9 +3,33 @@ import { router } from '@inertiajs/vue3'
 import { normalizeSingleID, normalizeMultiIDs, cleanQueryParams } from '@/core/scripts/utilities';
 import axios from 'axios';
 
-const DEFAULT_PER_PAGE = 50;
-const DEFAULT_ORDER_BY = 'updated_at';
-const DEFAULT_ORDER_DIRECTION = 'desc';
+const defaultPaginationOptions = {
+    page: 1,
+    per_page: 50,
+    order_by: 'updated_at',
+    order_direction: 'desc',
+    total_records: 0,
+    last_page: 1,
+    navigate_to_page: 1, // Prepended navigation
+};
+
+const defaultFilters = {
+    // Singular autocompletes
+    analyst_user_id: null,
+    bdm_user_id: null,
+    region: null,
+    category_id: null,
+    active: null,
+    important: null,
+
+    // Multiple autocompletes
+    country_id: [],
+    id: [],
+    productClasses: [],
+    zones: [],
+    process_country_id: [],
+    blacklists: [],
+}
 
 const API_URL = '/api/manufacturers';
 
@@ -18,23 +42,11 @@ export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', 
         isTrashPage: false,
 
         pagination: {
-            page: 1,
-            per_page: DEFAULT_PER_PAGE,
-            order_by: DEFAULT_ORDER_BY,
-            order_direction: DEFAULT_ORDER_DIRECTION,
-            total_records: 0,
-            last_page: 1,
-            navigate_to_page: 1, // Prepended navigation
+            ...defaultPaginationOptions
         },
 
         filters: {
-            // Singular autocompletes
-            analyst_user_id: null,
-            bdm_user_id: null,
-
-            // Multiple autocompletes
-            country_id: null,
-            id: null,
+            ...defaultFilters
         },
     }),
 
@@ -50,18 +62,28 @@ export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', 
 
             // Pagination
             this.pagination.page = Number(query.page ?? 1);
-            this.pagination.per_page = Number(query.per_page ?? DEFAULT_PER_PAGE);
-            this.pagination.order_by = query.order_by ?? DEFAULT_ORDER_BY;
-            this.pagination.order_direction = query.order_direction ?? DEFAULT_ORDER_DIRECTION;
+            this.pagination.per_page = Number(query.per_page ?? defaultPaginationOptions.per_page);
+            this.pagination.order_by = query.order_by ?? defaultPaginationOptions.order_by;
+            this.pagination.order_direction = query.order_direction ?? defaultPaginationOptions.order_direction;
             this.navigate_to_page = this.pagination.page;
 
-            // Normalize singular autocompletes
+            // Filters that don`t require normalization
+            this.filters.region = query.region;
+            this.filters.active = query.active;
+            this.filters.important = query.important;
+
+            // Normalize singular id autocompletes
             this.filters.analyst_user_id = normalizeSingleID(query.analyst_user_id);
             this.filters.bdm_user_id = normalizeSingleID(query.bdm_user_id);
+            this.filters.category_id = normalizeSingleID(query.category_id);
 
-            // Normalize multiple autocompletes
+            // Normalize multiple id autocompletes
             this.filters.country_id = normalizeMultiIDs(query.country_id);
             this.filters.id = normalizeMultiIDs(query.id);
+            this.filters.productClasses = normalizeMultiIDs(query.productClasses);
+            this.filters.zones = normalizeMultiIDs(query.zones);
+            this.filters.process_country_id = normalizeMultiIDs(query.process_country_id);
+            this.filters.blacklists = normalizeMultiIDs(query.blacklists);
 
             // Mark as initialized
             this.initializedFromInertiaPage = true;
@@ -79,10 +101,7 @@ export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', 
                 order_direction: this.pagination.order_direction,
 
                 // Filters
-                analyst_user_id: this.filters.analyst_user_id,
-                bdm_user_id: this.filters.bdm_user_id,
-                country_id: this.filters.country_id,
-                id: this.filters.id,
+                ...this.filters
             };
 
             return cleanQueryParams(rawQuery);
@@ -148,22 +167,13 @@ export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', 
             this.loading = false;
             this.selected = [];
 
-            // Pagination
-            this.pagination.page = 1;
-            this.pagination.per_page = DEFAULT_PER_PAGE;
-            this.pagination.order_by = DEFAULT_ORDER_BY;
-            this.pagination.order_direction = DEFAULT_ORDER_DIRECTION;
-            this.pagination.total_records = 0;
-            this.last_page = 1;
-            this.navigate_to_page = 1;
+            this.pagination = {
+                ...defaultPaginationOptions
+            };
 
-            // Singular autocompletes
-            this.filters.analyst_user_id = null;
-            this.filters.bdm_user_id = null;
-
-            // Multiple autocompletes
-            this.filters.country_id = [];
-            this.filters.id = [];
+            this.filters = {
+                ...defaultFilters
+            };
         },
 
         resetUrl() {

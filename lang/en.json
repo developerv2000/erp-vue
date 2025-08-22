@@ -1,4 +1,7 @@
 {
+    "Yes": "Yes",
+    "No": "No",
+
     "validations.required": "This field is required.",
     "validations.invalid": "The value is invalid.",
     "validations.one_of": "Value must be one of: {values}.",
@@ -87,6 +90,7 @@
     "dates.Deletion date": "Deletion date",
 
     "filter.Filtered records": "Filtered records",
+    "filter.Region": "Region",
 
     "fields.Email": "Email",
     "fields.Password": "Password",

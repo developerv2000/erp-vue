@@ -14,13 +14,14 @@ class CountrySeeder extends Seeder
     public function run(): void
     {
         $countries = [
-            ['name' => 'Dominican Republic', 'code' =>	'DO'],
-            ['name' => 'Guatemala', 'code' =>	'GT'],
-            ['name' => 'Russia', 'code' =>	'RU'],
-            ['name' => 'Azerbaijan', 'code' =>	'AZ'],
-            ['name' => 'Moldova', 'code' =>	'MD'],
-            ['name' => 'Kenya', 'code' =>	'KE'],
-            ['name' => 'Tanzania', 'code' =>	'TZ'],
+            ['name' => 'Dominican Republic', 'code' => 'DO'],
+            ['name' => 'Guatemala', 'code' => 'GT'],
+            ['name' => 'Russia', 'code' => 'RU'],
+            ['name' => 'Azerbaijan', 'code' => 'AZ'],
+            ['name' => 'Moldova', 'code' => 'MD'],
+            ['name' => 'Kenya', 'code' => 'KE'],
+            ['name' => 'Tanzania', 'code' => 'TZ'],
+            ['name' => 'India', 'code' => 'IN'],
         ];
 
         $orderedCountries = collect($countries)->sortBy('name');

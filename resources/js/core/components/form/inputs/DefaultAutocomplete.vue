@@ -23,8 +23,8 @@ const inputAttrs = useAttrs();
             color="orange"
             variant="outlined"
             density="compact"
-            item-value="id"
             item-title="name"
+            item-value="id"
             :list-props="{ density: 'compact' }"
             autocomplete="off"
             clearable

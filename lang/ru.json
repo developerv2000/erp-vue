@@ -1,4 +1,7 @@
 {
+    "Yes": "Да",
+    "No": "Нет",
+
     "validations.required": "Это поле обязательно.",
     "validations.invalid": "Недопустимое значение.",
     "validations.one_of": "Значение должно быть одним из: {values}.",
@@ -55,6 +58,7 @@
     "forms.Password update": "Обновить пароль",
 
     "filter.Filtered records": "Отфильтрованных записей",
+    "filter.Region": "Регион",
 
     "messages.Updated successfully": "Обновлено успешно!",
     "messages.Submition failed": "Что-то пошло не так. Пожалуйста, попробуйте позже!",

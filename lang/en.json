@@ -91,6 +91,7 @@
 
     "filter.Filtered records": "Filtered records",
     "filter.Region": "Region",
+    "filter.Has VPS for country": "Has VPS for country",
 
     "fields.Email": "Email",
     "fields.Password": "Password",

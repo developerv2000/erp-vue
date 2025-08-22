@@ -9,7 +9,7 @@
     --main-table-wrapper-fullscreened-max-height: calc(100vh - var(--default-toolbar-height) - var(--main-table-footer-height));
 
     --main-filter-width: 200px;
-    --main-filter-max-height: calc(100vh - var(--app-bar-height));
+    --main-filter-max-height: calc(100vh - var(--app-bar-height) - var(--main-box-padding-top));
     --main-filter-fullscreened-max-height: 100vh;
 }
 
@@ -84,13 +84,25 @@
 .main-filter {
     width: var(--main-filter-width);
     min-width: var(--main-filter-width);
+}
+
+/* Set max-height for v-card to enable position sticky for apply button */
+.main-filter > .v-card {
     max-height: var(--main-filter-max-height);
     overflow-y: auto;
 }
 
 /* Fullscreen mode */
-.default-table-wrapper.fullscreen .main-filter {
+.default-table-wrapper.fullscreen .main-filter > .v-card {
     max-height: var(--main-filter-fullscreened-max-height);
 }
 
+/* Align with main-table header */
+.main-filter .v-card-item {
+    height: 56px;
+}
+
+.main-filter .v-card-text {
+    padding-top: 18px;
+}
 /* ------------ /end Main filter ------------ */

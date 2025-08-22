@@ -41,7 +41,9 @@ function applyFilter() {
                 <slot />
             </v-card-text>
 
-            <v-card-actions>
+            <v-card-actions
+                class="position-sticky bottom-0 bg-surface border-t"
+            >
                 <FilterApplyButton
                     @click="applyFilter"
                     :loading="store.loading"
@@ -50,14 +52,3 @@ function applyFilter() {
         </v-card>
     </v-sheet>
 </template>
-
-<style scoped>
-/* Align with main-table header */
-.main-filter .v-card-item {
-    height: 56px;
-}
-
-.main-filter .v-card-text {
-    padding-top: 18px;
-}
-</style>

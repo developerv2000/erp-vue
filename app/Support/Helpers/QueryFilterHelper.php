@@ -92,8 +92,8 @@ class QueryFilterHelper
                 [$fromDate, $toDate] = explode(' - ', $request->input($attribute));
 
                 // Parse dates to match valid timestamp format
-                $fromDate = Carbon::createFromFormat('d/m/Y', $fromDate)->format('Y-m-d');
-                $toDate = Carbon::createFromFormat('d/m/Y', $toDate)->format('Y-m-d');
+                $fromDate = Carbon::createFromFormat('d.m.Y', $fromDate)->format('Y-m-d');
+                $toDate = Carbon::createFromFormat('d.m.Y', $toDate)->format('Y-m-d');
 
                 $query->whereDate($attribute, '>=', $fromDate)
                     ->whereDate($attribute, '<', $toDate);
@@ -109,8 +109,8 @@ class QueryFilterHelper
                 [$fromDate, $toDate] = explode(' - ', $request->input($relation['attribute']));
 
                 // Parse dates to match valid timestamp format
-                $fromDate = Carbon::createFromFormat('d/m/Y', $fromDate)->format('Y-m-d');
-                $toDate = Carbon::createFromFormat('d/m/Y', $toDate)->format('Y-m-d');
+                $fromDate = Carbon::createFromFormat('d.m.Y', $fromDate)->format('Y-m-d');
+                $toDate = Carbon::createFromFormat('d.m.Y', $toDate)->format('Y-m-d');
 
                 $query->whereHas($relation['name'], function ($q) use ($fromDate, $toDate, $relation) {
                     $q->whereDate($relation['ambiguousAttribute'], '>=', $fromDate)

@@ -14,6 +14,10 @@ const defaultPaginationOptions = {
 };
 
 const defaultFilters = {
+    // Date ranges
+    created_at: null,
+    updated_at: null,
+
     // Singular autocompletes
     analyst_user_id: null,
     bdm_user_id: null,
@@ -71,6 +75,8 @@ export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', 
             this.filters.region = query.region;
             this.filters.active = query.active;
             this.filters.important = query.important;
+            this.filters.created_at = query.created_at;
+            this.filters.updated_at = query.updated_at;
 
             // Normalize singular id autocompletes
             this.filters.analyst_user_id = normalizeSingleID(query.analyst_user_id);

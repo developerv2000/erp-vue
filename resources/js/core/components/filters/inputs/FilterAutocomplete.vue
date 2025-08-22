@@ -39,6 +39,9 @@ const inputClass = computed(() => ({
         :class="inputClass"
         :list-props="{ class: 'filter-autocomplete__list', density: 'compact' }"
         v-bind="attrs"
+        :chips="isMultiple ? true : false"
+        :clear-on-select="isMultiple ? true : false"
+        :closable-chips="isMultiple ? true : false"
     />
 </template>
 

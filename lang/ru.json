@@ -59,6 +59,7 @@
 
     "filter.Filtered records": "Отфильтрованных записей",
     "filter.Region": "Регион",
+    "filter.Has VPS for country": "Имеет ВПЦ для страны",
 
     "messages.Updated successfully": "Обновлено успешно!",
     "messages.Submition failed": "Что-то пошло не так. Пожалуйста, попробуйте позже!",
@@ -98,10 +99,6 @@
     "fields.Photo": "Фото",
     "fields.Current password": "Текущий пароль",
     "fields.New password": "Новый пароль",
-
-    "fields.Created at": "Новый пароль",
-    "fields.Updated at": "Новый пароль",
-    "fields.Deleted at": "Новый пароль",
 
     "fields.Analyst": "Аналитик",
     "fields.BDM": "БДМ",

@@ -27,7 +27,7 @@ class UserSeeder extends Seeder
 
         $globalAdmins = [
             ['name' => 'Nuridinov Bobur', 'email' => 'developer@mail.com', 'photo' => 'developer.jpg'],
-            ['name' => 'Firdavs Kilichbekov', 'email' => 'firdavs@mail.com', 'photo' => 'developer.jpg'],
+            ['name' => 'Global admin', 'email' => 'admin@mail.com', 'photo' => 'developer.jpg'],
         ];
 
         // Create global admins

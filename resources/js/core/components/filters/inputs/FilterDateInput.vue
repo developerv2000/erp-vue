@@ -6,5 +6,11 @@ const attrs = useAttrs();
 </script>
 
 <template>
-    <DefaultDateInput prepend-icon="" v-bind="attrs" clearable hide-details />
+    <DefaultDateInput
+        prepend-icon=""
+        placeholder=" "
+        clearable
+        hide-details
+        v-bind="attrs"
+    />
 </template>

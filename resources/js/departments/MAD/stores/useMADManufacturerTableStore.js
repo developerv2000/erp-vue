@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { router } from '@inertiajs/vue3'
-import { normalizeSingleID, normalizeMultiIDs, cleanQueryParams } from '@/core/scripts/utilities';
 import axios from 'axios';
+import { cleanQueryParams, normalizeDateRangesFromQuery, normalizeDateRangesToQueryFormat, normalizeMultiIDsFromQuery, normalizeSingleIDsFromQuery } from '@/core/scripts/queryHelper';
 
 const defaultPaginationOptions = {
     page: 1,
@@ -75,21 +75,11 @@ export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', 
             this.filters.region = query.region;
             this.filters.active = query.active;
             this.filters.important = query.important;
-            this.filters.created_at = query.created_at;
-            this.filters.updated_at = query.updated_at;
 
-            // Normalize singular id autocompletes
-            this.filters.analyst_user_id = normalizeSingleID(query.analyst_user_id);
-            this.filters.bdm_user_id = normalizeSingleID(query.bdm_user_id);
-            this.filters.category_id = normalizeSingleID(query.category_id);
-
-            // Normalize multiple id autocompletes
-            this.filters.country_id = normalizeMultiIDs(query.country_id);
-            this.filters.id = normalizeMultiIDs(query.id);
-            this.filters.productClasses = normalizeMultiIDs(query.productClasses);
-            this.filters.zones = normalizeMultiIDs(query.zones);
-            this.filters.process_country_id = normalizeMultiIDs(query.process_country_id);
-            this.filters.blacklists = normalizeMultiIDs(query.blacklists);
+            // Normalize filters
+            normalizeSingleIDsFromQuery(this.filters, query, ['analyst_user_id', 'bdm_user_id', 'category_id']);
+            normalizeMultiIDsFromQuery(this.filters, query, ['country_id', 'id', 'productClasses', 'zones', 'process_country_id', 'blacklists']);
+            normalizeDateRangesFromQuery(this.filters, query, ['created_at', 'updated_at']);
 
             // Mark as initialized
             this.initializedFromInertiaPage = true;
@@ -107,7 +97,8 @@ export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', 
                 order_direction: this.pagination.order_direction,
 
                 // Filters
-                ...this.filters
+                ...this.filters,
+                ...normalizeDateRangesToQueryFormat(this.filters, ['created_at', 'updated_at']),
             };
 
             return cleanQueryParams(rawQuery);

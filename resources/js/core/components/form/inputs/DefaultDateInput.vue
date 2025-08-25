@@ -32,7 +32,7 @@ const inputAttrs = useAttrs();
             color="orange"
             variant="outlined"
             density="compact"
-            :label="placeholder"
+            :placeholder="placeholder"
             autocomplete="off"
             v-bind="inputAttrs"
         />

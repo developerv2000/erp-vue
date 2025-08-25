@@ -85,20 +85,30 @@ class QueryFilterHelper
         return $query;
     }
 
+    /**
+     * Apply date range filters to a query.
+     *
+     * Example input:
+     *   created_at = "2024-01-01 - 2025-01-01"
+     *
+     * @param  Request $request
+     * @param  Builder $query
+     * @param  array   $attributes  List of date attributes (e.g. ['created_at', 'updated_at'])
+     * @return Builder
+     */
     public static function filterDateRange(Request $request, Builder $query, array $attributes): Builder
     {
         foreach ($attributes as $attribute) {
             if ($request->filled($attribute)) {
                 [$fromDate, $toDate] = explode(' - ', $request->input($attribute));
 
-                // Parse dates to match valid timestamp format
-                $fromDate = Carbon::createFromFormat('d.m.Y', $fromDate)->format('Y-m-d');
-                $toDate = Carbon::createFromFormat('d.m.Y', $toDate)->format('Y-m-d');
+                $fromDate = Carbon::createFromFormat('Y-m-d', trim($fromDate))->startOfDay();
+                $toDate   = Carbon::createFromFormat('Y-m-d', trim($toDate))->endOfDay();
 
-                $query->whereDate($attribute, '>=', $fromDate)
-                    ->whereDate($attribute, '<', $toDate);
+                $query->whereBetween($attribute, [$fromDate, $toDate]);
             }
         }
+
         return $query;
     }
 
@@ -108,19 +118,17 @@ class QueryFilterHelper
             if ($request->filled($relation['attribute'])) {
                 [$fromDate, $toDate] = explode(' - ', $request->input($relation['attribute']));
 
-                // Parse dates to match valid timestamp format
-                $fromDate = Carbon::createFromFormat('d.m.Y', $fromDate)->format('Y-m-d');
-                $toDate = Carbon::createFromFormat('d.m.Y', $toDate)->format('Y-m-d');
+                $fromDate = Carbon::createFromFormat('Y-m-d', trim($fromDate))->startOfDay();
+                $toDate   = Carbon::createFromFormat('Y-m-d', trim($toDate))->endOfDay();
 
                 $query->whereHas($relation['name'], function ($q) use ($fromDate, $toDate, $relation) {
-                    $q->whereDate($relation['ambiguousAttribute'], '>=', $fromDate)
-                        ->whereDate($relation['ambiguousAttribute'], '<', $toDate);
+                    $q->whereBetween($relation['ambiguousAttribute'], [$fromDate, $toDate]);
                 });
             }
         }
+
         return $query;
     }
-
 
     public static function filterBelongsToMany(Request $request, Builder $query, array $relationNames): Builder
     {

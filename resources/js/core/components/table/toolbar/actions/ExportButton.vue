@@ -3,8 +3,6 @@ import { computed, ref } from "vue";
 import { mdiDownload, mdiClose } from "@mdi/js";
 import DefaultButton from "../../../buttons/DefaultButton.vue";
 import axios from "axios";
-import { useTemplateRef } from "vue";
-import { nextTick } from "vue";
 import { getCSRFToken } from "@/core/scripts/functions";
 import { useI18n } from "vue-i18n";
 
@@ -15,29 +13,20 @@ const props = defineProps({
 
 const { t } = useI18n();
 const csrf = getCSRFToken();
-const downloadForm = useTemplateRef("downloadForm");
 const snackbar = ref(false);
 const generatingFile = ref(false);
 const downloadStarted = ref(false);
-const filename = ref("name");
 const snackbarTimeout = ref(-1);
 
 const snackbarColor = computed(() => {
     return downloadStarted.value ? "success" : "warning";
 });
 
-const downloadLink = computed(() => {
-    return route("excel-storage.download", {
-        model: props.model,
-        filename: filename.value,
-    });
-});
-
-function exportRecords() {
+function generateFile() {
+    downloadStarted.value = false;
+    generatingFile.value = true;
     snackbarTimeout.value = -1;
     snackbar.value = true;
-    generatingFile.value = true;
-    downloadStarted.value = false;
 
     axios
         .post(
@@ -45,16 +34,33 @@ function exportRecords() {
             props.store.toQuery()
         )
         .then(async (response) => {
-            filename.value = response.data.filename;
-            downloadStarted.value = true;
-
-            await nextTick(); // wait for DOM to update form action
-            snackbarTimeout.value = 5000;
-            downloadForm.value.submit();
-        })
-        .finally(() => {
-            generatingFile.value = false;
+            await startDownload(response.data.filename);
         });
+}
+
+async function startDownload(filename) {
+    generatingFile.value = false;
+    downloadStarted.value = true;
+    snackbarTimeout.value = 5000;
+    snackbar.value = true;
+
+    axios
+        .post(
+            route("excel-storage.download", { model: props.model, filename }),
+            {
+                _token: csrf,
+            },
+            { responseType: "blob" }
+        )
+        .then((response) => {
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", filename);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        })
 }
 </script>
 
@@ -65,7 +71,7 @@ function exportRecords() {
         size="default"
         variant="tonal"
         :loading="generatingFile"
-        @click="exportRecords"
+        @click="generateFile"
     >
         {{ t("actions.Export") }}
     </DefaultButton>
@@ -93,9 +99,5 @@ function exportRecords() {
             <v-icon :icon="mdiDownload" />
             <p>{{ t("file.Download started") }}!</p>
         </div>
-
-        <form :action="downloadLink" ref="downloadForm" method="POST">
-            <input type="hidden" name="_token" :value="csrf" />
-        </form>
     </v-snackbar>
 </template>

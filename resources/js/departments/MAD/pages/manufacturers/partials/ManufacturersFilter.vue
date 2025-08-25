@@ -5,7 +5,7 @@ import FilterBooleanAutocomplete from "@/core/components/filters/inputs/FilterBo
 import { usePage } from "@inertiajs/vue3";
 import { useMADManufacturerTableStore } from "@/departments/MAD/stores/useMADManufacturerTableStore";
 import { useI18n } from "vue-i18n";
-import FilterDateInput from "@/core/components/filters/inputs/FilterDateInput.vue";
+import FilterDefaultInputs from "@/core/components/filters/inputs/FilterDefaultInputs.vue";
 
 const { t } = useI18n();
 const page = usePage();
@@ -108,11 +108,6 @@ const store = useMADManufacturerTableStore();
             multiple
         />
 
-        <FilterDateInput
-            :label="t('dates.Date of creation')"
-            name="created_at"
-            v-model="store.filters.created_at"
-            multiple="range"
-        />
+        <FilterDefaultInputs :store="store" :exclude="['id']" />
     </StoreBindedFilter>
 </template>

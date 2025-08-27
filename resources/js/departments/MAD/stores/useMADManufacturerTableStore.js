@@ -35,7 +35,7 @@ const defaultFilters = {
     blacklists: [],
 }
 
-const API_URL = '/api/manufacturers';
+const API_URL = route('api.manufacturers.get');
 
 export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', {
     state: () => ({

@@ -39,6 +39,8 @@
     "pages.Misc": "Misc",
 
     "actions.Logout": "Logout",
+    "actions.Create": "Create",
+    "actions.Create new record": "Create new record",
     "actions.Update": "Update",
     "actions.Reset": "Reset",
     "actions.New": "New",

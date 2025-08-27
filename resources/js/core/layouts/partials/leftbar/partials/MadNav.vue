@@ -22,6 +22,7 @@ const listItems = computed(() => [
         title: t("pages.EPP"),
         routeName: "mad.manufacturers.index",
         routeParams: null,
+        activeOnRoutes: "mad.manufacturers.*",
         prependIcon: mdiViewList,
     },
 
@@ -29,6 +30,7 @@ const listItems = computed(() => [
         title: t("pages.KVPP"),
         routeName: "mad.product-searches.index",
         routeParams: null,
+        activeOnRoutes: "mad.product-searches.*",
         prependIcon: mdiCalendarSearch,
     },
 
@@ -36,6 +38,7 @@ const listItems = computed(() => [
         title: t("pages.IVP"),
         routeName: "mad.products.index",
         routeParams: null,
+        activeOnRoutes: "mad.products.*",
         prependIcon: mdiPill,
     },
 
@@ -43,6 +46,7 @@ const listItems = computed(() => [
         title: t("pages.VPS"),
         routeName: "mad.processes.index",
         routeParams: null,
+        activeOnRoutes: "mad.processes.*",
         prependIcon: mdiLayers,
     },
 
@@ -50,6 +54,7 @@ const listItems = computed(() => [
         title: t("pages.Meetings"),
         routeName: "mad.meetings.index",
         routeParams: null,
+        activeOnRoutes: "mad.meetings.*",
         prependIcon: mdiAccountGroup,
     },
 
@@ -57,6 +62,7 @@ const listItems = computed(() => [
         title: t("pages.KPI"),
         routeName: "mad.kpi.index",
         routeParams: null,
+        activeOnRoutes: "mad.kpi.index",
         prependIcon: mdiFinance,
     },
 
@@ -64,6 +70,7 @@ const listItems = computed(() => [
         title: t("pages.ASP"),
         routeName: "mad.asp.index",
         routeParams: null,
+        activeOnRoutes: "mad.asp.*",
         prependIcon: mdiChartArc,
     },
 
@@ -71,6 +78,7 @@ const listItems = computed(() => [
         title: t("pages.Decision hub"),
         routeName: "mad.decision-hub.index",
         routeParams: null,
+        activeOnRoutes: "mad.decision-hub.*",
         prependIcon: mdiTextSearch,
     },
 
@@ -78,6 +86,7 @@ const listItems = computed(() => [
         title: t("pages.Misc"),
         routeName: "misc-models.department-models",
         routeParams: { department: "MAD" },
+        activeOnRoutes: 'misc-models.department-models.*',
         prependIcon: mdiApps,
     },
 ]);
@@ -93,7 +102,7 @@ const listItems = computed(() => [
             :title="item.title"
             :link="route(item.routeName, item.routeParams)"
             :prepend-icon="item.prependIcon"
-            :active="route().current(item.routeName, item.routeParams)"
+            :active="route().current(item.activeOnRoutes, item.routeParams)"
         />
     </v-list>
 </template>

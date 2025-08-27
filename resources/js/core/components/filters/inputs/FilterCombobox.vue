@@ -35,7 +35,6 @@ const inputClass = computed(() => ({
     <DefaultCombobox
         v-model="modelValue"
         :clearable="clearable"
-        hide-details
         :class="inputClass"
         :list-props="{ class: 'filter-combobox__list', density: 'compact' }"
         v-bind="attrs"

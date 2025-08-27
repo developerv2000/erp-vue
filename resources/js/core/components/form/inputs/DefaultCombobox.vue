@@ -28,6 +28,7 @@ const inputAttrs = useAttrs();
             :list-props="{ density: 'compact' }"
             :auto-select-first="true"
             autocomplete="off"
+            hide-details="auto"
             clearable
             v-bind="inputAttrs"
         />

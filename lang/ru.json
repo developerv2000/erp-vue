@@ -39,6 +39,8 @@
     "pages.Misc": "Разное",
 
     "actions.Logout": "Выйти",
+    "actions.Create": "Создать",
+    "actions.Create new record": "Создать новую запись",
     "actions.Update": "Обновить",
     "actions.Reset": "Сбросить",
     "actions.New": "Новый",

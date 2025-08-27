@@ -34,6 +34,7 @@ const inputAttrs = useAttrs();
             density="compact"
             :placeholder="placeholder"
             autocomplete="off"
+            hide-details="auto"
             v-bind="inputAttrs"
         />
     </StandardLabeledGroup>

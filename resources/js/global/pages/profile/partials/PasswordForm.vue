@@ -2,7 +2,7 @@
 import { Form, useForm, useField } from "vee-validate";
 import DefaultSheet from "@/core/components/containers/DefaultSheet.vue";
 import DefaultTitle from "@/core/components/titles/DefaultTitle.vue";
-import DefaultInput from "@/core/components/form/inputs/DefaultInput.vue";
+import DefaultTextField from "@/core/components/form/inputs/DefaultTextField.vue";
 import FormActionsContainer from "@/core/components/form/containers/FormActionsContainer.vue";
 import FormUpdateButton from "@/core/components/form/buttons/FormUpdateButton.vue";
 import FormResetButton from "@/core/components/form/buttons/FormResetButton.vue";
@@ -65,7 +65,7 @@ const submit = handleSubmit((values) => {
         <Form @submit="submit">
             <v-row>
                 <v-col>
-                    <DefaultInput
+                    <DefaultTextField
                         :label="t('fields.Current password')"
                         name="current_password"
                         v-model="currentPassword"
@@ -83,7 +83,7 @@ const submit = handleSubmit((values) => {
                 </v-col>
 
                 <v-col>
-                    <DefaultInput
+                    <DefaultTextField
                         :label="t('fields.New password')"
                         name="new_password"
                         v-model="newPassword"
@@ -99,7 +99,7 @@ const submit = handleSubmit((values) => {
                 </v-col>
             </v-row>
 
-            <FormActionsContainer>
+            <FormActionsContainer class="mt-5">
                 <FormUpdateButton :loading="loading" />
                 <FormResetButton />
             </FormActionsContainer>

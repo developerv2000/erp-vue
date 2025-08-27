@@ -1,6 +1,6 @@
 <script setup>
 import GuestLayout from "@/core/layouts/GuestLayout.vue";
-import DefaultInput from "@/core/components/form/inputs/DefaultInput.vue";
+import DefaultTextField from "@/core/components/form/inputs/DefaultTextField.vue";
 import { mdiEye, mdiEyeOff } from "@mdi/js";
 import { ref } from "vue";
 import { Head } from "@inertiajs/vue3";
@@ -64,7 +64,7 @@ const login = handleSubmit((values) => {
                 subtitle="Please, sign in to your account"
             >
                 <Form @submit="login" class="d-flex flex-column ga-1 mt-5">
-                    <DefaultInput
+                    <DefaultTextField
                         label="Email"
                         name="email"
                         type="email"
@@ -72,10 +72,10 @@ const login = handleSubmit((values) => {
                         v-model="email"
                         :error-messages="emailError"
                         color="lime-accent-4"
-                        clearable
+                        :hide-details="false"
                     />
 
-                    <DefaultInput
+                    <DefaultTextField
                         label="Password"
                         name="password"
                         :type="showPassword ? 'text' : 'password'"
@@ -83,6 +83,7 @@ const login = handleSubmit((values) => {
                         v-model="password"
                         :error-messages="passwordError"
                         color="lime-accent-4"
+                        :hide-details="false"
                         :append-inner-icon="showPassword ? mdiEyeOff : mdiEye"
                         @click:append-inner="showPassword = !showPassword"
                     />

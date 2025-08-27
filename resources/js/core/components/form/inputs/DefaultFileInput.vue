@@ -19,15 +19,20 @@ const inputAttrs = useAttrs();
 </script>
 
 <template>
-    <StandardLabeledGroup v-bind="groupAttrs" :label="label" :required="required">
+    <StandardLabeledGroup
+        v-bind="groupAttrs"
+        :label="label"
+        :required="required"
+    >
         <v-file-input
             color="orange"
             variant="outlined"
             density="compact"
             clearable
-            v-bind="inputAttrs"
             :prepend-inner-icon="mdiPaperclip"
             :prepend-icon="null"
+            hide-details="auto"
+            v-bind="inputAttrs"
         />
     </StandardLabeledGroup>
 </template>

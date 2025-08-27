@@ -23,6 +23,8 @@ const inputAttrs = useAttrs();
             color="orange"
             variant="outlined"
             density="compact"
+            hide-details="auto"
+            clearable
             v-bind="inputAttrs"
         />
     </WrappedLabelGroup>

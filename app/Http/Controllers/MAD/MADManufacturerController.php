@@ -3,8 +3,13 @@
 namespace App\Http\Controllers\MAD;
 
 use App\Http\Controllers\Controller;
+use App\Models\Country;
 use App\Models\Manufacturer;
+use App\Models\ManufacturerBlacklist;
+use App\Models\ManufacturerCategory;
+use App\Models\ProductClass;
 use App\Models\User;
+use App\Models\Zone;
 use App\Support\FilterDependencies\SimpleFilters\MAD\ManufacturersSimpleFilterDependencies;
 use App\Support\FilterDependencies\SmartFilters\MAD\ManufacturersSmartFilterDependencies;
 use App\Support\Traits\Controller\DestroysModelRecords;
@@ -44,10 +49,26 @@ class MADManufacturerController extends Controller
         $getVisibleHeaders = fn() => User::filterOnlyVisibleHeaders($getAllTableHeaders());
 
         return Inertia::render('departments/MAD/pages/manufacturers/Trash', [
-            'allTableHeaders' => $getAllTableHeaders, // Lazy load
             'tableVisibleHeaders' => $getVisibleHeaders, // Lazy load
             'simpleFilterDependencies' => fn() => ManufacturersSimpleFilterDependencies::getAllDependencies(), // Lazy load
             'smartFilterDependencies' => ManufacturersSmartFilterDependencies::getAllDependencies(),
+        ]);
+    }
+
+    public function create()
+    {
+        return Inertia::render('departments/MAD/pages/manufacturers/Create', [
+            'analystUsers' => User::getMADAnalystsMinified(),
+            'bdmUsers' => User::getCMDBDMsMinifed(),
+            'countriesOrderedByName' => Country::orderByName()->get(),
+            'countriesOrderedByProcessesCount' => Country::orderByProcessesCount()->get(),
+            'manufacturers' => Manufacturer::getMinifiedRecordsWithName(),
+            'categories' => ManufacturerCategory::orderByName()->get(),
+            'zones' => Zone::orderByName()->get(),
+            'defaultSelectedZoneIDs' => Zone::getRelatedDefaultSelectedIDValues(),
+            'productClasses' => ProductClass::orderByName()->get(),
+            'blacklists' => ManufacturerBlacklist::orderByName()->get(),
+            'statusOptions' => Manufacturer::getStatusOptions(),
         ]);
     }
 }

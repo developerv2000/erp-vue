@@ -35,7 +35,6 @@ const inputClass = computed(() => ({
     <DefaultAutocomplete
         v-model="modelValue"
         :clearable="clearable"
-        hide-details
         :class="inputClass"
         :list-props="{ class: 'filter-autocomplete__list', density: 'compact' }"
         v-bind="attrs"

@@ -1,6 +1,6 @@
 <script setup>
 import useAuth from "@/core/composables/useAuth";
-import DefaultInput from "@/core/components/form/inputs/DefaultInput.vue";
+import DefaultTextField from "@/core/components/form/inputs/DefaultTextField.vue";
 import DefaultSheet from "@/core/components/containers/DefaultSheet.vue";
 import DefaultTitle from "@/core/components/titles/DefaultTitle.vue";
 import DefaultFileInput from "@/core/components/form/inputs/DefaultFileInput.vue";
@@ -15,11 +15,11 @@ import { router } from "@inertiajs/vue3";
 import { useFormData } from "@/core/composables/useFormData";
 import { useMessagesStore } from "@/core/stores/useMessages";
 
-const { user } = useAuth();
 const { t } = useI18n();
 const { objectToFormData } = useFormData();
-const loading = ref(false);
+const { user } = useAuth();
 const messages = useMessagesStore();
+const loading = ref(false);
 
 // Define yup schema
 const schema = yup.object({
@@ -75,7 +75,7 @@ const submit = handleSubmit((values) => {
         <Form @submit="submit" enctype="multipart/form-data">
             <v-row>
                 <v-col>
-                    <DefaultInput
+                    <DefaultTextField
                         :label="t('fields.Name')"
                         name="name"
                         v-model="name"
@@ -85,7 +85,7 @@ const submit = handleSubmit((values) => {
                 </v-col>
 
                 <v-col>
-                    <DefaultInput
+                    <DefaultTextField
                         :label="t('fields.Email')"
                         name="email"
                         type="email"
@@ -106,7 +106,7 @@ const submit = handleSubmit((values) => {
                 </v-col>
             </v-row>
 
-            <FormActionsContainer>
+            <FormActionsContainer class="mt-5">
                 <FormUpdateButton :loading="loading" />
                 <FormResetButton @click="resetForm" />
             </FormActionsContainer>

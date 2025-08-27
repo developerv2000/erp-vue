@@ -1,6 +1,6 @@
 <script setup>
-import WrappedLabelGroup from "../groups/WrappedLabelGroup.vue";
-import { useAttrs } from "vue";
+import StandardLabeledGroup from "../groups/StandardLabeledGroup.vue";
+import { computed, useAttrs } from "vue";
 
 const props = defineProps({
     label: String,
@@ -15,10 +15,15 @@ const props = defineProps({
 });
 
 const inputAttrs = useAttrs();
+
+// Determine if field is multiple
+const isMultiple = computed(
+    () => inputAttrs.multiple === "" || !!inputAttrs.multiple
+);
 </script>
 
 <template>
-    <WrappedLabelGroup v-bind="groupAttrs" :label="label" :required="required">
+    <StandardLabeledGroup v-bind="groupAttrs" :label="label" :required="required">
         <v-combobox
             color="orange"
             variant="outlined"
@@ -29,8 +34,11 @@ const inputAttrs = useAttrs();
             :auto-select-first="true"
             autocomplete="off"
             hide-details="auto"
-            clearable
+            :clearable="!isMultiple"
+            :clear-on-select="isMultiple ? true : false"
+            :chips="isMultiple ? true : false"
+            :closable-chips="isMultiple ? true : false"
             v-bind="inputAttrs"
         />
-    </WrappedLabelGroup>
+    </StandardLabeledGroup>
 </template>

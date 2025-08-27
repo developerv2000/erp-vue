@@ -55,6 +55,9 @@
     "actions.Filter": "Filter",
     "actions.Apply": "Apply",
     "actions.Go to page": "Go to page",
+    "actions.Store and go back": "Store and go back",
+    "actions.Store and reset form": "Store and reset form",
+    "actions.Store without reseting form": "Store without reseting form",
 
     "forms.Personal data": "Personal data",
     "forms.Password update": "Password update",

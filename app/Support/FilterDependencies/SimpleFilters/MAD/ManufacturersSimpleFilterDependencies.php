@@ -18,7 +18,6 @@ class ManufacturersSimpleFilterDependencies
             'bdmUsers' => User::getCMDBDMsMinifed(),
             'regions' => Country::getRegionOptions(),
             'categories' => ManufacturerCategory::orderByName()->get(),
-            'statusOptions' => Manufacturer::getStatusOptions(),
             'productClasses' => ProductClass::orderByName()->get(),
             'zones' => Zone::orderByName()->get(),
             'countriesOrderedByProcessesCount' => Country::orderByProcessesCount()->get(), // used in has processes_for_country filter

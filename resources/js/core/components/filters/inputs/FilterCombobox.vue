@@ -10,9 +10,6 @@ const attrs = useAttrs();
 // Determine if field is multiple
 const isMultiple = computed(() => attrs.multiple === "" || !!attrs.multiple);
 
-// Clearable only for single fields
-const clearable = computed(() => !isMultiple.value);
-
 // Highlight if value is not empty
 const isHighlighted = computed(() => {
     if (isMultiple.value) {
@@ -34,13 +31,9 @@ const inputClass = computed(() => ({
 <template>
     <DefaultCombobox
         v-model="modelValue"
-        :clearable="clearable"
         :class="inputClass"
         :list-props="{ class: 'filter-combobox__list', density: 'compact' }"
         v-bind="attrs"
-        :chips="isMultiple ? true : false"
-        :clear-on-select="isMultiple ? true : false"
-        :closable-chips="isMultiple ? true : false"
     />
 </template>
 

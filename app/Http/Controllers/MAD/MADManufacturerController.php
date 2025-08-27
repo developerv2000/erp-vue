@@ -58,17 +58,14 @@ class MADManufacturerController extends Controller
     public function create()
     {
         return Inertia::render('departments/MAD/pages/manufacturers/Create', [
+            'categories' => ManufacturerCategory::orderByName()->get(),
+            'productClasses' => ProductClass::orderByName()->get(),
             'analystUsers' => User::getMADAnalystsMinified(),
             'bdmUsers' => User::getCMDBDMsMinifed(),
             'countriesOrderedByName' => Country::orderByName()->get(),
-            'countriesOrderedByProcessesCount' => Country::orderByProcessesCount()->get(),
-            'manufacturers' => Manufacturer::getMinifiedRecordsWithName(),
-            'categories' => ManufacturerCategory::orderByName()->get(),
             'zones' => Zone::orderByName()->get(),
             'defaultSelectedZoneIDs' => Zone::getRelatedDefaultSelectedIDValues(),
-            'productClasses' => ProductClass::orderByName()->get(),
             'blacklists' => ManufacturerBlacklist::orderByName()->get(),
-            'statusOptions' => Manufacturer::getStatusOptions(),
         ]);
     }
 }

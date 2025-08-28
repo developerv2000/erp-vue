@@ -2,6 +2,7 @@ import { createVuetifyProTipTap, VuetifyTiptap, VuetifyViewer } from "vuetify-pr
 import { BaseKit, Bold, Italic, Underline, Strike, Color, Highlight, Heading, TextAlign, FontFamily, FontSize, SubAndSuperScript, BulletList, OrderedList, TaskList, Indent, Link, Image, Video, Table, Blockquote, HorizontalRule, Code, CodeBlock, Clear, Fullscreen, History } from 'vuetify-pro-tiptap'
 import 'vuetify-pro-tiptap/style.css'
 import axios from "axios";
+import { Plugin, PluginKey } from 'prosemirror-state';
 
 // Common extensions
 export const extensions = [
@@ -35,7 +36,42 @@ export const extensions = [
 
 // Image extension factory
 export const imageExtension = function (folder = 'default') {
-    return Image.configure({
+    return Image.extend({
+        addProseMirrorPlugins() {
+            return [
+                new Plugin({
+                    key: new PluginKey('imagePaste'),
+                    props: {
+                        handlePaste: (view, event) => {
+                            const items = (event.clipboardData || event.originalEvent.clipboardData).items;
+                            for (const item of items) {
+                                if (item.type.startsWith('image/')) {
+                                    const file = item.getAsFile();
+                                    if (file) {
+                                        // Prevent default paste behavior
+                                        event.preventDefault();
+                                        // Use the configured upload function
+                                        this.options.upload(file).then((url) => {
+                                            // Insert image into editor
+                                            view.dispatch(
+                                                view.state.tr.replaceSelectionWith(
+                                                    this.type.create({ src: url })
+                                                )
+                                            );
+                                        }).catch((error) => {
+                                            console.error('Image paste upload failed:', error);
+                                        });
+                                        return true; // Handled
+                                    }
+                                }
+                            }
+                            return false; // Not handled, use default behavior
+                        },
+                    },
+                }),
+            ];
+        },
+    }).configure({
         upload(image) {
             const formData = new FormData();
             formData.append('image', image);
@@ -50,6 +86,8 @@ export const imageExtension = function (folder = 'default') {
                 throw error;
             });
         },
+        imageTabs: [],
+        hiddenTabs: ['upload'],
     });
 };
 

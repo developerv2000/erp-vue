@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Http\Requests\MAD\ManufacturerStoreRequest;
 use App\Support\Abstracts\BaseModel;
 use App\Support\Contracts\Model\ExportsRecordsAsExcel;
 use App\Support\Helpers\QueryFilterHelper;
@@ -397,6 +398,39 @@ class Manufacturer extends BaseModel implements ExportsRecordsAsExcel
                         $statusQuery->where('stage', '<=', 5);
                     });
             });
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Store & update
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * API request handler
+     */
+    public static function storeFromRequest(ManufacturerStoreRequest $request)
+    {
+        $record = self::create($request->all());
+
+        // BelongsToMany relations
+        $record->zones()->attach($request->input('zones'));
+        $record->productClasses()->attach($request->input('productClasses'));
+        $record->blacklists()->attach($request->input('blacklists'));
+
+        // HasMany relations
+        $record->storePresencesOnCreate($request->input('presences'));
+        $record->storeCommentFromRequest($request);
+        $record->storeAttachmentsFromRequest($request);
+    }
+
+    private function storePresencesOnCreate($presences)
+    {
+        if (!$presences) return;
+
+        foreach ($presences as $name) {
+            $this->presences()->create(['name' => $name]);
         }
     }
 

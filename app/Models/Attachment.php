@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Attachment extends Model
 {
@@ -38,22 +39,6 @@ class Attachment extends Model
 
     /*
     |--------------------------------------------------------------------------
-    | Additional attributes
-    |--------------------------------------------------------------------------
-    */
-
-    /**
-     * Get the file size in megabytes.
-     *
-     * @return float
-     */
-    public function getFileSizeInMegabytesAttribute()
-    {
-        return round($this->file_size / (1024 * 1024), 2);
-    }
-
-    /*
-    |--------------------------------------------------------------------------
     | Events
     |--------------------------------------------------------------------------
     */
@@ -82,12 +67,11 @@ class Attachment extends Model
      */
     public function deleteFileFromStorage()
     {
-        // Construct the full file path relative to the public directory
-        $filePath = public_path($this->file_path);
+        $disk = Storage::disk('local');
+        $path = 'attachments/' . $this->folder . '/' . $this->filename;
 
-        // Ensure the file exists before trying to delete it
-        if (file_exists($filePath)) {
-            unlink($filePath);
+        if ($disk->exists($path)) {
+            unlink($disk->path($path));
         }
     }
 }

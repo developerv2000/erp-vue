@@ -86,8 +86,6 @@ export const imageExtension = function (folder = 'default') {
                 throw error;
             });
         },
-        imageTabs: [],
-        hiddenTabs: ['upload'],
     });
 };
 

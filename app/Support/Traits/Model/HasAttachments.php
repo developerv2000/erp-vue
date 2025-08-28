@@ -5,6 +5,7 @@ namespace App\Support\Traits\Model;
 use App\Models\Attachment;
 use App\Support\Helpers\FileHelper;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Support\Facades\Storage;
 
 trait HasAttachments
 {
@@ -60,20 +61,24 @@ trait HasAttachments
         $attachments = $request->file('attachments');
 
         if ($attachments) {
+            $folder = class_basename($this) . '/' . $this->id;
+            $storagePath = Storage::disk('local')->path('attachments/' . $folder);
+
             foreach ($attachments as $attachment) {
-                $path = "attachments/" . class_basename($this) . "/{$this->id}/";
-                $fileName = $attachment->getClientOriginalName();
-                $fileName = FileHelper::ensureUniqueFilename($fileName, public_path($path));
+                // Get 'file_type' and 'file_size_in_mb' before moving to the store
+                $fileType = $attachment->getClientMimeType();
+                $fileSizeInMb = round($attachment->getSize() / (1024 * 1024), 2);
 
-                // Save attachment details in the database
+                // Move attachment to the store
+                $filename = FileHelper::uploadFile($attachment, $storagePath);
+
+                 // Save attachment details in the database
                 $this->addAttachment([
-                    'filename' => $fileName,
-                    'file_path' => "attachments/" . class_basename($this) . "/{$this->id}/" . $fileName,
-                    'file_type' => $attachment->getClientMimeType(),
-                    'file_size' => $attachment->getSize(),
+                    'filename' => $filename,
+                    'folder' => $folder,
+                    'file_type' => $fileType,
+                    'file_size_in_mb' => $fileSizeInMb
                 ]);
-
-                $attachment->move(public_path($path), $fileName);
             }
         }
     }
@@ -85,7 +90,8 @@ trait HasAttachments
      */
     public function deleteAttachmentsFolder()
     {
-        $path = public_path("attachments/" . class_basename($this) . "/{$this->id}/");
+        $disk = Storage::disk('local');
+        $path = $disk->path('attachments/' . class_basename($this) . "/{$this->id}");
 
         // Check if the directory exists
         if (is_dir($path)) {

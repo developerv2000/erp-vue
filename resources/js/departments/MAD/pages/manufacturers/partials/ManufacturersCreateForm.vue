@@ -1,7 +1,7 @@
 <script setup>
 import { Form, useForm } from "vee-validate";
 import { object, string, number, array } from "yup";
-import { router, usePage } from "@inertiajs/vue3";
+import { usePage } from "@inertiajs/vue3";
 import { useI18n } from "vue-i18n";
 import { useFormData } from "@/core/composables/useFormData";
 import DefaultSheet from "@/core/components/containers/DefaultSheet.vue";
@@ -18,11 +18,19 @@ import FormResetButton from "@/core/components/form/buttons/FormResetButton.vue"
 import FormStoreAndGoBack from "@/core/components/form/buttons/FormStoreAndGoBack.vue";
 import FormStoreAndReset from "@/core/components/form/buttons/FormStoreAndReset.vue";
 import FormStoreWithoutReseting from "@/core/components/form/buttons/FormStoreWithoutReseting.vue";
+import { router } from "@inertiajs/vue3";
+import { ref } from "vue";
+import { useMessagesStore } from "@/core/stores/useMessages";
 
 // Dependencies
 const { t } = useI18n();
 const { objectToFormData } = useFormData();
 const page = usePage();
+const messages = useMessagesStore();
+
+const loading = ref(false);
+const redirectBack = ref(false);
+const resetFormOnSuccess = ref(false);
 
 // Yup schema
 const schema = object({
@@ -30,6 +38,9 @@ const schema = object({
     category_id: number().required(),
     productClasses: array().required().min(1),
     analyst_user_id: number().required(),
+    bdm_user_id: number().required(),
+    country_id: number().required(),
+    zones: array().required().min(1),
 });
 
 // Default form values
@@ -43,8 +54,8 @@ const defaultFields = {
     zones: page.props.defaultSelectedZoneIDs ?? [],
     blacklists: [],
     presences: [],
-    active: true,
-    important: false,
+    active: 1,
+    important: 0,
     website: null,
     relationship: null,
     attachments: [],
@@ -53,39 +64,50 @@ const defaultFields = {
 };
 
 // Initialize form
-const { errors, isSubmitting, handleSubmit, resetForm, setErrors, meta } =
-    useForm({
-        validationSchema: schema,
-        initialValues: { ...defaultFields },
-    });
+const { errors, handleSubmit, resetForm, setErrors, meta } = useForm({
+    validationSchema: schema,
+    initialValues: { ...defaultFields },
+});
 
+// Get form values as ref
 const { values } = useVeeFormFields(Object.keys(defaultFields));
 
 // Submit handler
 const submit = handleSubmit((values) => {
+    loading.value = true;
     const formData = objectToFormData(values);
 
-    router.post(route("api.manufacturers.store"), formData, {
+    router.post(route("mad.manufacturers.store"), formData, {
         preserveState: true,
         preserveScroll: true,
-        onStart: () => {
-            isSubmitting.value = true;
-        },
         onSuccess: () => {
-            // resetForm();
+            messages.addCreatedSuccessfullyMessage();
+
+            if (resetFormOnSuccess.value) {
+                resetForm();
+            }
+
+            if (redirectBack.value) {
+                window.history.back();
+            }
         },
         onError: (errors) => {
+            messages.addFixErrorsMessage();
             setErrors(errors);
         },
         onFinish: () => {
-            isSubmitting.value = false;
+            loading.value = false;
         },
     });
 });
 </script>
 
 <template>
-    <Form class="d-flex flex-column ga-6 pb-8" enctype="multipart/form-data">
+    <Form
+        class="d-flex flex-column ga-6 pb-8"
+        enctype="multipart/form-data"
+        ref="form"
+    >
         <DefaultSheet>
             <v-row>
                 <v-col cols="4">
@@ -174,7 +196,6 @@ const submit = handleSubmit((values) => {
                         v-model="values.blacklists"
                         :error-messages="errors.blacklists"
                         multiple
-                        required
                     />
                 </v-col>
 
@@ -186,7 +207,6 @@ const submit = handleSubmit((values) => {
                         v-model="values.presences"
                         :error-messages="errors.presences"
                         multiple
-                        required
                     />
                 </v-col>
             </v-row>
@@ -236,6 +256,7 @@ const submit = handleSubmit((values) => {
                         name="attachments"
                         v-model="values.attachments"
                         :error-messages="errors.attachments"
+                        multiple
                     />
                 </v-col>
 
@@ -263,10 +284,37 @@ const submit = handleSubmit((values) => {
         </DefaultSheet>
 
         <FormActionsContainer>
-            <FormResetButton @click="resetForm" />
-            <FormStoreAndGoBack @click="submit" />
-            <FormStoreAndReset @click="submit" />
-            <FormStoreWithoutReseting @click="submit" />
+            <FormResetButton @click="resetForm" :loading="loading" />
+
+            <FormStoreAndGoBack
+                @click="
+                    resetFormOnSuccess = true;
+                    redirectBack = true;
+                    submit();
+                "
+                :loading="loading"
+                :disabled="!meta.valid"
+            />
+
+            <FormStoreAndReset
+                @click="
+                    resetFormOnSuccess = true;
+                    redirectBack = false;
+                    submit();
+                "
+                :loading="loading"
+                :disabled="!meta.valid"
+            />
+
+            <FormStoreWithoutReseting
+                @click="
+                    resetFormOnSuccess = false;
+                    redirectBack = false;
+                    submit();
+                "
+                :loading="loading"
+                :disabled="!meta.valid"
+            />
         </FormActionsContainer>
     </Form>
 </template>

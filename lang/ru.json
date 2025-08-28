@@ -66,10 +66,12 @@
     "filter.Region": "Регион",
     "filter.Has VPS for country": "Имеет ВПЦ для страны",
 
+    "messages.Created successfully": "Успешно создано!",
     "messages.Updated successfully": "Обновлено успешно!",
-    "messages.Submition failed": "Что-то пошло не так. Пожалуйста, попробуйте позже!",
     "messages.Successefully deleted": "{count} записей успешно удалены!",
     "messages.Successefully restored": "{count} записей успешно востановлены!",
+    "messages.Submition failed": "Что-то пошло не так. Пожалуйста, попробуйте позже!",
+    "messages.Fix errors": "Ошибка. Пожалуйста, исправьте ошибки и попробуйте заново!",
 
     "modals.Delete selected": "Удалить отмеченные",
     "modals.Delete selected question": "Вы уверены, что хотите удалить отмеченные?",

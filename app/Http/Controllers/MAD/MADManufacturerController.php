@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\MAD;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\MAD\ManufacturerStoreRequest;
 use App\Models\Country;
 use App\Models\Manufacturer;
 use App\Models\ManufacturerBlacklist;
@@ -67,5 +68,12 @@ class MADManufacturerController extends Controller
             'defaultSelectedZoneIDs' => Zone::getRelatedDefaultSelectedIDValues(),
             'blacklists' => ManufacturerBlacklist::orderByName()->get(),
         ]);
+    }
+
+    public function store(ManufacturerStoreRequest $request)
+    {
+        Manufacturer::storeFromRequest($request);
+
+        return redirect()->back();
     }
 }

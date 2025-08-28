@@ -22,7 +22,7 @@ function submit() {
         })
         .then((response) => {
             showModal.value = false;
-            messages.addSuccessefullyDeletedMessage(response.data.count);
+            messages.addDeletedSuccessefullyMessage(response.data.count);
             props.store.fetchRecords({ updateUrl: false });
         });
 }

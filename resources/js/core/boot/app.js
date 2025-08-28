@@ -17,6 +17,9 @@ import { ZiggyVue } from '../../../../vendor/tightenco/ziggy/src/js'
 // Vuetify setup (theme, icons, etc.)
 import vuetify from './vuetify'
 
+// Vuetify Pro TipTap (WYSIWYG) setup
+import { vuetifyProTipTap } from './vuetify-tiptap'
+
 // Pinia store (global state manager)
 import { createPinia } from 'pinia'
 
@@ -47,12 +50,13 @@ createInertiaApp({
     // Setup Vue app
     setup({ el, App, props, plugin }) {
         return createApp({ render: () => h(App, props) })
-            .use(plugin)     // Inertia plugin
-            .use(ZiggyVue)   // Laravel route support
-            .use(vuetify)    // Vuetify UI plugin
-            .use(pinia)      // Global Pinia store
-            .use(i18n)       // i18n translations
-            .mount(el)       // Mount to the DOM
+            .use(plugin)           // Inertia plugin
+            .use(ZiggyVue)         // Laravel route support
+            .use(vuetify)          // Vuetify UI plugin
+            .use(vuetifyProTipTap) // Vuetify Pro TipTap (WYSIWYG)
+            .use(pinia)            // Global Pinia store
+            .use(i18n)             // i18n translations
+            .mount(el)             // Mount to the DOM
     },
 
     // Inertia page transition progress bar (top bar)

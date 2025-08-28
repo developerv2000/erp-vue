@@ -1,5 +1,5 @@
 <script setup>
-import { Form, useForm, useField } from "vee-validate";
+import { Form, useForm } from "vee-validate";
 import { object, string, number, array } from "yup";
 import { router, usePage } from "@inertiajs/vue3";
 import { useI18n } from "vue-i18n";
@@ -11,6 +11,7 @@ import DefaultCombobox from "@/core/components/form/inputs/DefaultCombobox.vue";
 import DefaultFileInput from "@/core/components/form/inputs/DefaultFileInput.vue";
 import DefaultSwitch from "@/core/components/form/inputs/DefaultSwitch.vue";
 import DefaultTextarea from "@/core/components/form/inputs/DefaultTextarea.vue";
+import DefaultWysiwyg from "@/core/components/form/inputs/DefaultWysiwyg.vue";
 import { useVeeFormFields } from "@/core/composables/useVeeFormFields";
 import FormActionsContainer from "@/core/components/form/containers/FormActionsContainer.vue";
 import FormResetButton from "@/core/components/form/buttons/FormResetButton.vue";
@@ -244,6 +245,18 @@ const submit = handleSubmit((values) => {
                         name="about"
                         v-model="values.about"
                         :error-messages="errors.about"
+                    />
+                </v-col>
+            </v-row>
+        </DefaultSheet>
+
+        <DefaultSheet>
+            <v-row>
+                <v-col cols="12">
+                    <DefaultWysiwyg
+                        v-model="values.comment"
+                        :label="t('Comment')"
+                        folder="comments"
                     />
                 </v-col>
             </v-row>

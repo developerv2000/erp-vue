@@ -408,7 +408,7 @@ class Manufacturer extends BaseModel implements ExportsRecordsAsExcel
     */
 
     /**
-     * API request handler
+     * AJAX request
      */
     public static function storeFromRequest(ManufacturerStoreRequest $request)
     {

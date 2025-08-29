@@ -18,9 +18,9 @@ import FormResetButton from "@/core/components/form/buttons/FormResetButton.vue"
 import FormStoreAndGoBack from "@/core/components/form/buttons/FormStoreAndGoBack.vue";
 import FormStoreAndReset from "@/core/components/form/buttons/FormStoreAndReset.vue";
 import FormStoreWithoutReseting from "@/core/components/form/buttons/FormStoreWithoutReseting.vue";
-import { router } from "@inertiajs/vue3";
 import { ref } from "vue";
 import { useMessagesStore } from "@/core/stores/useMessages";
+import axios from "axios";
 
 // Dependencies
 const { t } = useI18n();
@@ -77,10 +77,9 @@ const submit = handleSubmit((values) => {
     loading.value = true;
     const formData = objectToFormData(values);
 
-    router.post(route("mad.manufacturers.store"), formData, {
-        preserveState: true,
-        preserveScroll: true,
-        onSuccess: () => {
+    axios
+        .post(route("mad.manufacturers.store"), formData)
+        .then(() => {
             messages.addCreatedSuccessfullyMessage();
 
             if (resetFormOnSuccess.value) {
@@ -90,15 +89,18 @@ const submit = handleSubmit((values) => {
             if (redirectBack.value) {
                 window.history.back();
             }
-        },
-        onError: (errors) => {
-            messages.addFixErrorsMessage();
-            setErrors(errors);
-        },
-        onFinish: () => {
+        })
+        .catch((error) => {
+            if (error.response?.status === 422) {
+                setErrors(error.response.data.errors);
+                messages.addFixErrorsMessage();
+            } else {
+                messages.addSubmitionFailedMessage();
+            }
+        })
+        .finally(() => {
             loading.value = false;
-        },
-    });
+        });
 });
 </script>
 

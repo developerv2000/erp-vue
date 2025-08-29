@@ -70,10 +70,13 @@ class MADManufacturerController extends Controller
         ]);
     }
 
+    /**
+     * Ajax request
+     */
     public function store(ManufacturerStoreRequest $request)
     {
         Manufacturer::storeFromRequest($request);
 
-        return redirect()->back();
+        return true;
     }
 }

@@ -55,9 +55,11 @@
     "actions.Filter": "Фильтр",
     "actions.Apply": "Применять",
     "actions.Go to page": "Перейти на страницу",
-    "actions.Store and go back": "Сохранить и вернуться",
+    "actions.Store and redirect back": "Сохранить и вернуться",
     "actions.Store and reset form": "Сохранить и сбросить форму",
     "actions.Store without reseting form": "Сохранить без сброса формы",
+    "actions.Update and redirect back": "Обновить и вернуться назад",
+    "actions.Update without redirect": "Обновить без перенаправления",
 
     "forms.Personal data": "Персональные данные",
     "forms.Password update": "Обновить пароль",

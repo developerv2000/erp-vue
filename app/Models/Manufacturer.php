@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Http\Requests\MAD\ManufacturerStoreRequest;
 use App\Support\Abstracts\BaseModel;
 use App\Support\Contracts\Model\ExportsRecordsAsExcel;
+use App\Support\Contracts\Model\HasTitle;
 use App\Support\Helpers\QueryFilterHelper;
 use App\Support\Traits\Model\Commentable;
 use App\Support\Traits\Model\GetsMinifiedRecordsWithName;
@@ -16,7 +17,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
-class Manufacturer extends BaseModel implements ExportsRecordsAsExcel
+class Manufacturer extends BaseModel implements HasTitle, ExportsRecordsAsExcel
 {
     /** @use HasFactory<\Database\Factories\ManufacturerFactory> */
     use HasFactory;
@@ -122,21 +123,18 @@ class Manufacturer extends BaseModel implements ExportsRecordsAsExcel
     |--------------------------------------------------------------------------
     */
 
-    /**
-     * Used on manufacturers.edit form
-     */
-    public function getPresenceNamesArrayAttribute(): array
-    {
-        return $this->presences->pluck('name')->toArray();
-    }
-
-    public static function appendBasicAttributes($records)
+    public static function appendRecordsBasicAttributes($records)
     {
         foreach ($records as $record) {
-            $record->append([
-                'base_model_class',
-            ]);
+            $record->appendBasicAttributes();
         }
+    }
+
+    public function appendBasicAttributes()
+    {
+        $this->append([
+            'base_model_class',
+        ]);
     }
 
     /*
@@ -229,10 +227,31 @@ class Manufacturer extends BaseModel implements ExportsRecordsAsExcel
     |--------------------------------------------------------------------------
     */
 
+    // Implement method declared in HasTitle Interface
+    public function getTitleAttribute(): string
+    {
+        return $this->name;
+    }
+
     // Implement method declared in Breadcrumbable Interface
     public function generateBreadcrumbs($department = null): array
     {
-        return [];
+        $lowercasedDepartment = strtolower($department);
+
+        // Index page
+        $breadcrumbs = [
+            ['title' => __('pages.EPP'), 'link' => route($lowercasedDepartment . '.manufacturers.index')],
+        ];
+
+        // Trash page
+        if ($this->trashed()) {
+            $breadcrumbs[] = ['title' => __('pages.Trash'), 'link' => route($lowercasedDepartment . '.manufacturers.trash')];
+        }
+
+        // Edit page
+        $breadcrumbs[] = ['title' => $this->title, 'link' => null];
+
+        return $breadcrumbs;
     }
 
     // Implement method declared in CanExportRecordsAsExcel Interface
@@ -297,7 +316,7 @@ class Manufacturer extends BaseModel implements ExportsRecordsAsExcel
 
         // Append attributes unless raw query is requested
         if ($action !== 'query') {
-            self::appendBasicAttributes($records);
+            self::appendRecordsBasicAttributes($records);
         }
 
         return $records;
@@ -434,6 +453,42 @@ class Manufacturer extends BaseModel implements ExportsRecordsAsExcel
         }
     }
 
+    public function updateFromRequest($request)
+    {
+        $this->update($request->all());
+
+        // BelongsToMany relations
+        $this->zones()->sync($request->input('zones'));
+        $this->productClasses()->sync($request->input('productClasses'));
+        $this->blacklists()->sync($request->input('blacklists'));
+
+        // HasMany relations
+        $this->syncPresencesOnEdit($request);
+        $this->storeCommentFromRequest($request);
+        $this->storeAttachmentsFromRequest($request);
+    }
+
+    private function syncPresencesOnEdit($request)
+    {
+        $presences = $request->input('presences');
+
+        // Remove existing presences if $presences is empty
+        if (!$presences) {
+            $this->presences()->delete();
+            return;
+        }
+
+        // Add new presences
+        foreach ($presences as $name) {
+            if (!$this->presences->contains('name', $name)) {
+                $this->presences()->create(['name' => $name]);
+            }
+        }
+
+        // Delete removed presences
+        $this->presences()->whereNotIn('name', $presences)->delete();
+    }
+    
     /*
     |--------------------------------------------------------------------------
     | Misc

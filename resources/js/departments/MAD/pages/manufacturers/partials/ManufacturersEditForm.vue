@@ -15,22 +15,21 @@ import DefaultWysiwyg from "@/core/components/form/inputs/DefaultWysiwyg.vue";
 import { useVeeFormFields } from "@/core/composables/useVeeFormFields";
 import FormActionsContainer from "@/core/components/form/containers/FormActionsContainer.vue";
 import FormResetButton from "@/core/components/form/buttons/FormResetButton.vue";
-import FormStoreAndRedirectBack from "@/core/components/form/buttons/FormStoreAndRedirectBack.vue";
-import FormStoreAndReset from "@/core/components/form/buttons/FormStoreAndReset.vue";
-import FormStoreWithoutReseting from "@/core/components/form/buttons/FormStoreWithoutReseting.vue";
-import { ref } from "vue";
+import FormUpdateAndRedirectBack from "@/core/components/form/buttons/FormUpdateAndRedirectBack.vue";
+import FormUpdateWithourRedirect from "@/core/components/form/buttons/FormUpdateWithourRedirect.vue";
+import { ref, computed } from "vue";
 import { useMessagesStore } from "@/core/stores/useMessages";
-import axios from "axios";
+import { router } from "@inertiajs/vue3";
 
 // Dependencies
 const { t } = useI18n();
 const { objectToFormData } = useFormData();
 const page = usePage();
+const record = page.props.record;
 const messages = useMessagesStore();
 
 const loading = ref(false);
 const redirectBack = ref(false);
-const resetFormOnSuccess = ref(false);
 
 // Yup schema
 const schema = object({
@@ -43,64 +42,61 @@ const schema = object({
     zones: array().required().min(1),
 });
 
-// Default form values
-const defaultFields = {
-    name: "",
-    category_id: null,
-    productClasses: [],
-    analyst_user_id: null,
-    bdm_user_id: null,
-    country_id: null,
-    zones: page.props.defaultSelectedZoneIDs ?? [],
-    blacklists: [],
-    presences: [],
-    active: 1,
-    important: 0,
-    website: null,
-    relationship: null,
-    attachments: [],
-    about: null,
-    comment: null,
-};
+// Initial form values
+const initialValues = computed(() => {
+    return {
+        name: record.name,
+        category_id: record.category_id,
+        productClasses: record.product_classes.map((pc) => pc.id),
+        analyst_user_id: record.analyst_user_id,
+        bdm_user_id: record.bdm_user_id,
+        country_id: record.country_id,
+        zones: record.zones.map((z) => z.id),
+        blacklists: record.blacklists.map((bl) => bl.id),
+        presences: record.presences.map((p) => p.name),
+        active: record.active,
+        important: record.important,
+        website: record.website,
+        relationship: record.relationship,
+        attachments: [],
+        about: record.about,
+        comment: null,
+    };
+});
 
 // Initialize form
 const { errors, handleSubmit, resetForm, setErrors, meta } = useForm({
     validationSchema: schema,
-    initialValues: { ...defaultFields },
+    initialValues: initialValues.value,
 });
 
 // Get form values as ref
-const { values } = useVeeFormFields(Object.keys(defaultFields));
+const { values } = useVeeFormFields(Object.keys(initialValues.value));
 
 // Submit handler
 const submit = handleSubmit((values) => {
-    loading.value = true;
     const formData = objectToFormData(values);
 
-    axios
-        .post(route("mad.manufacturers.store"), formData)
-        .then(() => {
-            messages.addCreatedSuccessfullyMessage();
-
-            if (resetFormOnSuccess.value) {
-                resetForm();
-            }
-
-            if (redirectBack.value) {
-                window.history.back();
-            }
-        })
-        .catch((error) => {
-            if (error.response?.status === 422) {
-                setErrors(error.response.data.errors);
-                messages.addFixErrorsMessage();
-            } else {
-                messages.addSubmitionFailedMessage();
-            }
-        })
-        .finally(() => {
-            loading.value = false;
-        });
+    router.post(
+        route("mad.manufacturers.update", { record: record.id }),
+        formData
+    ),
+        {
+            preserveScroll: true,
+            forceFormData: true,
+            onStart: () => {
+                loading.value = true;
+            },
+            onSuccess: () => {
+                messages.addUpdatedSuccessfullyMessage();
+            },
+            onError: (errors) => {
+                setErrors(errors);
+            },
+            onFinish: () => {
+                loading.value = false;
+            },
+        };
 });
 </script>
 
@@ -288,9 +284,8 @@ const submit = handleSubmit((values) => {
         <FormActionsContainer>
             <FormResetButton @click="resetForm" :loading="loading" />
 
-            <FormStoreAndRedirectBack
+            <FormUpdateAndRedirectBack
                 @click="
-                    resetFormOnSuccess = true;
                     redirectBack = true;
                     submit();
                 "
@@ -298,19 +293,8 @@ const submit = handleSubmit((values) => {
                 :disabled="!meta.valid"
             />
 
-            <FormStoreAndReset
+            <FormUpdateWithourRedirect
                 @click="
-                    resetFormOnSuccess = true;
-                    redirectBack = false;
-                    submit();
-                "
-                :loading="loading"
-                :disabled="!meta.valid"
-            />
-
-            <FormStoreWithoutReseting
-                @click="
-                    resetFormOnSuccess = false;
                     redirectBack = false;
                     submit();
                 "

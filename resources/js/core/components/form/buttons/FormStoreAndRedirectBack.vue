@@ -8,6 +8,6 @@ const { t } = useI18n();
 
 <template>
     <DefaultButton :prepend-icon="mdiKeyboardReturn" color="success">
-        {{ t("actions.Store and go back") }}
+        {{ t("actions.Store and redirect back") }}
     </DefaultButton>
 </template>

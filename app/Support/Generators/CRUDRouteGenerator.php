@@ -64,7 +64,7 @@ class CRUDRouteGenerator
                 Route::post('/store', 'store')->name('store')->middleware($editMiddleware);
                 break;
             case 'update':
-                Route::patch('/update/{record}', 'update')->name('update')->middleware($editMiddleware);
+                Route::post('/update/{record}', 'update')->name('update')->middleware($editMiddleware);
                 break;
             case 'destroy':
                 Route::post('/destroy', 'destroy')->name('destroy')->middleware();

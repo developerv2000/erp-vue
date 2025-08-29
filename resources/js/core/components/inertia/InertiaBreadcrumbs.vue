@@ -1,6 +1,5 @@
 <script setup>
 import { router } from "@inertiajs/vue3";
-import i18n from "@/core/boot/i18n";
 
 const props = defineProps({
     breadcrumbs: {

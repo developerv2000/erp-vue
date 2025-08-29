@@ -4,6 +4,7 @@ namespace App\Http\Controllers\MAD;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MAD\ManufacturerStoreRequest;
+use App\Http\Requests\MAD\ManufacturerUpdateRequest;
 use App\Models\Country;
 use App\Models\Manufacturer;
 use App\Models\ManufacturerBlacklist;
@@ -78,5 +79,49 @@ class MADManufacturerController extends Controller
         Manufacturer::storeFromRequest($request);
 
         return true;
+    }
+
+    /**
+     * Route model binding is not used, because trashed records can also be edited
+     */
+    public function edit($record)
+    {
+        $fetchedRecord = Manufacturer::withTrashed()
+            ->withBasicRelations()
+            ->findOrFail($record);
+
+        $fetchedRecord->appendBasicAttributes();
+        $fetchedRecord->append('title'); // used on generating breadcrumbs
+
+        return Inertia::render('departments/MAD/pages/manufacturers/Edit', [
+            'record' => $fetchedRecord,
+            'breadcrumbs' => $fetchedRecord->generateBreadcrumbs('mad'),
+
+            'categories' => fn() => ManufacturerCategory::orderByName()->get(),
+            'productClasses' => fn() => ProductClass::orderByName()->get(),
+            'analystUsers' => fn() => User::getMADAnalystsMinified(),
+            'bdmUsers' => fn() => User::getCMDBDMsMinifed(),
+            'countriesOrderedByName' => fn() => Country::orderByName()->get(),
+            'zones' => fn() => Zone::orderByName()->get(),
+            'defaultSelectedZoneIDs' => fn() => Zone::getRelatedDefaultSelectedIDValues(),
+            'blacklists' => fn() => ManufacturerBlacklist::orderByName()->get(),
+        ]);
+    }
+
+    /**
+     * Route model binding is not used, because trashed records can also be edited
+     */
+    public function update(ManufacturerUpdateRequest $request, $record)
+    {
+        // Find record
+        $fetchedRecord = Manufacturer::withTrashed()
+            ->withBasicRelations()
+            ->findOrFail($record);
+
+        // Update record
+        $fetchedRecord->updateFromRequest($request);
+
+        // Return
+        return redirect()->back();
     }
 }

@@ -7,6 +7,7 @@ import PageIntro from "@/core/layouts/PageIntro.vue";
 import ManufacturersCreateForm from "./partials/ManufacturersCreateForm.vue";
 
 const { t } = useI18n();
+
 const title = computed(() => t("pages.EPP") + " — " + t("actions.Create"));
 const pageIntroTitle = computed(() => t("actions.Create new record"));
 

@@ -66,10 +66,12 @@
 
     "messages.Created successfully": "Created successfully!",
     "messages.Updated successfully": "Updated successfully!",
-    "messages.Successefully deleted": "{count} records successefully deleted!",
-    "messages.Successefully restored": "{count} records successefully restored!",
+    "messages.Deleted successfully": "{count} records deleted successfully!",
+    "messages.Restored successfully": "{count} records restored successfully!",
     "messages.Submition failed": "Something went wrong, please try again later!",
     "messages.Fix errors": "Error. Please fix errors and try again!",
+    "messages.Smart filters updated successfully": "Smart filters updated successfully!",
+    "messages.Smart filters update failed": "Smart filters update failed!",
 
     "modals.Delete selected": "Delete selected",
     "modals.Delete selected question": "Are you sure you want to delete selected",

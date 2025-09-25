@@ -2,14 +2,39 @@
 import StoreBindedFilter from "@/core/components/filters/StoreBindedFilter.vue";
 import FilterAutocomplete from "@/core/components/filters/inputs/FilterAutocomplete.vue";
 import FilterBooleanAutocomplete from "@/core/components/filters/inputs/FilterBooleanAutocomplete.vue";
-import { usePage } from "@inertiajs/vue3";
+import { router, usePage } from "@inertiajs/vue3";
 import { useMADManufacturerTableStore } from "@/departments/MAD/stores/useMADManufacturerTableStore";
 import { useI18n } from "vue-i18n";
 import FilterDefaultInputs from "@/core/components/filters/inputs/FilterDefaultInputs.vue";
+import { debounce } from "@/core/scripts/utilities";
+import { useMessagesStore } from "@/core/stores/useMessages";
 
 const { t } = useI18n();
 const page = usePage();
 const store = useMADManufacturerTableStore();
+const messages = useMessagesStore();
+
+// Function to reload smart filters
+const reloadSmartFilters = () => {
+    router.reload({
+        data: {
+            analyst_user_id: store.filters.analyst_user_id,
+            country_id: store.filters.country_id,
+            id: store.filters.id,
+        },
+        only: ["smartFilterDependencies"],
+        preserveUrl: true,
+        onSuccess: () => {
+            messages.addSmartFiltersUpdatedSuccessfullyMessage();
+        },
+        onError: () => {
+            messages.addSmartFiltersUpdateFailedMessage();
+        },
+    });
+};
+
+// Create a debounced version of the reloadSmartFilters function
+const reloadSmartFiltersDebounced = debounce(reloadSmartFilters, 500);
 </script>
 
 <template>
@@ -19,6 +44,7 @@ const store = useMADManufacturerTableStore();
             name="analyst_user_id"
             v-model="store.filters.analyst_user_id"
             :items="page.props.smartFilterDependencies.analystUsers"
+            @update:modelValue="reloadSmartFiltersDebounced"
         />
 
         <FilterAutocomplete
@@ -27,6 +53,7 @@ const store = useMADManufacturerTableStore();
             v-model="store.filters.country_id"
             :items="page.props.smartFilterDependencies.countriesOrderedByName"
             multiple
+            @update:modelValue="reloadSmartFiltersDebounced"
         />
 
         <FilterAutocomplete
@@ -35,6 +62,7 @@ const store = useMADManufacturerTableStore();
             v-model="store.filters.id"
             :items="page.props.smartFilterDependencies.manufacturers"
             multiple
+            @update:modelValue="reloadSmartFiltersDebounced"
         />
 
         <FilterAutocomplete

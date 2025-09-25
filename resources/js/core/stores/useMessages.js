@@ -21,15 +21,15 @@ export const useMessagesStore = defineStore('messages', {
                 color: 'success',
             });
         },
-        addDeletedSuccessefullyMessage(count) {
+        addDeletedSuccessfullyMessage(count) {
             this.add({
-                text: i18n.global.t('messages.Successefully deleted', { count: count }),
+                text: i18n.global.t('messages.Deleted successfully', { count: count }),
                 color: 'success',
             });
         },
-        addRestoredSuccessefullyMessage(count) {
+        addRestoredSuccessfullyMessage(count) {
             this.add({
-                text: i18n.global.t('messages.Successefully restored', { count: count }),
+                text: i18n.global.t('messages.Restored successfully', { count: count }),
                 color: 'success',
             });
         },
@@ -43,6 +43,20 @@ export const useMessagesStore = defineStore('messages', {
             this.add({
                 text: i18n.global.t('messages.Fix errors'),
                 color: 'error',
+            });
+        },
+        addSmartFiltersUpdatedSuccessfullyMessage() {
+            this.add({
+                text: i18n.global.t('messages.Smart filters updated successfully'),
+                color: 'success',
+                timeout: 1200
+            });
+        },
+        addSmartFiltersUpdateFailedMessage() {
+            this.add({
+                text: i18n.global.t('messages.Smart filters update failed'),
+                color: 'error',
+                timeout: 1200
             });
         },
     },

@@ -69,11 +69,13 @@
     "filter.Has VPS for country": "Имеет ВПЦ для страны",
 
     "messages.Created successfully": "Успешно создано!",
-    "messages.Updated successfully": "Обновлено успешно!",
-    "messages.Successefully deleted": "{count} записей успешно удалены!",
-    "messages.Successefully restored": "{count} записей успешно востановлены!",
+    "messages.Updated successfully": "Успешно обновлено!",
+    "messages.Deleted successfully": "{count} записей успешно удалены!",
+    "messages.Restored successfully": "{count} записей успешно востановлены!",
     "messages.Submition failed": "Что-то пошло не так. Пожалуйста, попробуйте позже!",
     "messages.Fix errors": "Ошибка. Пожалуйста, исправьте ошибки и попробуйте заново!",
+    "messages.Smart filters updated successfully": "Умный фильтр успешно обновлен!",
+    "messages.Smart filters update failed": "Обновление умного фильтра не удалось!",
 
     "modals.Delete selected": "Удалить отмеченные",
     "modals.Delete selected question": "Вы уверены, что хотите удалить отмеченные?",

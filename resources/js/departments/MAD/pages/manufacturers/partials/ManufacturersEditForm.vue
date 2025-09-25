@@ -25,7 +25,7 @@ import { router } from "@inertiajs/vue3";
 const { t } = useI18n();
 const { objectToFormData } = useFormData();
 const page = usePage();
-const record = page.props.record;
+const record = computed(() => page.props.record);
 const messages = useMessagesStore();
 
 const loading = ref(false);
@@ -42,70 +42,91 @@ const schema = object({
     zones: array().required().min(1),
 });
 
-// Initial form values
-const initialValues = computed(() => {
-    return {
-        name: record.name,
-        category_id: record.category_id,
-        productClasses: record.product_classes.map((pc) => pc.id),
-        analyst_user_id: record.analyst_user_id,
-        bdm_user_id: record.bdm_user_id,
-        country_id: record.country_id,
-        zones: record.zones.map((z) => z.id),
-        blacklists: record.blacklists.map((bl) => bl.id),
-        presences: record.presences.map((p) => p.name),
-        active: record.active,
-        important: record.important,
-        website: record.website,
-        relationship: record.relationship,
-        attachments: [],
-        about: record.about,
-        comment: null,
-    };
-});
+// Backend-driven values (reactive to record)
+const baseInitialValues = computed(() => ({
+    name: record.value.name,
+    category_id: record.value.category_id,
+    productClasses: record.value.product_classes.map((pc) => pc.id),
+    analyst_user_id: record.value.analyst_user_id,
+    bdm_user_id: record.value.bdm_user_id,
+    country_id: record.value.country_id,
+    zones: record.value.zones.map((z) => z.id),
+    blacklists: record.value.blacklists.map((bl) => bl.id),
+    presences: record.value.presences.map((p) => p.name),
+    active: record.value.active,
+    important: record.value.important,
+    website: record.value.website,
+    relationship: record.value.relationship,
+    about: record.value.about,
+}));
 
-// Initialize form
-const { errors, handleSubmit, resetForm, setErrors, meta } = useForm({
+// Always-reset values
+const extraResetValues = {
+    attachments: [],
+    comment: null,
+};
+
+// Merged initial values
+const mergedInitialValues = computed(() => ({
+    ...baseInitialValues.value,
+    ...extraResetValues,
+}));
+
+// VeeValidate form
+const { handleSubmit, errors, setErrors, resetForm, meta } = useForm({
     validationSchema: schema,
-    initialValues: initialValues.value,
+    initialValues: mergedInitialValues.value,
 });
 
 // Get form values as ref
-const { values } = useVeeFormFields(Object.keys(initialValues.value));
+const { values } = useVeeFormFields(Object.keys(mergedInitialValues.value));
 
 // Submit handler
 const submit = handleSubmit((values) => {
     const formData = objectToFormData(values);
+    loading.value = true;
 
-    router.post(
-        route("mad.manufacturers.update", { record: record.id }),
-        formData
-    ),
-        {
-            preserveScroll: true,
-            forceFormData: true,
-            onStart: () => {
-                loading.value = true;
-            },
-            onSuccess: () => {
-                messages.addUpdatedSuccessfullyMessage();
-            },
-            onError: (errors) => {
-                setErrors(errors);
-            },
-            onFinish: () => {
-                loading.value = false;
-            },
-        };
+    axios
+        .post(
+            route("mad.manufacturers.update", { record: record.value.id }),
+            formData
+        )
+        .then(() => {
+            messages.addUpdatedSuccessfullyMessage();
+
+            if (redirectBack.value) {
+                window.history.back();
+            } else {
+                reloadRequiredDataAndResetForm();
+            }
+        })
+        .catch((error) => {
+            if (error.response?.status === 422) {
+                setErrors(error.response.data.errors);
+                messages.addFixErrorsMessage();
+            } else {
+                messages.addSubmitionFailedMessage();
+            }
+        })
+        .finally(() => {
+            loading.value = false;
+        });
 });
+
+const reloadRequiredDataAndResetForm = () => {
+    router.reload({
+        only: ["record", "breadcrumbs"],
+        onSuccess: () => {
+            resetForm({
+                values: mergedInitialValues.value,
+            });
+        },
+    });
+};
 </script>
 
 <template>
-    <Form
-        class="d-flex flex-column ga-6 pb-8"
-        enctype="multipart/form-data"
-        ref="form"
-    >
+    <Form class="d-flex flex-column ga-6 pb-8" enctype="multipart/form-data">
         <DefaultSheet>
             <v-row>
                 <v-col cols="4">

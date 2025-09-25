@@ -63,7 +63,7 @@ const defaultFields = {
     comment: null,
 };
 
-// Initialize form
+// VeeValidate form
 const { errors, handleSubmit, resetForm, setErrors, meta } = useForm({
     validationSchema: schema,
     initialValues: { ...defaultFields },
@@ -105,11 +105,7 @@ const submit = handleSubmit((values) => {
 </script>
 
 <template>
-    <Form
-        class="d-flex flex-column ga-6 pb-8"
-        enctype="multipart/form-data"
-        ref="form"
-    >
+    <Form class="d-flex flex-column ga-6 pb-8" enctype="multipart/form-data">
         <DefaultSheet>
             <v-row>
                 <v-col cols="4">

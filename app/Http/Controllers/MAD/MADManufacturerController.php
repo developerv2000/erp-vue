@@ -110,18 +110,16 @@ class MADManufacturerController extends Controller
 
     /**
      * Route model binding is not used, because trashed records can also be edited
+     *
+     * Ajax request
      */
     public function update(ManufacturerUpdateRequest $request, $record)
     {
-        // Find record
-        $fetchedRecord = Manufacturer::withTrashed()
-            ->withBasicRelations()
-            ->findOrFail($record);
-
-        // Update record
+        // Find and update record
+        $fetchedRecord = Manufacturer::withTrashed()->findOrFail($record);
         $fetchedRecord->updateFromRequest($request);
 
-        // Return
-        return redirect()->back();
+        // Return success
+        return true;
     }
 }

@@ -488,7 +488,7 @@ class Manufacturer extends BaseModel implements HasTitle, ExportsRecordsAsExcel
         // Delete removed presences
         $this->presences()->whereNotIn('name', $presences)->delete();
     }
-    
+
     /*
     |--------------------------------------------------------------------------
     | Misc
@@ -558,7 +558,7 @@ class Manufacturer extends BaseModel implements HasTitle, ExportsRecordsAsExcel
             ['title' => 'dates.Update date', 'key' => 'updated_at', 'order' => $order++, 'width' => 150, 'visible' => 1, 'sortable' => true],
             ['title' => 'pages.Meetings', 'key' => 'meetings_count', 'order' => $order++, 'width' => 86, 'visible' => 1, 'sortable' => true],
             ['title' => 'ID', 'key' => 'id', 'order' => $order++, 'width' => 62, 'visible' => 1, 'sortable' => true],
-            ['title' => 'Attachments', 'key' => 'attachments_count', 'order' => $order++, 'width' => 260, 'visible' => 1, 'sortable' => true],
+            ['title' => 'Attachments', 'key' => 'attachments_count', 'order' => $order++, 'width' => 340, 'visible' => 1, 'sortable' => true],
         );
 
         return $columns;

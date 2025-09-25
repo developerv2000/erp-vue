@@ -132,7 +132,6 @@ const reloadRequiredDataAndResetForm = () => {
                 <v-col cols="4">
                     <DefaultTextField
                         :label="t('fields.Manufacturer')"
-                        name="name"
                         v-model="values.name"
                         :error-messages="errors.name"
                         required
@@ -142,7 +141,6 @@ const reloadRequiredDataAndResetForm = () => {
                 <v-col cols="4">
                     <DefaultAutocomplete
                         :label="t('fields.Category')"
-                        name="category_id"
                         :items="page.props.categories"
                         v-model="values.category_id"
                         :error-messages="errors.category_id"
@@ -153,7 +151,6 @@ const reloadRequiredDataAndResetForm = () => {
                 <v-col cols="4">
                     <DefaultAutocomplete
                         :label="t('fields.Product class')"
-                        name="productClasses"
                         :items="page.props.productClasses"
                         v-model="values.productClasses"
                         :error-messages="errors.productClasses"
@@ -165,7 +162,6 @@ const reloadRequiredDataAndResetForm = () => {
                 <v-col cols="4">
                     <DefaultAutocomplete
                         :label="t('fields.Analyst')"
-                        name="analyst_user_id"
                         :items="page.props.analystUsers"
                         v-model="values.analyst_user_id"
                         :error-messages="errors.analyst_user_id"
@@ -176,7 +172,6 @@ const reloadRequiredDataAndResetForm = () => {
                 <v-col cols="4">
                     <DefaultAutocomplete
                         :label="t('fields.BDM')"
-                        name="bdm_user_id"
                         :items="page.props.bdmUsers"
                         v-model="values.bdm_user_id"
                         :error-messages="errors.bdm_user_id"
@@ -187,7 +182,6 @@ const reloadRequiredDataAndResetForm = () => {
                 <v-col cols="4">
                     <DefaultAutocomplete
                         :label="t('fields.Country')"
-                        name="country_id"
                         :items="page.props.countriesOrderedByName"
                         v-model="values.country_id"
                         :error-messages="errors.country_id"
@@ -198,7 +192,6 @@ const reloadRequiredDataAndResetForm = () => {
                 <v-col cols="4">
                     <DefaultAutocomplete
                         :label="t('fields.Zones')"
-                        name="zones"
                         :items="page.props.zones"
                         v-model="values.zones"
                         :error-messages="errors.zones"
@@ -210,7 +203,6 @@ const reloadRequiredDataAndResetForm = () => {
                 <v-col cols="4">
                     <DefaultAutocomplete
                         :label="t('fields.Blacklist')"
-                        name="blacklists"
                         :items="page.props.blacklists"
                         v-model="values.blacklists"
                         :error-messages="errors.blacklists"
@@ -221,7 +213,6 @@ const reloadRequiredDataAndResetForm = () => {
                 <v-col cols="4">
                     <DefaultCombobox
                         :label="t('fields.Presence')"
-                        name="presences"
                         :items="[]"
                         v-model="values.presences"
                         :error-messages="errors.presences"
@@ -254,7 +245,6 @@ const reloadRequiredDataAndResetForm = () => {
                 <v-col cols="4">
                     <DefaultTextField
                         :label="t('fields.Website')"
-                        name="website"
                         v-model="values.website"
                         :error-messages="errors.website"
                     />
@@ -263,7 +253,6 @@ const reloadRequiredDataAndResetForm = () => {
                 <v-col cols="4">
                     <DefaultTextField
                         :label="t('fields.Relationship')"
-                        name="relationship"
                         v-model="values.relationship"
                         :error-messages="errors.relationship"
                     />
@@ -272,7 +261,6 @@ const reloadRequiredDataAndResetForm = () => {
                 <v-col cols="4">
                     <DefaultFileInput
                         :label="t('Attachments')"
-                        name="attachments"
                         v-model="values.attachments"
                         :error-messages="errors.attachments"
                         multiple
@@ -282,7 +270,6 @@ const reloadRequiredDataAndResetForm = () => {
                 <v-col rows="12">
                     <DefaultTextarea
                         :label="t('fields.About company')"
-                        name="about"
                         v-model="values.about"
                         :error-messages="errors.about"
                     />
@@ -292,10 +279,18 @@ const reloadRequiredDataAndResetForm = () => {
 
         <DefaultSheet>
             <v-row>
-                <v-col cols="12">
+                <v-col v-if="record.last_comment">
+                    <DefaultWysiwyg
+                        v-model="record.last_comment.body"
+                        :label="t('comments.Last comment')"
+                        disabled
+                    />
+                </v-col>
+
+                <v-col>
                     <DefaultWysiwyg
                         v-model="values.comment"
-                        :label="t('Comment')"
+                        :label="t('comments.New comment')"
                         folder="comments"
                     />
                 </v-col>

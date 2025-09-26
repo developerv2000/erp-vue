@@ -114,30 +114,30 @@ function handleTableOptionsUpdate(options) {
         </template>
 
         <template v-slot:item.category_id="{ item }">
-            <TdChip
+            <strong
                 :class="{
-                    'bg-yellow-accent-4': item.category.name == 'УДС',
-                    'bg-blue-lighten-4': item.category.name == 'НПП',
+                    'text-orange': item.category.name == 'УДС',
+                    'text-purple': item.category.name == 'НПП',
                 }"
             >
                 {{ item.category.name }}
-            </TdChip>
+            </strong>
         </template>
 
         <template v-slot:item.active="{ item }">
-            <TdChip :color="item.active ? 'green-accent-2' : 'grey-lighten-2'">
+            <strong :class="item.active ? 'text-green' : 'text-brown'">
                 {{
                     item.active
                         ? t("properties.Active")
                         : t("properties.Stopped")
                 }}
-            </TdChip>
+            </strong>
         </template>
 
         <template v-slot:item.important="{ item }">
-            <TdChip v-if="item.important" color="purple-lighten-4">
+            <strong v-if="item.important" class="text-red">
                 {{ t("properties.Important") }}
-            </TdChip>
+            </strong>
         </template>
 
         <template v-slot:item.product_classes_name="{ item }">

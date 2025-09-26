@@ -1,4 +1,5 @@
 import { useI18n } from 'vue-i18n';
+import { useTimeAgoIntl } from "@vueuse/core"
 
 /**
  * Format Laravel-style timestamps using native Intl.DateTimeFormat.
@@ -27,4 +28,16 @@ export function useDateFormatter() {
     }
 
     return { formatDate };
+}
+
+/**
+ * Wrapper for useTimeAgoIntl with locale loaded from store.
+ */
+export function useTimeAgoFormatter(date, options = {}) {
+    const { locale } = useI18n();
+
+    return useTimeAgoIntl(date, {
+        locale: locale.value || "en",
+        ...options,
+    });
 }

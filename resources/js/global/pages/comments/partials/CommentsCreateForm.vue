@@ -4,19 +4,21 @@ import DefaultSheet from "@/core/components/containers/DefaultSheet.vue";
 import DefaultTitle from "@/core/components/titles/DefaultTitle.vue";
 import DefaultWysiwyg from "@/core/components/form/inputs/DefaultWysiwyg.vue";
 import { Form, useForm, useField } from "vee-validate";
-import FormStoreButton from "@/core/components/form/buttons/FormStoreButton.vue";
 import FormActionsContainer from "@/core/components/form/containers/FormActionsContainer.vue";
 import { ref } from "vue";
 import { useMessagesStore } from "@/core/stores/useMessages";
 import { object, string } from "yup";
 import { router } from "@inertiajs/vue3";
 import { usePage } from "@inertiajs/vue3";
+import FormStoreAndRedirectBack from "@/core/components/form/buttons/FormStoreAndRedirectBack.vue";
+import FormStoreAndReset from "@/core/components/form/buttons/FormStoreAndReset.vue";
 
 const { t } = useI18n();
 const messages = useMessagesStore();
 const page = usePage();
 
 const loading = ref(false);
+const redirectBack = ref(false);
 
 // Yup schema
 const schema = object({
@@ -42,18 +44,22 @@ const { value: bodyValue, errorMessage: bodyError } = useField("body");
 // Submit handler
 const submit = handleSubmit((values) => {
     loading.value = true;
-    console.log(values);
 
     axios
         .post(route("comments.store"), values)
         .then(() => {
             messages.addCreatedSuccessfullyMessage();
 
-            router.reload({
-                onSuccess: () => {
-                    resetForm();
-                },
-            });
+            if (redirectBack.value) {
+                window.history.back();
+            } else {
+                router.reload({
+                    only: ["comments"],
+                    onSuccess: () => {
+                        resetForm();
+                    },
+                });
+            }
         })
         .catch((error) => {
             if (error.response?.status === 422) {
@@ -71,7 +77,7 @@ const submit = handleSubmit((values) => {
 
 <template>
     <DefaultSheet>
-        <DefaultTitle class="text-secondary">
+        <DefaultTitle>
             {{ t("comments.New comment") }}
         </DefaultTitle>
 
@@ -84,7 +90,23 @@ const submit = handleSubmit((values) => {
             />
 
             <FormActionsContainer class="mt-5">
-                <FormStoreButton @click="submit" :loading="loading" />
+                <FormStoreAndRedirectBack
+                    @click="
+                        redirectBack = true;
+                        submit();
+                    "
+                    :loading="loading"
+                    :disabled="!meta.valid"
+                />
+
+                <FormStoreAndReset
+                    @click="
+                        redirectBack = false;
+                        submit();
+                    "
+                    :loading="loading"
+                    :disabled="!meta.valid"
+                />
             </FormActionsContainer>
         </Form>
     </DefaultSheet>

@@ -234,7 +234,7 @@ const reloadRequiredDataAndResetForm = () => {
                     <DefaultSwitch
                         :label="t('properties.Important')"
                         v-model="values.important"
-                        color="purple"
+                        color="red"
                     ></DefaultSwitch>
                 </v-col>
             </v-row>

@@ -222,7 +222,7 @@ const submit = handleSubmit((values) => {
                     <DefaultSwitch
                         :label="t('properties.Important')"
                         v-model="values.important"
-                        color="purple"
+                        color="red"
                     ></DefaultSwitch>
                 </v-col>
             </v-row>

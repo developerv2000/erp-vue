@@ -40,6 +40,7 @@ class CommentController extends Controller
         // Render page
         return Inertia::render('global/pages/comments/Index', [
             'record' => $record,
+            'comments' => $record->comments,
             'commentable_id' => $record->id,
             'commentable_type' => $model,
         ]);

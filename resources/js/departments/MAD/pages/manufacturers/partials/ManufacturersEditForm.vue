@@ -291,6 +291,7 @@ const reloadRequiredDataAndResetForm = () => {
                     <DefaultWysiwyg
                         v-model="values.comment"
                         :label="t('comments.New comment')"
+                        :error-messages="errors.comment"
                         folder="comments"
                     />
                 </v-col>

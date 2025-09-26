@@ -93,7 +93,7 @@ class Comment extends Model
     /**
      * Used in comments.index page
      */
-    public static function loadRecordsMinifiedUsers($comments)
+    public static function loadMinifiedUsersOfRecords($comments)
     {
         return $comments->load(['user' => function ($query) {
             $query->select('id', 'name', 'photo')

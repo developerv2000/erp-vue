@@ -55,6 +55,7 @@
     "actions.Filter": "Filter",
     "actions.Apply": "Apply",
     "actions.Go to page": "Go to page",
+    "actions.Store": "Store",
     "actions.Store and redirect back": "Store and redirect back",
     "actions.Store and reset form": "Store and reset form",
     "actions.Store without reseting form": "Store without reseting form",
@@ -113,6 +114,7 @@
     "fields.Current password": "Current password",
     "fields.New password": "New password",
 
+    "fields.Text": "Текст",
     "fields.Analyst": "Analyst",
     "fields.BDM": "BDM",
     "fields.Country": "Country",

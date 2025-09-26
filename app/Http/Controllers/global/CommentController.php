@@ -8,6 +8,7 @@ use App\Support\Helpers\ModelHelper;
 use App\Support\Traits\Controller\DestroysModelRecords;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class CommentController extends Controller
 {
@@ -18,30 +19,30 @@ class CommentController extends Controller
 
     public function index(Request $request)
     {
-        // Retrieve the model and record with comments eagerly loaded
+        // Retrieve record with comments eagerly loaded and appended title
         $model = ModelHelper::addFullNamespaceToModelBasename(
             $request->route('commentable_type')
         );
 
-        $recordQuery = $model::query()->with(['comments']);
+        $query = $model::query();
 
         if (in_array(SoftDeletes::class, class_uses_recursive($model))) {
-            $recordQuery->withTrashed();
+            $query->withTrashed();
         }
 
-        $record = $recordQuery->findOrFail($request->route('commentable_id'));
+        $record = $query->with(['comments'])
+            ->findOrFail($request->route('commentable_id'))
+            ->append(['title']);
 
-        // Load comments minified users
-        Comment::loadRecordsMinifiedUsers($record->comments);
+        // Load minified users of each comments
+        Comment::loadMinifiedUsersOfRecords($record->comments);
 
-        // Generate breadcrumbs
-        $breadcrumbs = $record->generateBreadcrumbs();
-        $breadcrumbs[] = [
-            'link' => null,
-            'text' => __('Comments'),
-        ];
-
-        return view('global.comments.index', compact('record', 'breadcrumbs'));
+        // Render page
+        return Inertia::render('global/pages/comments/Index', [
+            'record' => $record,
+            'commentable_id' => $record->id,
+            'commentable_type' => $model,
+        ]);
     }
 
     public function store(Request $request)

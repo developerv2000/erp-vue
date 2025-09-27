@@ -13,7 +13,7 @@ import * as yup from "yup";
 import { computed, ref } from "vue";
 import { router } from "@inertiajs/vue3";
 import { useFormData } from "@/core/composables/useFormData";
-import { useMessagesStore } from "@/core/stores/useMessages";
+import { useMessagesStore } from "@/core/stores/messages";
 
 const { t } = useI18n();
 const { objectToFormData } = useFormData();

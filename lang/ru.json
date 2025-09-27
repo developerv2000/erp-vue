@@ -61,6 +61,7 @@
     "actions.Store without reseting form": "Сохранить без сброса формы",
     "actions.Update and redirect back": "Обновить и вернуться назад",
     "actions.Update without redirect": "Обновить без перенаправления",
+    "actions.Edit record": "Редактировать запись",
 
     "forms.Personal data": "Персональные данные",
     "forms.Password update": "Обновить пароль",

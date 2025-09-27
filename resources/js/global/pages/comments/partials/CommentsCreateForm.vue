@@ -6,7 +6,7 @@ import DefaultWysiwyg from "@/core/components/form/inputs/DefaultWysiwyg.vue";
 import { Form, useForm, useField } from "vee-validate";
 import FormActionsContainer from "@/core/components/form/containers/FormActionsContainer.vue";
 import { ref } from "vue";
-import { useMessagesStore } from "@/core/stores/useMessages";
+import { useMessagesStore } from "@/core/stores/messages";
 import { object, string } from "yup";
 import { router } from "@inertiajs/vue3";
 import { usePage } from "@inertiajs/vue3";

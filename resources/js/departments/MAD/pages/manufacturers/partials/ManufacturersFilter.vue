@@ -3,11 +3,11 @@ import StoreBindedFilter from "@/core/components/filters/StoreBindedFilter.vue";
 import FilterAutocomplete from "@/core/components/filters/inputs/FilterAutocomplete.vue";
 import FilterBooleanAutocomplete from "@/core/components/filters/inputs/FilterBooleanAutocomplete.vue";
 import { router, usePage } from "@inertiajs/vue3";
-import { useMADManufacturerTableStore } from "@/departments/MAD/stores/useMADManufacturerTableStore";
+import { useMADManufacturerTableStore } from "@/departments/MAD/stores/manufacturerTable";
 import { useI18n } from "vue-i18n";
 import FilterDefaultInputs from "@/core/components/filters/inputs/FilterDefaultInputs.vue";
 import { debounce } from "@/core/scripts/utilities";
-import { useMessagesStore } from "@/core/stores/useMessages";
+import { useMessagesStore } from "@/core/stores/messages";
 
 const { t } = useI18n();
 const page = usePage();

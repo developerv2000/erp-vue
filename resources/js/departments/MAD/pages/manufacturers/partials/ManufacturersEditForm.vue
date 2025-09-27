@@ -18,7 +18,7 @@ import FormResetButton from "@/core/components/form/buttons/FormResetButton.vue"
 import FormUpdateAndRedirectBack from "@/core/components/form/buttons/FormUpdateAndRedirectBack.vue";
 import FormUpdateWithourRedirect from "@/core/components/form/buttons/FormUpdateWithourRedirect.vue";
 import { ref, computed } from "vue";
-import { useMessagesStore } from "@/core/stores/useMessages";
+import { useMessagesStore } from "@/core/stores/messages";
 import { router } from "@inertiajs/vue3";
 
 // Dependencies

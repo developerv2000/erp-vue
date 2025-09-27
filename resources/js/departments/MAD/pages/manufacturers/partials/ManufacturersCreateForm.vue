@@ -19,7 +19,7 @@ import FormStoreAndRedirectBack from "@/core/components/form/buttons/FormStoreAn
 import FormStoreAndReset from "@/core/components/form/buttons/FormStoreAndReset.vue";
 import FormStoreWithoutReseting from "@/core/components/form/buttons/FormStoreWithoutReseting.vue";
 import { ref } from "vue";
-import { useMessagesStore } from "@/core/stores/useMessages";
+import { useMessagesStore } from "@/core/stores/messages";
 import axios from "axios";
 
 // Dependencies

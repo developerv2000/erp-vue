@@ -3,7 +3,7 @@ import { ref } from "vue";
 import { mdiDelete } from "@mdi/js";
 import DefaultButton from "../../../buttons/DefaultButton.vue";
 import axios from "axios";
-import { useMessagesStore } from "@/core/stores/useMessages";
+import { useMessagesStore } from "@/core/stores/messages";
 import { useI18n } from "vue-i18n";
 
 const props = defineProps({

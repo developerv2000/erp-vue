@@ -11,7 +11,7 @@ import TdRecordCommentsLink from "@/core/components/table/td/TdRecordCommentsLin
 import TdAttachmentsList from "@/core/components/table/td/TdAttachmentsList.vue";
 import TdRecordAttachmentsLink from "@/core/components/table/td/TdRecordAttachmentsLink.vue";
 import TableNavigateToPage from "@/core/components/table/misc/TableNavigateToPage.vue";
-import { useMADManufacturerTableStore } from "@/departments/MAD/stores/useMADManufacturerTableStore";
+import { useMADManufacturerTableStore } from "@/departments/MAD/stores/manufacturerTable";
 import { useDateFormat } from "@vueuse/core";
 import { usePage } from "@inertiajs/vue3";
 import { onMounted } from "vue";

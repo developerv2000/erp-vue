@@ -2,6 +2,7 @@
 import { useAttrs } from "vue";
 import StandardLabeledGroup from "../groups/StandardLabeledGroup.vue";
 import { VDateInput } from "vuetify/labs/VDateInput";
+import { mdiCalendar } from "@mdi/js";
 
 const props = defineProps({
     label: String,
@@ -32,6 +33,8 @@ const inputAttrs = useAttrs();
             color="orange"
             variant="outlined"
             density="compact"
+            prepend-icon=""
+            :prepend-inner-icon="mdiCalendar"
             :placeholder="placeholder"
             autocomplete="off"
             hide-details="auto"

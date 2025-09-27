@@ -61,6 +61,7 @@
     "actions.Store without reseting form": "Store without reseting form",
     "actions.Update and redirect back": "Update and redirect back",
     "actions.Update without redirect": "Update without redirect",
+    "actions.Edit record": "Edit record",
 
     "forms.Personal data": "Personal data",
     "forms.Password update": "Password update",

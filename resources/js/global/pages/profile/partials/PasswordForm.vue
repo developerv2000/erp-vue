@@ -11,7 +11,7 @@ import { router } from "@inertiajs/vue3";
 import { ref } from "vue";
 import * as yup from "yup";
 import { mdiEye, mdiEyeOff } from "@mdi/js";
-import { useMessagesStore } from "@/core/stores/useMessages";
+import { useMessagesStore } from "@/core/stores/messages";
 
 const { t } = useI18n();
 const loading = ref(false);

@@ -7,7 +7,7 @@ import RestoreSelectedButton from "@/core/components/table/toolbar/actions/Resto
 import ColumnsListItem from "@/core/components/table/toolbar/more-action-items/ColumnsListItem.vue";
 import FullscreenListItem from "@/core/components/table/toolbar/more-action-items/FullscreenListItem.vue";
 import TrashListItem from "@/core/components/table/toolbar/more-action-items/TrashListItem.vue";
-import { useMADManufacturerTableStore } from "@/departments/MAD/stores/useMADManufacturerTableStore";
+import { useMADManufacturerTableStore } from "@/departments/MAD/stores/manufacturerTable";
 import ExportButton from "@/core/components/table/toolbar/actions/ExportButton.vue";
 import { useI18n } from "vue-i18n";
 

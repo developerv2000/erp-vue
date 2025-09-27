@@ -1,5 +1,5 @@
 <script setup>
-import { useMessagesStore } from "@/core/stores/useMessages";
+import { useMessagesStore } from "@/core/stores/messages";
 import { mdiClose } from "@mdi/js";
 
 const messages = useMessagesStore();

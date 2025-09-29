@@ -37,6 +37,7 @@ class User extends Authenticatable
     const DEFAULT_LOCALE = 'ru';
     const DEFAULT_IS_LEFTBAR_COLLAPSED = false;
 
+    const DELETED_USER_PHOTO = 'deleted-user.png';
     const PHOTO_PATH = 'images/users';
     const PHOTO_WIDTH = 400;
     const PHOTO_HEIGHT = 400;
@@ -627,6 +628,11 @@ class User extends Authenticatable
     | Misc
     |--------------------------------------------------------------------------
     */
+
+    public static function getDeletedUserImageUrl(): string
+    {
+        return url('storage/' . self::PHOTO_PATH . '/' . self::DELETED_USER_PHOTO);
+    }
 
     public static function notifyUsersBasedOnPermission($notification, $permission)
     {

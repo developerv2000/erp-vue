@@ -4,6 +4,7 @@ namespace App\Http\Controllers\global;
 
 use App\Http\Controllers\Controller;
 use App\Models\Comment;
+use App\Models\User;
 use App\Support\Helpers\ModelHelper;
 use App\Support\Traits\Controller\DestroysModelRecords;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -43,6 +44,7 @@ class CommentController extends Controller
             'comments' => $record->comments,
             'commentable_id' => $record->id,
             'commentable_type' => $model,
+            'deletedUserImage' => User::getDeletedUserImageUrl(),
         ]);
     }
 

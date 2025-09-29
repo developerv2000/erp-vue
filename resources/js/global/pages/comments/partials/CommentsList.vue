@@ -42,11 +42,24 @@ const destroy = (comment) => {
                 elevation="1"
             >
                 <template #title>
-                    <div class="text-subtitle-2">{{ comment.user.name }}</div>
+                    <div class="text-subtitle-2">
+                        {{
+                            comment.user
+                                ? comment.user.name
+                                : t("comments.Deleted user")
+                        }}
+                    </div>
                 </template>
 
                 <template #prepend>
-                    <v-avatar :image="comment.user.photo_url" size="32" />
+                    <v-avatar
+                        :image="
+                            comment.user
+                                ? comment.user.photo_url
+                                : page.props.deletedUserImage
+                        "
+                        size="32"
+                    />
                 </template>
 
                 <template #append>

@@ -63,25 +63,13 @@ class CommentController extends Controller
         return redirect()->back();
     }
 
-    public function edit(Comment $record)
-    {
-        $record->load('commentable');
-
-        // Generate breadcrumbs
-        $crumbs = $record->commentable->generateBreadcrumbs();
-        array_push(
-            $crumbs,
-            ['link' => null, 'text' => __('Comments')],
-            ['link' => null, 'text' => '#' . $record->id]
-        );
-
-        return view('global.comments.edit', compact('record', 'crumbs'));
-    }
-
+    /**
+     * Ajax request
+     */
     public function update(Request $request, Comment $record)
     {
-        $record->update($request->all());
+        $record->update($request->only('body'));
 
-        return redirect($request->input('previous_url'));
+        return true;
     }
 }

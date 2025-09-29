@@ -37,7 +37,7 @@ const defaultFilters = {
 
 const API_URL = route('api.manufacturers.get');
 
-export const useMADManufacturerTableStore = defineStore('MADManufacturerTable', {
+export const useMADManufacturersTableStore = defineStore('MADManufacturersTable', {
     state: () => ({
         records: [],
         loading: false,

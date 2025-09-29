@@ -61,7 +61,6 @@
     "actions.Store without reseting form": "Store without reseting form",
     "actions.Update and redirect back": "Update and redirect back",
     "actions.Update without redirect": "Update without redirect",
-    "actions.Edit record": "Edit record",
 
     "forms.Personal data": "Personal data",
     "forms.Password update": "Password update",
@@ -83,9 +82,14 @@
     "modals.Delete selected permanently question": "Are you sure you want to delete selected permanently",
     "modals.Customize Columns": "Customize Columns",
     "modals.Drag and drop columns": "Drag and drop columns for sorting",
+    "modals.Edit record": "Edit record",
+    "modals.Delete record": "Delete record",
+    "modals.Delete record question": "Are you sure you want to delete this record",
 
     "file.Generating file": "Generating file",
     "file.Download started": "Download started",
+    "file.Filename": "Filename",
+    "file.File size": "File size",
 
     "properties.Important": "Important",
     "properties.Active": "Active",

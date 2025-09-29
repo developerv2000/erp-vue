@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Attachment;
 use App\Support\Helpers\ModelHelper;
 use App\Support\Traits\Controller\DestroysModelRecords;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
+use Inertia\Inertia;
 
 class AttachmentController extends Controller
 {
@@ -22,26 +24,28 @@ class AttachmentController extends Controller
         // Secure request
         $this->authorizeGates($request->route('attachable_type'));
 
-        // Retrieve the model and record with attachments eagerly loaded
+        // Retrieve record with attachments eagerly loaded and appended title
         $model = ModelHelper::addFullNamespaceToModelBasename(
             $request->route('attachable_type')
         );
-        $record = $model::withTrashed()->with(['attachments'])->findOrFail(
-            $request->route('attachable_id')
-        );
 
-        // Generate breadcrumbs
-        $breadcrumbs = $record->generateBreadcrumbs();
-        $breadcrumbs[] = [
-            'link' => null,
-            'text' => __('Attachments'),
-        ];
-        $breadcrumbs[] = [
-            'link' => null,
-            'text' => $record->attachments->count() . ' ' . __('records'),
-        ];
+        $query = $model::query();
 
-        return view('global.attachments.index', compact('record', 'breadcrumbs'));
+        if (in_array(SoftDeletes::class, class_uses_recursive($model))) {
+            $query->withTrashed();
+        }
+
+        $record = $query->with(['attachments'])
+            ->findOrFail($request->route('attachable_id'))
+            ->append(['title']);
+
+        // Render page
+        return Inertia::render('global/pages/attachments/Index', [
+            'record' => $record,
+            'attachments' => $record->attachments,
+            'attachable_id' => $record->id,
+            'attachable_type' => $model,
+        ]);
     }
 
     public function show(Attachment $record)
@@ -52,7 +56,7 @@ class AttachmentController extends Controller
         if (!$disk->exists($path)) {
             abort(404);
         }
-        
+
         $mimeType = $disk->mimeType($path);
 
         return response()->stream(function () use ($disk, $path) {

@@ -30,7 +30,7 @@ function submit() {
 </script>
 
 <template>
-    <v-dialog v-model="showModal" max-width="400">
+    <v-dialog v-model="showModal" max-width="420">
         <template v-slot:activator="{ props: activatorProps }">
             <DefaultButton
                 :prepend-icon="mdiDelete"

@@ -46,7 +46,7 @@
     max-width: calc(100% - 24px - var(--main-filter-width));
 }
 
-.main-table .v-table__wrapper {
+.main-table--limited-height .v-table__wrapper {
     max-height: var(--main-table-wrapper-max-height);
     overflow: auto;
 }

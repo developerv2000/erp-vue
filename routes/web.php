@@ -46,7 +46,7 @@ Route::middleware('auth', 'auth.session')->group(function () {
     Route::prefix('comments')->controller(CommentController::class)->name('comments.')->group(function () {
         Route::get('/view/{commentable_type}/{commentable_id}', 'index')->name('index');
 
-        CRUDRouteGenerator::defineDefaultRoutesOnly(['edit', 'store', 'update', 'destroy'], 'id', null, 'can:edit-comments');
+        CRUDRouteGenerator::defineDefaultRoutesOnly(['store', 'update', 'destroy'], 'id', null, 'can:edit-comments');
     });
 
     Route::prefix('excel-storage')
@@ -61,11 +61,10 @@ Route::middleware('auth', 'auth.session')->group(function () {
             Route::post('/{model}/download/{filename}', 'download')->name('download');
         });
 
-
     Route::prefix('attachments')->controller(AttachmentController::class)->name('attachments.')->group(function () {
         Route::get('/view-model-attachments/{attachable_type}/{attachable_id}', 'viewModelAttachments')->name('view-model-attachments');
         Route::get('/show/{record}', 'show')->name('show');
-        Route::delete('/destroy', 'destroy')->name('destroy');
+        Route::post('/destroy', 'destroy')->name('destroy');
     });
 
     Route::prefix('misc-models')->controller(MiscModelController::class)->name('misc-models.')->group(function () {

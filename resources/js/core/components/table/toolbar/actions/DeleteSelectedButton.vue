@@ -9,6 +9,7 @@ import { useI18n } from "vue-i18n";
 const props = defineProps({
     deleteLink: String,
     store: Object,
+    actionOnSuccess: Function,
 });
 
 const { t } = useI18n();
@@ -23,13 +24,17 @@ function submit() {
         .then((response) => {
             showModal.value = false;
             messages.addDeletedSuccessfullyMessage(response.data.count);
-            props.store.fetchRecords({ updateUrl: false });
+
+            // Call action on success if given
+            if (typeof props.actionOnSuccess === "function") {
+                props.actionOnSuccess();
+            }
         });
 }
 </script>
 
 <template>
-    <v-dialog v-model="showModal" max-width="400">
+    <v-dialog v-model="showModal" max-width="420">
         <template v-slot:activator="{ props: activatorProps }">
             <DefaultButton
                 :prepend-icon="mdiDelete"
@@ -46,7 +51,9 @@ function submit() {
         <template v-slot:default="{ isActive }">
             <v-card>
                 <v-card-item class="pa-4" :prepend-icon="mdiDelete">
-                    <v-card-title>{{ t("modals.Delete selected") }}</v-card-title>
+                    <v-card-title>{{
+                        t("modals.Delete selected")
+                    }}</v-card-title>
                 </v-card-item>
 
                 <v-divider />

@@ -4,14 +4,13 @@ import TableDefaultSkeleton from "@/core/components/table/misc/TableDefaultSkele
 import TdEditButton from "@/core/components/table/td/TdEditButton.vue";
 import TdAva from "@/core/components/table/td/TdAva.vue";
 import TdInertiaLink from "@/core/components/table/td/TdInertiaLink.vue";
-import TdChip from "@/core/components/table/td/TdChip.vue";
 import TdLink from "@/core/components/table/td/TdLink.vue";
 import TogglableMaxLinesLimitedText from "@/core/components/misc/TogglableThreeLinesLimitedText.vue";
 import TdRecordCommentsLink from "@/core/components/table/td/TdRecordCommentsLink.vue";
 import TdAttachmentsList from "@/core/components/table/td/TdAttachmentsList.vue";
 import TdRecordAttachmentsLink from "@/core/components/table/td/TdRecordAttachmentsLink.vue";
 import TableNavigateToPage from "@/core/components/table/misc/TableNavigateToPage.vue";
-import { useMADManufacturerTableStore } from "@/departments/MAD/stores/manufacturerTable";
+import { useMADManufacturersTableStore } from "@/departments/MAD/stores/manufacturersTable";
 import { useDateFormat } from "@vueuse/core";
 import { usePage } from "@inertiajs/vue3";
 import { onMounted } from "vue";
@@ -20,7 +19,7 @@ import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
 const page = usePage();
-const store = useMADManufacturerTableStore();
+const store = useMADManufacturersTableStore();
 
 if (!store.initializedFromInertiaPage) {
     store.initFromInertiaPage(page); // Initialize store from inertia page only once.
@@ -38,7 +37,7 @@ function handleTableOptionsUpdate(options) {
 
 <template>
     <v-data-table-server
-        class="main-table main-table--with-filter"
+        class="main-table main-table--limited-height main-table--with-filter"
         :headers="page.props.tableVisibleHeaders"
         v-model="store.selected"
         :items="store.records"

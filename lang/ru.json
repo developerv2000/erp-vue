@@ -61,7 +61,6 @@
     "actions.Store without reseting form": "Сохранить без сброса формы",
     "actions.Update and redirect back": "Обновить и вернуться назад",
     "actions.Update without redirect": "Обновить без перенаправления",
-    "actions.Edit record": "Редактировать запись",
 
     "forms.Personal data": "Персональные данные",
     "forms.Password update": "Обновить пароль",
@@ -80,16 +79,21 @@
     "messages.Smart filters update failed": "Обновление умного фильтра не удалось!",
 
     "modals.Delete selected": "Удалить отмеченные",
-    "modals.Delete selected question": "Вы уверены, что хотите удалить отмеченные?",
+    "modals.Delete selected question": "Вы уверены, что хотите удалить отмеченные",
     "modals.Restore selected": "Востановить отмеченные",
     "modals.Restore selected question": "Вы уверены, что хотите востановить отмеченные",
     "modals.Delete selected permanently": "Удалить отмеченные навсегда",
-    "modals.Delete selected permanently question": "Вы уверены, что хотите удалить отмеченные навсегда?",
+    "modals.Delete selected permanently question": "Вы уверены, что хотите удалить отмеченные навсегда",
     "modals.Customize Columns": "Настройка столбцов",
     "modals.Drag and drop columns": "Перетащите столбцы для сортировки",
+    "modals.Edit record": "Редактировать запись",
+    "modals.Delete record": "Удалить запись",
+    "modals.Delete record question": "Вы уверены, что хотите удалить эту запись",
 
     "file.Generating file": "Генерация файла",
     "file.Download started": "Загрузка началась",
+    "file.Filename": "Имя файла",
+    "file.File size": "Размер файла",
 
     "properties.Important": "Важный",
     "properties.Active": "Активный",

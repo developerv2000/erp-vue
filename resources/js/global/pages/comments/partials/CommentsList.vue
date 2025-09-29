@@ -6,27 +6,27 @@ import { useI18n } from "vue-i18n";
 import { computed } from "vue";
 import { useTimeAgoFormatter } from "@/core/composables/useDateFormatter";
 import { mdiPencil, mdiDelete } from "@mdi/js";
-import { ref } from "vue";
-import DefaultButton from "@/core/components/buttons/DefaultButton.vue";
-import DefaultWysiwyg from "@/core/components/form/inputs/DefaultWysiwyg.vue";
-import DefaultDateInput from "@/core/components/form/inputs/DefaultDateInput.vue";
+import { useCommentsStore } from "@/global/stores/comments";
+import CommentsEditDialog from "./CommentsEditDialog.vue";
+import CommentsDestroyDialog from "./CommentsDestroyDialog.vue";
 
 const page = usePage();
 const { t } = useI18n();
-
-const editDialog = ref(false);
-const activeRecord = ref(null);
+const store = useCommentsStore();
 
 const title = computed(
     () => t("comments.All comments") + " — " + page.props.comments.length
 );
 
 const edit = (comment) => {
-    activeRecord.value = comment;
-    editDialog.value = true;
+    store.activeRecord = { ...comment };
+    store.editDialog = true;
 };
 
-const update = () => {};
+const destroy = (comment) => {
+    store.activeRecord = { ...comment };
+    store.destroyDialog = true;
+};
 </script>
 
 <template>
@@ -39,7 +39,7 @@ const update = () => {};
                 v-for="comment in page.props.comments"
                 :key="comment.id"
                 :subtitle="useTimeAgoFormatter(comment.created_at).value"
-                elevation="2"
+                elevation="1"
             >
                 <template #title>
                     <div class="text-subtitle-2">{{ comment.user.name }}</div>
@@ -58,7 +58,12 @@ const update = () => {};
                             @click="edit(comment)"
                         />
 
-                        <v-btn color="error" size="small" :icon="mdiDelete" />
+                        <v-btn
+                            color="error"
+                            size="small"
+                            :icon="mdiDelete"
+                            @click="destroy(comment)"
+                        />
                     </div>
                 </template>
 
@@ -67,49 +72,8 @@ const update = () => {};
                 </template>
             </v-card>
         </div>
-
-        <!-- Edit dialog -->
-        <v-dialog v-model="editDialog" max-width="760">
-            <v-card>
-                <v-card-item class="pa-4" :prepend-icon="mdiPencil">
-                    <v-card-title>{{ t("actions.Edit record") }}</v-card-title>
-                </v-card-item>
-
-                <v-divider />
-
-                <v-card-text class="px-4 py-6">
-                    <div class="d-flex flex-column ga-5">
-                        <DefaultDateInput
-                            :label="t('dates.Date of creation')"
-                            name="created_at"
-                            v-model="activeRecord.created_at"
-                        />
-
-                        <DefaultWysiwyg
-                            :label="t('fields.Text')"
-                            name="body"
-                            v-model="activeRecord.body"
-                            folder="comments"
-                        />
-                    </div>
-                </v-card-text>
-
-                <v-divider></v-divider>
-
-                <v-card-actions class="pa-4">
-                    <DefaultButton
-                        class="px-6"
-                        color="grey-lighten-2"
-                        @click="editDialog = false"
-                    >
-                        {{ t("actions.Cancel") }}
-                    </DefaultButton>
-
-                    <DefaultButton class="px-6" color="success" @click="update">
-                        {{ t("actions.Update") }}
-                    </DefaultButton>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
     </DefaultSheet>
+
+    <CommentsEditDialog />
+    <CommentsDestroyDialog />
 </template>

@@ -159,9 +159,9 @@ function handleTableOptionsUpdate(options) {
         </template>
 
         <template v-slot:item.website="{ item }">
-            <TdLink :link="item.website" target="_blank">{{
-                item.website
-            }}</TdLink>
+            <TdLink :link="item.website" target="_blank">
+                <TogglableMaxLinesLimitedText :text="item.website" />
+            </TdLink>
         </template>
 
         <template v-slot:item.about="{ item }">

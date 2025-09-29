@@ -117,6 +117,7 @@ function handleTableOptionsUpdate(options) {
                 :class="{
                     'text-orange': item.category.name == 'УДС',
                     'text-purple': item.category.name == 'НПП',
+                    'text-blue-grey': item.category.name == 'НПП-',
                 }"
             >
                 {{ item.category.name }}

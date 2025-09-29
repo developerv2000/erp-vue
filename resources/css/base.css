@@ -77,6 +77,9 @@
     justify-items: flex-start;
 }
 
+.main-table .three-lines-limited-text img {
+    max-width: 40px;
+}
 /* ------------ /end Main table ------------ */
 
 

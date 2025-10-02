@@ -20,8 +20,8 @@ const { t } = useI18n();
             })
         "
         size="small"
-        color="brown-lighten-5"
         class="mb-1 font-weight-regular"
+        color="grey-lighten-2"
         variant="flat"
     >
         {{ record.attachments_count }}

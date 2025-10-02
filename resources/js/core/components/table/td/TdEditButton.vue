@@ -14,7 +14,7 @@ defineProps({
     <InertiaLinkedButtonedIcon
         :icon="mdiPen"
         size="small"
-        color="orange"
+        color="amber"
         variant="tonal"
         :link="link"
     />

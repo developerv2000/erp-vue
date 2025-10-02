@@ -16,6 +16,24 @@
 /* ------------ /end Vars ------------ */
 
 
+/* ------------ Inertia progress bar ------------ */
+body.theme--light #nprogress .bar {
+    background: #1867c0 !important;
+}
+body.theme--dark #nprogress .bar {
+    background: #FF9800 !important;
+}
+
+/* Optional glow effect (peg) */
+body.theme--light #nprogress .peg {
+    box-shadow: 0 0 10px #1867c0, 0 0 5px #1867c0 !important;
+}
+body.theme--dark #nprogress .peg {
+    box-shadow: 0 0 10px #FF9800, 0 0 5px #FF9800 !important;
+}
+/* ------------ /end Inertia progress bar ------------ */
+
+
 /* ------------ Max lines limited text ------------ */
 [data-on-click="toggle-text-max-lines"] {
     cursor: pointer;
@@ -37,7 +55,7 @@
     overflow: hidden;
 }
 
-/* ------------ /end misc ------------ */
+/* ------------ /end Max lines limited text ------------ */
 
 
 /* ------------ Main table ------------ */

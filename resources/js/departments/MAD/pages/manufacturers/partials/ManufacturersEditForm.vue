@@ -279,20 +279,20 @@ const reloadRequiredDataAndResetForm = () => {
 
         <DefaultSheet>
             <v-row>
-                <v-col v-if="record.last_comment">
-                    <DefaultWysiwyg
-                        v-model="record.last_comment.body"
-                        :label="t('comments.Last comment')"
-                        disabled
-                    />
-                </v-col>
-
                 <v-col>
                     <DefaultWysiwyg
                         v-model="values.comment"
                         :label="t('comments.New comment')"
                         :error-messages="errors.comment"
                         folder="comments"
+                    />
+                </v-col>
+
+                <v-col v-if="record.last_comment">
+                    <DefaultWysiwyg
+                        v-model="record.last_comment.body"
+                        :label="t('comments.Last comment')"
+                        disabled
                     />
                 </v-col>
             </v-row>

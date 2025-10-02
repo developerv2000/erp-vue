@@ -17,7 +17,6 @@ class ExcelStorageController extends Controller
      */
     public function generate(Request $request, string $model)
     {
-        sleep(2);
         $modelClass = $this->resolveModelClass($model);
 
         if (! method_exists($modelClass, 'queryForExport')) {

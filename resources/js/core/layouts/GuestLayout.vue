@@ -15,7 +15,9 @@ axios.get("/sanctum/csrf-cookie");
                 backgroundPosition: 'right bottom',
             }"
         >
-            <slot />
+            <v-theme-provider theme="light">
+                <slot />
+            </v-theme-provider>
         </v-main>
     </v-app>
 </template>

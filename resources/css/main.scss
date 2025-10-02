@@ -4,7 +4,7 @@
 
 @use 'vuetify' as *;
 
-// Components
+/* ------------ Components ------------ */
 // 'v-field__input' of v-text-field, v-autocomplete etc...
 .v-text-field .v-field__input {
     font-size: 14px;
@@ -19,3 +19,4 @@
 .vuetify-pro-tiptap .v-input__details {
     padding-left: 16px;
 }
+/* ------------ /end Components ------------ */

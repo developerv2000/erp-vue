@@ -18,11 +18,6 @@ class ExcelStorageController extends Controller
     public function generate(Request $request, string $model)
     {
         $modelClass = $this->resolveModelClass($model);
-
-        if (! method_exists($modelClass, 'queryForExport')) {
-            abort(400, "Model [$modelClass] must implement queryForExport(Request)");
-        }
-
         $query = $modelClass::queryForExport($request);
 
         // Load the Excel template

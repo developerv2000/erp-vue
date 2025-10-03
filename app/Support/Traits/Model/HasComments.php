@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-trait Commentable
+trait HasComments
 {
     /**
      * Get all comments associated with the model, ordered by ID in descending order.

@@ -3,29 +3,33 @@
 namespace App\Models;
 
 use App\Http\Requests\MAD\ManufacturerStoreRequest;
-use App\Support\Abstracts\BaseModel;
 use App\Support\Contracts\Model\ExportsRecordsAsExcel;
-use App\Support\Contracts\Model\HasTitle;
+use App\Support\Contracts\Model\GeneratesBreadcrumbs;
+use App\Support\Contracts\Model\HasTitleAttribute;
+use App\Support\Helpers\ModelHelper;
 use App\Support\Helpers\QueryFilterHelper;
-use App\Support\Traits\Model\Commentable;
+use App\Support\Traits\Model\AddsDefaultQueryParamsToRequest;
 use App\Support\Traits\Model\GetsMinifiedRecordsWithName;
 use App\Support\Traits\Model\HasAttachments;
-use App\Support\Traits\Model\HasModelNamespace;
+use App\Support\Traits\Model\HasComments;
+use App\Support\Traits\Model\HasModelNamespaceAttributes;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
-class Manufacturer extends BaseModel implements HasTitle, ExportsRecordsAsExcel
+class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, ExportsRecordsAsExcel
 {
     /** @use HasFactory<\Database\Factories\ManufacturerFactory> */
     use HasFactory;
     use SoftDeletes;
-    use Commentable;
+    use HasComments;
     use HasAttachments;
+    use HasModelNamespaceAttributes;
+    use AddsDefaultQueryParamsToRequest;
     use GetsMinifiedRecordsWithName;
-    use HasModelNamespace;
 
     /*
     |--------------------------------------------------------------------------
@@ -54,28 +58,6 @@ class Manufacturer extends BaseModel implements HasTitle, ExportsRecordsAsExcel
     | Relations
     |--------------------------------------------------------------------------
     */
-
-    public function products()
-    {
-        return $this->hasMany(Product::class);
-    }
-
-    public function processes()
-    {
-        return $this->hasManyThrough(
-            Process::class,
-            Product::class,
-            'manufacturer_id', // Foreign key on Products table
-            'product_id',   // Foreign key on Processes table
-            'id',         // Local key on Manufacturers table
-            'id'          // Local key on Products table
-        );
-    }
-
-    public function meetings()
-    {
-        return $this->hasMany(Meeting::class);
-    }
 
     public function category()
     {
@@ -149,25 +131,10 @@ class Manufacturer extends BaseModel implements HasTitle, ExportsRecordsAsExcel
             $record->name = mb_strtoupper($record->name);
         });
 
-        static::deleting(function ($record) { // trashing
-            foreach ($record->products as $product) {
-                $product->delete();
-            }
+        // Trashing
+        static::deleting(function ($record) {});
 
-            foreach ($record->meetings as $meeting) {
-                $meeting->delete();
-            }
-        });
-
-        static::restored(function ($record) {
-            foreach ($record->products()->onlyTrashed()->get() as $product) {
-                $product->restore();
-            }
-
-            foreach ($record->meetings()->onlyTrashed()->get() as $meeting) {
-                $meeting->restore();
-            }
-        });
+        static::restored(function ($record) {});
 
         static::forceDeleting(function ($record) {
             $record->zones()->detach();
@@ -176,14 +143,6 @@ class Manufacturer extends BaseModel implements HasTitle, ExportsRecordsAsExcel
 
             foreach ($record->presences as $presence) {
                 $presence->delete();
-            }
-
-            foreach ($record->products()->withTrashed()->get() as $product) {
-                $product->forceDelete();
-            }
-
-            foreach ($record->meetings()->withTrashed()->get() as $meeting) {
-                $meeting->forceDelete();
             }
         });
     }
@@ -216,8 +175,8 @@ class Manufacturer extends BaseModel implements HasTitle, ExportsRecordsAsExcel
         return $query->withCount([
             'comments',
             'attachments',
-            'products',
-            'meetings',
+            // 'products',
+            // 'meetings',
         ]);
     }
 
@@ -227,13 +186,13 @@ class Manufacturer extends BaseModel implements HasTitle, ExportsRecordsAsExcel
     |--------------------------------------------------------------------------
     */
 
-    // Implement method declared in HasTitle Interface
+    // Implement method declared in HasTitleAttribute Interface
     public function getTitleAttribute(): string
     {
         return $this->name;
     }
 
-    // Implement method declared in Breadcrumbable Interface
+    // Implement method declared in GeneratesBreadcrumbs Interface
     public function generateBreadcrumbs($department = null): array
     {
         $lowercasedDepartment = strtolower($department);
@@ -254,20 +213,26 @@ class Manufacturer extends BaseModel implements HasTitle, ExportsRecordsAsExcel
         return $breadcrumbs;
     }
 
-    // Implement method declared in CanExportRecordsAsExcel Interface
-    public static function queryForExport(Request $request): Builder
+    // Implement method declared in ExportsRecordsAsExcel Interface
+    public static function queryRecordsForExportFromRequest(Request $request): Builder
     {
         $query = self::withBasicRelations()
             ->withBasicRelationCounts()
-            ->with('comments');
+            ->with('comments'); // Important
 
+        // Normalize request parameters
         self::addDefaultQueryParamsToRequest($request);
+
+        // Apply filters
         self::filterQueryForRequest($query, $request);
 
-        return self::finalizeQueryForRequest($query, $request, 'query');
+        // Finalize (sorting)
+        ModelHelper::finalizeQueryForRequest($query, $request, 'query');
+
+        return $query;
     }
 
-    // Implement method declared in CanExportRecordsAsExcel Interface
+    // Implement method declared in ExportsRecordsAsExcel Interface
     public function getExcelColumnValuesForExport(): array
     {
         return [
@@ -296,7 +261,7 @@ class Manufacturer extends BaseModel implements HasTitle, ExportsRecordsAsExcel
      * @param  string  $action  ('paginate', 'get' or 'query')
      * @return mixed
      */
-    public static function queryFromRequest(Request $request, string $action = 'paginate')
+    public static function queryRecordsFromRequest(Request $request, string $action = 'paginate')
     {
         $query = self::withBasicRelations()->withBasicRelationCounts();
 
@@ -312,7 +277,7 @@ class Manufacturer extends BaseModel implements HasTitle, ExportsRecordsAsExcel
         self::filterQueryForRequest($query, $request);
 
         // Finalize (sorting & pagination)
-        $records = self::finalizeQueryForRequest($query, $request, $action);
+        $records = ModelHelper::finalizeQueryForRequest($query, $request, $action);
 
         // Append attributes unless raw query is requested
         if ($action !== 'query') {
@@ -335,8 +300,8 @@ class Manufacturer extends BaseModel implements HasTitle, ExportsRecordsAsExcel
 
         // Additional filters
         self::applyRegionFilter($query, $request);
-        self::applyProcessCountriesFilter($query, $request);
-        self::applyHasActiveProcessesForMonthFilter($query, $request);
+        // self::applyProcessCountriesFilter($query, $request);
+        // self::applyHasActiveProcessesForMonthFilter($query, $request);
 
         return $query;
     }
@@ -429,7 +394,7 @@ class Manufacturer extends BaseModel implements HasTitle, ExportsRecordsAsExcel
     /**
      * AJAX request
      */
-    public static function storeFromRequest(ManufacturerStoreRequest $request)
+    public static function storeByMADFromRequest(ManufacturerStoreRequest $request)
     {
         $record = self::create($request->all());
 
@@ -453,7 +418,10 @@ class Manufacturer extends BaseModel implements HasTitle, ExportsRecordsAsExcel
         }
     }
 
-    public function updateFromRequest($request)
+    /**
+     * AJAX request
+     */
+    public function updateByMADFromRequest($request)
     {
         $this->update($request->all());
 
@@ -496,29 +464,14 @@ class Manufacturer extends BaseModel implements HasTitle, ExportsRecordsAsExcel
     */
 
     /**
-     * Update self 'updated_at' field on comment store
+     * Update self 'updated_at' attribute on comment store
      */
     public function updateSelfOnCommentCreate()
     {
         $this->updateQuietly(['updated_at' => now()]);
     }
 
-    /**
-     * Return an array of status options
-     *
-     * Used on records filter and on create/update as radiogroups options
-     *
-     * @return array
-     */
-    public static function getStatusOptions()
-    {
-        return [
-            (object) ['caption' => trans('Active'), 'value' => 1],
-            (object) ['caption' => trans('Stopped'), 'value' => 0],
-        ];
-    }
-
-    public static function getDefaultMADTableHeadersForUser($user)
+    public static function getMADTableHeadersForUser($user)
     {
         if (Gate::forUser($user)->denies('view-MAD-EPP')) {
             return null;
@@ -534,32 +487,39 @@ class Manufacturer extends BaseModel implements HasTitle, ExportsRecordsAsExcel
             );
         }
 
-        array_push(
-            $columns,
-            ['title' => 'fields.BDM', 'key' => 'bdm_user_id', 'order' => $order++, 'width' => 146, 'visible' => 1, 'sortable' => true],
-            ['title' => 'fields.Analyst', 'key' => 'analyst_user_id', 'order' => $order++, 'width' => 146, 'visible' => 1, 'sortable' => true],
-            ['title' => 'fields.Country', 'key' => 'country_id', 'order' => $order++, 'width' => 144, 'visible' => 1, 'sortable' => true],
-            ['title' => 'pages.IVP', 'key' => 'products_count', 'order' => $order++, 'width' => 104, 'visible' => 1, 'sortable' => true],
-            ['title' => 'fields.Manufacturer', 'key' => 'name', 'order' => $order++, 'width' => 140, 'visible' => 1, 'sortable' => true],
-            ['title' => 'fields.Category', 'key' => 'category_id', 'order' => $order++, 'width' => 104, 'visible' => 1, 'sortable' => true],
-            ['title' => 'fields.Status', 'key' => 'active', 'order' => $order++, 'width' => 106, 'visible' => 1, 'sortable' => true],
-            ['title' => 'properties.Important', 'key' => 'important', 'order' => $order++, 'width' => 100, 'visible' => 1, 'sortable' => true],
-            ['title' => 'fields.Product class', 'key' => 'product_classes_name', 'order' => $order++, 'width' => 114, 'visible' => 1, 'sortable' => false],
-            ['title' => 'fields.Zones', 'key' => 'zones_name', 'order' => $order++, 'width' => 54, 'visible' => 1, 'sortable' => false],
-            ['title' => 'fields.Blacklist', 'key' => 'blacklists_name', 'order' => $order++, 'width' => 120, 'visible' => 1, 'sortable' => false],
-            ['title' => 'fields.Presence', 'key' => 'presences_name', 'order' => $order++, 'width' => 128, 'visible' => 1, 'sortable' => false],
-            ['title' => 'fields.Website', 'key' => 'website', 'order' => $order++, 'width' => 180, 'visible' => 1, 'sortable' => false],
-            ['title' => 'fields.About company', 'key' => 'about', 'order' => $order++, 'width' => 240, 'visible' => 1, 'sortable' => false],
-            ['title' => 'fields.Relationship', 'key' => 'relationship', 'order' => $order++, 'width' => 200, 'visible' => 1, 'sortable' => false],
-            ['title' => 'Comments', 'key' => 'comments_count', 'order' => $order++, 'width' => 132, 'visible' => 1, 'sortable' => false],
-            ['title' => 'comments.Last comment', 'key' => 'last_comment_body', 'order' => $order++, 'width' => 240, 'visible' => 1, 'sortable' => false],
-            ['title' => 'comments.Comments date', 'key' => 'last_comment_created_at', 'order' => $order++, 'width' => 116, 'visible' => 1, 'sortable' => false],
-            ['title' => 'dates.Date of creation', 'key' => 'created_at', 'order' => $order++, 'width' => 130, 'visible' => 1, 'sortable' => true],
-            ['title' => 'dates.Update date', 'key' => 'updated_at', 'order' => $order++, 'width' => 150, 'visible' => 1, 'sortable' => true],
-            ['title' => 'pages.Meetings', 'key' => 'meetings_count', 'order' => $order++, 'width' => 86, 'visible' => 1, 'sortable' => true],
-            ['title' => 'ID', 'key' => 'id', 'order' => $order++, 'width' => 62, 'visible' => 1, 'sortable' => true],
-            ['title' => 'Attachments', 'key' => 'attachments_count', 'order' => $order++, 'width' => 340, 'visible' => 1, 'sortable' => true],
-        );
+        $additionalColumns = [
+            ['title' => 'fields.BDM', 'key' => 'bdm_user_id', 'width' => 146, 'sortable' => true],
+            ['title' => 'fields.Analyst', 'key' => 'analyst_user_id', 'width' => 146, 'sortable' => true],
+            ['title' => 'fields.Country', 'key' => 'country_id', 'width' => 144, 'sortable' => true],
+            ['title' => 'pages.IVP', 'key' => 'products_count', 'width' => 104, 'sortable' => true],
+            ['title' => 'fields.Manufacturer', 'key' => 'name', 'width' => 140, 'sortable' => true],
+            ['title' => 'fields.Category', 'key' => 'category_id', 'width' => 104, 'sortable' => true],
+            ['title' => 'fields.Status', 'key' => 'active', 'width' => 106, 'sortable' => true],
+            ['title' => 'properties.Important', 'key' => 'important', 'width' => 100, 'sortable' => true],
+            ['title' => 'fields.Product class', 'key' => 'product_classes_name', 'width' => 114, 'sortable' => false],
+            ['title' => 'fields.Zones', 'key' => 'zones_name', 'width' => 54, 'sortable' => false],
+            ['title' => 'fields.Blacklist', 'key' => 'blacklists_name', 'width' => 120, 'sortable' => false],
+            ['title' => 'fields.Presence', 'key' => 'presences_name', 'width' => 128, 'sortable' => false],
+            ['title' => 'fields.Website', 'key' => 'website', 'width' => 180, 'sortable' => false],
+            ['title' => 'fields.About company', 'key' => 'about', 'width' => 240, 'sortable' => false],
+            ['title' => 'fields.Relationship', 'key' => 'relationship', 'width' => 200, 'sortable' => false],
+            ['title' => 'Comments', 'key' => 'comments_count', 'width' => 132, 'sortable' => false],
+            ['title' => 'comments.Last comment', 'key' => 'last_comment_body', 'width' => 240, 'sortable' => false],
+            ['title' => 'comments.Comments date', 'key' => 'last_comment_created_at', 'width' => 116, 'sortable' => false],
+            ['title' => 'dates.Date of creation', 'key' => 'created_at', 'width' => 130, 'sortable' => true],
+            ['title' => 'dates.Update date', 'key' => 'updated_at', 'width' => 150, 'sortable' => true],
+            ['title' => 'pages.Meetings', 'key' => 'meetings_count', 'width' => 86, 'sortable' => true],
+            ['title' => 'ID', 'key' => 'id', 'width' => 62, 'sortable' => true],
+            ['title' => 'Attachments', 'key' => 'attachments_count', 'width' => 340, 'sortable' => true],
+        ];
+
+        foreach ($additionalColumns as $column) {
+            array_push($columns, [
+                ...$column,
+                'order' => $order++,
+                'visible' => 1
+            ]);
+        }
 
         return $columns;
     }

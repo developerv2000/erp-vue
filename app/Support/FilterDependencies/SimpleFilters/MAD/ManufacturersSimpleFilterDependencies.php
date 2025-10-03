@@ -3,7 +3,6 @@
 namespace App\Support\FilterDependencies\SimpleFilters\MAD;
 
 use App\Models\Country;
-use App\Models\Manufacturer;
 use App\Models\ManufacturerBlacklist;
 use App\Models\ManufacturerCategory;
 use App\Models\ProductClass;
@@ -20,7 +19,7 @@ class ManufacturersSimpleFilterDependencies
             'categories' => ManufacturerCategory::orderByName()->get(),
             'productClasses' => ProductClass::orderByName()->get(),
             'zones' => Zone::orderByName()->get(),
-            'countriesOrderedByProcessesCount' => Country::orderByProcessesCount()->get(), // used in has processes_for_country filter
+            'countriesOrderedByProcessesCount' => Country::orderByProcessesCount()->get(), // Used in has processes_for_country filter
             'blacklists' => ManufacturerBlacklist::orderByName()->get(),
         ];
     }

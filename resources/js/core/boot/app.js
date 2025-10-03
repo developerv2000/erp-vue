@@ -35,6 +35,8 @@ const pinia = createPinia()
 // App name from `.env` (or fallback)
 const appName = import.meta.env.VITE_APP_NAME || 'ERP'
 
+console.log(import.meta.glob('/resources/js/**/pages/**/*.vue'));
+
 // Inertia app initialization
 createInertiaApp({
     // Dynamic page titles
@@ -43,8 +45,8 @@ createInertiaApp({
     // Resolve components from the ./pages folder using glob import
     resolve: (name) =>
         resolvePageComponent(
-            `../../${name}.vue`,
-            import.meta.glob('../../**/pages/**/*.vue')
+            `/resources/js/${name}.vue`,
+            import.meta.glob('/resources/js/**/pages/**/*.vue')
         ),
 
     // Setup Vue app

@@ -2,7 +2,7 @@
 
 namespace App\Support\Traits\Model;
 
-trait HasModelNamespace
+trait HasModelNamespaceAttributes
 {
     /**
      * Get the fully qualified class name of the model.

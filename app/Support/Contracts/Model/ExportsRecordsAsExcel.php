@@ -17,7 +17,7 @@ interface ExportsRecordsAsExcel
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public static function queryForExport(Request $request): Builder;
+    public static function queryRecordsForExportFromRequest(Request $request): Builder;
 
     /**
      * Get Excel column values for exporting.

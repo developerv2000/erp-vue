@@ -2,11 +2,7 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-
 use App\Support\Helpers\FileHelper;
-use App\Support\Traits\Model\AddsDefaultQueryParamsToRequest;
-use App\Support\Traits\Model\FinalizesQueryForRequest;
 use App\Support\Traits\Model\UploadsFile;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -18,10 +14,9 @@ use InvalidArgumentException;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory;
+    use Notifiable;
     use UploadsFile;
-    use AddsDefaultQueryParamsToRequest;
-    use FinalizesQueryForRequest;
 
     /*
     |--------------------------------------------------------------------------
@@ -29,26 +24,19 @@ class User extends Authenticatable
     |--------------------------------------------------------------------------
     */
 
-    const DEFAULT_ORDER_BY = 'name';
-    const DEFAULT_ORDER_TYPE = 'asc';
-    const DEFAULT_PAGINATION_LIMIT = 50;
+    // Photo
+    const PHOTO_PATH = 'images/users';
+    const PHOTO_WIDTH = 400;
+    const PHOTO_HEIGHT = 400;
+    const DELETED_USER_PHOTO = 'deleted-user.png';
 
+    // Appearance settings
     const DEFAULT_THEME = 'light';
     const DEFAULT_LOCALE = 'ru';
     const DEFAULT_IS_LEFTBAR_COLLAPSED = false;
 
-    const DELETED_USER_PHOTO = 'deleted-user.png';
-    const PHOTO_PATH = 'images/users';
-    const PHOTO_WIDTH = 400;
-    const PHOTO_HEIGHT = 400;
-
-    // Table setting keys
-    const SETTINGS_KEY_OF_MAD_EPP_TABLE = 'MAD_EPP';
-    const SETTINGS_KEY_OF_MAD_IVP_TABLE = 'MAD_IVP';
-    const SETTINGS_KEY_OF_MAD_VPS_TABLE = 'MAD_VPS';
-    const SETTINGS_KEY_OF_MAD_KVPP_TABLE = 'MAD_KVPP';
-    const SETTINGS_KEY_OF_MAD_MEETINGS_TABLE = 'MAD_Meetings';
-    const SETTINGS_KEY_OF_MAD_DH_TABLE = 'MAD_DH';
+    // Setting keys of table headers
+    const MAD_EPP_HEADERS_KEY = 'MAD_EPP';
 
     /*
     |--------------------------------------------------------------------------
@@ -130,11 +118,6 @@ class User extends Authenticatable
         return $this->hasMany(Manufacturer::class, 'analyst_user_id');
     }
 
-    public function productSearches()
-    {
-        return $this->hasMany(ProductSearch::class);
-    }
-
     /*
     |--------------------------------------------------------------------------
     | Additional attributes
@@ -179,31 +162,6 @@ class User extends Authenticatable
     |--------------------------------------------------------------------------
     */
 
-    public function scopeWithBasicRelations($query)
-    {
-        return $query->with([
-            'department',
-            'roles',
-            'permissions',
-            'responsibleCountries',
-        ]);
-    }
-
-    /**
-     * Load basic relations, while sending notifications.
-     *
-     * Roles with permissions must be loaded, because of using gates.
-     */
-    public function scopeWithBasicRelationsToNotify($query)
-    {
-        return $query->with([
-            'roles' => function ($rolesQuery) {
-                $rolesQuery->with('permissions');
-            },
-            'permissions'
-        ]);
-    }
-
     public function scopeOnlyCMDBDMs($query)
     {
         return $query->whereRelation('roles', 'name', Role::CMD_BDM_NAME);
@@ -230,13 +188,6 @@ class User extends Authenticatable
         return self::onlyMADAnalysts()->select('id', 'name')->get();
     }
 
-    public static function getAllMinified()
-    {
-        return self::select('id', 'name')
-            ->orderBy('name', 'asc')
-            ->get();
-    }
-
     /*
     |--------------------------------------------------------------------------
     | Roles
@@ -258,20 +209,15 @@ class User extends Authenticatable
         return $this->hasRole(Role::GLOBAL_ADMINISTRATOR_NAME);
     }
 
-    public function isMADAdministrator()
-    {
-        return $this->hasRole(Role::MAD_ADMINISTRATOR_NAME);
-    }
-
     public function isAnyAdministrator()
     {
         return $this->isGlobalAdministrator()
             || $this->isMADAdministrator();
     }
 
-    public function isMADAnalyst()
+    public function isMADAdministrator()
     {
-        return $this->hasRole(Role::MAD_ANALYST_NAME);
+        return $this->hasRole(Role::MAD_ADMINISTRATOR_NAME);
     }
 
     /*
@@ -326,16 +272,12 @@ class User extends Authenticatable
 
     /*
     |--------------------------------------------------------------------------
-    | Settings
+    | Settings: Main helpers
     |--------------------------------------------------------------------------
     */
 
     /**
      * Update the specified setting for the user.
-     *
-     * @param  string  $key
-     * @param  mixed  $value
-     * @return void
      */
     public function updateSetting($key, $value): void
     {
@@ -352,7 +294,7 @@ class User extends Authenticatable
      *
      * Empty settings is used for Inactive users.
      */
-    public function resetAllSettingsToDefault(): void
+    public function resetSettings(): void
     {
         // Refresh user because roles may have been updated
         $this->refresh();
@@ -364,103 +306,73 @@ class User extends Authenticatable
             return;
         }
 
-        // Appearance settings
+        // Appearance
         $settings = [
             'theme' => User::DEFAULT_THEME,
             'locale' => User::DEFAULT_LOCALE,
             'is_leftbar_collapsed' => User::DEFAULT_IS_LEFTBAR_COLLAPSED,
-            'tables' => [],
+            'table_headers' => [],
         ];
 
         $this->settings = $settings;
         $this->save();
 
-        // Table settings
-        $this->resetMADTableSettings($settings);
+        // Table headers
+        $this->resetMADTableHeaders($settings);
     }
 
     /**
-     * Reset users MAD table settings.
-     */
-    public function resetMADTableSettings($settings)
-    {
-        $this->refresh();
-        $settings = $this->settings;
-        $tableSettings = $settings['tables'];
-
-        $tableSettings[self::SETTINGS_KEY_OF_MAD_EPP_TABLE] = Manufacturer::getDefaultMADTableHeadersForUser($this);
-        // $tableSettings[self::SETTINGS_KEY_OF_MAD_IVP_TABLE] = Product::getDefaultMADTableHeadersForUser($this);
-        // $tableSettings[self::SETTINGS_KEY_OF_MAD_VPS_TABLE] = Process::getDefaultMADTableHeadersForUser($this);
-        // $tableSettings[self::SETTINGS_KEY_OF_MAD_KVPP_TABLE] = ProductSearch::getDefaultMADTableHeadersForUser($this);
-        // $tableSettings[self::SETTINGS_KEY_OF_MAD_MEETINGS_TABLE] = Meeting::getDefaultMADTableHeadersForUser($this);
-        // $tableSettings[self::SETTINGS_KEY_OF_MAD_DH_TABLE] = Process::getDefaultMADTableHeadersForUser($this);
-
-        $settings['tables'] = $tableSettings;
-        $this->settings = $settings;
-        $this->save();
-    }
-
-    /**
-     * Reset all settings to default for all users.
-     *
      * Used via artisan command line.
      */
-    public static function resetAllSettingsToDefaultForAll()
+    public static function resetSettingsOfAllUsers()
     {
         self::all()->each(function ($user) {
-            $user->resetAllSettingsToDefault();
+            $user->resetSettings();
         });
     }
 
-    /**
-     * Reset only specific table headers.
-     */
-    public function resetSpecificTableHeaders(string $key): void
+    /*
+    |--------------------------------------------------------------------------
+    | Settings: Table headers helpers
+    |--------------------------------------------------------------------------
+    */
+
+    public function resetTableHeadersByKey(string $key): void
     {
         $this->refresh();
         $settings = $this->settings;
-        $tableSettings = $settings['tables'];
+        $headersSettings = $settings['table_headers'];
 
-        $defaultSettings = match ($key) {
-            self::SETTINGS_KEY_OF_MAD_EPP_TABLE => Manufacturer::getDefaultMADTableHeadersForUser($this),
-            self::SETTINGS_KEY_OF_MAD_IVP_TABLE => Product::getDefaultMADTableHeadersForUser($this),
-            self::SETTINGS_KEY_OF_MAD_VPS_TABLE => Process::getDefaultMADTableHeadersForUser($this),
-            self::SETTINGS_KEY_OF_MAD_KVPP_TABLE => ProductSearch::getDefaultMADTableHeadersForUser($this),
-            self::SETTINGS_KEY_OF_MAD_MEETINGS_TABLE => Meeting::getDefaultMADTableHeadersForUser($this),
-            self::SETTINGS_KEY_OF_MAD_DH_TABLE => Process::getDefaultMADTableHeadersForUser($this),
+        $defaultHeaders = match ($key) {
+            self::MAD_EPP_HEADERS_KEY => Manufacturer::getMADTableHeadersForUser($this),
 
             default => throw new InvalidArgumentException("Unknown key: $key"),
         };
 
-        $tableSettings = array_merge($tableSettings ?? [], [$key => $defaultSettings]);
+        $headersSettings = array_merge($headersSettings ?? [], [$key => $defaultHeaders]);
 
-        $settings['tables'] = $tableSettings;
+        $settings['table_headers'] = $headersSettings;
         $this->settings = $settings;
         $this->save();
     }
 
     /**
-     * Reset only specific table headers for all users.
-     *
-     * Can be used via artisan command line.
+     * Used via artisan command line.
      */
-    public function resetSpecificTableHeadersForAll(string $key): void
+    public static function resetTableHeadersByKeyForAllUsers(string $key): void
     {
         self::all()->each(function ($user) use ($key) {
-            $user->resetSpecificTableHeaders($key);
+            $user->resetTableHeadersByKey($key);
         });
     }
 
     /**
      * Collect all table headers for a given key, from user settings
      * and translate their titles.
-     *
-     * @param  string  $key
-     * @return \Illuminate\Support\Collection
      */
-    public function collectTableHeadersTranslatedFromSettings($key): Collection
+    public function collectTranslatedTableHeadersByKey($key): Collection
     {
-        $headers = collect($this->settings['tables'][$key])->sortBy('order');
+        $headers = collect($this->settings['table_headers'][$key])->sortBy('order');
 
         $headers->transform(function ($header) {
             $header['title'] = trans($header['title']);
@@ -471,17 +383,36 @@ class User extends Authenticatable
     }
 
     /**
-     * Filters out only the visible headers from all headers collection
+     * Filters out only the visible table headers from all headers collection
      *
      * @param  \Illuminate\Support\Collection  $columns
      * @return array
      */
-    public static function filterOnlyVisibleHeaders($headers): array
+    public static function filterOnlyVisibleTableHeaders($headers): array
     {
         return $headers->filter(fn($header) => $header['visible'] ?? false)
             ->sortBy('order')
             ->values()
             ->all();
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Settings: Department based table headers
+    |--------------------------------------------------------------------------
+    */
+
+    public function resetMADTableHeaders($settings)
+    {
+        $this->refresh();
+        $settings = $this->settings;
+        $headersSettings = $settings['table_headers'];
+
+        $headersSettings[self::MAD_EPP_HEADERS_KEY] = Manufacturer::getMADTableHeadersForUser($this);
+
+        $settings['table_headers'] = $headersSettings;
+        $this->settings = $settings;
+        $this->save();
     }
 
     /*
@@ -528,142 +459,16 @@ class User extends Authenticatable
 
     /*
     |--------------------------------------------------------------------------
-    | Filtering
-    |--------------------------------------------------------------------------
-    */
-
-    public static function filterQueryForRequest($query, $request)
-    {
-        // Apply base filters using helper
-        $query = QueryFilterHelper::applyFilters($query, $request, self::getFilterConfig());
-
-        return $query;
-    }
-
-    private static function getFilterConfig(): array
-    {
-        return [
-            'whereIn' => ['id', 'department_id'],
-            'like' => ['email'],
-            'dateRange' => ['created_at', 'updated_at'],
-            'belongsToMany' => ['permissions', 'roles', 'responsibleCountries'],
-        ];
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Create & Update
-    |--------------------------------------------------------------------------
-    */
-
-    /**
-     * Create new user by admin.
-     */
-    public static function createFromRequest($request)
-    {
-        $record = self::create($request->validated());
-
-        // Attach belongsToMany associations
-        $record->roles()->attach($request->input('roles'));
-        $record->permissions()->attach($request->input('permissions'));
-        $record->responsibleCountries()->attach($request->input('responsibleCountries'));
-
-        // Load all settings for the user
-        $record->resetAllSettingsToDefault();
-
-        // Upload user's photo
-        $record->uploadPhoto();
-    }
-
-    /**
-     * Update user by admin.
-     *
-     * Logouts user from all devices.
-     */
-    public function updateFromRequest($request)
-    {
-        // Update the user's profile
-        $this->update($request->validated());
-
-        // BelongsToMany relations
-        $this->roles()->sync($request->input('roles'));
-        $this->permissions()->sync($request->input('permissions'));
-        $this->responsibleCountries()->sync($request->input('responsibleCountries'));
-
-        // Reset settings
-        $this->resetAllSettingsToDefault();
-
-        // Manually logout user from all devices
-        if (Auth::user()->id != $this->id) {
-            $this->logoutFromAllSessions();
-        }
-
-        // Upload user's photo if provided
-        if ($request->hasFile('photo')) {
-            $this->uploadPhoto();
-        }
-    }
-
-    /**
-     * Update users password by admin.
-     *
-     * Laravel automatically logouts user from other devices, while user is updating his own password.
-     * Thats why manually logout user from all devices, if not own password is being updated.
-     */
-    public function updatePassword($request): void
-    {
-        // Update the user's password with the new hashed password
-        $this->update([
-            'password' => bcrypt($request->password),
-        ]);
-
-        // Manually logout from all devices
-        if (Auth::user()->id != $this->id) {
-            $this->logoutFromAllSessions();
-        }
-    }
-
-    /*
-    |--------------------------------------------------------------------------
     | Misc
     |--------------------------------------------------------------------------
     */
 
-    public static function getDeletedUserImageUrl(): string
+    public static function getImageUrlForDeletedUser(): string
     {
         return url('storage/' . self::PHOTO_PATH . '/' . self::DELETED_USER_PHOTO);
     }
 
-    public static function notifyUsersBasedOnPermission($notification, $permission)
-    {
-        self::withBasicRelationsToNotify()->each(function ($user) use ($notification, $permission) {
-            if (Gate::forUser($user)->allows($permission)) {
-                $user->notify($notification);
-            }
-        });
-    }
-
-    /**
-     * Logout user manually from all devices, by clearing sessions and remember_token.
-     *
-     * Laravel automatically logouts user from other devices, while user is updating his own password.
-     * Used only while updating users by admin!
-     */
-    private function logoutFromAllSessions(): void
-    {
-        // Delete all sessions for the current user
-        DB::table('sessions')->where('user_id', $this->id)->delete();
-
-        // Delete users remember_token.
-        $this->refresh();
-        $this->remember_token = null;
-        $this->save();
-    }
-
-    /**
-     * Upload users photo.
-     */
-    public function uploadPhoto()
+    public function uploadPhoto(): void
     {
         $this->uploadFile('photo', storage_path('app/public/' . self::PHOTO_PATH), $this->name);
         FileHelper::resizeImage($this->photo_path, self::PHOTO_WIDTH, self::PHOTO_HEIGHT);
@@ -677,9 +482,6 @@ class User extends Authenticatable
         $homepageRoutes = [
             // MAD
             'mad.manufacturers.index' => 'view-MAD-EPP',
-            'mad.product-searches.index' => 'view-MAD-KVPP',
-            'mad.products.index' => 'view-MAD-IVP',
-            'mad.processes.index' => 'view-MAD-VPS',
         ];
 
         foreach ($homepageRoutes as $routeName => $gate) {

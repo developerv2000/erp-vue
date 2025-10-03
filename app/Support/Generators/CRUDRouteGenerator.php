@@ -22,12 +22,12 @@ class CRUDRouteGenerator
         return [
             'index',
             'create',
+            'store',
             'show',
             'edit',
-            'trash',
-            'store',
             'update',
             'destroy',
+            'trash',
             'restore',
         ];
     }
@@ -48,11 +48,11 @@ class CRUDRouteGenerator
             case 'index':
                 Route::get('/', 'index')->name('index')->middleware($viewMiddleware);
                 break;
-            case 'trash':
-                Route::get('/trash', 'trash')->name('trash')->middleware($viewMiddleware);
-                break;
             case 'create':
                 Route::get('/create', 'create')->name('create')->middleware($editMiddleware);
+                break;
+            case 'store':
+                Route::post('/store', 'store')->name('store')->middleware($editMiddleware);
                 break;
             case 'show':
                 Route::get('/view/{record:' . $identifierAttribute . '}', 'show')->name('show')->middleware($viewMiddleware);
@@ -60,14 +60,14 @@ class CRUDRouteGenerator
             case 'edit':
                 Route::get('/edit/{record:' . $identifierAttribute . '}', 'edit')->name('edit')->middleware($editMiddleware);
                 break;
-            case 'store':
-                Route::post('/store', 'store')->name('store')->middleware($editMiddleware);
-                break;
             case 'update':
                 Route::post('/update/{record}', 'update')->name('update')->middleware($editMiddleware);
                 break;
             case 'destroy':
                 Route::post('/destroy', 'destroy')->name('destroy')->middleware();
+                break;
+            case 'trash':
+                Route::get('/trash', 'trash')->name('trash')->middleware($viewMiddleware);
                 break;
             case 'restore':
                 Route::post('/restore', 'restore')->name('restore')->middleware($editMiddleware);

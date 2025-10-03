@@ -2,14 +2,12 @@
 
 namespace App\Support\Contracts\Model;
 
-interface Breadcrumbable
+interface GeneratesBreadcrumbs
 {
     /**
      * Get the breadcrumb items for the model.
      *
-     * Used in route breadcrumbs like 'model.edit ,'comments.index', 'attachments.index' etc.
-     *
-     * @return array
+     * Used in routes like 'model.edit', 'comments.index', 'attachments.index' etc.
      */
     public function generateBreadcrumbs($department = null): array;
 }

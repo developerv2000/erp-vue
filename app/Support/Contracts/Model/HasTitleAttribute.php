@@ -2,15 +2,12 @@
 
 namespace App\Support\Contracts\Model;
 
-interface HasTitle
+interface HasTitleAttribute
 {
     /**
-     * Get the title attribute of the model.
-     *
      * Only models without 'title' attribute should implement this interface.
-     * Used in route breadcrumbs like 'comments.index', 'attachments.index' etc.
      *
-     * @return string
+     * Used in routes like 'model.edit', 'comments.index', 'attachments.index' etc.
      */
     public function getTitleAttribute(): string;
 }

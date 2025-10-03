@@ -26,69 +26,69 @@ const listItems = computed(() => [
         prependIcon: mdiViewList,
     },
 
-    {
-        title: t("pages.KVPP"),
-        routeName: "mad.product-searches.index",
-        routeParams: null,
-        activeOnRoutes: "mad.product-searches.*",
-        prependIcon: mdiCalendarSearch,
-    },
+    // {
+    //     title: t("pages.KVPP"),
+    //     routeName: "mad.product-searches.index",
+    //     routeParams: null,
+    //     activeOnRoutes: "mad.product-searches.*",
+    //     prependIcon: mdiCalendarSearch,
+    // },
 
-    {
-        title: t("pages.IVP"),
-        routeName: "mad.products.index",
-        routeParams: null,
-        activeOnRoutes: "mad.products.*",
-        prependIcon: mdiPill,
-    },
+    // {
+    //     title: t("pages.IVP"),
+    //     routeName: "mad.products.index",
+    //     routeParams: null,
+    //     activeOnRoutes: "mad.products.*",
+    //     prependIcon: mdiPill,
+    // },
 
-    {
-        title: t("pages.VPS"),
-        routeName: "mad.processes.index",
-        routeParams: null,
-        activeOnRoutes: "mad.processes.*",
-        prependIcon: mdiLayers,
-    },
+    // {
+    //     title: t("pages.VPS"),
+    //     routeName: "mad.processes.index",
+    //     routeParams: null,
+    //     activeOnRoutes: "mad.processes.*",
+    //     prependIcon: mdiLayers,
+    // },
 
-    {
-        title: t("pages.Meetings"),
-        routeName: "mad.meetings.index",
-        routeParams: null,
-        activeOnRoutes: "mad.meetings.*",
-        prependIcon: mdiAccountGroup,
-    },
+    // {
+    //     title: t("pages.Meetings"),
+    //     routeName: "mad.meetings.index",
+    //     routeParams: null,
+    //     activeOnRoutes: "mad.meetings.*",
+    //     prependIcon: mdiAccountGroup,
+    // },
 
-    {
-        title: t("pages.KPI"),
-        routeName: "mad.kpi.index",
-        routeParams: null,
-        activeOnRoutes: "mad.kpi.index",
-        prependIcon: mdiFinance,
-    },
+    // {
+    //     title: t("pages.KPI"),
+    //     routeName: "mad.kpi.index",
+    //     routeParams: null,
+    //     activeOnRoutes: "mad.kpi.index",
+    //     prependIcon: mdiFinance,
+    // },
 
-    {
-        title: t("pages.ASP"),
-        routeName: "mad.asp.index",
-        routeParams: null,
-        activeOnRoutes: "mad.asp.*",
-        prependIcon: mdiChartArc,
-    },
+    // {
+    //     title: t("pages.ASP"),
+    //     routeName: "mad.asp.index",
+    //     routeParams: null,
+    //     activeOnRoutes: "mad.asp.*",
+    //     prependIcon: mdiChartArc,
+    // },
 
-    {
-        title: t("pages.Decision hub"),
-        routeName: "mad.decision-hub.index",
-        routeParams: null,
-        activeOnRoutes: "mad.decision-hub.*",
-        prependIcon: mdiTextSearch,
-    },
+    // {
+    //     title: t("pages.Decision hub"),
+    //     routeName: "mad.decision-hub.index",
+    //     routeParams: null,
+    //     activeOnRoutes: "mad.decision-hub.*",
+    //     prependIcon: mdiTextSearch,
+    // },
 
-    {
-        title: t("pages.Misc"),
-        routeName: "misc-models.department-models",
-        routeParams: { department: "MAD" },
-        activeOnRoutes: 'misc-models.department-models.*',
-        prependIcon: mdiApps,
-    },
+    // {
+    //     title: t("pages.Misc"),
+    //     routeName: "misc-models.department-models",
+    //     routeParams: { department: "MAD" },
+    //     activeOnRoutes: 'misc-models.department-models.*',
+    //     prependIcon: mdiApps,
+    // },
 ]);
 </script>
 

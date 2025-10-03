@@ -11,6 +11,6 @@ Route::middleware('auth:sanctum')->name('api.')->group(function () {
     });
 
     Route::prefix('/manufacturers')->name('manufacturers.')->group(function () {
-        Route::get('/', fn(Request $request) => Manufacturer::queryFromRequest($request))->name('get');
+        Route::get('/', fn(Request $request) => Manufacturer::queryRecordsFromRequest($request))->name('get');
     });
 });

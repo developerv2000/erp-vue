@@ -14,7 +14,7 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         // Default password
-        $password = '12345';
+        $password = 'laravel';
 
         /*
         |--------------------------------------------------------------------------
@@ -26,7 +26,7 @@ class UserSeeder extends Seeder
         $globalAdminRoleID = Role::findByName(Role::GLOBAL_ADMINISTRATOR_NAME);
 
         $globalAdmins = [
-            ['name' => 'Nuridinov Bobur', 'email' => 'developer@mail.com', 'photo' => 'developer.jpg'],
+            ['name' => 'Mister developer', 'email' => 'developer@mail.com', 'photo' => 'developer.jpg'],
             ['name' => 'Global admin', 'email' => 'admin@mail.com', 'photo' => 'developer.jpg'],
         ];
 
@@ -144,8 +144,6 @@ class UserSeeder extends Seeder
         |--------------------------------------------------------------------------
         */
 
-        User::all()->each(function ($user) {
-            $user->resetAllSettingsToDefault();
-        });
+        User::resetSettingsOfAllUsers();
     }
 }

@@ -14,8 +14,8 @@ use App\Models\User;
 use App\Models\Zone;
 use App\Support\FilterDependencies\SimpleFilters\MAD\ManufacturersSimpleFilterDependencies;
 use App\Support\FilterDependencies\SmartFilters\MAD\ManufacturersSmartFilterDependencies;
+use App\Support\Helpers\ControllerHelper;
 use App\Support\Traits\Controller\DestroysModelRecords;
-use App\Support\Traits\Controller\PrependsTrashPageTableHeaders;
 use App\Support\Traits\Controller\RestoresModelRecords;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -24,41 +24,47 @@ class MADManufacturerController extends Controller
 {
     use DestroysModelRecords;
     use RestoresModelRecords;
-    use PrependsTrashPageTableHeaders;
 
-    // used in multiple destroy/restore traits
+    // Required for DestroysModelRecords and RestoresModelRecords traits
     public static $model = Manufacturer::class;
 
     public function index(Request $request)
     {
-        $getAllTableHeaders = fn() => $request->user()->collectTableHeadersTranslatedFromSettings(User::SETTINGS_KEY_OF_MAD_EPP_TABLE);
-        $getVisibleHeaders = fn() => User::filterOnlyVisibleHeaders($getAllTableHeaders());
+        $getAllTableHeaders = fn() => $request->user()->collectTranslatedTableHeadersByKey(User::MAD_EPP_HEADERS_KEY);
+        $getVisibleHeaders = fn() => User::filterOnlyVisibleTableHeaders($getAllTableHeaders());
 
         return Inertia::render('departments/MAD/pages/manufacturers/Index', [
-            'allTableHeaders' => $getAllTableHeaders, // Lazy load
-            'tableVisibleHeaders' => $getVisibleHeaders, // Lazy load
-            'simpleFilterDependencies' => fn() => ManufacturersSimpleFilterDependencies::getAllDependencies(), // Lazy load
+            // Refetched on smart filters change and filter form submit
             'smartFilterDependencies' => ManufacturersSmartFilterDependencies::getAllDependencies(),
+
+            // Lazy loads
+            'simpleFilterDependencies' => fn() => ManufacturersSimpleFilterDependencies::getAllDependencies(),
+            'allTableHeaders' => $getAllTableHeaders, // Refetched only on headers update
+            'tableVisibleHeaders' => $getVisibleHeaders, // Refetched only on headers update
         ]);
     }
 
     public function trash(Request $request)
     {
-        $getAllTableHeaders = fn() => $this->prependTrashPageTableHeaders(
-            $request->user()->collectTableHeadersTranslatedFromSettings(User::SETTINGS_KEY_OF_MAD_EPP_TABLE)
+        $getAllTableHeaders = fn() => ControllerHelper::prependTrashPageTableHeaders(
+            $request->user()->collectTranslatedTableHeadersByKey(User::MAD_EPP_HEADERS_KEY)
         );
 
         $getVisibleHeaders = fn() => User::filterOnlyVisibleHeaders($getAllTableHeaders());
 
         return Inertia::render('departments/MAD/pages/manufacturers/Trash', [
-            'tableVisibleHeaders' => $getVisibleHeaders, // Lazy load
-            'simpleFilterDependencies' => fn() => ManufacturersSimpleFilterDependencies::getAllDependencies(), // Lazy load
+            // Refetched on smart filters change and filter form submit
             'smartFilterDependencies' => ManufacturersSmartFilterDependencies::getAllDependencies(),
+
+            // Lazy loads, never refetched again
+            'simpleFilterDependencies' => fn() => ManufacturersSimpleFilterDependencies::getAllDependencies(),
+            'tableVisibleHeaders' => $getVisibleHeaders,
         ]);
     }
 
     public function create()
     {
+        // No lazy loads required, because AJAX request is used on store
         return Inertia::render('departments/MAD/pages/manufacturers/Create', [
             'categories' => ManufacturerCategory::orderByName()->get(),
             'productClasses' => ProductClass::orderByName()->get(),
@@ -72,11 +78,11 @@ class MADManufacturerController extends Controller
     }
 
     /**
-     * Ajax request
+     * AJAX request
      */
     public function store(ManufacturerStoreRequest $request)
     {
-        Manufacturer::storeFromRequest($request);
+        Manufacturer::storeByMADFromRequest($request);
 
         return true;
     }
@@ -91,12 +97,14 @@ class MADManufacturerController extends Controller
             ->findOrFail($record);
 
         $fetchedRecord->appendBasicAttributes();
-        $fetchedRecord->append('title'); // used on generating breadcrumbs
+        $fetchedRecord->append('title'); // Used on generating breadcrumbs
 
         return Inertia::render('departments/MAD/pages/manufacturers/Edit', [
+            // Refetched after record update
             'record' => $fetchedRecord,
             'breadcrumbs' => $fetchedRecord->generateBreadcrumbs('mad'),
 
+            // Lazy loads, never refetched again
             'categories' => fn() => ManufacturerCategory::orderByName()->get(),
             'productClasses' => fn() => ProductClass::orderByName()->get(),
             'analystUsers' => fn() => User::getMADAnalystsMinified(),
@@ -109,17 +117,15 @@ class MADManufacturerController extends Controller
     }
 
     /**
-     * Route model binding is not used, because trashed records can also be edited
+     * AJAX request
      *
-     * Ajax request
+     * Route model binding is not used, because trashed records can also be edited
      */
     public function update(ManufacturerUpdateRequest $request, $record)
     {
-        // Find and update record
         $fetchedRecord = Manufacturer::withTrashed()->findOrFail($record);
-        $fetchedRecord->updateFromRequest($request);
+        $fetchedRecord->updateByMADFromRequest($request);
 
-        // Return success
         return true;
     }
 }

@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthenticationController extends Controller
 {
-    public function loginShow(Request $request)
+    public function loginShow()
     {
         return inertia('global/pages/auth/Login');
     }

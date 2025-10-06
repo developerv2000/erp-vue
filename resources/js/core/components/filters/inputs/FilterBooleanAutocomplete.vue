@@ -1,10 +1,7 @@
 <script setup>
-import FilterAutocomplete from "./FilterAutocomplete.vue";
 import { useAttrs, computed } from "vue";
 import { useI18n } from "vue-i18n";
-
-const { t } = useI18n();
-const attrs = useAttrs();
+import FilterAutocomplete from "./FilterAutocomplete.vue";
 
 const props = defineProps({
     trueLabel: {
@@ -16,6 +13,9 @@ const props = defineProps({
         default: undefined,
     },
 });
+
+const { t } = useI18n();
+const attrs = useAttrs();
 
 // fallback to translations if prop is not passed
 const trueLabel = computed(() => props.trueLabel ?? t("Yes"));

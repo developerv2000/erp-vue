@@ -1,23 +1,23 @@
 <script setup>
 import GuestLayout from "@/core/layouts/GuestLayout.vue";
-import DefaultTextField from "@/core/components/form/inputs/DefaultTextField.vue";
-import { mdiEye, mdiEyeOff } from "@mdi/js";
 import { ref } from "vue";
 import { Head } from "@inertiajs/vue3";
-
+import { router } from "@inertiajs/vue3";
 import { Form, useForm, useField } from "vee-validate";
 import * as yup from "yup";
-import { router } from "@inertiajs/vue3";
+
+import DefaultTextField from "@/core/components/form/inputs/DefaultTextField.vue";
+import { mdiEye, mdiEyeOff } from "@mdi/js";
 
 const showPassword = ref(false);
 
-// Define Yup schema
+// Yup schema
 const schema = yup.object({
     email: yup.string().required().email(),
     password: yup.string().required(),
 });
 
-// Initialize VeeValidate form context
+// VeeValidate form
 const { handleSubmit, setErrors, resetForm } = useForm({
     validationSchema: schema,
 });
@@ -26,10 +26,9 @@ const { handleSubmit, setErrors, resetForm } = useForm({
 const { value: email, errorMessage: emailError } = useField("email");
 const { value: password, errorMessage: passwordError } = useField("password");
 
-// Inertia login request
-const login = handleSubmit((values) => {
+// Submit handler
+const submit = handleSubmit((values) => {
     router.post("/login", values, {
-        preserveScroll: true,
         onStart: () => {
             // VeeValidate will clear client-side errors on input change.
         },
@@ -50,11 +49,11 @@ const login = handleSubmit((values) => {
     <GuestLayout>
         <Head title="Login" />
 
-        <v-sheet width="460" elevation="1" class="px-8 pt-8 pb-10">
+        <v-sheet class="px-8 pt-8 pb-10" width="460" elevation="1">
             <v-img
+                class="mx-auto mb-2"
                 :width="180"
                 src="/images/main/logo-dark.svg"
-                class="mx-auto mb-2"
             />
 
             <v-card
@@ -63,29 +62,31 @@ const login = handleSubmit((values) => {
                 title="Welcome"
                 subtitle="Please, sign in to your account"
             >
-                <Form @submit="login" class="d-flex flex-column ga-1 mt-5">
+                <Form @submit="submit" class="d-flex flex-column ga-1 mt-5">
                     <DefaultTextField
+                        color="lime-accent-4"
+                        autocomplete="username"
                         label="Email"
                         name="email"
                         type="email"
-                        required
                         v-model="email"
                         :error-messages="emailError"
-                        color="lime-accent-4"
                         :hide-details="false"
+                        required
                     />
 
                     <DefaultTextField
+                        color="lime-accent-4"
+                        autocomplete="current-password"
                         label="Password"
                         name="password"
                         :type="showPassword ? 'text' : 'password'"
-                        required
                         v-model="password"
                         :error-messages="passwordError"
-                        color="lime-accent-4"
                         :hide-details="false"
                         :append-inner-icon="showPassword ? mdiEyeOff : mdiEye"
                         @click:append-inner="showPassword = !showPassword"
+                        required
                     />
 
                     <v-btn class="mt-2" color="lime-accent-4" type="submit">

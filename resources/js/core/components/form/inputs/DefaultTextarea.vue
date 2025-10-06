@@ -1,6 +1,6 @@
 <script setup>
-import WrappedLabelGroup from "../groups/WrappedLabelGroup.vue";
 import { useAttrs } from "vue";
+import WrappedLabelGroup from "../groups/WrappedLabelGroup.vue";
 
 const props = defineProps({
     label: String,
@@ -20,11 +20,11 @@ const inputAttrs = useAttrs();
 <template>
     <WrappedLabelGroup v-bind="groupAttrs" :label="label" :required="required">
         <v-textarea
-            variant="outlined"
             color="orange"
+            variant="outlined"
+            v-bind="inputAttrs"
             auto-grow
             clearable
-            v-bind="inputAttrs"
         />
     </WrappedLabelGroup>
 </template>

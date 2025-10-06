@@ -5,7 +5,7 @@ const props = defineProps({
 </script>
 
 <template>
-    <a :href="link" class="td-link text-primary text-decoration-none">
+    <a class="td-link text-primary text-decoration-none" :href="link">
         <slot />
     </a>
 </template>

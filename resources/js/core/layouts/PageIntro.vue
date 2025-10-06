@@ -1,6 +1,3 @@
-<script setup>
-</script>
-
 <template>
     <div class="d-flex justify-space-between align-center mb-8">
         <div>

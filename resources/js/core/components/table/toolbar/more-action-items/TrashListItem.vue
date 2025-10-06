@@ -1,10 +1,10 @@
 <script setup>
-import { mdiDelete } from "@mdi/js";
-import InertiaLinkedListItem from "@/core/components/inertia/InertiaLinkedListItem.vue";
 import { useI18n } from "vue-i18n";
+import InertiaLinkedListItem from "@/core/components/inertia/InertiaLinkedListItem.vue";
+import { mdiDelete } from "@mdi/js";
 
 defineProps({
-    routeName: String
+    routeName: String,
 });
 
 const { t } = useI18n();

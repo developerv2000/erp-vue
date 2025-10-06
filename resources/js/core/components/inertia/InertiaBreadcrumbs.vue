@@ -15,13 +15,13 @@ const navigate = (link) => {
 </script>
 
 <template>
-    <v-breadcrumbs density="compact" class="px-0 ml-n1">
+    <v-breadcrumbs class="px-0 ml-n1" density="compact">
         <v-breadcrumbs-item
             v-for="(crumb, index) in breadcrumbs"
             :key="index"
             :disabled="!crumb.link || index === breadcrumbs.length - 1"
         >
-            <span @click="() => navigate(crumb.link)" class="cursor-pointer">
+            <span class="cursor-pointer" @click="() => navigate(crumb.link)">
                 {{ crumb.title }}
             </span>
 

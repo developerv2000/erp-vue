@@ -1,9 +1,9 @@
 <script setup>
+import { Head } from "@inertiajs/vue3";
+import { usePage } from "@inertiajs/vue3";
+import { useUserSettingsStore } from "@/core/stores/userSettings";
 import Leftbar from "./Leftbar.vue";
 import Header from "./Header.vue";
-import { useUserSettingsStore } from "@/core/stores/userSettings";
-import { usePage } from "@inertiajs/vue3";
-import { Head } from "@inertiajs/vue3";
 import SnackbarQueue from "../components/misc/SnackbarQueue.vue";
 
 defineProps({

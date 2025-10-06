@@ -1,7 +1,7 @@
 <script setup>
+import { useI18n } from "vue-i18n";
 import FilterApplyButton from "@/core/components/filters/buttons/FilterApplyButton.vue";
 import FilterResetButton from "@/core/components/filters/buttons/FilterResetButton.vue";
-import { useI18n } from "vue-i18n";
 
 const { store } = defineProps({
     store: Object,

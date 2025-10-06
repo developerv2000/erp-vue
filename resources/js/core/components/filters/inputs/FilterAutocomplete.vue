@@ -30,22 +30,22 @@ const inputClass = computed(() => ({
 
 <template>
     <DefaultAutocomplete
-        v-model="modelValue"
         :class="inputClass"
+        v-model="modelValue"
         :list-props="{ class: 'filter-autocomplete__list', density: 'compact' }"
         v-bind="attrs"
     />
 </template>
 
+<style>
+.filter-autocomplete__list .v-list-item--density-compact {
+    min-height: 36px;
+}
+</style>
+
 <style scoped>
 ::v-deep(.highlight-autocomplete .v-field__outline) {
     color: #ff9800;
     --v-field-border-width: 2px;
-}
-</style>
-
-<style>
-.filter-autocomplete__list .v-list-item--density-compact {
-    min-height: 36px;
 }
 </style>

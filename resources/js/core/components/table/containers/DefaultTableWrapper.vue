@@ -12,8 +12,8 @@ function handleFullscreenChange() {
 
 <template>
     <div
-        @fullscreenchange="handleFullscreenChange"
         class="default-table-wrapper d-flex ga-6 align-start"
+        @fullscreenchange="handleFullscreenChange"
     >
         <slot />
     </div>

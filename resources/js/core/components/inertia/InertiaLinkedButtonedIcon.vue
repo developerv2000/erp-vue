@@ -2,6 +2,7 @@
 import { router } from "@inertiajs/vue3";
 
 const props = defineProps({
+    icon: String,
     link: {
         type: String,
         required: true,
@@ -22,8 +23,8 @@ const handleMouseDown = (event) => {
 
 <template>
     <v-btn
+        :icon="props.icon"
         @click.prevent.stop="navigate"
         @mousedown="handleMouseDown"
-    >
-    </v-btn>
+    />
 </template>

@@ -8,7 +8,7 @@ const messages = useMessagesStore();
 <template>
     <v-snackbar-queue v-model="messages.queue" :timeout="4000" closable>
         <template #actions="{ props }">
-            <v-btn icon variant="text" @click="props.onClick">
+            <v-btn variant="text" @click="props.onClick" icon>
                 <v-icon :icon="mdiClose" />
             </v-btn>
         </template>

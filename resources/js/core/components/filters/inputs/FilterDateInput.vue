@@ -42,11 +42,11 @@ const inputClass = computed(() => ({
 
 <template>
     <DefaultDateInput
+        :class="inputClass"
         v-model="modelValue"
         :prepend-inner-icon="null"
         placeholder=" "
         :clearable="clearable"
-        :class="inputClass"
         v-bind="attrs"
     />
 </template>

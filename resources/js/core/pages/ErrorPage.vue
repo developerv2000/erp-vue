@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from "vue";
 import { Link } from "@inertiajs/vue3";
+
 import {
     mdiUpdate,
     mdiAlertCircle,
@@ -57,16 +58,16 @@ const icon = computed(() => {
                 <v-card class="elevation-10 pa-6 rounded-xl" max-width="500">
                     <div class="text-center">
                         <v-icon
-                            :icon="icon"
-                            size="64"
-                            color="primary"
                             class="mb-4"
+                            color="primary"
+                            size="64"
+                            :icon="icon"
                         />
 
                         <h1 class="text-h5 font-weight-bold mb-2">
                             {{ title }}
                         </h1>
-                        
+
                         <p class="text-body-1 mb-6">{{ description }}</p>
 
                         <Link href="/">

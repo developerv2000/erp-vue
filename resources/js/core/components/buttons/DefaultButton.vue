@@ -6,9 +6,9 @@ const attrs = useAttrs();
 
 <template>
     <v-btn
-        :height="attrs.size ? '' : '40'"
-        variant="flat"
         color="primary"
+        variant="flat"
+        :height="attrs.size ? '' : '40'"
         rounded="lg"
         v-bind="attrs"
     >

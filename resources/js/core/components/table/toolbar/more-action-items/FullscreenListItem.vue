@@ -1,12 +1,12 @@
 <script setup>
-import { mdiFullscreen } from '@mdi/js';
-import { enterFullscreen } from '@/core/scripts/functions';
-import { useI18n } from 'vue-i18n';
+import { useI18n } from "vue-i18n";
+import { enterFullscreen } from "@/core/scripts/functions";
+import { mdiFullscreen } from "@mdi/js";
 
 const { t } = useI18n();
 
 const action = () => {
-    const tableWrapper = document.querySelector('.default-table-wrapper');
+    const tableWrapper = document.querySelector(".default-table-wrapper");
     enterFullscreen(tableWrapper);
 };
 </script>

@@ -30,22 +30,22 @@ const inputClass = computed(() => ({
 
 <template>
     <DefaultCombobox
-        v-model="modelValue"
         :class="inputClass"
+        v-model="modelValue"
         :list-props="{ class: 'filter-combobox__list', density: 'compact' }"
         v-bind="attrs"
     />
 </template>
 
+<style>
+.filter-combobox__list .v-list-item--density-compact {
+    min-height: 36px;
+}
+</style>
+
 <style scoped>
 ::v-deep(.highlight-combobox .v-field__outline) {
     color: #ff9800;
     --v-field-border-width: 2px;
-}
-</style>
-
-<style>
-.filter-combobox__list .v-list-item--density-compact {
-    min-height: 36px;
 }
 </style>

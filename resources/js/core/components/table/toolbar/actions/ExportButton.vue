@@ -1,10 +1,10 @@
 <script setup>
 import { computed, ref } from "vue";
-import { mdiDownload, mdiClose } from "@mdi/js";
-import DefaultButton from "../../../buttons/DefaultButton.vue";
+import { useI18n } from "vue-i18n";
 import axios from "axios";
 import { getCSRFToken } from "@/core/scripts/functions";
-import { useI18n } from "vue-i18n";
+import DefaultButton from "../../../buttons/DefaultButton.vue";
+import { mdiDownload, mdiClose } from "@mdi/js";
 
 const props = defineProps({
     model: String,
@@ -60,16 +60,16 @@ async function startDownload(filename) {
             document.body.appendChild(link);
             link.click();
             link.remove();
-        })
+        });
 }
 </script>
 
 <template>
     <DefaultButton
-        :prepend-icon="mdiDownload"
         color="warning"
-        size="default"
         variant="tonal"
+        size="default"
+        :prepend-icon="mdiDownload"
         :loading="generatingFile"
         @click="generateFile"
     >
@@ -78,14 +78,14 @@ async function startDownload(filename) {
 
     <v-snackbar
         class="text-body-2"
-        v-model="snackbar"
-        :timeout="snackbarTimeout"
         :color="snackbarColor"
         density="compact"
+        v-model="snackbar"
         location="top right"
+        :timeout="snackbarTimeout"
     >
         <template v-if="downloadStarted" #actions>
-            <v-btn icon variant="text" @click="snackbar = false">
+            <v-btn variant="text" @click="snackbar = false" icon>
                 <v-icon :icon="mdiClose" />
             </v-btn>
         </template>

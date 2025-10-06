@@ -1,7 +1,7 @@
 <script setup>
+import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 import InertiaLinkedListItem from "@/core/components/inertia/InertiaLinkedListItem.vue";
-import { computed } from "vue";
 
 import {
     mdiViewList,
@@ -100,8 +100,8 @@ const listItems = computed(() => [
             v-for="(item, index) in listItems"
             :key="index"
             :title="item.title"
-            :link="route(item.routeName, item.routeParams)"
             :prepend-icon="item.prependIcon"
+            :link="route(item.routeName, item.routeParams)"
             :active="route().current(item.activeOnRoutes, item.routeParams)"
         />
     </v-list>

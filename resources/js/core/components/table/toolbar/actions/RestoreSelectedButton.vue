@@ -1,10 +1,10 @@
 <script setup>
 import { ref } from "vue";
-import { mdiRestore } from "@mdi/js";
-import DefaultButton from "../../../buttons/DefaultButton.vue";
+import { useI18n } from "vue-i18n";
 import axios from "axios";
 import { useMessagesStore } from "@/core/stores/messages";
-import { useI18n } from "vue-i18n";
+import DefaultButton from "../../../buttons/DefaultButton.vue";
+import { mdiRestore } from "@mdi/js";
 
 const props = defineProps({
     restoreLink: String,
@@ -32,11 +32,11 @@ function submit() {
     <v-dialog v-model="showModal" max-width="400">
         <template v-slot:activator="{ props: activatorProps }">
             <DefaultButton
-                :prepend-icon="mdiRestore"
                 color="success"
                 size="default"
-                v-bind="activatorProps"
                 variant="tonal"
+                v-bind="activatorProps"
+                :prepend-icon="mdiRestore"
                 :disabled="store.selected.length == 0"
             >
                 {{ t("actions.Restore") }}
@@ -46,7 +46,9 @@ function submit() {
         <template v-slot:default="{ isActive }">
             <v-card>
                 <v-card-item class="pa-4" :prepend-icon="mdiRestore">
-                    <v-card-title>{{ t("modals.Restore selected") }}</v-card-title>
+                    <v-card-title>{{
+                        t("modals.Restore selected")
+                    }}</v-card-title>
                 </v-card-item>
 
                 <v-divider />

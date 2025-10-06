@@ -1,6 +1,6 @@
 <script setup>
-import TdInertiaLink from './TdInertiaLink.vue';
-import { useI18n } from 'vue-i18n';
+import { useI18n } from "vue-i18n";
+import TdInertiaLink from "./TdInertiaLink.vue";
 
 defineProps({
     record: Object,

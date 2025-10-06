@@ -1,7 +1,7 @@
 <script setup>
-import LeftbarNav from "./partials/leftbar/LeftbarNav.vue";
-import { useUserSettingsStore } from "@/core/stores/userSettings";
 import useAuth from "@/core/composables/useAuth";
+import { useUserSettingsStore } from "@/core/stores/userSettings";
+import LeftbarNav from "./partials/leftbar/LeftbarNav.vue";
 
 const { user } = useAuth();
 const userSettings = useUserSettingsStore();
@@ -15,9 +15,9 @@ const userSettings = useUserSettingsStore();
     >
         <v-list>
             <v-list-item
-                :prepend-avatar="user.photo_url"
                 :title="user.name"
                 :subtitle="user.email"
+                :prepend-avatar="user.photo_url"
             >
             </v-list-item>
         </v-list>

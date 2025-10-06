@@ -1,8 +1,8 @@
 ```javascript
 <script setup>
-import StandardLabeledGroup from "../groups/StandardLabeledGroup.vue";
-import { extensions, imageExtension } from "@/core/boot/vuetify-tiptap";
 import { useAttrs, computed } from "vue";
+import { extensions, imageExtension } from "@/core/boot/vuetify-tiptap";
+import StandardLabeledGroup from "../groups/StandardLabeledGroup.vue";
 
 // Props
 const props = defineProps({
@@ -38,9 +38,9 @@ const combinedExtensions = computed(() => [
     >
         <vuetify-tiptap
             max-width="96%"
-            rounded
             v-bind="inputAttrs"
             :extensions="combinedExtensions"
+            rounded
         />
     </StandardLabeledGroup>
 </template>

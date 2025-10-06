@@ -1,7 +1,8 @@
 <script setup>
 import { computed } from "vue";
-import { mdiWeatherNight, mdiWeatherSunny } from "@mdi/js";
 import { useUserSettingsStore } from "@/core/stores/userSettings";
+import axios from "axios";
+import { mdiWeatherNight, mdiWeatherSunny } from "@mdi/js";
 
 const userSettings = useUserSettingsStore();
 
@@ -16,10 +17,11 @@ function toggle() {
         key: "theme",
         value: userSettings.theme,
     });
+
     axios.patch(url);
 }
 </script>
 
 <template>
-    <v-btn :icon="icon" @click="toggle" variant="text" />
+    <v-btn variant="text" :icon="icon" @click="toggle" />
 </template>

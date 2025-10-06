@@ -1,11 +1,11 @@
 <script setup>
 import { ref } from "vue";
 import { usePage, router } from "@inertiajs/vue3";
-import { mdiCog, mdiDrag, mdiSort } from "@mdi/js";
 import draggable from "vuedraggable";
-import DefaultButton from "@/core/components/buttons/DefaultButton.vue";
 import axios from "axios";
 import { useI18n } from "vue-i18n";
+import DefaultButton from "@/core/components/buttons/DefaultButton.vue";
+import { mdiCog, mdiDrag, mdiSort } from "@mdi/js";
 
 const props = defineProps({
     settingsKey: String,
@@ -29,9 +29,12 @@ function updateHeaders() {
 
     // Update table headers
     axios
-        .patch(route("settings.table-headers.update", { key: props.settingsKey }), {
-            headers: headers.value,
-        })
+        .patch(
+            route("settings.table-headers.update", { key: props.settingsKey }),
+            {
+                headers: headers.value,
+            }
+        )
         .then(() => {
             loading.value = false;
             showModal.value = false;
@@ -49,7 +52,9 @@ function resetHeaders() {
     loading.value = true;
 
     axios
-        .patch(route("settings.table-headers.reset", { key: props.settingsKey }))
+        .patch(
+            route("settings.table-headers.reset", { key: props.settingsKey })
+        )
         .then(() => {
             loading.value = false;
             showModal.value = false;
@@ -65,10 +70,7 @@ function resetHeaders() {
 </script>
 
 <template>
-    <!-- Settings Button -->
-
-    <!-- Modal -->
-    <v-dialog v-model="showModal" max-width="650px">
+    <v-dialog max-width="650px" v-model="showModal">
         <template v-slot:activator="{ props: activatorProps }">
             <v-list-item
                 :title="t('actions.Columns')"
@@ -81,7 +83,9 @@ function resetHeaders() {
         <template v-slot:default="{ isActive }">
             <v-card>
                 <v-card-item class="pa-4" :prepend-icon="mdiCog">
-                    <v-card-title>{{ t("modals.Customize Columns") }}</v-card-title>
+                    <v-card-title>{{
+                        t("modals.Customize Columns")
+                    }}</v-card-title>
                 </v-card-item>
 
                 <v-divider />
@@ -90,9 +94,9 @@ function resetHeaders() {
                     <v-alert
                         class="mb-1"
                         color="warning"
+                        variant="tonal"
                         border="start"
                         :icon="mdiSort"
-                        variant="tonal"
                     >
                         {{ t("modals.Drag and drop columns") }}
                     </v-alert>
@@ -129,10 +133,10 @@ function resetHeaders() {
                                 <!-- Width input -->
                                 <v-col cols="4">
                                     <v-number-input
-                                        v-model="element.width"
-                                        :min="20"
                                         density="compact"
                                         control-variant="split"
+                                        v-model="element.width"
+                                        :min="20"
                                         hide-details
                                     />
                                 </v-col>

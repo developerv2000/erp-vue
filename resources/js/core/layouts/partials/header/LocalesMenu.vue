@@ -1,6 +1,7 @@
 <script setup>
-import { mdiTranslate } from "@mdi/js";
 import { useUserSettingsStore } from "@/core/stores/userSettings";
+import axios from "axios";
+import { mdiTranslate } from "@mdi/js";
 
 const userSettings = useUserSettingsStore();
 
@@ -29,9 +30,9 @@ function updateLocale(newLocale) {
 
         <v-list
             class="locales-list"
+            color="primary"
             density="compact"
             variant="text"
-            color="primary"
             v-model:selected="userSettings.locale"
             @update:selected="updateLocale"
             mandatory
@@ -39,13 +40,13 @@ function updateLocale(newLocale) {
         >
             <v-list-item
                 v-for="(item, index) in listItems"
+                :key="index"
                 :title="item.title"
                 :value="item.value"
-                :key="index"
                 :active="userSettings.locale == item.value"
             >
                 <template #prepend>
-                    <v-img width="auto" :src="item.image"></v-img>
+                    <v-img width="auto" :src="item.image" />
                 </template>
             </v-list-item>
         </v-list>

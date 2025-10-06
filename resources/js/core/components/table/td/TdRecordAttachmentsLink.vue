@@ -1,7 +1,7 @@
 <script setup>
+import { useI18n } from "vue-i18n";
 import InertiaLinkedButton from "../../inertia/InertiaLinkedButton.vue";
 import { mdiArrowRight } from "@mdi/js";
-import { useI18n } from "vue-i18n";
 
 defineProps({
     record: Object,
@@ -12,6 +12,10 @@ const { t } = useI18n();
 
 <template>
     <InertiaLinkedButton
+        class="mb-1 font-weight-regular"
+        color="grey-lighten-2"
+        variant="flat"
+        size="small"
         :append-icon="mdiArrowRight"
         :link="
             route('attachments.view-model-attachments', {
@@ -19,13 +23,9 @@ const { t } = useI18n();
                 attachable_id: record.id,
             })
         "
-        size="small"
-        class="mb-1 font-weight-regular"
-        color="grey-lighten-2"
-        variant="flat"
     >
         {{ record.attachments_count }}
         <span class="text-lowercase">{{ t("Attachments") }}</span>
     </InertiaLinkedButton>
-    <br>
+    <br />
 </template>

@@ -1,7 +1,7 @@
 <script setup>
+import { useI18n } from "vue-i18n";
 import FilterDateInput from "./FilterDateInput.vue";
 import FilterCombobox from "./FilterCombobox.vue";
-import { useI18n } from "vue-i18n";
 
 defineProps({
     store: Object,
@@ -35,9 +35,9 @@ const { t } = useI18n();
         v-if="!exclude.includes('id')"
         label="ID"
         name="id"
+        type="number"
         v-model="store.filters.id"
         :items="[]"
-        type="number"
         :hide-spin-buttons="true"
         multiple
     />

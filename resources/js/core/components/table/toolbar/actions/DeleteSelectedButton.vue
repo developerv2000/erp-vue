@@ -1,10 +1,10 @@
 <script setup>
 import { ref } from "vue";
-import { mdiDelete } from "@mdi/js";
-import DefaultButton from "../../../buttons/DefaultButton.vue";
+import { useI18n } from "vue-i18n";
 import axios from "axios";
 import { useMessagesStore } from "@/core/stores/messages";
-import { useI18n } from "vue-i18n";
+import DefaultButton from "../../../buttons/DefaultButton.vue";
+import { mdiDelete } from "@mdi/js";
 
 const props = defineProps({
     deleteLink: String,
@@ -37,11 +37,11 @@ function submit() {
     <v-dialog v-model="showModal" max-width="420">
         <template v-slot:activator="{ props: activatorProps }">
             <DefaultButton
-                :prepend-icon="mdiDelete"
                 color="error"
-                size="default"
-                v-bind="activatorProps"
                 variant="tonal"
+                size="default"
+                :prepend-icon="mdiDelete"
+                v-bind="activatorProps"
                 :disabled="store.selected.length == 0"
             >
                 {{ t("actions.Delete") }}

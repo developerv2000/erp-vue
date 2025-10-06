@@ -22,8 +22,8 @@ const handleMouseDown = (event) => {
 
 <template>
     <a
-        :href="props.link"
         class="cursor-pointer"
+        :href="props.link"
         @click.prevent.stop="navigate"
         @mousedown="handleMouseDown"
     >

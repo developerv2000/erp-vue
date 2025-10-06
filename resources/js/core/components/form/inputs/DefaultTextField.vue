@@ -1,6 +1,6 @@
 <script setup>
-import WrappedLabelGroup from "../groups/WrappedLabelGroup.vue";
 import { useAttrs } from "vue";
+import WrappedLabelGroup from "../groups/WrappedLabelGroup.vue";
 
 const props = defineProps({
     label: String,
@@ -24,8 +24,8 @@ const inputAttrs = useAttrs();
             variant="outlined"
             density="compact"
             hide-details="auto"
-            clearable
             v-bind="inputAttrs"
+            clearable
         />
     </WrappedLabelGroup>
 </template>

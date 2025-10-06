@@ -4,8 +4,8 @@ import MoreActionsMenu from "./actions/MoreActionsMenu.vue";
 
 <template>
     <v-toolbar
-        color="surface"
         class="default-toolbar border-b-sm pr-5"
+        color="surface"
         height="56"
     >
         <v-toolbar-title>

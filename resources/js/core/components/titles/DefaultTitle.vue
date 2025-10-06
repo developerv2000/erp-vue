@@ -7,7 +7,7 @@ defineProps({
     marginBottom: {
         type: [String, Number],
         default: "4",
-    }
+    },
 });
 </script>
 

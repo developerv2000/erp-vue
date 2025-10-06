@@ -7,7 +7,7 @@ const props = defineProps({
 </script>
 
 <template>
-    <InertiaLink :link="link" class="td-inertia-link text-primary">
+    <InertiaLink class="td-inertia-link text-primary" :link="link">
         <slot />
     </InertiaLink>
 </template>

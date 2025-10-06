@@ -1,11 +1,11 @@
 <script setup>
-import MadNav from './partials/MadNav.vue';
+import MadNav from "./partials/MadNav.vue";
 </script>
 
 <template>
-  <div class="leftbar-nav">
-    <MadNav />
-  </div>
+    <div class="leftbar-nav">
+        <MadNav />
+    </div>
 </template>
 
 <style scoped>

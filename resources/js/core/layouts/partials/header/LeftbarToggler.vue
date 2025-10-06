@@ -1,6 +1,7 @@
 <script setup>
-import { mdiMenu  } from '@mdi/js';
-import { useUserSettingsStore  } from '@/core/stores/userSettings';
+import { useUserSettingsStore } from "@/core/stores/userSettings";
+import axios from "axios";
+import { mdiMenu } from "@mdi/js";
 
 const userSettings = useUserSettingsStore();
 
@@ -11,16 +12,17 @@ function toggle() {
         key: "is_leftbar_collapsed",
         value: userSettings.isLeftbarCollapsed,
     });
+
     axios.patch(url);
 }
 </script>
 
 <template>
     <v-btn
+        class="mr-4"
+        color="primary"
+        variant="text"
         :icon="mdiMenu"
         @click.stop="toggle"
-        variant="text"
-        color="primary"
-        class="mr-4"
     />
 </template>

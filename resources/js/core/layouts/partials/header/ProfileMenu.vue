@@ -1,8 +1,8 @@
 <script setup>
-import { useI18n } from "vue-i18n";
 import { router } from "@inertiajs/vue3";
-import { mdiAccount, mdiAccountEdit, mdiLogout } from "@mdi/js";
+import { useI18n } from "vue-i18n";
 import InertiaLinkedListItem from "@/core/components/inertia/InertiaLinkedListItem.vue";
+import { mdiAccount, mdiAccountEdit, mdiLogout } from "@mdi/js";
 
 const { t } = useI18n();
 
@@ -19,9 +19,9 @@ const logout = () => {
 
         <v-list
             class="profile-list"
+            color="primary"
             density="compact"
             variant="text"
-            color="primary"
             nav
         >
             <InertiaLinkedListItem

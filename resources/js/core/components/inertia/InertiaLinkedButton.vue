@@ -25,9 +25,9 @@ const handleMouseDown = (event) => {
 
 <template>
     <v-btn
-        :height="attrs.size ? '' : '40'"
-        variant="flat"
         color="primary"
+        variant="flat"
+        :height="attrs.size ? '' : '40'"
         rounded="lg"
         @click.prevent.stop="navigate"
         @mousedown="handleMouseDown"

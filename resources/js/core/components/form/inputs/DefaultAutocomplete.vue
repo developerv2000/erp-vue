@@ -1,6 +1,6 @@
 <script setup>
-import StandardLabeledGroup from "../groups/StandardLabeledGroup.vue";
 import { useAttrs, computed } from "vue";
+import StandardLabeledGroup from "../groups/StandardLabeledGroup.vue";
 
 const props = defineProps({
     label: String,
@@ -23,7 +23,11 @@ const isMultiple = computed(
 </script>
 
 <template>
-    <StandardLabeledGroup v-bind="groupAttrs" :label="label" :required="required">
+    <StandardLabeledGroup
+        :label="label"
+        v-bind="groupAttrs"
+        :required="required"
+    >
         <v-autocomplete
             color="orange"
             variant="outlined"

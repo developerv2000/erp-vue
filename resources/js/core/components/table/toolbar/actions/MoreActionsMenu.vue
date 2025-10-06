@@ -1,7 +1,7 @@
 <script setup>
-import { mdiChevronDown } from "@mdi/js";
-import DefaultButton from "../../../buttons/DefaultButton.vue";
 import { useI18n } from "vue-i18n";
+import DefaultButton from "../../../buttons/DefaultButton.vue";
+import { mdiChevronDown } from "@mdi/js";
 
 const { t } = useI18n();
 </script>
@@ -10,11 +10,11 @@ const { t } = useI18n();
     <v-menu>
         <template v-slot:activator="{ props }">
             <DefaultButton
-                :append-icon="mdiChevronDown"
                 color="primary"
-                size="default"
-                v-bind="props"
                 variant="tonal"
+                size="default"
+                :append-icon="mdiChevronDown"
+                v-bind="props"
             >
                 {{ t("actions.More") }}
             </DefaultButton>
@@ -22,9 +22,9 @@ const { t } = useI18n();
 
         <v-list
             class="table-toolbar-list"
-            density="compact"
-            variant="text"
             color="primary"
+            variant="text"
+            density="compact"
             nav
         >
             <slot />

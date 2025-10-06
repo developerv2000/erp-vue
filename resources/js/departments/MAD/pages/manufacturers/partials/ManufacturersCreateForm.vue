@@ -1,9 +1,14 @@
 <script setup>
-import { Form, useForm } from "vee-validate";
-import { object, string, number, array } from "yup";
+import { ref } from "vue";
 import { usePage } from "@inertiajs/vue3";
 import { useI18n } from "vue-i18n";
+import { Form, useForm } from "vee-validate";
+import { object, string, number, array } from "yup";
+import { useVeeFormFields } from "@/core/composables/useVeeFormFields";
 import { useFormData } from "@/core/composables/useFormData";
+import { useMessagesStore } from "@/core/stores/messages";
+import axios from "axios";
+
 import DefaultSheet from "@/core/components/containers/DefaultSheet.vue";
 import DefaultTextField from "@/core/components/form/inputs/DefaultTextField.vue";
 import DefaultAutocomplete from "@/core/components/form/inputs/DefaultAutocomplete.vue";
@@ -12,15 +17,11 @@ import DefaultFileInput from "@/core/components/form/inputs/DefaultFileInput.vue
 import DefaultSwitch from "@/core/components/form/inputs/DefaultSwitch.vue";
 import DefaultTextarea from "@/core/components/form/inputs/DefaultTextarea.vue";
 import DefaultWysiwyg from "@/core/components/form/inputs/DefaultWysiwyg.vue";
-import { useVeeFormFields } from "@/core/composables/useVeeFormFields";
 import FormActionsContainer from "@/core/components/form/containers/FormActionsContainer.vue";
 import FormResetButton from "@/core/components/form/buttons/FormResetButton.vue";
 import FormStoreAndRedirectBack from "@/core/components/form/buttons/FormStoreAndRedirectBack.vue";
 import FormStoreAndReset from "@/core/components/form/buttons/FormStoreAndReset.vue";
 import FormStoreWithoutReseting from "@/core/components/form/buttons/FormStoreWithoutReseting.vue";
-import { ref } from "vue";
-import { useMessagesStore } from "@/core/stores/messages";
-import axios from "axios";
 
 // Dependencies
 const { t } = useI18n();
@@ -111,7 +112,6 @@ const submit = handleSubmit((values) => {
                 <v-col cols="4">
                     <DefaultTextField
                         :label="t('fields.Manufacturer')"
-                        name="name"
                         v-model="values.name"
                         :error-messages="errors.name"
                         required
@@ -121,7 +121,6 @@ const submit = handleSubmit((values) => {
                 <v-col cols="4">
                     <DefaultAutocomplete
                         :label="t('fields.Category')"
-                        name="category_id"
                         :items="page.props.categories"
                         v-model="values.category_id"
                         :error-messages="errors.category_id"
@@ -132,7 +131,6 @@ const submit = handleSubmit((values) => {
                 <v-col cols="4">
                     <DefaultAutocomplete
                         :label="t('fields.Product class')"
-                        name="productClasses"
                         :items="page.props.productClasses"
                         v-model="values.productClasses"
                         :error-messages="errors.productClasses"
@@ -144,7 +142,6 @@ const submit = handleSubmit((values) => {
                 <v-col cols="4">
                     <DefaultAutocomplete
                         :label="t('fields.Analyst')"
-                        name="analyst_user_id"
                         :items="page.props.analystUsers"
                         v-model="values.analyst_user_id"
                         :error-messages="errors.analyst_user_id"
@@ -155,7 +152,6 @@ const submit = handleSubmit((values) => {
                 <v-col cols="4">
                     <DefaultAutocomplete
                         :label="t('fields.BDM')"
-                        name="bdm_user_id"
                         :items="page.props.bdmUsers"
                         v-model="values.bdm_user_id"
                         :error-messages="errors.bdm_user_id"
@@ -166,7 +162,6 @@ const submit = handleSubmit((values) => {
                 <v-col cols="4">
                     <DefaultAutocomplete
                         :label="t('fields.Country')"
-                        name="country_id"
                         :items="page.props.countriesOrderedByName"
                         v-model="values.country_id"
                         :error-messages="errors.country_id"
@@ -177,7 +172,6 @@ const submit = handleSubmit((values) => {
                 <v-col cols="4">
                     <DefaultAutocomplete
                         :label="t('fields.Zones')"
-                        name="zones"
                         :items="page.props.zones"
                         v-model="values.zones"
                         :error-messages="errors.zones"
@@ -189,7 +183,6 @@ const submit = handleSubmit((values) => {
                 <v-col cols="4">
                     <DefaultAutocomplete
                         :label="t('fields.Blacklist')"
-                        name="blacklists"
                         :items="page.props.blacklists"
                         v-model="values.blacklists"
                         :error-messages="errors.blacklists"
@@ -200,7 +193,6 @@ const submit = handleSubmit((values) => {
                 <v-col cols="4">
                     <DefaultCombobox
                         :label="t('fields.Presence')"
-                        name="presences"
                         :items="[]"
                         v-model="values.presences"
                         :error-messages="errors.presences"
@@ -214,15 +206,15 @@ const submit = handleSubmit((values) => {
             <v-row>
                 <v-col cols="12" class="d-flex ga-12">
                     <DefaultSwitch
+                        color="green"
                         :label="t('properties.Active')"
                         v-model="values.active"
-                        color="green"
                     ></DefaultSwitch>
 
                     <DefaultSwitch
+                        color="red"
                         :label="t('properties.Important')"
                         v-model="values.important"
-                        color="red"
                     ></DefaultSwitch>
                 </v-col>
             </v-row>
@@ -233,7 +225,6 @@ const submit = handleSubmit((values) => {
                 <v-col cols="4">
                     <DefaultTextField
                         :label="t('fields.Website')"
-                        name="website"
                         v-model="values.website"
                         :error-messages="errors.website"
                     />
@@ -242,7 +233,6 @@ const submit = handleSubmit((values) => {
                 <v-col cols="4">
                     <DefaultTextField
                         :label="t('fields.Relationship')"
-                        name="relationship"
                         v-model="values.relationship"
                         :error-messages="errors.relationship"
                     />
@@ -251,7 +241,6 @@ const submit = handleSubmit((values) => {
                 <v-col cols="4">
                     <DefaultFileInput
                         :label="t('Attachments')"
-                        name="attachments"
                         v-model="values.attachments"
                         :error-messages="errors.attachments"
                         multiple
@@ -261,7 +250,6 @@ const submit = handleSubmit((values) => {
                 <v-col rows="12">
                     <DefaultTextarea
                         :label="t('fields.About company')"
-                        name="about"
                         v-model="values.about"
                         :error-messages="errors.about"
                     />

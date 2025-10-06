@@ -1,11 +1,11 @@
 <script setup>
 import MainLayout from "@/core/layouts/MainLayout.vue";
+import { computed } from "vue";
+import { usePage } from "@inertiajs/vue3";
+import { useI18n } from "vue-i18n";
 import InertiaBreadcrumbs from "@/core/components/inertia/InertiaBreadcrumbs.vue";
 import PageIntro from "@/core/layouts/PageIntro.vue";
 import ManufacturersEditForm from "./partials/ManufacturersEditForm.vue";
-import { usePage } from "@inertiajs/vue3";
-import { useI18n } from "vue-i18n";
-import { computed } from "vue";
 
 const page = usePage();
 const { t } = useI18n();

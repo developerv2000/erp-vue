@@ -15,7 +15,7 @@ class ProfileController extends Controller
      */
     public function edit(Request $request)
     {
-        return inertia('global/pages/profile/ProfileEdit', [
+        return inertia('global/pages/profile/Edit', [
             'record' => $request->user(),
         ]);
     }

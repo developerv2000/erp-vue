@@ -1,21 +1,22 @@
 <script setup>
+import { router, usePage } from "@inertiajs/vue3";
+import { useI18n } from "vue-i18n";
+import { debounce } from "@/core/scripts/utilities";
+import { useMessagesStore } from "@/core/stores/messages";
+import { useMADManufacturersTableStore } from "@/departments/MAD/stores/manufacturersTable";
+
 import StoreBindedFilter from "@/core/components/filters/StoreBindedFilter.vue";
 import FilterAutocomplete from "@/core/components/filters/inputs/FilterAutocomplete.vue";
 import FilterBooleanAutocomplete from "@/core/components/filters/inputs/FilterBooleanAutocomplete.vue";
-import { router, usePage } from "@inertiajs/vue3";
-import { useMADManufacturersTableStore } from "@/departments/MAD/stores/manufacturersTable";
-import { useI18n } from "vue-i18n";
 import FilterDefaultInputs from "@/core/components/filters/inputs/FilterDefaultInputs.vue";
-import { debounce } from "@/core/scripts/utilities";
-import { useMessagesStore } from "@/core/stores/messages";
 
 const { t } = useI18n();
 const page = usePage();
 const store = useMADManufacturersTableStore();
 const messages = useMessagesStore();
 
-// Function to reload smart filters
-const reloadSmartFilters = () => {
+// Function to refresh smart filters
+const refreshSmartFilters = () => {
     router.reload({
         data: {
             analyst_user_id: store.filters.analyst_user_id,
@@ -33,8 +34,8 @@ const reloadSmartFilters = () => {
     });
 };
 
-// Create a debounced version of the reloadSmartFilters function
-const reloadSmartFiltersDebounced = debounce(reloadSmartFilters, 500);
+// Create a debounced version of the refreshSmartFilters function
+const refreshSmartFiltersDebounced = debounce(refreshSmartFilters, 500);
 </script>
 
 <template>
@@ -44,7 +45,7 @@ const reloadSmartFiltersDebounced = debounce(reloadSmartFilters, 500);
             name="analyst_user_id"
             v-model="store.filters.analyst_user_id"
             :items="page.props.smartFilterDependencies.analystUsers"
-            @update:modelValue="reloadSmartFiltersDebounced"
+            @update:modelValue="refreshSmartFiltersDebounced"
         />
 
         <FilterAutocomplete
@@ -53,7 +54,7 @@ const reloadSmartFiltersDebounced = debounce(reloadSmartFilters, 500);
             v-model="store.filters.country_id"
             :items="page.props.smartFilterDependencies.countriesOrderedByName"
             multiple
-            @update:modelValue="reloadSmartFiltersDebounced"
+            @update:modelValue="refreshSmartFiltersDebounced"
         />
 
         <FilterAutocomplete
@@ -62,7 +63,7 @@ const reloadSmartFiltersDebounced = debounce(reloadSmartFilters, 500);
             v-model="store.filters.id"
             :items="page.props.smartFilterDependencies.manufacturers"
             multiple
-            @update:modelValue="reloadSmartFiltersDebounced"
+            @update:modelValue="refreshSmartFiltersDebounced"
         />
 
         <FilterAutocomplete

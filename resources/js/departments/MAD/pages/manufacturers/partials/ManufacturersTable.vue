@@ -1,4 +1,11 @@
 <script setup>
+import { onMounted } from "vue";
+import { usePage } from "@inertiajs/vue3";
+import { useMADManufacturersTableStore } from "@/departments/MAD/stores/manufacturersTable";
+import { useI18n } from "vue-i18n";
+import { useDateFormat } from "@vueuse/core";
+import { DEFAULT_PER_PAGE_OPTIONS } from "@/core/scripts/constants";
+
 import ManufacturersTableTop from "./ManufacturersTableTop.vue";
 import TableDefaultSkeleton from "@/core/components/table/misc/TableDefaultSkeleton.vue";
 import TdEditButton from "@/core/components/table/td/TdEditButton.vue";
@@ -10,12 +17,6 @@ import TdRecordCommentsLink from "@/core/components/table/td/TdRecordCommentsLin
 import TdAttachmentsList from "@/core/components/table/td/TdAttachmentsList.vue";
 import TdRecordAttachmentsLink from "@/core/components/table/td/TdRecordAttachmentsLink.vue";
 import TableNavigateToPage from "@/core/components/table/misc/TableNavigateToPage.vue";
-import { useMADManufacturersTableStore } from "@/departments/MAD/stores/manufacturersTable";
-import { useDateFormat } from "@vueuse/core";
-import { usePage } from "@inertiajs/vue3";
-import { onMounted } from "vue";
-import { DEFAULT_PER_PAGE_OPTIONS } from "@/core/scripts/constants";
-import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
 const page = usePage();
@@ -42,9 +43,9 @@ function handleTableOptionsUpdate(options) {
         v-model="store.selected"
         :items="store.records"
         :items-length="store.pagination.total_records"
-        :items-per-page-options="DEFAULT_PER_PAGE_OPTIONS"
         :page="store.pagination.page"
         :items-per-page="store.pagination.per_page"
+        :items-per-page-options="DEFAULT_PER_PAGE_OPTIONS"
         :sort-by="[
             {
                 key: store.pagination.order_by,
@@ -53,7 +54,7 @@ function handleTableOptionsUpdate(options) {
         ]"
         @update:options="handleTableOptionsUpdate"
         :loading="store.loading"
-        :must-sort="true"
+        must-sort
         show-select
         show-current-page
         fixed-header

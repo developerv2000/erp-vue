@@ -1,9 +1,13 @@
 <script setup>
+import { ref, computed } from "vue";
+import { usePage, router } from "@inertiajs/vue3";
+import { useI18n } from "vue-i18n";
 import { Form, useForm } from "vee-validate";
 import { object, string, number, array } from "yup";
-import { usePage } from "@inertiajs/vue3";
-import { useI18n } from "vue-i18n";
+import { useVeeFormFields } from "@/core/composables/useVeeFormFields";
 import { useFormData } from "@/core/composables/useFormData";
+import { useMessagesStore } from "@/core/stores/messages";
+
 import DefaultSheet from "@/core/components/containers/DefaultSheet.vue";
 import DefaultTextField from "@/core/components/form/inputs/DefaultTextField.vue";
 import DefaultAutocomplete from "@/core/components/form/inputs/DefaultAutocomplete.vue";
@@ -12,22 +16,18 @@ import DefaultFileInput from "@/core/components/form/inputs/DefaultFileInput.vue
 import DefaultSwitch from "@/core/components/form/inputs/DefaultSwitch.vue";
 import DefaultTextarea from "@/core/components/form/inputs/DefaultTextarea.vue";
 import DefaultWysiwyg from "@/core/components/form/inputs/DefaultWysiwyg.vue";
-import { useVeeFormFields } from "@/core/composables/useVeeFormFields";
 import FormActionsContainer from "@/core/components/form/containers/FormActionsContainer.vue";
 import FormResetButton from "@/core/components/form/buttons/FormResetButton.vue";
 import FormUpdateAndRedirectBack from "@/core/components/form/buttons/FormUpdateAndRedirectBack.vue";
 import FormUpdateWithourRedirect from "@/core/components/form/buttons/FormUpdateWithourRedirect.vue";
-import { ref, computed } from "vue";
-import { useMessagesStore } from "@/core/stores/messages";
-import { router } from "@inertiajs/vue3";
 
 // Dependencies
 const { t } = useI18n();
 const { objectToFormData } = useFormData();
 const page = usePage();
-const record = computed(() => page.props.record);
 const messages = useMessagesStore();
 
+const record = computed(() => page.props.record);
 const loading = ref(false);
 const redirectBack = ref(false);
 

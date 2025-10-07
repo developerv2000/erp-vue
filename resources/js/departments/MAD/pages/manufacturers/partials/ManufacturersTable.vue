@@ -97,17 +97,16 @@ function handleTableOptionsUpdate(options) {
         </template>
 
         <template v-slot:item.products_count="{ item }">
-            <!-- <TdInertiaLink
+            <TdInertiaLink
                 :link="
-                    route('mad.products.index', {
+                    route('mad.manufacturers.index', {
                         'manufacturer_id[]': item.id,
                     })
                 "
             >
                 {{ item.products_count }}
                 <span class="text-lowercase">{{ t("Products") }}</span>
-            </TdInertiaLink> -->
-            Not done yet
+            </TdInertiaLink>
         </template>
 
         <template v-slot:item.name="{ item }">
@@ -195,18 +194,16 @@ function handleTableOptionsUpdate(options) {
         </template>
 
         <template v-slot:item.meetings_count="{ item }">
-            <!-- <TdInertiaLink
+            <TdInertiaLink
                 :link="
-                    route('mad.meetings.index', {
+                    route('mad.manufacturers.index', {
                         'manufacturer_id[]': item.id,
                     })
                 "
             >
                 {{ item.meetings_count }}
                 <span class="text-lowercase">{{ t("pages.Meetings") }}</span>
-            </TdInertiaLink> -->
-
-            Not done yet
+            </TdInertiaLink>
         </template>
 
         <template v-slot:item.attachments_count="{ item }">

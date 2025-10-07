@@ -99,6 +99,28 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
         return $this->belongsTo(User::class, 'bdm_user_id');
     }
 
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
+
+    public function processes()
+    {
+        return $this->hasManyThrough(
+            Process::class,
+            Product::class,
+            'manufacturer_id', // Foreign key on Products table
+            'product_id',   // Foreign key on Processes table
+            'id',         // Local key on Manufacturers table
+            'id'          // Local key on Products table
+        );
+    }
+
+    public function meetings()
+    {
+        return $this->hasMany(Meeting::class);
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Additional attributes & appends
@@ -125,6 +147,10 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
     |--------------------------------------------------------------------------
     */
 
+    /**
+     * Process controls (deleting/restoring etc) are binded with Product model events,
+     * so we don't need to bind them here.
+     */
     protected static function booted(): void
     {
         static::saving(function ($record) {
@@ -132,9 +158,25 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
         });
 
         // Trashing
-        static::deleting(function ($record) {});
+        static::deleting(function ($record) {
+            foreach ($record->products as $product) {
+                $product->delete();
+            }
 
-        static::restored(function ($record) {});
+            foreach ($record->meetings as $meeting) {
+                $meeting->delete();
+            }
+        });
+
+        static::restored(function ($record) {
+            foreach ($record->products()->onlyTrashed()->get() as $product) {
+                $product->restore();
+            }
+
+            foreach ($record->meetings()->onlyTrashed()->get() as $meeting) {
+                $meeting->restore();
+            }
+        });
 
         static::forceDeleting(function ($record) {
             $record->zones()->detach();
@@ -143,6 +185,14 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
 
             foreach ($record->presences as $presence) {
                 $presence->delete();
+            }
+
+            foreach ($record->products()->withTrashed()->get() as $product) {
+                $product->forceDelete();
+            }
+
+            foreach ($record->meetings()->withTrashed()->get() as $meeting) {
+                $meeting->forceDelete();
             }
         });
     }
@@ -175,8 +225,8 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
         return $query->withCount([
             'comments',
             'attachments',
-            // 'products',
-            // 'meetings',
+            'products',
+            'meetings',
         ]);
     }
 
@@ -237,6 +287,26 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
     {
         return [
             $this->id,
+            $this->bdm->name,
+            $this->analyst->name,
+            $this->country->name,
+            $this->products_count,
+            $this->name,
+            $this->category->name,
+            $this->active ? __('Active') : __('Stoped'),
+            $this->important ? __('Important') : '',
+            $this->productClasses->pluck('name')->implode(' '),
+            $this->zones->pluck('name')->implode(' '),
+            $this->blacklists->pluck('name')->implode(' '),
+            $this->presences->pluck('name')->implode(' '),
+            $this->website,
+            $this->about,
+            $this->relationship,
+            $this->comments->pluck('plain_text')->implode(' / '),
+            $this->lastComment?->created_at,
+            $this->created_at,
+            $this->updated_at,
+            $this->meetings_count,
         ];
     }
 
@@ -300,8 +370,8 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
 
         // Additional filters
         self::applyRegionFilter($query, $request);
-        // self::applyProcessCountriesFilter($query, $request);
-        // self::applyHasActiveProcessesForMonthFilter($query, $request);
+        self::applyProcessCountriesFilter($query, $request);
+        self::applyHasActiveProcessesForMonthFilter($query, $request);
 
         return $query;
     }

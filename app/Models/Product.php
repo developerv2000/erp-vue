@@ -13,16 +13,15 @@ use App\Support\Traits\Model\Commentable;
 use App\Support\Traits\Model\ExportsRecordsAsExcel;
 use App\Support\Traits\Model\HasAttachments;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Gate;
 
-class Product extends BaseModel implements HasTitle, ExportsProductSelection
+class Product extends Model
 {
     /** @use HasFactory<\Database\Factories\ProductFactory> */
     use HasFactory;
     use SoftDeletes;
-    use Commentable;
-    use HasAttachments;
 
     /*
     |--------------------------------------------------------------------------

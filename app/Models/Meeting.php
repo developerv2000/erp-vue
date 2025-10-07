@@ -9,10 +9,11 @@ use App\Support\Helpers\GeneralHelper;
 use App\Support\Helpers\QueryFilterHelper;
 use App\Support\Traits\Model\ExportsRecordsAsExcel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Gate;
 
-class Meeting extends BaseModel implements HasTitle
+class Meeting extends Model
 {
     /** @use HasFactory<\Database\Factories\MeetingFactory> */
     use HasFactory;

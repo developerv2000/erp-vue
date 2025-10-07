@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Http\Requests\ProductSearchStoreRequest;
-use App\Support\Abstracts\BaseModel;
 use App\Support\Contracts\Model\CanExportRecordsAsExcel;
 use App\Support\Contracts\Model\HasTitle;
 use App\Support\Helpers\QueryFilterHelper;
@@ -11,16 +10,15 @@ use App\Support\Traits\Model\Commentable;
 use App\Support\Traits\Model\ExportsRecordsAsExcel;
 use App\Support\Traits\Model\HasAttachments;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Gate;
 
-class ProductSearch extends BaseModel implements HasTitle
+class ProductSearch extends Model
 {
     /** @use HasFactory<\Database\Factories\ProductSearchFactory> */
     use HasFactory;
     use SoftDeletes;
-    use Commentable;
-    use HasAttachments;
 
     /*
     |--------------------------------------------------------------------------

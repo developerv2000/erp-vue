@@ -50,7 +50,7 @@ class MADManufacturerController extends Controller
             $request->user()->collectTranslatedTableHeadersByKey(User::MAD_EPP_HEADERS_KEY)
         );
 
-        $getVisibleHeaders = fn() => User::filterOnlyVisibleHeaders($getAllTableHeaders());
+        $getVisibleHeaders = fn() => User::filterOnlyVisibleTableHeaders($getAllTableHeaders());
 
         return Inertia::render('departments/MAD/pages/manufacturers/Trash', [
             // Refetched on smart filters change and filter form submit

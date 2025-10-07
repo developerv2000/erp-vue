@@ -18,7 +18,7 @@ class ExcelStorageController extends Controller
     public function generate(Request $request, string $model)
     {
         $modelClass = $this->resolveModelClass($model);
-        $query = $modelClass::queryForExport($request);
+        $query = $modelClass::queryRecordsForExportFromRequest($request);
 
         // Load the Excel template
         $template = storage_path($modelClass::STORAGE_PATH_OF_EXCEL_TEMPLATE_FILE_FOR_EXPORT);

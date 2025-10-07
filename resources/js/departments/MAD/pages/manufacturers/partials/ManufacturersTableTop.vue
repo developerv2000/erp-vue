@@ -30,33 +30,37 @@ const actionAfterSuccessDelete = () => {
         </template>
 
         <template #actions>
-            <!-- Trashing -->
-            <DeleteSelectedButton
-                v-if="!store.isTrashPage"
-                :delete-link="route('mad.manufacturers.destroy')"
-                :store="store"
-                :actionOnSuccess="actionAfterSuccessDelete"
-            />
+            <!-- Edit actions -->
+            <template v-if="can('edit-MAD-EPP')">
+                <!-- Trashing -->
+                <DeleteSelectedButton
+                    v-if="!store.isTrashPage"
+                    :delete-link="route('mad.manufacturers.destroy')"
+                    :store="store"
+                    :actionOnSuccess="actionAfterSuccessDelete"
+                />
 
-            <NewRecordButton
-                v-if="can('edit-MAD-EPP') && !store.isTrashPage"
-                :link="route('mad.manufacturers.create')"
-            />
+                <NewRecordButton
+                    v-if="!store.isTrashPage"
+                    :link="route('mad.manufacturers.create')"
+                />
 
-            <RestoreSelectedButton
-                v-if="store.isTrashPage"
-                :restore-link="route('mad.manufacturers.restore')"
-                :store="store"
-            />
+                <RestoreSelectedButton
+                    v-if="store.isTrashPage"
+                    :restore-link="route('mad.manufacturers.restore')"
+                    :store="store"
+                />
 
-            <PermanentDeleteSelectedButton
-                v-if="store.isTrashPage"
-                :delete-link="route('mad.manufacturers.destroy')"
-                :store="store"
-            />
+                <PermanentDeleteSelectedButton
+                    v-if="can('delete-from-trash') && store.isTrashPage"
+                    :delete-link="route('mad.manufacturers.destroy')"
+                    :store="store"
+                />
+            </template>
 
+            <!-- Export -->
             <ExportButton
-                v-if="!store.isTrashPage"
+                v-if="can('export-records-as-excel') && !store.isTrashPage"
                 model="Manufacturer"
                 :store="store"
             />

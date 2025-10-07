@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
+import { useMessagesStore } from "@/core/stores/messages";
 import axios from "axios";
 import { getCSRFToken } from "@/core/scripts/functions";
 import DefaultButton from "../../../buttons/DefaultButton.vue";
@@ -12,7 +13,9 @@ const props = defineProps({
 });
 
 const { t } = useI18n();
+const messages = useMessagesStore();
 const csrf = getCSRFToken();
+
 const snackbar = ref(false);
 const generatingFile = ref(false);
 const downloadStarted = ref(false);
@@ -60,6 +63,9 @@ async function startDownload(filename) {
             document.body.appendChild(link);
             link.click();
             link.remove();
+        })
+        .catch(() => {
+            messages.addSubmitionFailedMessage();
         });
 }
 </script>

@@ -473,14 +473,14 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
 
     public static function getMADTableHeadersForUser($user)
     {
-        if (Gate::forUser($user)->denies('view-MAD-EPP')) {
+        if (Gate::forUser($user)->denies(Permission::extractAbilityName(Permission::CAN_VIEW_MAD_EPP_NAME))) {
             return null;
         }
 
         $order = 1;
         $columns = array();
 
-        if (Gate::forUser($user)->allows('edit-MAD-EPP')) {
+        if (Gate::forUser($user)->allows(Permission::extractAbilityName(Permission::CAN_EDIT_MAD_EPP_NAME))) {
             array_push(
                 $columns,
                 ['title' => 'Edit', 'key' => 'edit', 'order' => $order++, 'width' => 56, 'visible' => 1, 'sortable' => false],

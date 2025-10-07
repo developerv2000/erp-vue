@@ -147,7 +147,7 @@ export const useMADManufacturersTableStore = defineStore('MADManufacturersTable'
 
         updateUrlAfterFetch() {
             router.get(route(route().current()), this.toQuery(), {
-                only: ['smartFilterDependencies'],
+                only: ['smartFilterDependencies', 'query'], // Also update query to trigger active filters class update
                 replace: true,
                 preserveState: true,
                 preserveScroll: true,

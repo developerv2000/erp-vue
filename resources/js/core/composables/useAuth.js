@@ -2,31 +2,86 @@ import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 
 export default function useAuth() {
-    const page = usePage();
+    const page = usePage()
 
-    const user = computed(() => page.props.auth?.user);
-    const isLoggedIn = computed(() => !!user.value);
+    const user = computed(() => page.props.auth?.user)
+    const isLoggedIn = computed(() => !!user.value)
 
-    const hasRole = (role) => {
-        if (!user.value || !user.value.roles) return false;
-        return user.value.roles.includes(role);
+    const hasRole = (roleName) => {
+        if (!user.value?.roles) return false
+        return user.value.roles.some(role => role.name === roleName)
     }
 
-    const can = (permission) => {
-        if (!user.value || !user.value.permissions) return false;
-        return user.value.permissions.includes(permission);
+    const isGlobalAdministrator = () => {
+        return hasRole("Global administrator")
+    }
+
+    const getDenyingPermission = (permissionName) => {
+        return permissionName.replace(/^can-/, "can-not-")
+    }
+
+    const hasPermission = (permissionName) => {
+        if (!user.value) return false
+
+        const denied = getDenyingPermission(permissionName)
+
+        // 1. User explicit deny
+        if (user.value.permissions?.some(p => p.name === denied)) return false
+
+        // 2. User explicit allow
+        if (user.value.permissions?.some(p => p.name === permissionName)) return true
+
+        // 3. Role deny
+        for (const role of user.value.roles ?? []) {
+            if (role.permissions?.some(p => p.name === denied)) return false
+        }
+
+        // 4. Role allow
+        for (const role of user.value.roles ?? []) {
+            if (role.permissions?.some(p => p.name === permissionName)) return true
+        }
+
+        return false
+    }
+
+    const normalizeAbility = (ability) => {
+        return ability.startsWith("can-") ? ability : `can-${ability}`
+    }
+
+    /**
+     * Check if the user has a given ability.
+     */
+    const can = (ability) => {
+        if (!user.value) return false
+
+        if (isGlobalAdministrator()) return true
+
+        return hasPermission(normalizeAbility(ability))
+    }
+
+    /**
+     * Check if the user has at least one of the given abilities.
+     */
+    const canAny = (abilities = []) => {
+        if (!user.value) return false
+
+        if (isGlobalAdministrator()) return true
+
+        return abilities.some((ability) => can(ability))
     }
 
     const owns = (model) => {
-        if (!user.value || !model || !model.user_id) return false;
-        return model.user_id === user.value.id;
+        if (!user.value || !model || !model.user_id) return false
+        return model.user_id === user.value.id
     }
 
     return {
         user,
         isLoggedIn,
         hasRole,
+        isGlobalAdministrator,
         can,
+        canAny,
         owns,
-    };
+    }
 }

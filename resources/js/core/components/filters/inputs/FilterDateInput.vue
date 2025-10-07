@@ -1,11 +1,13 @@
 <script setup>
 import { computed, useAttrs } from "vue";
+import useQueryParams from "@/core/composables/useQueryParams";
 import DefaultDateInput from "../../form/inputs/DefaultDateInput.vue";
+
+const attrs = useAttrs();
+const { get } = useQueryParams();
 
 // Proper v-model binding
 const modelValue = defineModel();
-
-const attrs = useAttrs();
 
 // multiple can be: true/"" (for multiple dates) or "range"
 const isMultiple = computed(() => attrs.multiple === "" || !!attrs.multiple);
@@ -34,9 +36,21 @@ const isHighlighted = computed(() => {
     );
 });
 
+// Move to the top if filter is active
+const isActive = computed(() => {
+    let nameAttribute = attrs.name;
+
+    if (isMultiple.value) {
+        nameAttribute = nameAttribute.replace("[]", "");
+    }
+
+    return get(nameAttribute) ? true : false;
+});
+
 // Dynamic classes
 const inputClass = computed(() => ({
     "highlight-date-input": isHighlighted.value,
+    "order-first": isActive.value,
 }));
 </script>
 

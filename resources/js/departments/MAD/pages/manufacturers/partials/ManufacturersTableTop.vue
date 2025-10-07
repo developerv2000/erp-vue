@@ -1,6 +1,7 @@
 <script setup>
 import { useI18n } from "vue-i18n";
 import { useMADManufacturersTableStore } from "@/departments/MAD/stores/manufacturersTable";
+import useAuth from "@/core/composables/useAuth";
 
 import DefaultTableToolbar from "@/core/components/table/toolbar/DefaultTableToolbar.vue";
 import NewRecordButton from "@/core/components/table/toolbar/actions/NewRecordButton.vue";
@@ -14,6 +15,7 @@ import ExportButton from "@/core/components/table/toolbar/actions/ExportButton.v
 
 const store = useMADManufacturersTableStore();
 const { t } = useI18n();
+const { can } = useAuth();
 
 const actionAfterSuccessDelete = () => {
     store.fetchRecords({ updateUrl: false });
@@ -37,7 +39,7 @@ const actionAfterSuccessDelete = () => {
             />
 
             <NewRecordButton
-                v-if="!store.isTrashPage"
+                v-if="can('edit-MAD-EPP') && !store.isTrashPage"
                 :link="route('mad.manufacturers.create')"
             />
 

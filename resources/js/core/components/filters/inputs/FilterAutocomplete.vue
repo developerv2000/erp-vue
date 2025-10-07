@@ -1,11 +1,13 @@
 <script setup>
 import { computed, useAttrs } from "vue";
+import useQueryParams from "@/core/composables/useQueryParams";
 import DefaultAutocomplete from "../../form/inputs/DefaultAutocomplete.vue";
+
+const attrs = useAttrs();
+const { get } = useQueryParams();
 
 // Use defineModel to handle v-model correctly
 const modelValue = defineModel();
-
-const attrs = useAttrs();
 
 // Determine if field is multiple
 const isMultiple = computed(() => attrs.multiple === "" || !!attrs.multiple);
@@ -22,9 +24,21 @@ const isHighlighted = computed(() => {
     );
 });
 
+// Move to the top if filter is active
+const isActive = computed(() => {
+    let nameAttribute = attrs.name;
+
+    if (isMultiple.value) {
+        nameAttribute = nameAttribute.replace("[]", "");
+    }
+
+    return get(nameAttribute) ? true : false;
+});
+
 // Build dynamic classes
 const inputClass = computed(() => ({
     "highlight-autocomplete": isHighlighted.value,
+    "order-first": isActive.value,
 }));
 </script>
 

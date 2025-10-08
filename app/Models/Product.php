@@ -2,26 +2,37 @@
 
 namespace App\Models;
 
-use App\Http\Requests\ProductStoreRequest;
-use App\Support\Abstracts\BaseModel;
-use App\Support\Contracts\Model\CanExportRecordsAsExcel;
-use App\Support\Contracts\Model\ExportsProductSelection;
-use App\Support\Contracts\Model\HasTitle;
+use App\Http\Requests\MAD\ProductStoreRequest;
+use App\Http\Requests\MAD\ProductUpdateRequest;
+use App\Support\Contracts\Model\ExportsRecordsAsExcel;
+use App\Support\Contracts\Model\GeneratesBreadcrumbs;
+use App\Support\Contracts\Model\HasTitleAttribute;
 use App\Support\Helpers\GeneralHelper;
+use App\Support\Helpers\ModelHelper;
 use App\Support\Helpers\QueryFilterHelper;
-use App\Support\Traits\Model\Commentable;
-use App\Support\Traits\Model\ExportsRecordsAsExcel;
+use App\Support\Traits\Model\AddsDefaultQueryParamsToRequest;
+use App\Support\Traits\Model\GetsMinifiedRecordsWithName;
 use App\Support\Traits\Model\HasAttachments;
+use App\Support\Traits\Model\HasComments;
+use App\Support\Traits\Model\HasModelNamespaceAttributes;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
-class Product extends Model
+class Product extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, ExportsRecordsAsExcel
 {
     /** @use HasFactory<\Database\Factories\ProductFactory> */
     use HasFactory;
     use SoftDeletes;
+    use HasComments;
+    use HasAttachments;
+    use HasModelNamespaceAttributes;
+    use AddsDefaultQueryParamsToRequest;
+    use GetsMinifiedRecordsWithName;
 
     /*
     |--------------------------------------------------------------------------
@@ -29,15 +40,13 @@ class Product extends Model
     |--------------------------------------------------------------------------
     */
 
-    const SETTINGS_MAD_TABLE_COLUMNS_KEY = 'MAD_IVP_table_columns';
-
     const DEFAULT_ORDER_BY = 'updated_at';
     const DEFAULT_ORDER_TYPE = 'desc';
     const DEFAULT_PAGINATION_LIMIT = 50;
 
     const LIMITED_EXCEL_RECORDS_COUNT_FOR_EXPORT = 80;
-    const STORAGE_PATH_OF_EXCEL_TEMPLATE_FILE_FOR_EXPORT = 'app/excel/export-templates/ivp.xlsx';
-    const STORAGE_PATH_FOR_EXPORTING_EXCEL_FILES = 'app/excel/exports/ivp';
+    const STORAGE_PATH_OF_EXCEL_TEMPLATE_FILE_FOR_EXPORT = 'app/private/excel/export-templates/ivp.xlsx';
+    const STORAGE_PATH_FOR_EXPORTING_EXCEL_FILES = 'app/private/excel/exports/ivp';
 
     /*
     |--------------------------------------------------------------------------
@@ -95,11 +104,26 @@ class Product extends Model
 
     /*
     |--------------------------------------------------------------------------
-    | Additional attributes
+    | Additional attributes & appends
     |--------------------------------------------------------------------------
     */
 
-    public function getProcessesIndexLinkAttribute()
+    public static function appendRecordsBasicAttributes($records): void
+    {
+        foreach ($records as $record) {
+            $record->appendBasicAttributes();
+        }
+    }
+
+    public function appendBasicAttributes(): void
+    {
+        $this->append([
+            'base_model_class',
+        ]);
+    }
+
+    // Used in products.index page table
+    public function getProcessesIndexLinkAttribute(): string
     {
         return route('mad.processes.index', [
             'manufacturer_id[]' => $this->manufacturer_id,
@@ -110,10 +134,8 @@ class Product extends Model
         ]);
     }
 
-    /**
-     * Also used while exporting product selection.
-     */
-    public function getMatchedProductSearchesAttribute()
+    // Used in products.index page table & product selection export
+    public function getMatchedProductSearchesAttribute(): Collection
     {
         return ProductSearch::where([
             'inn_id' => $this->inn_id,
@@ -134,7 +156,8 @@ class Product extends Model
 
     protected static function booted(): void
     {
-        static::deleting(function ($record) { // trashing
+        // trashing
+        static::deleting(function ($record) {
             foreach ($record->processes as $process) {
                 $process->delete();
             }
@@ -167,7 +190,7 @@ class Product extends Model
     |--------------------------------------------------------------------------
     */
 
-    public function scopeWithBasicRelations($query)
+    public function scopeWithBasicRelations($query): Builder
     {
         return $query->with([
             'inn',
@@ -203,7 +226,7 @@ class Product extends Model
         ]);
     }
 
-    public function scopeWithBasicRelationCounts($query)
+    public function scopeWithBasicRelationCounts($query): Builder
     {
         return $query->withCount([
             'comments',
@@ -218,23 +241,7 @@ class Product extends Model
     |--------------------------------------------------------------------------
     */
 
-    // Implement method defined in BaseModel abstract class
-    public function generateBreadcrumbs($department = null): array
-    {
-        $breadcrumbs = [
-            ['link' => route('mad.products.index'), 'text' => __('IVP')],
-        ];
-
-        if ($this->trashed()) {
-            $breadcrumbs[] = ['link' => route('mad.products.trash'), 'text' => __('Trash')];
-        }
-
-        $breadcrumbs[] = ['link' => route('mad.products.edit', $this->id), 'text' => $this->title];
-
-        return $breadcrumbs;
-    }
-
-    // Implement method declared in HasTitle Interface
+    // Implement method declared in HasTitleAttribute Interface
     public function getTitleAttribute(): string
     {
         return GeneralHelper::truncateString($this->form->name, 12)
@@ -242,38 +249,47 @@ class Product extends Model
             . GeneralHelper::truncateString($this->inn->name, 40);
     }
 
-    // Implement method declared in CanExportRecordsAsExcel Interface
-    public function scopeWithRelationsForExport($query)
+    // Implement method declared in GeneratesBreadcrumbs Interface
+    public function generateBreadcrumbs($department = null): array
     {
-        return $query->withBasicRelations()
+        $lowercasedDepartment = strtolower($department);
+
+        // Index page
+        $breadcrumbs = [
+            ['title' => __('pages.EPP'), 'link' => route($lowercasedDepartment . '.products.index')],
+        ];
+
+        // Trash page
+        if ($this->trashed()) {
+            $breadcrumbs[] = ['title' => __('pages.Trash'), 'link' => route($lowercasedDepartment . '.products.trash')];
+        }
+
+        // Edit page
+        $breadcrumbs[] = ['title' => $this->title, 'link' => null];
+
+        return $breadcrumbs;
+    }
+
+    // Implement method declared in ExportsRecordsAsExcel Interface
+    public static function queryRecordsForExportFromRequest(Request $request): Builder
+    {
+        $query = self::withBasicRelations()
             ->withBasicRelationCounts()
-            ->with(['comments']);
+            ->with('comments'); // Important
+
+        // Normalize request parameters
+        self::addDefaultQueryParamsToRequest($request);
+
+        // Apply filters
+        self::filterQueryForRequest($query, $request);
+
+        // Finalize (sorting)
+        ModelHelper::finalizeQueryForRequest($query, $request, 'query');
+
+        return $query;
     }
 
-    /**
-     * Implement method declared in ExportsProductSelection Interface.
-     */
-    public function scopeWithRelationsForProductSelection($query)
-    {
-        // Select only required fields
-        return $query
-            ->with([
-                'inn',
-                'form',
-                'shelfLife',
-            ])
-            ->select([
-                'products.id',
-                'inn_id',
-                'form_id',
-                'shelf_life_id',
-                'dosage',
-                'pack',
-                'moq',
-            ]);
-    }
-
-    // Implement method declared in CanExportRecordsAsExcel Interface
+    // Implement method declared in ExportsRecordsAsExcel Interface
     public function getExcelColumnValuesForExport(): array
     {
         return [
@@ -312,11 +328,58 @@ class Product extends Model
 
     /*
     |--------------------------------------------------------------------------
+    | Queries
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Build and execute a model query based on request parameters.
+     *
+     * Steps:
+     *  - Apply default relations & counts
+     *  - Apply soft delete scope (if requested)
+     *  - Normalize query params (pagination, sorting, etc.)
+     *  - Apply filters
+     *  - Finalize query with sorting & pagination
+     *  - Append basic attributes (unless returning raw query)
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $action  ('paginate', 'get' or 'query')
+     * @return mixed
+     */
+    public static function queryRecordsFromRequest(Request $request, string $action = 'paginate')
+    {
+        $query = self::withBasicRelations()->withBasicRelationCounts();
+
+        // Apply trashed filter
+        if ($request->boolean('only_trashed')) {
+            $query->onlyTrashed();
+        }
+
+        // Normalize request parameters
+        self::addDefaultQueryParamsToRequest($request);
+
+        // Apply filters
+        self::filterQueryForRequest($query, $request);
+
+        // Finalize (sorting & pagination)
+        $records = ModelHelper::finalizeQueryForRequest($query, $request, $action);
+
+        // Append attributes unless raw query is requested
+        if ($action !== 'query') {
+            self::appendRecordsBasicAttributes($records);
+        }
+
+        return $records;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Filtering
     |--------------------------------------------------------------------------
     */
 
-    public static function filterQueryForRequest($query, $request)
+    public static function filterQueryForRequest($query, $request): Builder
     {
         // Apply base filters using helper
         $query = QueryFilterHelper::applyFilters($query, $request, self::getFilterConfig());
@@ -363,11 +426,14 @@ class Product extends Model
 
     /*
     |--------------------------------------------------------------------------
-    | Create & Update
+    | Store & update
     |--------------------------------------------------------------------------
     */
 
-    public static function createFromRequest($request)
+    /**
+     * AJAX request
+     */
+    public static function storeByMADFromRequest(ProductStoreRequest $request): void
     {
         $record = self::create($request->all());
 
@@ -381,6 +447,7 @@ class Product extends Model
 
     /**
      * Create multiple instances of the model from the request data.
+     * AJAX request.
      *
      * This method iterates over each products,
      * validates request for uniqueness,
@@ -389,7 +456,7 @@ class Product extends Model
      * @param \Illuminate\Http\Request $request The request containing data.
      * @return void
      */
-    public static function createMultipleRecordsFromRequest($request)
+    public static function storeMultipleRecordsByMADFromRequest($request)
     {
         // Get 'atx_id' for each product
         $atxID = Atx::where([
@@ -439,7 +506,10 @@ class Product extends Model
         }
     }
 
-    public function updateFromRequest($request)
+    /**
+     * AJAX request
+     */
+    public function updateFromRequest(ProductUpdateRequest $request): void
     {
         $this->update($request->all());
 
@@ -461,11 +531,11 @@ class Product extends Model
     */
 
     /**
-     * Validate product ATX.
+     * Validate products ATX.
      *
-     * Used on products.update route.
+     * Used after product update.
      */
-    public function validateATX()
+    public function validateATX(): void
     {
         $atx = Atx::where([
             'inn_id' => $this->inn_id,
@@ -477,7 +547,7 @@ class Product extends Model
         ]);
     }
 
-    // Used on filter
+    // Used on filters
     public static function getAllUniqueBrands()
     {
         return self::whereNotNull('brand')->distinct()->pluck('brand');
@@ -497,7 +567,7 @@ class Product extends Model
         $formFamilyIDs = ProductForm::find($request->form_id)->getFamilyIDs();
 
         // Query similar records based on manufacturer, inn, and form family IDs
-        $similarRecords = Product::withTrashed()->where('manufacturer_id', $request->manufacturer_id)
+        $similarRecords = self::withTrashed()->where('manufacturer_id', $request->manufacturer_id)
             ->where('inn_id', $request->inn_id)
             ->whereIn('form_id', $formFamilyIDs)
             ->with(['form'])
@@ -506,65 +576,64 @@ class Product extends Model
         return $similarRecords;
     }
 
-    /**
-     * Provides the default MAD table columns along with their properties.
-     *
-     * These columns are typically used to display data in tables,
-     * such as on index and trash pages, and are iterated over in a loop.
-     *
-     * @return array
-     */
-    public static function getDefaultMADTableSettingsForUser($user)
+    public static function getMADTableHeadersForUser($user): array|null
     {
-        if (Gate::forUser($user)->denies('view-MAD-IVP')) {
+        if (Gate::forUser($user)->denies(Permission::extractAbilityName(Permission::CAN_VIEW_MAD_IVP_NAME))) {
             return null;
         }
 
         $order = 1;
         $columns = array();
 
-        if (Gate::forUser($user)->allows('edit-MAD-IVP')) {
+        if (Gate::forUser($user)->allows(Permission::extractAbilityName(Permission::CAN_EDIT_MAD_IVP_NAME))) {
             array_push(
                 $columns,
-                ['name' => 'Edit', 'order' => $order++, 'width' => 40, 'visible' => 1],
+                ['title' => 'Edit', 'key' => 'edit', 'order' => $order++, 'width' => 56, 'visible' => 1, 'sortable' => false],
             );
         }
 
-        array_push(
-            $columns,
-            ['name' => 'Processes', 'order' => $order++, 'width' => 132, 'visible' => 1],
-            ['name' => 'Category', 'order' => $order++, 'width' => 84, 'visible' => 1],
-            ['name' => 'Country', 'order' => $order++, 'width' => 144, 'visible' => 1],
-            ['name' => 'Manufacturer', 'order' => $order++, 'width' => 140, 'visible' => 1],
-            ['name' => 'Generic', 'order' => $order++, 'width' => 180, 'visible' => 1],
-            ['name' => 'Form', 'order' => $order++, 'width' => 130, 'visible' => 1],
-            ['name' => 'Basic form', 'order' => $order++, 'width' => 130, 'visible' => 1],
-            ['name' => 'Dosage', 'order' => $order++, 'width' => 120, 'visible' => 1],
-            ['name' => 'Pack', 'order' => $order++, 'width' => 110, 'visible' => 1],
-            ['name' => 'MOQ', 'order' => $order++, 'width' => 158, 'visible' => 1],
-            ['name' => 'Shelf life', 'order' => $order++, 'width' => 130, 'visible' => 1],
-            ['name' => 'Product class', 'order' => $order++, 'width' => 96, 'visible' => 1],
-            ['name' => 'ATX', 'order' => $order++, 'width' => 190, 'visible' => 1],
-            ['name' => 'Our ATX', 'order' => $order++, 'width' => 150, 'visible' => 1],
-            ['name' => 'Dossier', 'order' => $order++, 'width' => 140, 'visible' => 1],
-            ['name' => 'Zones', 'order' => $order++, 'width' => 54, 'visible' => 1],
-            ['name' => 'Brand', 'order' => $order++, 'width' => 150, 'visible' => 1],
-            ['name' => 'Bioequivalence', 'order' => $order++, 'width' => 120, 'visible' => 1],
-            ['name' => 'Validity period', 'order' => $order++, 'width' => 132, 'visible' => 1],
-            ['name' => 'Registered in EU', 'order' => $order++, 'width' => 138, 'visible' => 1],
-            ['name' => 'Sold in EU', 'order' => $order++, 'width' => 134, 'visible' => 1],
-            ['name' => 'Down payment', 'order' => $order++, 'width' => 120, 'visible' => 1],
-            ['name' => 'Comments', 'order' => $order++, 'width' => 132, 'visible' => 1],
-            ['name' => 'Last comment', 'order' => $order++, 'width' => 240, 'visible' => 1],
-            ['name' => 'Comments date', 'order' => $order++, 'width' => 116, 'visible' => 1],
-            ['name' => 'BDM', 'order' => $order++, 'width' => 142, 'visible' => 1],
-            ['name' => 'Analyst', 'order' => $order++, 'width' => 142, 'visible' => 1],
-            ['name' => 'Date of creation', 'order' => $order++, 'width' => 130, 'visible' => 1],
-            ['name' => 'Update date', 'order' => $order++, 'width' => 150, 'visible' => 1],
-            ['name' => 'Matched KVPP', 'order' => $order++, 'width' => 146, 'visible' => 1],
-            ['name' => 'ID', 'order' => $order++, 'width' => 62, 'visible' => 1],
-            ['name' => 'Attachments', 'order' => $order++, 'width' => 260, 'visible' => 1],
-        );
+        $additionalColumns = [
+            ['title' => 'Processes', 'key' => 'processes_count', 'width' => 132, 'sortable' => true],
+            ['title' => 'Category', 'key' => 'category_id', 'width' => 84, 'sortable' => false],
+            ['title' => 'Country', 'key' => 'country_id', 'width' => 144, 'sortable' => false],
+            ['title' => 'Manufacturer', 'key' => 'manufacturer_id', 'width' => 140, 'sortable' => true],
+            ['title' => 'Generic', 'key' => 'inn_id', 'width' => 180, 'sortable' => true],
+            ['title' => 'Form', 'key' => 'form_id', 'width' => 130, 'sortable' => true],
+            ['title' => 'Basic form', 'key' => 'basic_form', 'width' => 130, 'sortable' => false],
+            ['title' => 'Dosage', 'key' => 'dosage', 'width' => 120, 'sortable' => true],
+            ['title' => 'Pack', 'key' => 'pack', 'width' => 110, 'sortable' => false],
+            ['title' => 'MOQ', 'key' => 'moq', 'width' => 158, 'sortable' => true],
+            ['title' => 'Shelf life', 'key' => 'shelf_life_id', 'width' => 130, 'sortable' => true],
+            ['title' => 'Product class', 'key' => 'class_id', 'width' => 96, 'sortable' => true],
+            ['title' => 'ATX', 'key' => 'atx_name', 'width' => 190, 'sortable' => false],
+            ['title' => 'Our ATX', 'key' => 'atx_short_name', 'width' => 150, 'sortable' => false],
+            ['title' => 'Dossier', 'key' => 'dossier', 'width' => 140, 'sortable' => false],
+            ['title' => 'Zones', 'key' => 'zones_name', 'width' => 54, 'sortable' => false],
+            ['title' => 'Brand', 'key' => 'brand', 'width' => 150, 'sortable' => true],
+            ['title' => 'Bioequivalence', 'key' => 'bioequivalence', 'width' => 120, 'sortable' => true],
+            ['title' => 'Validity period', 'key' => 'validity_period', 'width' => 132, 'sortable' => true],
+            ['title' => 'Registered in EU', 'key' => 'registered_in_eu', 'width' => 138, 'sortable' => true],
+            ['title' => 'Sold in EU', 'key' => 'sold_in_eu', 'width' => 134, 'sortable' => true],
+            ['title' => 'Down payment', 'key' => 'down_payment', 'width' => 120, 'sortable' => false],
+            ['title' => 'Comments', 'key' => 'comments_count', 'width' => 132, 'sortable' => false],
+            ['title' => 'comments.Last', 'key' => 'last_comment_body', 'width' => 240, 'sortable' => false],
+            ['title' => 'comments.Date', 'key' => 'last_comment_created_at', 'width' => 116, 'sortable' => false],
+            ['title' => 'fields.BDM', 'key' => 'bdm_user_id', 'width' => 146, 'sortable' => false],
+            ['title' => 'fields.Analyst', 'key' => 'analyst_user_id', 'width' => 146, 'sortable' => false],
+            ['title' => 'dates.Date of creation', 'key' => 'created_at', 'width' => 130, 'sortable' => true],
+            ['title' => 'dates.Update date', 'key' => 'updated_at', 'width' => 150, 'sortable' => true],
+            ['title' => 'Matched KVPP', 'key' => 'matched_product_searches', 'width' => 146, 'sortable' => false],
+            ['title' => 'ID', 'key' => 'id', 'width' => 62, 'sortable' => true],
+            ['title' => 'Attachments', 'key' => 'attachments_count', 'width' => 340, 'sortable' => true],
+        ];
+
+        foreach ($additionalColumns as $column) {
+            array_push($columns, [
+                ...$column,
+                'order' => $order++,
+                'visible' => 1
+            ]);
+        }
 
         return $columns;
     }

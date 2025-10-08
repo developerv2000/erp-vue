@@ -78,7 +78,7 @@ const submit = handleSubmit((values) => {
 <template>
     <DefaultSheet>
         <DefaultTitle>
-            {{ t("comments.New comment") }}
+            {{ t("comments.New") }}
         </DefaultTitle>
 
         <Form>

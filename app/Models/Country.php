@@ -2,20 +2,12 @@
 
 namespace App\Models;
 
-use App\Support\Contracts\Model\TracksUsageCount;
-use App\Support\Helpers\GeneralHelper;
-use App\Support\Traits\Model\CalculatesMADASPQuarterAndYearCounts;
-use App\Support\Traits\Model\PreventsDeletionIfInUse;
-use App\Support\Traits\Model\RecalculatesAllUsageCounts;
 use App\Support\Traits\Model\ScopesOrderingByName;
 use Illuminate\Database\Eloquent\Model;
 
-class Country extends Model implements TracksUsageCount
+class Country extends Model
 {
     use ScopesOrderingByName;
-    use RecalculatesAllUsageCounts;
-    use CalculatesMADASPQuarterAndYearCounts;
-    use PreventsDeletionIfInUse;
 
     /*
     |--------------------------------------------------------------------------
@@ -62,26 +54,6 @@ class Country extends Model implements TracksUsageCount
         return $this->belongsToMany(ProductSearch::class, 'additional_search_country_product_search');
     }
 
-    public function madAsps()
-    {
-        return $this->belongsToMany(MadAsp::class, 'mad_asp_country_marketing_authorization_holder');
-    }
-
-    public function madAspMAHs()
-    {
-        return $this->belongsToMany(MarketingAuthorizationHolder::class, 'mad_asp_country_marketing_authorization_holder')
-            ->withPivot(MadAsp::getPivotColumnNamesForMAHRelation());
-    }
-
-    /**
-     * Return marketing authorization holders for specific MAD ASP
-     */
-    public function MAHsOfSpecificMadAsp($asp)
-    {
-        return $this->madAspMAHs()
-            ->wherePivot('mad_asp_id', $asp->id);
-    }
-
     /*
     |--------------------------------------------------------------------------
     | Scopes
@@ -109,38 +81,6 @@ class Country extends Model implements TracksUsageCount
 
     /*
     |--------------------------------------------------------------------------
-    | Contracts
-    |--------------------------------------------------------------------------
-    */
-
-    //Implement method declared in 'TracksUsageCount' interface.
-    public function scopeWithRelatedUsageCounts($query)
-    {
-        return $query->withCount([
-            'manufacturers',
-            'processes',
-            'responsibleUsers',
-            'clinicalTrialProcesses',
-            'productSearches',
-            'additionalProductSearches',
-            'madAsps',
-        ]);
-    }
-
-    //Implement method declared in 'TracksUsageCount' interface.
-    public function getUsageCountAttribute()
-    {
-        return $this->manufacturers_count +
-            $this->processes_count +
-            $this->responsible_users_count +
-            $this->clinical_trial_processes_count +
-            $this->product_searches_count +
-            $this->additional_product_searches_count +
-            $this->mad_asps_count;
-    }
-
-    /*
-    |--------------------------------------------------------------------------
     | Misc
     |--------------------------------------------------------------------------
     */
@@ -161,72 +101,5 @@ class Country extends Model implements TracksUsageCount
             $record->database_processes_count = $record->processes_count;
             $record->save();
         }
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | MAD ASP calculations
-    |--------------------------------------------------------------------------
-    */
-
-    /**
-     * Perform all necessary MAD ASP calculations.
-     *
-     * @param MadAsp $asp The $asp model associated with the MAH
-     * @param \Illuminate\Http\Request $request The request object containing user inputs
-     */
-    public function makeAllMadAspCalculations($asp, $request)
-    {
-        // Step 1: Prepare contract plan calculations based on the provided request and plan
-        $this->calculateAspMonthlyProcessCounts();
-
-        // Step 2: Calculate quarterly process counts from monthly data (CalculatesMADASPQuarterAndYearCounts trait)
-        $this->calculateAspQuartersProcessCounts();
-
-        // Step 3: Calculate yearly process counts from monthly and quarterly data (CalculatesMADASPQuarterAndYearCounts trait)
-        $this->calculateAspYearProcessCounts();
-
-        // Step 4: Calculate percentages for yearly process counts (e.g., success rates) (CalculatesMADASPQuarterAndYearCounts trait)
-        $this->calculateAspYearPercentages();
-    }
-
-    private function calculateAspMonthlyProcessCounts()
-    {
-        $months = GeneralHelper::collectCalendarMonths();
-
-        foreach ($months as $month) {
-            $monthName = $month['name'];
-
-            // Calculate the totals for the current month
-            [$contractPlanCount, $contractFactCount, $registerFactCount] = $this->sumMonthlyCountsOfMAHs($monthName);
-
-            // Assign totals to the current model instance
-            $this->{$monthName . '_contract_plan'} = $contractPlanCount;
-            $this->{$monthName . '_contract_fact'} = $contractFactCount;
-            $this->{$monthName . '_register_fact'} = $registerFactCount;
-        }
-    }
-
-    /**
-     * Sum the 'contract_plan', 'contract_fact', and 'register_fact' counts for a specific month
-     * across all related Marketing Authorization Holders (MAHs).
-     *
-     * @param  string  $monthName
-     * @return array  [contractPlanCount, contractFactCount, registerFactCount]
-     */
-    private function sumMonthlyCountsOfMAHs($monthName)
-    {
-        $contractPlanCount = 0;
-        $contractFactCount = 0;
-        $registerFactCount = 0;
-
-        // Iterate through all marketing authorization holders
-        foreach ($this->MAHs as $mah) {
-            $contractPlanCount += $mah->{$monthName . '_contract_plan'} ?? 0;
-            $contractFactCount += $mah->{$monthName . '_contract_fact'} ?? 0;
-            $registerFactCount += $mah->{$monthName . '_register_fact'} ?? 0;
-        }
-
-        return [$contractPlanCount, $contractFactCount, $registerFactCount];
     }
 }

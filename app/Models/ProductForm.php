@@ -2,17 +2,14 @@
 
 namespace App\Models;
 
-use App\Support\Contracts\Model\TracksUsageCount;
 use App\Support\Traits\Model\GetsMinifiedRecordsWithName;
-use App\Support\Traits\Model\PreventsDeletionIfInUse;
 use App\Support\Traits\Model\ScopesOrderingByName;
 use Illuminate\Database\Eloquent\Model;
 
-class ProductForm extends Model implements TracksUsageCount
+class ProductForm extends Model
 {
     use ScopesOrderingByName;
     use GetsMinifiedRecordsWithName;
-    use PreventsDeletionIfInUse;
 
     /*
     |--------------------------------------------------------------------------
@@ -101,31 +98,6 @@ class ProductForm extends Model implements TracksUsageCount
     public function scopeOnlyParents()
     {
         return self::whereNull('parent_id');
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Contracts
-    |--------------------------------------------------------------------------
-    */
-
-    //Implement method declared in 'TracksUsageCount' interface.
-    public function scopeWithRelatedUsageCounts($query)
-    {
-        return $query->withCount([
-            'products',
-            'productSearches',
-            'atxes',
-        ]);
-    }
-
-    //Implement method declared in 'TracksUsageCount' interface.
-    public function getUsageCountAttribute()
-    {
-        // childs count ignored
-        return $this->products_count
-            + $this->product_searches_count
-            + $this->atxes_count;
     }
 
     /*

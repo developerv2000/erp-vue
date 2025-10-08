@@ -2,14 +2,11 @@
 
 namespace App\Models;
 
-use App\Support\Traits\Model\FormatsAttributeForDateTimeInput;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\ValidationException;
 
 class ProcessStatusHistory extends Model
 {
-    use FormatsAttributeForDateTimeInput;
-
     /*
     |--------------------------------------------------------------------------
     | Properties

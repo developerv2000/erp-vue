@@ -26,7 +26,7 @@ class ProductFactory extends Factory
     {
         return [
             'manufacturer_id' => rand(1, Manufacturer::count()),
-            'inn_id' => Inn::inRandomOrder()->first()->id,
+            'inn_id' => rand(1, Inn::count()),
             'brand' => fake()->name(),
             'form_id' => rand(1, ProductForm::count()),
             'class_id' => rand(1, ProductClass::count()),
@@ -49,12 +49,6 @@ class ProductFactory extends Factory
             $record->zones()->attach(rand(1, Zone::count()));
 
             $record->comments()->saveMany([
-                new Comment([
-                    'body' => '<p>' . fake()->sentences(2, true) . '</p>',
-                    'user_id' => User::onlyMADAnalysts()->inRandomOrder()->first()->id,
-                    'created_at' => now()
-                ]),
-
                 new Comment([
                     'body' => '<p>' . fake()->sentences(2, true) . '</p>',
                     'user_id' => User::onlyMADAnalysts()->inRandomOrder()->first()->id,

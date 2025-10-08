@@ -17,11 +17,11 @@ class DepartmentSeeder extends Seeder
             Department::MGMT_NAME,
             Department::MAD_NAME,
             Department::CMD_NAME,
-            Department::PLPD_NAME,
+            Department::PLD_NAME,
             Department::PRD_NAME,
             Department::PPDD_NAME,
             Department::ELD_NAME,
-            Department::MSD_NAME,
+            Department::MD_NAME,
             Department::DD_NAME,
         ];
 
@@ -29,11 +29,11 @@ class DepartmentSeeder extends Seeder
             Department::MGMT_ABBREVIATION,
             Department::MAD_ABBREVIATION,
             Department::CMD_ABBREVIATION,
-            Department::PLPD_ABBREVIATION,
+            Department::PLD_ABBREVIATION,
             Department::PRD_ABBREVIATION,
             Department::PPDD_ABBREVIATION,
             Department::ELD_ABBREVIATION,
-            Department::MSD_ABBREVIATION,
+            Department::MD_ABBREVIATION,
             Department::DD_ABBREVIATION,
         ];
 

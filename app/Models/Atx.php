@@ -54,7 +54,7 @@ class Atx extends Model
      */
     public static function syncAtxWithProduct(Request $request)
     {
-        Atx::updateOrCreate(
+        self::updateOrCreate(
             [
                 'inn_id' => $request->input('inn_id'),
                 'form_id' => $request->input('form_id'),

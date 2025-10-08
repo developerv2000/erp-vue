@@ -14,7 +14,7 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         // Default password
-        $password = 'laravel';
+        $password = 'evolet';
 
         /*
         |--------------------------------------------------------------------------

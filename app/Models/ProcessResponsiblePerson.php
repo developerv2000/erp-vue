@@ -2,15 +2,12 @@
 
 namespace App\Models;
 
-use App\Support\Contracts\Model\TracksUsageCount;
-use App\Support\Traits\Model\PreventsDeletionIfInUse;
 use App\Support\Traits\Model\ScopesOrderingByName;
 use Illuminate\Database\Eloquent\Model;
 
-class ProcessResponsiblePerson extends Model implements TracksUsageCount
+class ProcessResponsiblePerson extends Model
 {
     use ScopesOrderingByName;
-    use PreventsDeletionIfInUse;
 
     /*
     |--------------------------------------------------------------------------
@@ -30,25 +27,5 @@ class ProcessResponsiblePerson extends Model implements TracksUsageCount
     public function processes()
     {
         return $this->hasMany(Process::class, 'responsible_person_id');
-    }
-
-        /*
-    |--------------------------------------------------------------------------
-    | Contracts
-    |--------------------------------------------------------------------------
-    */
-
-    //Implement method declared in 'TracksUsageCount' interface.
-    public function scopeWithRelatedUsageCounts($query)
-    {
-        return $query->withCount([
-            'processes',
-        ]);
-    }
-
-    //Implement method declared in 'TracksUsageCount' interface.
-    public function getUsageCountAttribute()
-    {
-        return $this->processes_count;
     }
 }

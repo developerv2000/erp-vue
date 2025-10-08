@@ -3,8 +3,6 @@
 namespace App\Models;
 
 use App\Support\Helpers\QueryFilterHelper;
-use App\Support\Traits\Model\AddsDefaultQueryParamsToRequest;
-use App\Support\Traits\Model\FinalizesQueryForRequest;
 use App\Support\Traits\Model\FindsRecordByName;
 use App\Support\Traits\Model\ScopesOrderingByName;
 use Illuminate\Database\Eloquent\Model;
@@ -13,8 +11,6 @@ class Role extends Model
 {
     use FindsRecordByName;
     use ScopesOrderingByName;
-    use AddsDefaultQueryParamsToRequest;
-    use FinalizesQueryForRequest;
 
     /*
     |--------------------------------------------------------------------------
@@ -42,7 +38,7 @@ class Role extends Model
 
     // CMD
     const CMD_BDM_NAME = 'CMD BDM';                             // User is assosiated as 'BDM'. Not fully implemented yet!
-    
+
     /*
     |--------------------------------------------------------------------------
     | Properties
@@ -70,49 +66,5 @@ class Role extends Model
     public function permissions()
     {
         return $this->belongsToMany(Permission::class);
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Scopes
-    |--------------------------------------------------------------------------
-    */
-
-    public function scopeWithBasicRelations($query)
-    {
-        return $query->with([
-            'department',
-            'permissions',
-        ]);
-    }
-
-    public function scopeWithBasicRelationCounts($query)
-    {
-        return $query->withCount([
-            'users',
-        ]);
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Filtering
-    |--------------------------------------------------------------------------
-    */
-
-    public static function filterQueryForRequest($query, $request)
-    {
-        // Apply base filters using helper
-        $query = QueryFilterHelper::applyFilters($query, $request, self::getFilterConfig());
-
-        return $query;
-    }
-
-    private static function getFilterConfig(): array
-    {
-        return [
-            'whereIn' => ['id', 'department_id'],
-            'whereEqual' => ['global'],
-            'belongsToMany' => ['permissions'],
-        ];
     }
 }

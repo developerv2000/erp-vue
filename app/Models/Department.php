@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use App\Support\Traits\Model\AddsDefaultQueryParamsToRequest;
-use App\Support\Traits\Model\FinalizesQueryForRequest;
 use App\Support\Traits\Model\FindsRecordByName;
 use App\Support\Traits\Model\ScopesOrderingByName;
 use Illuminate\Database\Eloquent\Model;
@@ -12,8 +10,6 @@ class Department extends Model
 {
     use FindsRecordByName;
     use ScopesOrderingByName;
-    use AddsDefaultQueryParamsToRequest;
-    use FinalizesQueryForRequest;
 
     /*
     |--------------------------------------------------------------------------
@@ -33,11 +29,11 @@ class Department extends Model
     const MAD_NAME = 'Отдел анализа производителей'; // Manufacturer Analysis Department
     const MAD_ABBREVIATION = 'ОАП';
 
-    const CMD_NAME = 'Отдел контрактного производства'; // Contract Manufacturing Department
-    const CMD_ABBREVIATION = 'ОКП';
+    const CMD_NAME = 'Департамент контрактного производства'; // Contract Manufacturing Department
+    const CMD_ABBREVIATION = 'ДКП';
 
-    const PLPD_NAME = 'Отдел планирования производства и логистики'; // Production & Logistics Planning Department
-    const PLPD_ABBREVIATION = 'ОППЛ';
+    const PLD_NAME = 'Департамент закупок и логистики'; // Purchasing and Logistics Department
+    const PLD_ABBREVIATION = 'ДЗЛ';
 
     const PRD_NAME = 'Отдел платёжной реконсиляции'; // Payment Reconciliation Department
     const PRD_ABBREVIATION = 'ОПР';
@@ -48,8 +44,8 @@ class Department extends Model
     const ELD_NAME = 'Отдел логистики Европы'; // European Logistics Department
     const ELD_ABBREVIATION = 'ОЛЕ';
 
-    const MSD_NAME = 'Отдел маркировки и сериализации'; // Marking & Serialization Department
-    const MSD_ABBREVIATION = 'ОМС';
+    const MD_NAME = 'Отдел маркировки'; // Marking Department
+    const MD_ABBREVIATION = 'ОМ';
 
     const DD_NAME = 'Отдел дизайна'; // Design Department
     const DD_ABBREVIATION = 'ОД';
@@ -81,26 +77,5 @@ class Department extends Model
     public function roles()
     {
         return $this->hasMany(Role::class);
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Scopes
-    |--------------------------------------------------------------------------
-    */
-
-    public function scopeWithBasicRelations($query)
-    {
-        return $query->with([
-            'roles',
-            'permissions',
-        ]);
-    }
-
-    public function scopeWithBasicRelationCounts($query)
-    {
-        return $query->withCount([
-            'users',
-        ]);
     }
 }

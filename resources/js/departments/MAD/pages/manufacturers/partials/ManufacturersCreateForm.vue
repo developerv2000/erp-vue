@@ -7,6 +7,7 @@ import { object, string, number, array } from "yup";
 import { useVeeFormFields } from "@/core/composables/useVeeFormFields";
 import { useFormData } from "@/core/composables/useFormData";
 import { useMessagesStore } from "@/core/stores/messages";
+import useAuth from "@/core/composables/useAuth";
 import axios from "axios";
 
 import DefaultSheet from "@/core/components/containers/DefaultSheet.vue";
@@ -28,6 +29,7 @@ const { t } = useI18n();
 const { objectToFormData } = useFormData();
 const page = usePage();
 const messages = useMessagesStore();
+const { isCurrentUserInArray } = useAuth();
 
 const loading = ref(false);
 const redirectBack = ref(false);
@@ -49,7 +51,7 @@ const defaultFields = {
     name: "",
     category_id: null,
     productClasses: [],
-    analyst_user_id: null,
+    analyst_user_id: isCurrentUserInArray(page.props.analystUsers) ? page.props.auth.user.id : null,
     bdm_user_id: null,
     country_id: null,
     zones: page.props.defaultSelectedZoneIDs ?? [],

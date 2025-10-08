@@ -15,7 +15,7 @@ const { t } = useI18n();
 const store = useCommentsStore();
 
 const title = computed(
-    () => t("comments.All comments") + " — " + page.props.comments.length
+    () => t("comments.All") + " — " + page.props.comments.length
 );
 
 const edit = (comment) => {
@@ -46,7 +46,7 @@ const destroy = (comment) => {
                         {{
                             comment.user
                                 ? comment.user.name
-                                : t("comments.Deleted user")
+                                : t("users.Deleted user")
                         }}
                     </div>
                 </template>

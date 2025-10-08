@@ -282,7 +282,7 @@ const reloadRequiredDataAndResetForm = () => {
                 <v-col>
                     <DefaultWysiwyg
                         v-model="values.comment"
-                        :label="t('comments.New comment')"
+                        :label="t('comments.New')"
                         :error-messages="errors.comment"
                         folder="comments"
                     />
@@ -291,7 +291,7 @@ const reloadRequiredDataAndResetForm = () => {
                 <v-col v-if="record.last_comment">
                     <DefaultWysiwyg
                         v-model="record.last_comment.body"
-                        :label="t('comments.Last comment')"
+                        :label="t('comments.Last')"
                         disabled
                     />
                 </v-col>

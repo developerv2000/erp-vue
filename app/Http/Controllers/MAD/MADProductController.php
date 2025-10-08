@@ -20,7 +20,7 @@ use App\Support\Traits\Controller\RestoresModelRecords;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class MADManufacturerController extends Controller
+class MADProductController extends Controller
 {
     use DestroysModelRecords;
     use RestoresModelRecords;
@@ -72,7 +72,7 @@ class MADManufacturerController extends Controller
             'bdmUsers' => User::getCMDBDMsMinifed(),
             'countriesOrderedByName' => Country::orderByName()->get(),
             'zones' => Zone::orderByName()->get(),
-            'defaultSelectedZoneIDs' => Zone::getSelectedIDsByDefault(),
+            'defaultSelectedZoneIDs' => Zone::getRelatedDefaultSelectedIDValues(),
             'blacklists' => ManufacturerBlacklist::orderByName()->get(),
         ]);
     }

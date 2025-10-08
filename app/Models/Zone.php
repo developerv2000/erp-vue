@@ -2,17 +2,14 @@
 
 namespace App\Models;
 
-use App\Support\Contracts\Model\TracksUsageCount;
 use App\Support\Traits\Model\FindsRecordByName;
-use App\Support\Traits\Model\PreventsDeletionIfInUse;
 use App\Support\Traits\Model\ScopesOrderingByName;
 use Illuminate\Database\Eloquent\Model;
 
-class Zone extends Model implements TracksUsageCount
+class Zone extends Model
 {
     use ScopesOrderingByName;
     use FindsRecordByName;
-    use PreventsDeletionIfInUse;
 
     /*
     |--------------------------------------------------------------------------
@@ -41,34 +38,12 @@ class Zone extends Model implements TracksUsageCount
 
     /*
     |--------------------------------------------------------------------------
-    | Contracts
-    |--------------------------------------------------------------------------
-    */
-
-    //Implement method declared in 'TracksUsageCount' interface.
-    public function scopeWithRelatedUsageCounts($query)
-    {
-        return $query->withCount([
-            'manufacturers',
-            'products',
-        ]);
-    }
-
-    //Implement method declared in 'TracksUsageCount' interface.
-    public function getUsageCountAttribute()
-    {
-        return $this->manufacturers_count +
-            $this->products_count;
-    }
-
-    /*
-    |--------------------------------------------------------------------------
     | Misc
     |--------------------------------------------------------------------------
     */
 
-    // Get default selected id values on related-models.create pages
-    public static function getRelatedDefaultSelectedIDValues()
+    // Get default selected ids, on related models create form
+    public static function getSelectedIDsByDefault()
     {
         $names = ['II'];
 

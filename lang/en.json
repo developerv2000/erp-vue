@@ -1,6 +1,9 @@
 {
     "Yes": "Yes",
     "No": "No",
+    "Attachments": "Attachments",
+    "Products": "Products",
+    "Processes": "Processes",
 
     "validations.required": "This field is required.",
     "validations.invalid": "The value is invalid.",
@@ -86,10 +89,10 @@
     "modals.Delete record": "Delete record",
     "modals.Delete record question": "Are you sure you want to delete this record",
 
-    "file.Generating file": "Generating file",
-    "file.Download started": "Download started",
-    "file.Filename": "Filename",
-    "file.File size": "File size",
+    "files.Generating": "Generating file",
+    "files.Download started": "Download started",
+    "files.Name": "Filename",
+    "files.Size": "File size",
 
     "properties.Important": "Important",
     "properties.Active": "Active",
@@ -97,14 +100,12 @@
 
     "Comment": "Comment",
     "Comments": "Comments",
-    "comments.Last comment": "Last comment",
-    "comments.New comment": "New comment",
-    "comments.Comments date": "Comments date",
-    "comments.All comments": "All comments",
-    "comments.Deleted user": "Deleted user",
+    "comments.Last": "Last comment",
+    "comments.New": "New comment",
+    "comments.Date": "Comments date",
+    "comments.All": "All comments",
 
-    "Attachments": "Attachments",
-    "Products": "Products",
+    "users.Deleted user": "Deleted user",
 
     "dates.Date of creation": "Date of creation",
     "dates.Update date": "Update date",

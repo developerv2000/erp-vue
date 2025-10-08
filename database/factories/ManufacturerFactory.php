@@ -43,7 +43,6 @@ class ManufacturerFactory extends Factory
         return $this->afterCreating(function ($record) {
             $record->presences()->saveMany([
                 new ManufacturerPresence(['name' => fake()->country()]),
-                new ManufacturerPresence(['name' => fake()->country()]),
             ]);
 
             Lottery::odds(1, 2)
@@ -57,12 +56,6 @@ class ManufacturerFactory extends Factory
             $record->productClasses()->attach(rand(3, 4));
 
             $record->comments()->saveMany([
-                new Comment([
-                    'body' => '<p>' . fake()->sentences(2, true) . '</p>',
-                    'user_id' => User::onlyMADAnalysts()->inRandomOrder()->first()->id,
-                    'created_at' => now()
-                ]),
-
                 new Comment([
                     'body' => '<p>' . fake()->sentences(2, true) . '</p>',
                     'user_id' => User::onlyMADAnalysts()->inRandomOrder()->first()->id,

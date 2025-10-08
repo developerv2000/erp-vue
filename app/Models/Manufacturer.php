@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Http\Requests\MAD\ManufacturerStoreRequest;
+use App\Http\Requests\MAD\ManufacturerUpdateRequest;
 use App\Support\Contracts\Model\ExportsRecordsAsExcel;
 use App\Support\Contracts\Model\GeneratesBreadcrumbs;
 use App\Support\Contracts\Model\HasTitleAttribute;
@@ -127,14 +128,14 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
     |--------------------------------------------------------------------------
     */
 
-    public static function appendRecordsBasicAttributes($records)
+    public static function appendRecordsBasicAttributes($records): void
     {
         foreach ($records as $record) {
             $record->appendBasicAttributes();
         }
     }
 
-    public function appendBasicAttributes()
+    public function appendBasicAttributes(): void
     {
         $this->append([
             'base_model_class',
@@ -203,7 +204,7 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
     |--------------------------------------------------------------------------
     */
 
-    public function scopeWithBasicRelations($query)
+    public function scopeWithBasicRelations($query): Builder
     {
         return $query->with([
             'country',
@@ -220,7 +221,7 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
         ]);
     }
 
-    public function scopeWithBasicRelationCounts($query)
+    public function scopeWithBasicRelationCounts($query): Builder
     {
         return $query->withCount([
             'comments',
@@ -363,7 +364,7 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
     |--------------------------------------------------------------------------
     */
 
-    public static function filterQueryForRequest($query, $request)
+    public static function filterQueryForRequest($query, $request): Builder
     {
         // Apply base filters using helper
         $query = QueryFilterHelper::applyFilters($query, $request, self::getFilterConfig());
@@ -421,7 +422,7 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
      *
      * This filter method returns records, which have related processes for selected countries.
      */
-    public static function applyProcessCountriesFilter($query, $request)
+    public static function applyProcessCountriesFilter($query, $request): void
     {
         $relationInAmbiguous = [
             [
@@ -464,7 +465,7 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
     /**
      * AJAX request
      */
-    public static function storeByMADFromRequest(ManufacturerStoreRequest $request)
+    public static function storeByMADFromRequest(ManufacturerStoreRequest $request): void
     {
         $record = self::create($request->all());
 
@@ -479,7 +480,7 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
         $record->storeAttachmentsFromRequest($request);
     }
 
-    private function storePresencesOnCreate($presences)
+    private function storePresencesOnCreate($presences): void
     {
         if (!$presences) return;
 
@@ -491,7 +492,7 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
     /**
      * AJAX request
      */
-    public function updateByMADFromRequest($request)
+    public function updateByMADFromRequest(ManufacturerUpdateRequest $request): void
     {
         $this->update($request->all());
 
@@ -506,7 +507,7 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
         $this->storeAttachmentsFromRequest($request);
     }
 
-    private function syncPresencesOnEdit($request)
+    private function syncPresencesOnEdit($request): void
     {
         $presences = $request->input('presences');
 
@@ -536,12 +537,12 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
     /**
      * Update self 'updated_at' attribute on comment store
      */
-    public function updateSelfOnCommentCreate()
+    public function updateSelfOnCommentCreate(): void
     {
         $this->updateQuietly(['updated_at' => now()]);
     }
 
-    public static function getMADTableHeadersForUser($user)
+    public static function getMADTableHeadersForUser($user): array|null
     {
         if (Gate::forUser($user)->denies(Permission::extractAbilityName(Permission::CAN_VIEW_MAD_EPP_NAME))) {
             return null;
@@ -574,8 +575,8 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
             ['title' => 'fields.About company', 'key' => 'about', 'width' => 240, 'sortable' => false],
             ['title' => 'fields.Relationship', 'key' => 'relationship', 'width' => 200, 'sortable' => false],
             ['title' => 'Comments', 'key' => 'comments_count', 'width' => 132, 'sortable' => false],
-            ['title' => 'comments.Last comment', 'key' => 'last_comment_body', 'width' => 240, 'sortable' => false],
-            ['title' => 'comments.Comments date', 'key' => 'last_comment_created_at', 'width' => 116, 'sortable' => false],
+            ['title' => 'comments.Last', 'key' => 'last_comment_body', 'width' => 240, 'sortable' => false],
+            ['title' => 'comments.Date', 'key' => 'last_comment_created_at', 'width' => 116, 'sortable' => false],
             ['title' => 'dates.Date of creation', 'key' => 'created_at', 'width' => 130, 'sortable' => true],
             ['title' => 'dates.Update date', 'key' => 'updated_at', 'width' => 150, 'sortable' => true],
             ['title' => 'pages.Meetings', 'key' => 'meetings_count', 'width' => 86, 'sortable' => true],

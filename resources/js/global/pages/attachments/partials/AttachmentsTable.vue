@@ -13,13 +13,13 @@ const store = useAttachmentsStore();
 
 const headers = [
     {
-        title: t("file.Filename"),
+        title: t("files.Name"),
         key: "filename",
         sortable: true,
     },
 
     {
-        title: t("file.File size"),
+        title: t("files.Size"),
         key: "file_size_in_mb",
         sortable: true,
     },

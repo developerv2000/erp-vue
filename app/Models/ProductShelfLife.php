@@ -2,13 +2,10 @@
 
 namespace App\Models;
 
-use App\Support\Contracts\Model\TracksUsageCount;
-use App\Support\Traits\Model\PreventsDeletionIfInUse;
 use Illuminate\Database\Eloquent\Model;
 
-class ProductShelfLife extends Model implements TracksUsageCount
+class ProductShelfLife extends Model
 {
-    use PreventsDeletionIfInUse;
 
     /*
     |--------------------------------------------------------------------------

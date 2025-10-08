@@ -1,6 +1,9 @@
 {
     "Yes": "Да",
     "No": "Нет",
+    "Attachments": "Вложения",
+    "Products": "Продукты",
+    "Processes": "Процессы",
 
     "validations.required": "Это поле обязательно.",
     "validations.invalid": "Недопустимое значение.",
@@ -90,10 +93,10 @@
     "modals.Delete record": "Удалить запись",
     "modals.Delete record question": "Вы уверены, что хотите удалить эту запись",
 
-    "file.Generating file": "Генерация файла",
-    "file.Download started": "Загрузка началась",
-    "file.Filename": "Имя файла",
-    "file.File size": "Размер файла",
+    "files.Generating": "Генерация файла",
+    "files.Download started": "Загрузка началась",
+    "files.Name": "Имя файла",
+    "files.Size": "Размер файла",
 
     "properties.Important": "Важный",
     "properties.Active": "Активный",
@@ -101,14 +104,12 @@
 
     "Comment": "Комментарий",
     "Comments": "Комментарии",
-    "comments.New comment": "Новый комментарий",
-    "comments.Last comment": "Последний комментарий",
-    "comments.Comments date": "Дата коммент.",
-    "comments.All comments": "Все комментарии",
-    "comments.Deleted user": "Удалённый пользователь",
+    "comments.New": "Новый комментарий",
+    "comments.Last": "Последний комментарий",
+    "comments.Date": "Дата коммент.",
+    "comments.All": "Все комментарии",
 
-    "Attachments": "Вложения",
-    "Products": "Продукты",
+    "users.Deleted user": "Удалённый пользователь",
 
     "dates.Date of creation": "Дата создания",
     "dates.Update date": "Дата обновления",

@@ -98,12 +98,12 @@ async function startDownload(filename) {
 
         <div v-if="generatingFile" class="d-flex ga-4 align-center">
             <v-progress-circular size="20" indeterminate />
-            <p>{{ t("file.Generating file") }}...</p>
+            <p>{{ t("files.Generating") }}...</p>
         </div>
 
         <div v-else class="d-flex ga-4 align-center">
             <v-icon :icon="mdiDownload" />
-            <p>{{ t("file.Download started") }}!</p>
+            <p>{{ t("files.Download started") }}!</p>
         </div>
     </v-snackbar>
 </template>

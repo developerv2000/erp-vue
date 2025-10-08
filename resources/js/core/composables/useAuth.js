@@ -75,6 +75,17 @@ export default function useAuth() {
         return model.user_id === user.value.id
     }
 
+    /**
+     * Check if current user exists in an array of objects with `id`.
+     *
+     * @param {Array} array - Array of objects that contain an `id` field.
+     * @returns {boolean} True if the current user is found in the array.
+     */
+    const isCurrentUserInArray = (array) => {
+        if (!user.value || !Array.isArray(array)) return false
+        return array.some((item) => item.id === user.value.id)
+    }
+
     return {
         user,
         isLoggedIn,
@@ -83,5 +94,6 @@ export default function useAuth() {
         can,
         canAny,
         owns,
+        isCurrentUserInArray,
     }
 }

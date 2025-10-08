@@ -2,15 +2,12 @@
 
 namespace App\Models;
 
-use App\Support\Contracts\Model\TracksUsageCount;
-use App\Support\Traits\Model\PreventsDeletionIfInUse;
 use App\Support\Traits\Model\ScopesOrderingByName;
 use Illuminate\Database\Eloquent\Model;
 
-class ProductSearchStatus extends Model implements TracksUsageCount
+class ProductSearchStatus extends Model
 {
     use ScopesOrderingByName;
-    use PreventsDeletionIfInUse;
 
     /*
     |--------------------------------------------------------------------------
@@ -30,26 +27,6 @@ class ProductSearchStatus extends Model implements TracksUsageCount
     public function productSearches()
     {
         return $this->hasMany(ProductSearch::class, 'status_id');
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Contracts
-    |--------------------------------------------------------------------------
-    */
-
-    //Implement method declared in 'TracksUsageCount' interface.
-    public function scopeWithRelatedUsageCounts($query)
-    {
-        return $query->withCount([
-            'productSearches',
-        ]);
-    }
-
-    //Implement method declared in 'TracksUsageCount' interface.
-    public function getUsageCountAttribute()
-    {
-        return $this->product_searches_count;
     }
 
     /*

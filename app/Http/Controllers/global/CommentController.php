@@ -44,7 +44,7 @@ class CommentController extends Controller
             'comments' => $record->comments,
             'commentable_id' => $record->id,
             'commentable_type' => $model,
-            'deletedUserImage' => User::getDeletedUserImageUrl(),
+            'deletedUserImage' => User::getImageUrlForDeletedUser(),
         ]);
     }
 

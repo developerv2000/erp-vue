@@ -101,7 +101,7 @@ function handleTableOptionsUpdate(options) {
         <template v-slot:item.products_count="{ item }">
             <TdInertiaLink
                 :link="
-                    route('mad.manufacturers.index', {
+                    route('mad.products.index', {
                         'manufacturer_id[]': item.id,
                     })
                 "

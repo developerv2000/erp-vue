@@ -22,7 +22,7 @@ import TableNavigateToPage from "@/core/components/table/misc/TableNavigateToPag
 import TdMediumWeightText from "@/core/components/table/td/TdMediumWeightText.vue";
 import InertiaLinkedButton from "@/core/components/inertia/InertiaLinkedButton.vue";
 
-import { mdiArrowRight, mdiPlus } from "@mdi/js";
+import { mdiArrowRight } from "@mdi/js";
 
 const { t } = useI18n();
 const page = usePage();

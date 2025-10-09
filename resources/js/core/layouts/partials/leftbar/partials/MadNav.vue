@@ -34,13 +34,13 @@ const listItems = computed(() => [
     //     prependIcon: mdiCalendarSearch,
     // },
 
-    // {
-    //     title: t("pages.IVP"),
-    //     routeName: "mad.products.index",
-    //     routeParams: null,
-    //     activeOnRoutes: "mad.products.*",
-    //     prependIcon: mdiPill,
-    // },
+    {
+        title: t("pages.IVP"),
+        routeName: "mad.products.index",
+        routeParams: null,
+        activeOnRoutes: "mad.products.*",
+        prependIcon: mdiPill,
+    },
 
     // {
     //     title: t("pages.VPS"),

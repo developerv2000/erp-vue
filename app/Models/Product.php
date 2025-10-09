@@ -41,10 +41,10 @@ class Product extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
     */
 
     const DEFAULT_ORDER_BY = 'updated_at';
-    const DEFAULT_ORDER_TYPE = 'desc';
-    const DEFAULT_PAGINATION_LIMIT = 50;
+    const DEFAULT_ORDER_DIRECTION = 'desc';
+    const DEFAULT_PER_PAGE = 50;
 
-    const LIMITED_EXCEL_RECORDS_COUNT_FOR_EXPORT = 80;
+    const LIMITED_RECORDS_COUNT_ON_EXPORT_TO_EXCEL = 160;
     const STORAGE_PATH_OF_EXCEL_TEMPLATE_FILE_FOR_EXPORT = 'app/private/excel/export-templates/ivp.xlsx';
     const STORAGE_PATH_FOR_EXPORTING_EXCEL_FILES = 'app/private/excel/exports/ivp';
 
@@ -119,13 +119,15 @@ class Product extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
     {
         $this->append([
             'base_model_class',
+            'index_link_of_related_processes',
+            'matched_product_searches',
         ]);
     }
 
-    // Used in products.index page table
-    public function getProcessesIndexLinkAttribute(): string
+    // Used in products.index/trash pages table
+    public function getIndexLinkOfRelatedProcessesAttribute(): string
     {
-        return route('mad.processes.index', [
+        return route('mad.products.index', [
             'manufacturer_id[]' => $this->manufacturer_id,
             'inn_id[]' => $this->inn_id,
             'form_id[]' => $this->form_id,
@@ -134,7 +136,7 @@ class Product extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
         ]);
     }
 
-    // Used in products.index page table & product selection export
+    // Used in products.index/trash pages table & product-selection export
     public function getMatchedProductSearchesAttribute(): Collection
     {
         return ProductSearch::where([
@@ -341,13 +343,12 @@ class Product extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
      *  - Normalize query params (pagination, sorting, etc.)
      *  - Apply filters
      *  - Finalize query with sorting & pagination
-     *  - Append basic attributes (unless returning raw query)
+     *  - Append basic attributes (if requested and unless returning raw query)
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $action  ('paginate', 'get' or 'query')
+     * @param $action  ('paginate', 'get' or 'query')
      * @return mixed
      */
-    public static function queryRecordsFromRequest(Request $request, string $action = 'paginate')
+    public static function queryRecordsFromRequest(Request $request, string $action = 'paginate', bool $appendAttributes = false)
     {
         $query = self::withBasicRelations()->withBasicRelationCounts();
 
@@ -366,7 +367,7 @@ class Product extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
         $records = ModelHelper::finalizeQueryForRequest($query, $request, $action);
 
         // Append attributes unless raw query is requested
-        if ($action !== 'query') {
+        if ($appendAttributes && $action !== 'query') {
             self::appendRecordsBasicAttributes($records);
         }
 
@@ -588,41 +589,41 @@ class Product extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
         if (Gate::forUser($user)->allows(Permission::extractAbilityName(Permission::CAN_EDIT_MAD_IVP_NAME))) {
             array_push(
                 $columns,
-                ['title' => 'Edit', 'key' => 'edit', 'order' => $order++, 'width' => 56, 'visible' => 1, 'sortable' => false],
+                ['title' => 'Record', 'key' => 'edit', 'order' => $order++, 'width' => 60, 'visible' => 1, 'sortable' => false],
             );
         }
 
         $additionalColumns = [
-            ['title' => 'Processes', 'key' => 'processes_count', 'width' => 132, 'sortable' => true],
-            ['title' => 'Category', 'key' => 'category_id', 'width' => 84, 'sortable' => false],
-            ['title' => 'Country', 'key' => 'country_id', 'width' => 144, 'sortable' => false],
-            ['title' => 'Manufacturer', 'key' => 'manufacturer_id', 'width' => 140, 'sortable' => true],
-            ['title' => 'Generic', 'key' => 'inn_id', 'width' => 180, 'sortable' => true],
-            ['title' => 'Form', 'key' => 'form_id', 'width' => 130, 'sortable' => true],
-            ['title' => 'Basic form', 'key' => 'basic_form', 'width' => 130, 'sortable' => false],
-            ['title' => 'Dosage', 'key' => 'dosage', 'width' => 120, 'sortable' => true],
-            ['title' => 'Pack', 'key' => 'pack', 'width' => 110, 'sortable' => false],
-            ['title' => 'MOQ', 'key' => 'moq', 'width' => 158, 'sortable' => true],
-            ['title' => 'Shelf life', 'key' => 'shelf_life_id', 'width' => 130, 'sortable' => true],
-            ['title' => 'Product class', 'key' => 'class_id', 'width' => 96, 'sortable' => true],
-            ['title' => 'ATX', 'key' => 'atx_name', 'width' => 190, 'sortable' => false],
-            ['title' => 'Our ATX', 'key' => 'atx_short_name', 'width' => 150, 'sortable' => false],
-            ['title' => 'Dossier', 'key' => 'dossier', 'width' => 140, 'sortable' => false],
-            ['title' => 'Zones', 'key' => 'zones_name', 'width' => 54, 'sortable' => false],
-            ['title' => 'Brand', 'key' => 'brand', 'width' => 150, 'sortable' => true],
-            ['title' => 'Bioequivalence', 'key' => 'bioequivalence', 'width' => 120, 'sortable' => true],
-            ['title' => 'Validity period', 'key' => 'validity_period', 'width' => 132, 'sortable' => true],
-            ['title' => 'Registered in EU', 'key' => 'registered_in_eu', 'width' => 138, 'sortable' => true],
-            ['title' => 'Sold in EU', 'key' => 'sold_in_eu', 'width' => 134, 'sortable' => true],
-            ['title' => 'Down payment', 'key' => 'down_payment', 'width' => 120, 'sortable' => false],
+            ['title' => 'Processes', 'key' => 'processes_count', 'width' => 136, 'sortable' => true],
+            ['title' => 'fields.Category', 'key' => 'manufacturer_category_name', 'width' => 84, 'sortable' => false],
+            ['title' => 'fields.Country', 'key' => 'manufacturer_country_name', 'width' => 144, 'sortable' => false],
+            ['title' => 'fields.Manufacturer', 'key' => 'manufacturer_id', 'width' => 140, 'sortable' => true],
+            ['title' => 'fields.Generic', 'key' => 'inn_id', 'width' => 180, 'sortable' => true],
+            ['title' => 'fields.Form', 'key' => 'form_id', 'width' => 130, 'sortable' => true],
+            ['title' => 'fields.Basic form', 'key' => 'form_parent_name', 'width' => 130, 'sortable' => false],
+            ['title' => 'fields.Dosage', 'key' => 'dosage', 'width' => 120, 'sortable' => true],
+            ['title' => 'fields.Pack', 'key' => 'pack', 'width' => 110, 'sortable' => false],
+            ['title' => 'fields.MOQ', 'key' => 'moq', 'width' => 158, 'sortable' => true],
+            ['title' => 'fields.Shelf life', 'key' => 'shelf_life_id', 'width' => 130, 'sortable' => true],
+            ['title' => 'fields.Product class', 'key' => 'class_id', 'width' => 96, 'sortable' => true],
+            ['title' => 'fields.ATX', 'key' => 'atx_id', 'width' => 150, 'sortable' => true],
+            ['title' => 'fields.Our ATX', 'key' => 'atx_short_name', 'width' => 150, 'sortable' => false],
+            ['title' => 'fields.Dossier', 'key' => 'dossier', 'width' => 140, 'sortable' => false],
+            ['title' => 'fields.Zones', 'key' => 'zones_name', 'width' => 54, 'sortable' => false],
+            ['title' => 'fields.Brand', 'key' => 'brand', 'width' => 150, 'sortable' => true],
+            ['title' => 'fields.Bioequivalence', 'key' => 'bioequivalence', 'width' => 120, 'sortable' => true],
+            ['title' => 'fields.Validity period', 'key' => 'validity_period', 'width' => 132, 'sortable' => true],
+            ['title' => 'fields.Registered in EU', 'key' => 'registered_in_eu', 'width' => 138, 'sortable' => true],
+            ['title' => 'fields.Sold in EU', 'key' => 'sold_in_eu', 'width' => 134, 'sortable' => true],
+            ['title' => 'fields.Down payment', 'key' => 'down_payment', 'width' => 120, 'sortable' => false],
             ['title' => 'Comments', 'key' => 'comments_count', 'width' => 132, 'sortable' => false],
             ['title' => 'comments.Last', 'key' => 'last_comment_body', 'width' => 240, 'sortable' => false],
             ['title' => 'comments.Date', 'key' => 'last_comment_created_at', 'width' => 116, 'sortable' => false],
-            ['title' => 'fields.BDM', 'key' => 'bdm_user_id', 'width' => 146, 'sortable' => false],
-            ['title' => 'fields.Analyst', 'key' => 'analyst_user_id', 'width' => 146, 'sortable' => false],
+            ['title' => 'fields.BDM', 'key' => 'manufacturer_bdm', 'width' => 146, 'sortable' => false],
+            ['title' => 'fields.Analyst', 'key' => 'manufacturer_analyst', 'width' => 146, 'sortable' => false],
             ['title' => 'dates.Date of creation', 'key' => 'created_at', 'width' => 130, 'sortable' => true],
             ['title' => 'dates.Update date', 'key' => 'updated_at', 'width' => 150, 'sortable' => true],
-            ['title' => 'Matched KVPP', 'key' => 'matched_product_searches', 'width' => 146, 'sortable' => false],
+            ['title' => 'fields.Matched KVPP', 'key' => 'matched_product_searches', 'width' => 146, 'sortable' => false],
             ['title' => 'ID', 'key' => 'id', 'width' => 62, 'sortable' => true],
             ['title' => 'Attachments', 'key' => 'attachments_count', 'width' => 340, 'sortable' => true],
         ];

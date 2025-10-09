@@ -12,6 +12,9 @@ class MADGatesDefiner
         $permission = [
             Permission::CAN_VIEW_MAD_EPP_NAME,
             Permission::CAN_EDIT_MAD_EPP_NAME,
+
+            Permission::CAN_VIEW_MAD_IVP_NAME,
+            Permission::CAN_EDIT_MAD_IVP_NAME,
         ];
 
         GatesDefiner::definePermissionBasedGates($permission);

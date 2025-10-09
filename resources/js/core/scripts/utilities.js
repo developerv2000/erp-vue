@@ -16,3 +16,19 @@ export function debounce(callback, timeoutDelay = 500) {
         timeoutId = setTimeout(() => callback.apply(this, args), timeoutDelay);
     };
 }
+
+/**
+ * Format a numeric price into a human-readable string.
+ *
+ * @param {number|string} price - The numeric price to format.
+ * @returns {string} The formatted price string.
+ */
+export function formatPrice(price) {
+    if (price === null || price === undefined || price === '') return ''
+    const numeric = parseInt(price, 10) || 0
+
+    return new Intl.NumberFormat('ru-RU', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+    }).format(numeric)
+}

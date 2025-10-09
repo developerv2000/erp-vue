@@ -1,8 +1,11 @@
 <script setup>
+import { router } from "@inertiajs/vue3";
+import { usePage } from "@inertiajs/vue3";
 import { useUserSettingsStore } from "@/core/stores/userSettings";
 import axios from "axios";
 import { mdiTranslate } from "@mdi/js";
 
+const page = usePage();
 const userSettings = useUserSettingsStore();
 
 const listItems = [
@@ -18,7 +21,14 @@ function updateLocale(newLocale) {
         value: newLocale[0],
     });
 
-    axios.patch(url);
+    axios.post(url).then(() => {
+        // Reload table headers only if they exist
+        if (page.props?.allTableHeaders || page.props?.tableVisibleHeaders) {
+            router.reload({
+                only: ["allTableHeaders", "tableVisibleHeaders"],
+            });
+        }
+    });
 }
 </script>
 

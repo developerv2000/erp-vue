@@ -80,7 +80,7 @@ class ExcelStorageController extends Controller
     {
         $row = 2;
 
-        $records = $query->limit($modelClass::LIMITED_EXCEL_RECORDS_COUNT_FOR_EXPORT)->get();
+        $records = $query->limit($modelClass::LIMITED_RECORDS_COUNT_ON_EXPORT_TO_EXCEL)->get();
 
         if (in_array(PreparesFetchedRecordsForExport::class, class_implements($modelClass))) {
             $modelClass::prepareFetchedRecordsForExport($records);

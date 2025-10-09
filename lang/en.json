@@ -3,7 +3,6 @@
     "No": "No",
     "Attachments": "Attachments",
     "Products": "Products",
-    "Processes": "Processes",
 
     "validations.required": "This field is required.",
     "validations.invalid": "The value is invalid.",
@@ -115,6 +114,10 @@
     "filter.Region": "Region",
     "filter.Has VPS for country": "Has VPS for country",
 
+    "Processes": "Processes",
+    "processes.add": "Add process",
+    "processes.count": "{count} processes",
+
     "fields.Email": "Email",
     "fields.Password": "Password",
     "fields.Name": "Name",
@@ -138,6 +141,22 @@
     "fields.About company": "About company",
     "fields.Relationship": "Relationship",
     "fields.Status": "Status",
+
+    "fields.Generic": "Generic",
+    "fields.Form": "Form",
+    "fields.Basic form": "Generic",
+    "fields.Dosage": "Generic",
+    "fields.Pack": "Generic",
+    "fields.MOQ": "Generic",
+    "fields.Shelf life": "Generic",
+    "fields.Dossier": "Dossier",
+    "fields.Brand": "Brand",
+    "fields.Bioequivalence": "Bioequivalence",
+    "fields.Validity period": "Validity period",
+    "fields.Registered in EU": "Registered in EU",
+    "fields.Sold in EU": "Sold in EU",
+    "fields.Down payment": "Down payment",
+    "fields.Matched KVPP": "Matched KVPP",
 
     "AAAAAAAAAAAAAA": "AAAAAAAAAAAAAA"
 }

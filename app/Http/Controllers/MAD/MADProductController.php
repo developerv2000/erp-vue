@@ -3,17 +3,18 @@
 namespace App\Http\Controllers\MAD;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\MAD\ManufacturerStoreRequest;
-use App\Http\Requests\MAD\ManufacturerUpdateRequest;
+use App\Http\Requests\MAD\ProductUpdateRequest;
 use App\Models\Country;
+use App\Models\Inn;
 use App\Models\Manufacturer;
-use App\Models\ManufacturerBlacklist;
 use App\Models\ManufacturerCategory;
+use App\Models\Product;
 use App\Models\ProductClass;
+use App\Models\ProductForm;
+use App\Models\ProductShelfLife;
 use App\Models\User;
-use App\Models\Zone;
-use App\Support\FilterDependencies\SimpleFilters\MAD\ManufacturersSimpleFilterDependencies;
-use App\Support\FilterDependencies\SmartFilters\MAD\ManufacturersSmartFilterDependencies;
+use App\Support\FilterDependencies\SimpleFilters\MAD\ProductsSimpleFilterDependencies;
+use App\Support\FilterDependencies\SmartFilters\MAD\ProductsSmartFilterDependencies;
 use App\Support\Helpers\ControllerHelper;
 use App\Support\Traits\Controller\DestroysModelRecords;
 use App\Support\Traits\Controller\RestoresModelRecords;
@@ -26,19 +27,19 @@ class MADProductController extends Controller
     use RestoresModelRecords;
 
     // Required for DestroysModelRecords and RestoresModelRecords traits
-    public static $model = Manufacturer::class;
+    public static $model = Product::class;
 
     public function index(Request $request)
     {
-        $getAllTableHeaders = fn() => $request->user()->collectTranslatedTableHeadersByKey(User::MAD_EPP_HEADERS_KEY);
+        $getAllTableHeaders = fn() => $request->user()->collectTranslatedTableHeadersByKey(User::MAD_IVP_HEADERS_KEY);
         $getVisibleHeaders = fn() => User::filterOnlyVisibleTableHeaders($getAllTableHeaders());
 
-        return Inertia::render('departments/MAD/pages/manufacturers/Index', [
+        return Inertia::render('departments/MAD/pages/products/Index', [
             // Refetched on smart filters change and filter form submit
-            'smartFilterDependencies' => ManufacturersSmartFilterDependencies::getAllDependencies(),
+            'smartFilterDependencies' => ProductsSmartFilterDependencies::getAllDependencies(),
 
             // Lazy loads
-            'simpleFilterDependencies' => fn() => ManufacturersSimpleFilterDependencies::getAllDependencies(),
+            'simpleFilterDependencies' => fn() => ProductsSimpleFilterDependencies::getAllDependencies(),
             'allTableHeaders' => $getAllTableHeaders, // Refetched only on headers update
             'tableVisibleHeaders' => $getVisibleHeaders, // Refetched only on headers update
         ]);
@@ -47,17 +48,17 @@ class MADProductController extends Controller
     public function trash(Request $request)
     {
         $getAllTableHeaders = fn() => ControllerHelper::prependTrashPageTableHeaders(
-            $request->user()->collectTranslatedTableHeadersByKey(User::MAD_EPP_HEADERS_KEY)
+            $request->user()->collectTranslatedTableHeadersByKey(User::MAD_IVP_HEADERS_KEY)
         );
 
         $getVisibleHeaders = fn() => User::filterOnlyVisibleTableHeaders($getAllTableHeaders());
 
-        return Inertia::render('departments/MAD/pages/manufacturers/Trash', [
+        return Inertia::render('departments/MAD/pages/products/Trash', [
             // Refetched on smart filters change and filter form submit
-            'smartFilterDependencies' => ManufacturersSmartFilterDependencies::getAllDependencies(),
+            'smartFilterDependencies' => ProductsSmartFilterDependencies::getAllDependencies(),
 
             // Lazy loads, never refetched again
-            'simpleFilterDependencies' => fn() => ManufacturersSimpleFilterDependencies::getAllDependencies(),
+            'simpleFilterDependencies' => fn() => ProductsSimpleFilterDependencies::getAllDependencies(),
             'tableVisibleHeaders' => $getVisibleHeaders,
         ]);
     }
@@ -65,26 +66,33 @@ class MADProductController extends Controller
     public function create()
     {
         // No lazy loads required, because AJAX request is used on store
-        return Inertia::render('departments/MAD/pages/manufacturers/Create', [
-            'categories' => ManufacturerCategory::orderByName()->get(),
-            'productClasses' => ProductClass::orderByName()->get(),
+        return Inertia::render('departments/MAD/pages/products/Create', [
+            'manufacturers' => Manufacturer::getMinifiedRecordsWithName(),
             'analystUsers' => User::getMADAnalystsMinified(),
             'bdmUsers' => User::getCMDBDMsMinifed(),
-            'countriesOrderedByName' => Country::orderByName()->get(),
+            'productClasses' => ProductClass::orderByName()->get(),
+            'productForms' => ProductForm::getMinifiedRecordsWithName(),
+            'shelfLifes' => ProductShelfLife::all(),
             'zones' => Zone::orderByName()->get(),
+            'inns' => Inn::orderByName()->get(),
+            'countriesOrderedByName' => Country::orderByName()->get(),
+            'manufacturerCategories' => ManufacturerCategory::orderByName()->get(),
+            'defaultSelectedClassID' => ProductClass::getDefaultSelectedIDValue(),
+            'defaultSelectedShelfLifeID' => ProductShelfLife::getDefaultSelectedIDValue(),
             'defaultSelectedZoneIDs' => Zone::getRelatedDefaultSelectedIDValues(),
-            'blacklists' => ManufacturerBlacklist::orderByName()->get(),
         ]);
     }
 
     /**
      * AJAX request
      */
-    public function store(ManufacturerStoreRequest $request)
+    public function store($request)
     {
-        Manufacturer::storeByMADFromRequest($request);
+        Product::storeMultipleRecordsByMADFromRequest($request);
 
-        return true;
+        return response()->json([
+            'success' => true,
+        ]);
     }
 
     /**
@@ -92,27 +100,29 @@ class MADProductController extends Controller
      */
     public function edit($record)
     {
-        $fetchedRecord = Manufacturer::withTrashed()
+        $fetchedRecord = Product::withTrashed()
             ->withBasicRelations()
             ->findOrFail($record);
 
         $fetchedRecord->appendBasicAttributes();
         $fetchedRecord->append('title'); // Used on generating breadcrumbs
 
-        return Inertia::render('departments/MAD/pages/manufacturers/Edit', [
+        return Inertia::render('departments/MAD/pages/products/Edit', [
             // Refetched after record update
             'record' => $fetchedRecord,
             'breadcrumbs' => $fetchedRecord->generateBreadcrumbs('mad'),
 
             // Lazy loads, never refetched again
-            'categories' => fn() => ManufacturerCategory::orderByName()->get(),
-            'productClasses' => fn() => ProductClass::orderByName()->get(),
-            'analystUsers' => fn() => User::getMADAnalystsMinified(),
-            'bdmUsers' => fn() => User::getCMDBDMsMinifed(),
-            'countriesOrderedByName' => fn() => Country::orderByName()->get(),
-            'zones' => fn() => Zone::orderByName()->get(),
-            'defaultSelectedZoneIDs' => fn() => Zone::getRelatedDefaultSelectedIDValues(),
-            'blacklists' => fn() => ManufacturerBlacklist::orderByName()->get(),
+            'manufacturers' => Manufacturer::getMinifiedRecordsWithName(),
+            'analystUsers' => User::getMADAnalystsMinified(),
+            'bdmUsers' => User::getCMDBDMsMinifed(),
+            'productClasses' => ProductClass::orderByName()->get(),
+            'productForms' => ProductForm::getMinifiedRecordsWithName(),
+            'shelfLifes' => ProductShelfLife::all(),
+            'zones' => Zone::orderByName()->get(),
+            'inns' => Inn::orderByName()->get(),
+            'countriesOrderedByName' => Country::orderByName()->get(),
+            'manufacturerCategories' => ManufacturerCategory::orderByName()->get(),
         ]);
     }
 
@@ -121,11 +131,13 @@ class MADProductController extends Controller
      *
      * Route model binding is not used, because trashed records can also be edited
      */
-    public function update(ManufacturerUpdateRequest $request, $record)
+    public function update(ProductUpdateRequest $request, $record)
     {
-        $fetchedRecord = Manufacturer::withTrashed()->findOrFail($record);
+        $fetchedRecord = Product::withTrashed()->findOrFail($record);
         $fetchedRecord->updateByMADFromRequest($request);
 
-        return true;
+        return response()->json([
+            'success' => true,
+        ]);
     }
 }

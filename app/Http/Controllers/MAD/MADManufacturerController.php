@@ -84,7 +84,9 @@ class MADManufacturerController extends Controller
     {
         Manufacturer::storeByMADFromRequest($request);
 
-        return true;
+        return response()->json([
+            'success' => true,
+        ]);
     }
 
     /**
@@ -111,7 +113,6 @@ class MADManufacturerController extends Controller
             'bdmUsers' => fn() => User::getCMDBDMsMinifed(),
             'countriesOrderedByName' => fn() => Country::orderByName()->get(),
             'zones' => fn() => Zone::orderByName()->get(),
-            'defaultSelectedZoneIDs' => fn() => Zone::getRelatedDefaultSelectedIDValues(),
             'blacklists' => fn() => ManufacturerBlacklist::orderByName()->get(),
         ]);
     }
@@ -126,6 +127,8 @@ class MADManufacturerController extends Controller
         $fetchedRecord = Manufacturer::withTrashed()->findOrFail($record);
         $fetchedRecord->updateByMADFromRequest($request);
 
-        return true;
+        return response()->json([
+            'success' => true,
+        ]);
     }
 }

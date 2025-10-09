@@ -36,7 +36,9 @@ class User extends Authenticatable
     const DEFAULT_IS_LEFTBAR_COLLAPSED = false;
 
     // Setting keys of table headers
+    // MAD
     const MAD_EPP_HEADERS_KEY = 'MAD_EPP';
+    const MAD_IVP_HEADERS_KEY = 'MAD_IVP';
 
     /*
     |--------------------------------------------------------------------------
@@ -345,6 +347,7 @@ class User extends Authenticatable
 
         $defaultHeaders = match ($key) {
             self::MAD_EPP_HEADERS_KEY => Manufacturer::getMADTableHeadersForUser($this),
+            self::MAD_IVP_HEADERS_KEY => Product::getMADTableHeadersForUser($this),
 
             default => throw new InvalidArgumentException("Unknown key: $key"),
         };
@@ -409,6 +412,7 @@ class User extends Authenticatable
         $headersSettings = $settings['table_headers'];
 
         $headersSettings[self::MAD_EPP_HEADERS_KEY] = Manufacturer::getMADTableHeadersForUser($this);
+        $headersSettings[self::MAD_IVP_HEADERS_KEY] = Product::getMADTableHeadersForUser($this);
 
         $settings['table_headers'] = $headersSettings;
         $this->settings = $settings;

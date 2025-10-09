@@ -1,28 +1,32 @@
 <script setup>
 import { onMounted } from "vue";
 import { usePage } from "@inertiajs/vue3";
-import { useMADManufacturersTableStore } from "@/departments/MAD/stores/manufacturersTable";
+import { useMADProductsTableStore } from "@/departments/MAD/stores/productsTable";
 import { useI18n } from "vue-i18n";
 import { useDateFormat } from "@vueuse/core";
+import { formatPrice } from "@/core/scripts/utilities";
 import { DEFAULT_PER_PAGE_OPTIONS } from "@/core/scripts/constants";
 
-import ManufacturersTableTop from "./ManufacturersTableTop.vue";
+import ProductsTableTop from "./ProductsTableTop.vue";
+import InertiaLink from "@/core/components/inertia/InertiaLink.vue";
 import TableDefaultSkeleton from "@/core/components/table/misc/TableDefaultSkeleton.vue";
 import TdEditButton from "@/core/components/table/td/TdEditButton.vue";
 import ManufacturerCategory from "@/core/components/table/td/MAD/manufacturers/ManufacturerCategory.vue";
 import TdAva from "@/core/components/table/td/TdAva.vue";
 import TdInertiaLink from "@/core/components/table/td/TdInertiaLink.vue";
-import TdLink from "@/core/components/table/td/TdLink.vue";
 import TogglableThreeLinesLimitedText from "@/core/components/misc/TogglableThreeLinesLimitedText.vue";
 import TdRecordCommentsLink from "@/core/components/table/td/TdRecordCommentsLink.vue";
 import TdAttachmentsList from "@/core/components/table/td/TdAttachmentsList.vue";
 import TdRecordAttachmentsLink from "@/core/components/table/td/TdRecordAttachmentsLink.vue";
 import TableNavigateToPage from "@/core/components/table/misc/TableNavigateToPage.vue";
 import TdMediumWeightText from "@/core/components/table/td/TdMediumWeightText.vue";
+import InertiaLinkedButton from "@/core/components/inertia/InertiaLinkedButton.vue";
+
+import { mdiArrowRight, mdiPlus } from "@mdi/js";
 
 const { t } = useI18n();
 const page = usePage();
-const store = useMADManufacturersTableStore();
+const store = useMADProductsTableStore();
 
 if (!store.initializedFromInertiaPage) {
     store.initFromInertiaPage(page); // Initialize store from inertia page only once.
@@ -64,7 +68,7 @@ function handleTableOptionsUpdate(options) {
     >
         <!-- Top slot -->
         <template #top>
-            <ManufacturersTableTop />
+            <ProductsTableTop />
         </template>
 
         <!-- Loading slot -->
@@ -83,93 +87,106 @@ function handleTableOptionsUpdate(options) {
         </template>
 
         <template v-slot:item.edit="{ item }">
-            <TdEditButton :link="route('mad.manufacturers.edit', item.id)" />
+            <TdEditButton :link="route('mad.products.edit', item.id)" />
         </template>
 
-        <template v-slot:item.bdm_user_id="{ item }">
-            <TdAva :user="item.bdm" />
-        </template>
+        <template v-slot:item.processes_count="{ item }">
+            <InertiaLink
+                class="d-flex ga-2 mb-3 text-high-emphasis"
+                :link="item.index_link_of_related_processes"
+            >
+                <span>{{
+                    t("processes.count", { count: item.processes_count })
+                }}</span>
+                <v-icon :icon="mdiArrowRight" />
+            </InertiaLink>
 
-        <template v-slot:item.analyst_user_id="{ item }">
-            <TdAva :user="item.analyst" />
-        </template>
-
-        <template v-slot:item.country_id="{ item }">
-            {{ item.country.name }}
-        </template>
-
-        <template v-slot:item.products_count="{ item }">
             <TdInertiaLink
                 :link="
-                    route('mad.manufacturers.index', {
-                        'manufacturer_id[]': item.id,
+                    route('mad.products.create', {
+                        product_id: item.id,
                     })
                 "
             >
-                {{ item.products_count }}
-                <span class="text-lowercase">{{ t("Products") }}</span>
+                <span>{{ t("processes.add") }}</span>
             </TdInertiaLink>
         </template>
 
-        <template v-slot:item.name="{ item }">
-            {{ item.name }}
+        <template v-slot:item.manufacturer_category_name="{ item }">
+            <ManufacturerCategory :name="item.manufacturer.category.name" />
         </template>
 
-        <template v-slot:item.category_id="{ item }">
-            <ManufacturerCategory :name="item.category.name" />
+        <template v-slot:item.manufacturer_country_name="{ item }">
+            {{ item.manufacturer.country.name }}
         </template>
 
-        <template v-slot:item.active="{ item }">
-            <TdMediumWeightText
-                :class="{
-                    'text-green': item.active,
-                    'text-brown': !item.active,
-                }"
-            >
-                {{
-                    item.active
-                        ? t("properties.Active")
-                        : t("properties.Stopped")
-                }}
+        <template v-slot:item.manufacturer_id="{ item }">
+            {{ item.manufacturer.name }}
+        </template>
+
+        <template v-slot:item.inn_id="{ item }">
+            <TogglableThreeLinesLimitedText :text="item.inn.name" />
+        </template>
+
+        <template v-slot:item.form_id="{ item }">
+            {{ item.form.name }}
+        </template>
+
+        <template v-slot:item.form_parent_name="{ item }">
+            {{ item.form.parent_name }}
+        </template>
+
+        <template v-slot:item.dosage="{ item }">
+            <TogglableThreeLinesLimitedText :text="item.dosage" />
+        </template>
+
+        <template v-slot:item.moq="{ item }">
+            {{ formatPrice(item.moq) }}
+        </template>
+
+        <template v-slot:item.shelf_life_id="{ item }">
+            {{ item.shelf_life.name }}
+        </template>
+
+        <template v-slot:item.class_id="{ item }">
+            <TdMediumWeightText class="text-green">
+                {{ item.class.name }}
             </TdMediumWeightText>
         </template>
 
-        <template v-slot:item.important="{ item }">
-            <TdMediumWeightText v-if="item.important" class="text-red">
-                {{ t("properties.Important") }}
-            </TdMediumWeightText>
+        <template v-slot:item.atx_id="{ item }">
+            <TogglableThreeLinesLimitedText v-if="item.atx" :text="item.atx.name" />
         </template>
 
-        <template v-slot:item.product_classes_name="{ item }">
-            <span>{{
-                item.product_classes.map((obj) => obj.name).join(" ")
-            }}</span>
+        <template v-slot:item.atx_short_name="{ item }">
+            {{ item.atx?.short_name }}
+        </template>
+
+        <template v-slot:item.dossier="{ item }">
+            <TogglableThreeLinesLimitedText :text="item.dossier" />
         </template>
 
         <template v-slot:item.zones_name="{ item }">
             <span>{{ item.zones.map((obj) => obj.name).join(" ") }}</span>
         </template>
 
-        <template v-slot:item.blacklists_name="{ item }">
-            <span>{{ item.blacklists.map((obj) => obj.name).join(" ") }}</span>
+        <template v-slot:item.bioequivalence="{ item }">
+            <TogglableThreeLinesLimitedText :text="item.bioequivalence" />
         </template>
 
-        <template v-slot:item.presences_name="{ item }">
-            <span>{{ item.presences.map((obj) => obj.name).join(" ") }}</span>
+        <template v-slot:item.registered_in_eu="{ item }">
+            <TdMediumWeightText
+                v-if="item.registered_in_eu"
+                class="text-pink-darken-3"
+            >
+                Registered
+            </TdMediumWeightText>
         </template>
 
-        <template v-slot:item.website="{ item }">
-            <TdLink :link="item.website" target="_blank">
-                <TogglableThreeLinesLimitedText :text="item.website" />
-            </TdLink>
-        </template>
-
-        <template v-slot:item.about="{ item }">
-            <TogglableThreeLinesLimitedText :text="item.about" />
-        </template>
-
-        <template v-slot:item.relationship="{ item }">
-            <TogglableThreeLinesLimitedText :text="item.relationship" />
+        <template v-slot:item.sold_in_eu="{ item }">
+            <TdMediumWeightText v-if="item.sold_in_eu" class="text-indigo">
+                For sale
+            </TdMediumWeightText>
         </template>
 
         <template v-slot:item.comments_count="{ item }">
@@ -184,6 +201,14 @@ function handleTableOptionsUpdate(options) {
             {{ useDateFormat(item.last_comment?.created_at, "DD MMM YYYY") }}
         </template>
 
+        <template v-slot:item.manufacturer_bdm="{ item }">
+            <TdAva :user="item.manufacturer.bdm" />
+        </template>
+
+        <template v-slot:item.manufacturer_analyst="{ item }">
+            <TdAva :user="item.manufacturer.analyst" />
+        </template>
+
         <template v-slot:item.created_at="{ item }">
             {{ useDateFormat(item.created_at, "DD MMM YYYY") }}
         </template>
@@ -192,16 +217,13 @@ function handleTableOptionsUpdate(options) {
             {{ useDateFormat(item.updated_at, "DD MMM YYYY") }}
         </template>
 
-        <template v-slot:item.meetings_count="{ item }">
+        <template v-slot:item.matched_product_searches="{ item }">
             <TdInertiaLink
-                :link="
-                    route('mad.manufacturers.index', {
-                        'manufacturer_id[]': item.id,
-                    })
-                "
+                v-for="search in item.matched_product_searches"
+                :key="search.id"
+                :link="route('mad.products.index', { 'id[]': search.id })"
             >
-                {{ item.meetings_count }}
-                <span class="text-lowercase">{{ t("pages.Meetings") }}</span>
+                # {{ search.id }} {{ search.country.code }}
             </TdInertiaLink>
         </template>
 

@@ -31,7 +31,7 @@ class Meeting extends Model
     const DEFAULT_ORDER_TYPE = 'desc';
     const DEFAULT_PAGINATION_LIMIT = 50;
 
-    const LIMITED_EXCEL_RECORDS_COUNT_FOR_EXPORT = 50;
+    const LIMITED_RECORDS_COUNT_ON_EXPORT_TO_EXCEL = 50;
     const STORAGE_PATH_OF_EXCEL_TEMPLATE_FILE_FOR_EXPORT = 'app/excel/export-templates/meetings.xlsx';
     const STORAGE_PATH_FOR_EXPORTING_EXCEL_FILES = 'app/excel/exports/meetings';
 

@@ -29,7 +29,7 @@ function updateHeaders() {
 
     // Update table headers
     axios
-        .patch(
+        .post(
             route("settings.table-headers.update", { key: props.settingsKey }),
             {
                 headers: headers.value,
@@ -52,7 +52,7 @@ function resetHeaders() {
     loading.value = true;
 
     axios
-        .patch(
+        .post(
             route("settings.table-headers.reset", { key: props.settingsKey })
         )
         .then(() => {

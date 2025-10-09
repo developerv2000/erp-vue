@@ -72,6 +72,8 @@ class CommentController extends Controller
     {
         $record->update($request->only('body'));
 
-        return true;
+        return response()->json([
+            'success' => true,
+        ]);
     }
 }

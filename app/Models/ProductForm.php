@@ -20,6 +20,10 @@ class ProductForm extends Model
     public $timestamps = false;
     protected $guarded = ['id'];
 
+    protected $appends = [
+        'parent_name'
+    ];
+
     /*
     |--------------------------------------------------------------------------
     | Relations

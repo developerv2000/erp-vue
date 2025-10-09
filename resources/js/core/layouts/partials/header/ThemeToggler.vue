@@ -18,7 +18,7 @@ function toggle() {
         value: userSettings.theme,
     });
 
-    axios.patch(url);
+    axios.post(url);
 }
 </script>
 

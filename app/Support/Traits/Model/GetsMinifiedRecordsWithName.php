@@ -13,7 +13,7 @@ trait GetsMinifiedRecordsWithName
     {
         return $query
             ->select('id', 'name')
-            ->withOnly([])
+            ->withOnly([]) // Ensures no extra relations are loaded.
             ->orderBy('name', 'asc');
     }
 

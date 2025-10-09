@@ -3,7 +3,7 @@
     "No": "Нет",
     "Attachments": "Вложения",
     "Products": "Продукты",
-    "Processes": "Процессы",
+    "Record": "Запись",
 
     "validations.required": "Это поле обязательно.",
     "validations.invalid": "Недопустимое значение.",
@@ -115,6 +115,10 @@
     "dates.Update date": "Дата обновления",
     "dates.Deletion date": "Дата удаления",
 
+    "Processes": "Процессы",
+    "processes.add": "Добавить процесс",
+    "processes.count": "{count} процесса",
+
     "fields.Email": "Электронная почта",
     "fields.Password": "Пароль",
     "fields.Name": "Имя",
@@ -138,6 +142,22 @@
     "fields.About company": "О компании",
     "fields.Relationship": "Отношения",
     "fields.Status": "Статус",
+
+    "fields.Generic": "Дженерик",
+    "fields.Form": "Форма",
+    "fields.Basic form": "Основная форма",
+    "fields.Brand": "Бренд",
+    "fields.Dosage": "Доза",
+    "fields.Pack": "Упаковка",
+    "fields.MOQ": "Мин. объем заказа",
+    "fields.Shelf life": "Срок Годности",
+    "fields.Dossier": "Досье",
+    "fields.Bioequivalence": "Биоэквив.",
+    "fields.Validity period": "Срок действия",
+    "fields.Registered in EU": "Зарегистр. в ЕС",
+    "fields.Sold in EU": "Продается в ЕС",
+    "fields.Down payment": "Доп. платёж",
+    "fields.Matched KVPP": "Совпадение с КВПП",
 
     "AAAAAAAAAAAAAA": "AAAAAAAAAAAAAA"
 }

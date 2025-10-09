@@ -25,7 +25,9 @@ class SettingController extends Controller
 
         auth()->user()->updateSetting($key, $value);
 
-        return true;
+        return response()->json([
+            'success' => true,
+        ]);
     }
 
     /**
@@ -35,11 +37,11 @@ class SettingController extends Controller
     {
         $user = $request->user();
         $settings = $user->settings ?? [];
-        $tableSettings = $settings['tables'] ?? [];
+        $headersSettings = $settings['table_headers'] ?? [];
 
-        abort_unless(isset($tableSettings[$key]), 404, 'Settings key not found');
+        abort_unless(isset($headersSettings[$key]), 404, 'Settings key not found');
 
-        $headers = collect($tableSettings[$key]);
+        $headers = collect($headersSettings[$key]);
         $requestHeaders = collect($request->input('headers', []))->keyBy('key');
 
         $updatedHeaders = $headers->map(function ($header) use ($requestHeaders) {
@@ -57,8 +59,8 @@ class SettingController extends Controller
         $orderedHeaders = $updatedHeaders->sortBy('order')->values()->all();
 
         // Save back to user settings
-        $tableSettings[$key] = $orderedHeaders;
-        $settings['tables'] = $tableSettings;
+        $headersSettings[$key] = $orderedHeaders;
+        $settings['table_headers'] = $headersSettings;
         $user->settings = $settings;
         $user->save();
 
@@ -72,7 +74,7 @@ class SettingController extends Controller
      */
     public function resetTableHeaders(Request $request, $key)
     {
-        auth()->user()->resetSpecificTableHeaders($key);
+        auth()->user()->resetTableHeadersByKey($key);
 
         return response()->json([
             'success' => true,

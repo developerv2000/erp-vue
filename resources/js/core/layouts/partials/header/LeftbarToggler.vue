@@ -13,7 +13,7 @@ function toggle() {
         value: userSettings.isLeftbarCollapsed,
     });
 
-    axios.patch(url);
+    axios.post(url);
 }
 </script>
 

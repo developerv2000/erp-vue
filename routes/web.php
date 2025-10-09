@@ -24,10 +24,10 @@ Route::middleware('auth', 'auth.session')->group(function () {
     });
 
     Route::controller(SettingController::class)->prefix('/settings')->name('settings.')->group(function () {
-        Route::patch('by-key/{key}/{value}', 'updateByKey')->name('update-by-key'); // AJAX request
+        Route::post('by-key/{key}/{value}', 'updateByKey')->name('update-by-key'); // AJAX request
 
-        Route::patch('table-headers/{key}', 'updateTableHeaders')->name('table-headers.update'); // AJAX request
-        Route::patch('table-headers/{key}/reset', 'resetTableHeaders')->name('table-headers.reset'); // AJAX request
+        Route::post('table-headers/{key}', 'updateTableHeaders')->name('table-headers.update'); // AJAX request
+        Route::post('table-headers/{key}/reset', 'resetTableHeaders')->name('table-headers.reset'); // AJAX request
     });
 
     Route::controller(ProfileController::class)->prefix('profile')->name('profile.')->group(function () {

@@ -92,17 +92,19 @@ class FileHelper
     }
 
     /**
-     * Sanitize a filename by removing unexpected symbols and characters.
+     * Sanitize a filename by removing unexpected symbols and characters,
+     * but keep letters from any language, numbers, dashes, underscores,
+     * dots, and spaces.
      *
      * @param string $filename The original filename.
      * @return string The sanitized filename.
      */
     public static function sanitizeFilename(string $filename): string
     {
-        // Allow only alphanumeric characters, dashes, underscores, dots, and spaces
-        $sanitized = preg_replace('/[^a-zA-Z0-9\-\_\.\s]/', '', $filename);
+        // Allow all letters (Unicode), numbers, dashes, underscores, dots, and spaces
+        $sanitized = preg_replace('/[^\p{L}\p{N}\-\_\.\s]/u', '', $filename);
 
-        // Trim any unnecessary spaces from the beginning and end of the filename
+        // Trim unnecessary spaces
         return trim($sanitized);
     }
 

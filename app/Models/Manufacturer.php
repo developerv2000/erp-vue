@@ -42,7 +42,7 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
     const DEFAULT_ORDER_DIRECTION = 'desc';
     const DEFAULT_PER_PAGE = 50;
 
-    const LIMITED_EXCEL_RECORDS_COUNT_FOR_EXPORT = 5;
+    const LIMITED_RECORDS_COUNT_ON_EXPORT_TO_EXCEL = 5;
     const STORAGE_PATH_OF_EXCEL_TEMPLATE_FILE_FOR_EXPORT = 'app/private/excel/export-templates/epp.xlsx';
     const STORAGE_PATH_OF_EXPORTED_EXCEL_FILES = 'app/private/excel/exports/epp';
 
@@ -326,13 +326,12 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
      *  - Normalize query params (pagination, sorting, etc.)
      *  - Apply filters
      *  - Finalize query with sorting & pagination
-     *  - Append basic attributes (unless returning raw query)
+     *  - Append basic attributes (if requested and unless returning raw query)
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $action  ('paginate', 'get' or 'query')
+     * @param $action  ('paginate', 'get' or 'query')
      * @return mixed
      */
-    public static function queryRecordsFromRequest(Request $request, string $action = 'paginate')
+    public static function queryRecordsFromRequest(Request $request, string $action = 'paginate', bool $appendAttributes = false)
     {
         $query = self::withBasicRelations()->withBasicRelationCounts();
 
@@ -351,7 +350,7 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
         $records = ModelHelper::finalizeQueryForRequest($query, $request, $action);
 
         // Append attributes unless raw query is requested
-        if ($action !== 'query') {
+        if ($appendAttributes && $action !== 'query') {
             self::appendRecordsBasicAttributes($records);
         }
 
@@ -554,7 +553,7 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
         if (Gate::forUser($user)->allows(Permission::extractAbilityName(Permission::CAN_EDIT_MAD_EPP_NAME))) {
             array_push(
                 $columns,
-                ['title' => 'Edit', 'key' => 'edit', 'order' => $order++, 'width' => 56, 'visible' => 1, 'sortable' => false],
+                ['title' => 'Record', 'key' => 'edit', 'order' => $order++, 'width' => 60, 'visible' => 1, 'sortable' => false],
             );
         }
 

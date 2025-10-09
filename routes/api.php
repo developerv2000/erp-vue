@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\global\MainController;
 use App\Models\Manufacturer;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -11,6 +12,10 @@ Route::middleware('auth:sanctum')->name('api.')->group(function () {
     });
 
     Route::prefix('/manufacturers')->name('manufacturers.')->group(function () {
-        Route::get('/', fn(Request $request) => Manufacturer::queryRecordsFromRequest($request))->name('get');
+        Route::get('/', fn(Request $request) => Manufacturer::queryRecordsFromRequest($request, 'paginate', true))->name('get');
+    });
+
+    Route::prefix('/products')->name('products.')->group(function () {
+        Route::get('/', fn(Request $request) => Product::queryRecordsFromRequest($request, 'paginate', true))->name('get');
     });
 });

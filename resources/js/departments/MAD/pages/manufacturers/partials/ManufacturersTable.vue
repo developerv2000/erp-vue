@@ -24,12 +24,8 @@ const { t } = useI18n();
 const page = usePage();
 const store = useMADManufacturersTableStore();
 
-if (!store.initializedFromInertiaPage) {
-    store.initFromInertiaPage(page); // Initialize store from inertia page only once.
-}
-
 onMounted(() => {
-    store.detectTrashPage();
+    store.initFromInertiaPage(page); // Needs improovement. Make sure to run it only when redirected from other pages!
     store.fetchRecords({ updateUrl: false });
 });
 

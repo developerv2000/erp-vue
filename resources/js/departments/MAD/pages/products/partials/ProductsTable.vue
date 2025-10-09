@@ -28,12 +28,8 @@ const { t } = useI18n();
 const page = usePage();
 const store = useMADProductsTableStore();
 
-if (!store.initializedFromInertiaPage) {
-    store.initFromInertiaPage(page); // Initialize store from inertia page only once.
-}
-
 onMounted(() => {
-    store.detectTrashPage();
+    store.initFromInertiaPage(page); // Needs improovement. Make sure to run it only when redirected from other pages!
     store.fetchRecords({ updateUrl: false });
 });
 
@@ -155,7 +151,10 @@ function handleTableOptionsUpdate(options) {
         </template>
 
         <template v-slot:item.atx_id="{ item }">
-            <TogglableThreeLinesLimitedText v-if="item.atx" :text="item.atx.name" />
+            <TogglableThreeLinesLimitedText
+                v-if="item.atx"
+                :text="item.atx.name"
+            />
         </template>
 
         <template v-slot:item.atx_short_name="{ item }">

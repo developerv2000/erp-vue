@@ -97,8 +97,8 @@ const refreshSmartFiltersDebounced = debounce(refreshSmartFilters, 500);
 
         <FilterAutocomplete
             :label="t('fields.Product class')"
-            name="productClasses"
-            v-model="store.filters.productClasses"
+            name="product_classes"
+            v-model="store.filters.product_classes"
             :items="page.props.simpleFilterDependencies.productClasses"
             multiple
         />

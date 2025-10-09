@@ -393,33 +393,41 @@ class Product extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
         return [
             'whereIn' => ['id', 'inn_id', 'form_id', 'class_id', 'shelf_life_id', 'brand', 'manufacturer_id'],
             'like' => ['dosage', 'pack'],
-            'belongsToMany' => ['zones'],
             'dateRange' => ['created_at', 'updated_at'],
+
+            'belongsToManyRelation' => [
+                [
+                    'inputName' => 'zones',
+                    'relationName' => 'zones',
+                    'relationTable' => 'zones',
+                ],
+            ],
 
             'relationEqual' => [
                 [
-                    'name' => 'manufacturer',
-                    'attribute' => 'analyst_user_id',
+                    'inputName' => 'manufacturer_analyst_user_id',
+                    'relationName' => 'manufacturer',
+                    'relationAttribute' => 'manufacturers.analyst_user_id',
                 ],
 
                 [
-                    'name' => 'manufacturer',
-                    'attribute' => 'bdm_user_id',
+                    'inputName' => 'manufacturer_bdm_user_id',
+                    'relationName' => 'manufacturer',
+                    'relationAttribute' => 'manufacturers.bdm_user_id',
                 ],
+
+                [
+                    'inputName' => 'manufacturer_category_id',
+                    'relationName' => 'manufacturer',
+                    'relationAttribute' => 'manufacturers.category_id',
+                ]
             ],
 
             'relationIn' => [
                 [
-                    'name' => 'manufacturer',
-                    'attribute' => 'country_id',
-                ]
-            ],
-
-            'relationEqualAmbiguous' => [
-                [
-                    'name' => 'manufacturer',
-                    'attribute' => 'manufacturer_category_id',
-                    'ambiguousAttribute' => 'manufacturers.category_id',
+                    'inputName' => 'manufacturer_country_id',
+                    'relationName' => 'manufacturer',
+                    'relationAttribute' => 'manufacturers.country_id',
                 ]
             ],
         ];

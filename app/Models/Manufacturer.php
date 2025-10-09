@@ -44,7 +44,7 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
 
     const LIMITED_RECORDS_COUNT_ON_EXPORT_TO_EXCEL = 5;
     const STORAGE_PATH_OF_EXCEL_TEMPLATE_FILE_FOR_EXPORT = 'app/private/excel/export-templates/epp.xlsx';
-    const STORAGE_PATH_OF_EXPORTED_EXCEL_FILES = 'app/private/excel/exports/epp';
+    const STORAGE_PATH_FOR_EXPORTING_EXCEL_FILES = 'app/private/excel/exports/epp';
 
     /*
     |--------------------------------------------------------------------------
@@ -381,8 +381,27 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
         return [
             'whereEqual' => ['analyst_user_id', 'bdm_user_id', 'category_id', 'active', 'important'],
             'whereIn' => ['id', 'country_id'],
-            'belongsToMany' => ['productClasses', 'zones', 'blacklists'],
             'dateRange' => ['created_at', 'updated_at'],
+
+            'belongsToManyRelation' => [
+                [
+                    'inputName' => 'product_classes',
+                    'relationName' => 'productClasses',
+                    'relationTable' => 'product_classes',
+                ],
+
+                [
+                    'inputName' => 'zones',
+                    'relationName' => 'zones',
+                    'relationTable' => 'zones',
+                ],
+
+                [
+                    'inputName' => 'blacklists',
+                    'relationName' => 'blacklists',
+                    'relationTable' => 'manufacturer_blacklists',
+                ],
+            ],
         ];
     }
 
@@ -423,15 +442,15 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
      */
     public static function applyProcessCountriesFilter($query, $request): void
     {
-        $relationInAmbiguous = [
+        $relationIn = [
             [
-                'name' => 'processes',
-                'attribute' => 'process_country_id',
-                'ambiguousAttribute' => 'processes.country_id',
+                'inputName' => 'process_country_id',
+                'relationName' => 'processes',
+                'relationAttribute' => 'processes.country_id',
             ]
         ];
 
-        QueryFilterHelper::filterRelationInAmbiguous($request, $query, $relationInAmbiguous);
+        QueryFilterHelper::filterRelationIn($request, $query, $relationIn);
     }
 
     /**

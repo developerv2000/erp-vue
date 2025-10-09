@@ -3,25 +3,26 @@ import { router, usePage } from "@inertiajs/vue3";
 import { useI18n } from "vue-i18n";
 import { debounce } from "@/core/scripts/utilities";
 import { useMessagesStore } from "@/core/stores/messages";
-import { useMADManufacturersTableStore } from "@/departments/MAD/stores/manufacturersTable";
-
+import { useMADProductsTableStore } from "@/departments/MAD/stores/productsTable";
 import StoreBindedFilter from "@/core/components/filters/StoreBindedFilter.vue";
 import FilterAutocomplete from "@/core/components/filters/inputs/FilterAutocomplete.vue";
-import FilterBooleanAutocomplete from "@/core/components/filters/inputs/FilterBooleanAutocomplete.vue";
 import FilterDefaultInputs from "@/core/components/filters/inputs/FilterDefaultInputs.vue";
+import FilterTextField from "@/core/components/filters/inputs/FilterTextField.vue";
 
 const { t } = useI18n();
 const page = usePage();
-const store = useMADManufacturersTableStore();
+const store = useMADProductsTableStore();
 const messages = useMessagesStore();
 
 // Function to refresh smart filters
 const refreshSmartFilters = () => {
     router.reload({
         data: {
-            analyst_user_id: store.filters.analyst_user_id,
-            country_id: store.filters.country_id,
-            id: store.filters.id,
+            inn_id: store.filters.inn_id,
+            manufacturer_id: store.filters.manufacturer_id,
+            form_id: store.filters.form_id,
+            dosage: store.filters.dosage,
+            pack: store.filters.pack,
         },
         only: ["smartFilterDependencies"],
         preserveUrl: true,
@@ -41,99 +42,104 @@ const refreshSmartFiltersDebounced = debounce(refreshSmartFilters, 500);
 <template>
     <StoreBindedFilter :store="store">
         <FilterAutocomplete
-            :label="'* ' + t('fields.Analyst')"
-            name="analyst_user_id"
-            v-model="store.filters.analyst_user_id"
-            :items="page.props.smartFilterDependencies.analystUsers"
+            :label="'* ' + t('fields.Generic')"
+            name="inn_id"
+            v-model="store.filters.inn_id"
+            :items="page.props.smartFilterDependencies.inns"
             @update:modelValue="refreshSmartFiltersDebounced"
-        />
-
-        <FilterAutocomplete
-            :label="'* ' + t('fields.Country')"
-            name="country_id[]"
-            v-model="store.filters.country_id"
-            :items="page.props.smartFilterDependencies.countriesOrderedByName"
             multiple
-            @update:modelValue="refreshSmartFiltersDebounced"
         />
 
         <FilterAutocomplete
             :label="'* ' + t('fields.Manufacturer')"
-            name="id[]"
-            v-model="store.filters.id"
+            name="manufacturer_id[]"
+            v-model="store.filters.manufacturer_id"
             :items="page.props.smartFilterDependencies.manufacturers"
+            @update:modelValue="refreshSmartFiltersDebounced"
             multiple
+        />
+
+        <FilterAutocomplete
+            :label="'* ' + t('fields.Form')"
+            name="form_id[]"
+            v-model="store.filters.form_id"
+            :items="page.props.smartFilterDependencies.productForms"
+            @update:modelValue="refreshSmartFiltersDebounced"
+            multiple
+        />
+
+        <FilterTextField
+            :label="'* ' + t('fields.Dosage')"
+            name="dosage"
+            v-model="store.filters.dosage"
+            @update:modelValue="refreshSmartFiltersDebounced"
+        />
+
+        <FilterTextField
+            :label="'* ' + t('fields.Pack')"
+            name="Pack"
+            v-model="store.filters.pack"
             @update:modelValue="refreshSmartFiltersDebounced"
         />
 
         <FilterAutocomplete
-            :label="t('fields.BDM')"
-            name="bdm_user_id"
-            v-model="store.filters.bdm_user_id"
-            :items="page.props.simpleFilterDependencies.bdmUsers"
-        />
-
-        <FilterAutocomplete
-            :label="t('filter.Region')"
-            name="region"
-            v-model="store.filters.region"
-            :items="page.props.simpleFilterDependencies.regions"
+            :label="t('fields.Country')"
+            name="manufacturer_country_id[]"
+            v-model="store.filters.manufacturer_country_id"
+            :items="page.props.simpleFilterDependencies.countriesOrderedByName"
+            multiple
         />
 
         <FilterAutocomplete
             :label="t('fields.Category')"
-            name="category_id"
-            v-model="store.filters.category_id"
-            :items="page.props.simpleFilterDependencies.categories"
-        />
-
-        <FilterBooleanAutocomplete
-            :label="t('fields.Status')"
-            name="active"
-            v-model="store.filters.active"
-            :true-label="t('properties.Active')"
-            :false-label="t('properties.Stopped')"
+            name="manufacturer_category_id"
+            v-model="store.filters.manufacturer_category_id"
+            :items="page.props.simpleFilterDependencies.manufacturerCategories"
         />
 
         <FilterAutocomplete
             :label="t('fields.Product class')"
-            name="productClasses"
-            v-model="store.filters.productClasses"
+            name="class_id"
+            v-model="store.filters.class_id"
             :items="page.props.simpleFilterDependencies.productClasses"
             multiple
         />
 
         <FilterAutocomplete
+            :label="t('fields.Analyst')"
+            name="manufacturer_analyst_user_id"
+            v-model="store.filters.manufacturer_analyst_user_id"
+            :items="page.props.simpleFilterDependencies.analystUsers"
+        />
+
+        <FilterAutocomplete
+            :label="t('fields.BDM')"
+            name="manufacturer_bdm_user_id"
+            v-model="store.filters.manufacturer_bdm_user_id"
+            :items="page.props.simpleFilterDependencies.bdmUsers"
+        />
+
+        <FilterAutocomplete
+            :label="t('fields.Brand')"
+            name="brand[]"
+            v-model="store.filters.brand"
+            :items="page.props.simpleFilterDependencies.brands"
+            multiple
+        />
+
+        <FilterAutocomplete
+            :label="t('fields.Shelf life')"
+            name="shelf_life_id[]"
+            v-model="store.filters.shelf_life_id"
+            :items="page.props.simpleFilterDependencies.shelfLifes"
+            multiple
+        />
+
+        <FilterAutocomplete
             :label="t('fields.Zones')"
-            name="zones"
+            name="zones[]"
             v-model="store.filters.zones"
             :items="page.props.simpleFilterDependencies.zones"
-            multiple
-        />
-
-        <FilterBooleanAutocomplete
-            :label="t('properties.Important')"
-            name="important"
-            v-model="store.filters.important"
-        />
-
-        <FilterAutocomplete
-            :label="t('filter.Has VPS for country')"
-            name="zones"
-            v-model="store.filters.process_country_id"
-            :items="
-                page.props.simpleFilterDependencies
-                    .countriesOrderedByProcessesCount
-            "
-            item-title="code"
-            multiple
-        />
-
-        <FilterAutocomplete
-            :label="t('fields.Blacklist')"
-            name="blacklists"
-            v-model="store.filters.blacklists"
-            :items="page.props.simpleFilterDependencies.blacklists"
             multiple
         />
 

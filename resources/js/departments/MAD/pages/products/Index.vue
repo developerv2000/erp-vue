@@ -12,7 +12,7 @@ const { t } = useI18n();
     <MainLayout :title="t('pages.IVP')" :display-title-at-header="true">
         <DefaultTableWrapper>
             <ProductsTable />
-            <!-- <ProductsFilter /> -->
+            <ProductsFilter />
         </DefaultTableWrapper>
     </MainLayout>
 </template>

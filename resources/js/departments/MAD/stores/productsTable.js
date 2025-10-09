@@ -14,25 +14,28 @@ const defaultPaginationOptions = {
 };
 
 const defaultFilters = {
+    // Text fields
+    dosage: null,
+    pack: null,
+
     // Date ranges
     created_at: null,
     updated_at: null,
 
     // Singular autocompletes
-    analyst_user_id: null,
-    bdm_user_id: null,
-    region: null,
-    category_id: null,
-    active: null,
-    important: null,
+    manufacturer_category_id: null,
+    manufacturer_analyst_user_id: null,
+    manufacturer_bdm_user_id: null,
 
     // Multiple autocompletes
-    country_id: [],
-    id: [],
-    productClasses: [],
+    inn_id: [],
+    manufacturer_id: [],
+    form_id: [],
+    manufacturer_country_id: [],
+    class_id: [],
+    brand: [],
+    shelf_life_id: [],
     zones: [],
-    process_country_id: [],
-    blacklists: [],
 }
 
 const API_URL = route('api.products.get');
@@ -72,13 +75,12 @@ export const useMADProductsTableStore = defineStore('MADProductsTable', {
             this.navigate_to_page = this.pagination.page;
 
             // Filters that don`t require normalization
-            this.filters.region = query.region;
-            this.filters.active = query.active;
-            this.filters.important = query.important;
+            this.filters.dosage = query.dosage;
+            this.filters.pack = query.pack;
 
             // Normalize filters
-            normalizeSingleIDsFromQuery(this.filters, query, ['analyst_user_id', 'bdm_user_id', 'category_id']);
-            normalizeMultiIDsFromQuery(this.filters, query, ['country_id', 'id', 'productClasses', 'zones', 'process_country_id', 'blacklists']);
+            normalizeSingleIDsFromQuery(this.filters, query, ['manufacturer_category_id', 'manufacturer_analyst_user_id', 'manufacturer_bdm_user_id']);
+            normalizeMultiIDsFromQuery(this.filters, query, ['inn_id', 'manufacturer_id', 'form_id', 'manufacturer_country_id', 'class_id', 'brand', 'shelf_life_id', 'zones']);
             normalizeDateRangesFromQuery(this.filters, query, ['created_at', 'updated_at']);
 
             // Mark as initialized

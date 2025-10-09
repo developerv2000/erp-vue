@@ -46,7 +46,7 @@ class ExcelStorageController extends Controller
     public function download(Request $request, string $model, string $filename)
     {
         $modelClass = $this->resolveModelClass($model);
-        $filePath = storage_path($modelClass::STORAGE_PATH_OF_EXPORTED_EXCEL_FILES . '/' . $filename);
+        $filePath = storage_path($modelClass::STORAGE_PATH_FOR_EXPORTING_EXCEL_FILES . '/' . $filename);
 
         if (! file_exists($filePath)) {
             abort(404, 'Exported file not found.');
@@ -98,8 +98,8 @@ class ExcelStorageController extends Controller
     {
         $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
         $filename = date('Y-m-d H-i-s') . '.xlsx';
-        $filename = FileHelper::ensureUniqueFilename($filename, storage_path($modelClass::STORAGE_PATH_OF_EXPORTED_EXCEL_FILES));
-        $filePath = storage_path($modelClass::STORAGE_PATH_OF_EXPORTED_EXCEL_FILES . '/' . $filename);
+        $filename = FileHelper::ensureUniqueFilename($filename, storage_path($modelClass::STORAGE_PATH_FOR_EXPORTING_EXCEL_FILES));
+        $filePath = storage_path($modelClass::STORAGE_PATH_FOR_EXPORTING_EXCEL_FILES . '/' . $filename);
 
         $writer->save($filePath);
 

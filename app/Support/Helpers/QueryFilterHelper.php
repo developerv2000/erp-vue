@@ -20,20 +20,24 @@ class QueryFilterHelper
     {
         $query = self::filterWhereEqual($request, $query, $config['whereEqual'] ?? []);
         $query = self::filterWhereIn($request, $query, $config['whereIn'] ?? []);
-        $query = self::filterWhereNotIn($request, $query, $config['whereNotIn'] ?? []);
         $query = self::filterDate($request, $query, $config['date'] ?? []);
         $query = self::filterLike($request, $query, $config['like'] ?? []);
         $query = self::filterDateRange($request, $query, $config['dateRange'] ?? []);
-        $query = self::filterWhereRelationDateRangeAmbiguous($request, $query, $config['relationDateRangeAmbiguous'] ?? []);
-        $query = self::filterBelongsToMany($request, $query, $config['belongsToMany'] ?? []);
+        $query = self::filterBelongsToManyRelation($request, $query, $config['belongsToManyRelation'] ?? []);
+
         $query = self::filterRelationEqual($request, $query, $config['relationEqual'] ?? []);
         $query = self::filterRelationIn($request, $query, $config['relationIn'] ?? []);
         $query = self::filterRelationLike($request, $query, $config['relationLike'] ?? []);
-        $query = self::filterRelationEqualAmbiguous($request, $query, $config['relationEqualAmbiguous'] ?? []);
-        $query = self::filterRelationInAmbiguous($request, $query, $config['relationInAmbiguous'] ?? []);
+        $query = self::filterRelationDateRange($request, $query, $config['relationDateRange'] ?? []);
 
         return $query;
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Record based filters
+    |--------------------------------------------------------------------------
+    */
 
     public static function filterWhereEqual(Request $request, Builder $query, array $attributes): Builder
     {
@@ -50,16 +54,6 @@ class QueryFilterHelper
         foreach ($attributes as $attribute) {
             if ($request->filled($attribute)) {
                 $query->whereIn($attribute, $request->input($attribute));
-            }
-        }
-        return $query;
-    }
-
-    public static function filterWhereNotIn(Request $request, Builder $query, array $attributes): Builder
-    {
-        foreach ($attributes as $attribute) {
-            if ($request->filled($attribute['inputName'])) {
-                $query->whereNotIn($attribute['attributeName'], $request->input($attribute['inputName']));
             }
         }
         return $query;
@@ -112,93 +106,75 @@ class QueryFilterHelper
         return $query;
     }
 
-    public static function filterWhereRelationDateRangeAmbiguous(Request $request, Builder $query, array $relations): Builder
+    public static function filterBelongsToManyRelation(Request $request, Builder $query, array $filters): Builder
     {
-        foreach ($relations as $relation) {
-            if ($request->filled($relation['attribute'])) {
-                [$fromDate, $toDate] = explode(' - ', $request->input($relation['attribute']));
+        foreach ($filters as $filter) {
+            if ($request->filled($filter['inputName'])) {
+                $query->whereHas($filter['relationName'], function ($q) use ($request, $filter) {
+                    $q->whereIn("{$filter['relationTable']}.id", $request->input($filter['inputName']));
+                });
+            }
+        }
+        return $query;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Relation based filters
+    |--------------------------------------------------------------------------
+    */
+
+    public static function filterRelationEqual(Request $request, Builder $query, array $filters): Builder
+    {
+        foreach ($filters as $filter) {
+            if ($request->filled($filter['inputName'])) {
+                $query->whereHas($filter['relationName'], function ($q) use ($request, $filter) {
+                    $q->where($filter['relationAttribute'], $request->input($filter['inputName']));
+                });
+            }
+        }
+        return $query;
+    }
+
+    public static function filterRelationIn(Request $request, Builder $query, array $filters): Builder
+    {
+        foreach ($filters as $filter) {
+            if ($request->filled($filter['inputName'])) {
+                $query->whereHas($filter['relationName'], function ($q) use ($request, $filter) {
+                    $q->whereIn($filter['relationAttribute'], $request->input($filter['inputName']));
+                });
+            }
+        }
+        return $query;
+    }
+
+    public static function filterRelationLike(Request $request, Builder $query, array $filters): Builder
+    {
+        foreach ($filters as $filter) {
+            if ($request->filled($filter['inputName'])) {
+                $query->whereHas($filter['relationName'], function ($q) use ($request, $filter) {
+                    $q->where($filter['relationAttribute'], 'LIKE', '%' . $request->input($filter['inputName']) . '%');
+                });
+            }
+        }
+        return $query;
+    }
+
+    public static function filterRelationDateRange(Request $request, Builder $query, array $filters): Builder
+    {
+        foreach ($filters as $filter) {
+            if ($request->filled($filter['inputName'])) {
+                [$fromDate, $toDate] = explode(' - ', $request->input($filter['inputName']));
 
                 $fromDate = Carbon::createFromFormat('Y-m-d', trim($fromDate))->startOfDay();
                 $toDate   = Carbon::createFromFormat('Y-m-d', trim($toDate))->endOfDay();
 
-                $query->whereHas($relation['name'], function ($q) use ($fromDate, $toDate, $relation) {
-                    $q->whereBetween($relation['ambiguousAttribute'], [$fromDate, $toDate]);
+                $query->whereHas($filter['relationName'], function ($q) use ($fromDate, $toDate, $filter) {
+                    $q->whereBetween($filter['relationAttribute'], [$fromDate, $toDate]);
                 });
             }
         }
 
-        return $query;
-    }
-
-    public static function filterBelongsToMany(Request $request, Builder $query, array $relationNames): Builder
-    {
-        foreach ($relationNames as $relationName) {
-            if ($request->filled($relationName)) {
-                $query->whereHas($relationName, function ($q) use ($request, $relationName) {
-                    $q->whereIn('id', $request->input($relationName));
-                });
-            }
-        }
-        return $query;
-    }
-
-    public static function filterRelationEqual(Request $request, Builder $query, array $relations): Builder
-    {
-        foreach ($relations as $relation) {
-            if ($request->filled($relation['attribute'])) {
-                $query->whereHas($relation['name'], function ($q) use ($request, $relation) {
-                    $q->where($relation['attribute'], $request->input($relation['attribute']));
-                });
-            }
-        }
-        return $query;
-    }
-
-    public static function filterRelationIn(Request $request, Builder $query, array $relations): Builder
-    {
-        foreach ($relations as $relation) {
-            if ($request->filled($relation['attribute'])) {
-                $query->whereHas($relation['name'], function ($q) use ($request, $relation) {
-                    $q->whereIn($relation['attribute'], $request->input($relation['attribute']));
-                });
-            }
-        }
-        return $query;
-    }
-
-    public static function filterRelationLike(Request $request, Builder $query, array $relations): Builder
-    {
-        foreach ($relations as $relation) {
-            if ($request->filled($relation['attribute'])) {
-                $query->whereHas($relation['name'], function ($q) use ($request, $relation) {
-                    $q->where($relation['attribute'], 'LIKE', '%' . $request->input($relation['attribute']) . '%');
-                });
-            }
-        }
-        return $query;
-    }
-
-    public static function filterRelationEqualAmbiguous(Request $request, Builder $query, array $relations): Builder
-    {
-        foreach ($relations as $relation) {
-            if ($request->filled($relation['attribute'])) {
-                $query->whereHas($relation['name'], function ($q) use ($request, $relation) {
-                    $q->where($relation['ambiguousAttribute'], $request->input($relation['attribute']));
-                });
-            }
-        }
-        return $query;
-    }
-
-    public static function filterRelationInAmbiguous(Request $request, Builder $query, array $relations): Builder
-    {
-        foreach ($relations as $relation) {
-            if ($request->filled($relation['attribute'])) {
-                $query->whereHas($relation['name'], function ($q) use ($request, $relation) {
-                    $q->whereIn($relation['ambiguousAttribute'], $request->input($relation['attribute']));
-                });
-            }
-        }
         return $query;
     }
 }

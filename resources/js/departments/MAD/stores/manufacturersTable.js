@@ -29,7 +29,7 @@ const defaultFilters = {
     // Multiple autocompletes
     country_id: [],
     id: [],
-    productClasses: [],
+    product_classes: [],
     zones: [],
     process_country_id: [],
     blacklists: [],
@@ -78,7 +78,7 @@ export const useMADManufacturersTableStore = defineStore('MADManufacturersTable'
 
             // Normalize filters
             normalizeSingleIDsFromQuery(this.filters, query, ['analyst_user_id', 'bdm_user_id', 'category_id']);
-            normalizeMultiIDsFromQuery(this.filters, query, ['country_id', 'id', 'productClasses', 'zones', 'process_country_id', 'blacklists']);
+            normalizeMultiIDsFromQuery(this.filters, query, ['country_id', 'id', 'product_classes', 'zones', 'process_country_id', 'blacklists']);
             normalizeDateRangesFromQuery(this.filters, query, ['created_at', 'updated_at']);
 
             // Mark as initialized

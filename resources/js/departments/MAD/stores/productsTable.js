@@ -27,6 +27,9 @@ const defaultFilters = {
     manufacturer_analyst_user_id: null,
     manufacturer_bdm_user_id: null,
 
+    // Arrays
+    id: [],
+
     // Multiple autocompletes
     inn_id: [],
     manufacturer_id: [],
@@ -80,7 +83,7 @@ export const useMADProductsTableStore = defineStore('MADProductsTable', {
 
             // Normalize filters
             normalizeSingleIDsFromQuery(this.filters, query, ['manufacturer_category_id', 'manufacturer_analyst_user_id', 'manufacturer_bdm_user_id']);
-            normalizeMultiIDsFromQuery(this.filters, query, ['inn_id', 'manufacturer_id', 'form_id', 'manufacturer_country_id', 'class_id', 'brand', 'shelf_life_id', 'zones']);
+            normalizeMultiIDsFromQuery(this.filters, query, ['id', 'inn_id', 'manufacturer_id', 'form_id', 'manufacturer_country_id', 'class_id', 'brand', 'shelf_life_id', 'zones']);
             normalizeDateRangesFromQuery(this.filters, query, ['created_at', 'updated_at']);
 
             // Mark as initialized

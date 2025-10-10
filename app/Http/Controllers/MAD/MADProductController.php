@@ -13,6 +13,7 @@ use App\Models\ProductClass;
 use App\Models\ProductForm;
 use App\Models\ProductShelfLife;
 use App\Models\User;
+use App\Models\Zone;
 use App\Support\FilterDependencies\SimpleFilters\MAD\ProductsSimpleFilterDependencies;
 use App\Support\FilterDependencies\SmartFilters\MAD\ProductsSmartFilterDependencies;
 use App\Support\Helpers\ControllerHelper;
@@ -77,10 +78,20 @@ class MADProductController extends Controller
             'inns' => Inn::orderByName()->get(),
             'countriesOrderedByName' => Country::orderByName()->get(),
             'manufacturerCategories' => ManufacturerCategory::orderByName()->get(),
-            'defaultSelectedClassID' => ProductClass::getDefaultSelectedIDValue(),
-            'defaultSelectedShelfLifeID' => ProductShelfLife::getDefaultSelectedIDValue(),
-            'defaultSelectedZoneIDs' => Zone::getRelatedDefaultSelectedIDValues(),
+            'defaultSelectedClassID' => ProductClass::getSelectedIDByDefault(),
+            'defaultSelectedShelfLifeID' => ProductShelfLife::getSelectedIDByDefault(),
+            'defaultSelectedZoneIDs' => Zone::getSelectedIDsByDefault(),
         ]);
+    }
+
+    /**
+     * Get similar records based on the provided request data.
+     *
+     * Used on AJAX requests to retrieve similar records, on the products create form.
+     */
+    public function getSimilarRecordsForRequest(Request $request)
+    {
+        return Product::getSimilarRecordsForRequest($request);
     }
 
     /**

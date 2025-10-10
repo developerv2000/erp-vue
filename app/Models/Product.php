@@ -576,7 +576,8 @@ class Product extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
         $formFamilyIDs = ProductForm::find($request->form_id)->getFamilyIDs();
 
         // Query similar records based on manufacturer, inn, and form family IDs
-        $similarRecords = self::withTrashed()->where('manufacturer_id', $request->manufacturer_id)
+        $similarRecords = self::withTrashed()
+            ->where('manufacturer_id', $request->manufacturer_id)
             ->where('inn_id', $request->inn_id)
             ->whereIn('form_id', $formFamilyIDs)
             ->with(['form'])

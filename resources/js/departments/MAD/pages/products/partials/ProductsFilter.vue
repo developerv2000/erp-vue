@@ -143,6 +143,6 @@ const refreshSmartFiltersDebounced = debounce(refreshSmartFilters, 500);
             multiple
         />
 
-        <FilterDefaultInputs :store="store" :exclude="['id']" />
+        <FilterDefaultInputs :store="store" />
     </StoreBindedFilter>
 </template>

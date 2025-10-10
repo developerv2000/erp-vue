@@ -29,31 +29,12 @@ class ProductShelfLife extends Model
 
     /*
     |--------------------------------------------------------------------------
-    | Contracts
-    |--------------------------------------------------------------------------
-    */
-
-    //Implement method declared in 'TracksUsageCount' interface.
-    public function scopeWithRelatedUsageCounts($query)
-    {
-        return $query->withCount([
-            'products',
-        ]);
-    }
-
-    //Implement method declared in 'TracksUsageCount' interface.
-    public function getUsageCountAttribute()
-    {
-        return $this->products_count;
-    }
-
-    /*
-    |--------------------------------------------------------------------------
     | Misc
     |--------------------------------------------------------------------------
     */
 
-    public static function getDefaultSelectedIDValue()
+    // Get default selected id, on products.create page
+    public static function getSelectedIDByDefault()
     {
         return self::where('name', 'TBC')->value('id');
     }

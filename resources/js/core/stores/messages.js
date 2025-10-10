@@ -59,5 +59,19 @@ export const useMessagesStore = defineStore('messages', {
                 timeout: 1200
             });
         },
+        addSimilarRecordsUpdatedSuccessfullyMessage() {
+            this.add({
+                text: i18n.global.t('messages.Similar records updated successfully'),
+                color: 'success',
+                timeout: 2500
+            });
+        },
+        addSimilarRecordsUpdateFailedMessage() {
+            this.add({
+                text: i18n.global.t('messages.Similar records update failed'),
+                color: 'error',
+                timeout: 2500
+            });
+        },
     },
 });

@@ -24,5 +24,7 @@ Route::middleware('auth', 'auth.session')->prefix('mad')->name('mad.')->group(fu
             'can:view-MAD-IVP',
             'can:edit-MAD-IVP'
         );
+
+        Route::post('/get-similar-records', 'getSimilarRecordsForRequest')->name('get-similar-records');  // AJAX request on create form for uniqness
     });
 });

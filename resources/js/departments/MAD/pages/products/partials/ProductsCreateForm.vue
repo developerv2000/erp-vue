@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { usePage } from "@inertiajs/vue3";
 import { useI18n } from "vue-i18n";
 import { Form, useForm } from "vee-validate";
@@ -11,6 +11,7 @@ import axios from "axios";
 import { debounce } from "@/core/scripts/utilities";
 
 import ProductsSimilarRecords from "./ProductsSimilarRecords.vue";
+import ProductsMatchedATX from "./ProductsMatchedATX.vue";
 import DefaultSheet from "@/core/components/containers/DefaultSheet.vue";
 import DefaultTextField from "@/core/components/form/inputs/DefaultTextField.vue";
 import DefaultAutocomplete from "@/core/components/form/inputs/DefaultAutocomplete.vue";
@@ -30,6 +31,7 @@ const page = usePage();
 const messages = useMessagesStore();
 
 const similarRecords = ref(undefined);
+const matchedATX = ref(undefined);
 const loading = ref(false);
 const redirectBack = ref(false);
 const resetFormOnSuccess = ref(false);
@@ -39,10 +41,10 @@ const schema = object({
     manufacturer_id: number().required(),
     inn_id: number().required(),
     form_id: number().required(),
-    atx_name: string().required(),
     class_id: number().required(),
     shelf_life_id: number().required(),
     zones: array().required().min(1),
+    atx_name: string().required(),
 });
 
 // Default form values
@@ -50,8 +52,6 @@ const defaultFields = {
     manufacturer_id: null,
     inn_id: null,
     form_id: null,
-    atx_name: null,
-    atx_short_name: null,
     class_id: page.props.defaultSelectedClassID ?? null,
     shelf_life_id: page.props.defaultSelectedShelfLifeID ?? null,
     brand: null,
@@ -64,6 +64,10 @@ const defaultFields = {
     sold_in_eu: 0,
     attachments: [],
     comment: null,
+
+    atx_id: null,
+    atx_name: null,
+    atx_short_name: null,
 };
 
 // VeeValidate form
@@ -107,6 +111,7 @@ const submit = handleSubmit((values) => {
         });
 });
 
+// Similar records
 const updateSimilarRecords = () => {
     // Return if required fields are not selected
     if (!values.manufacturer_id || !values.inn_id || !values.form_id) {
@@ -131,6 +136,43 @@ const updateSimilarRecords = () => {
 };
 
 const updateSimilarRecordsDebounced = debounce(updateSimilarRecords, 500);
+
+// Matched ATX
+const updateMatchedATX = () => {
+    // Return if required fields are not selected
+    if (!values.inn_id || !values.form_id) {
+        matchedATX.value = undefined;
+        return;
+    }
+
+    // Get matched ATX
+    axios
+        .post(route("mad.products.get-matched-atx"), {
+            inn_id: values.inn_id,
+            form_id: values.form_id,
+        })
+        .then((response) => {
+            matchedATX.value = response.data ?? {
+                id: null,
+                name: null,
+                short_name: null,
+            };
+
+            messages.addAtxUpdatedSuccessfullyMessage();
+        })
+        .catch(() => {
+            messages.addAtxUpdateFailedMessage();
+        });
+};
+
+const updateMatchedATXDebounced = debounce(updateMatchedATX, 500);
+
+// Watch for matchedATX changes and update binded form values
+watch(matchedATX, (matchedATX) => {
+    values.atx_id = matchedATX?.id;
+    values.atx_name = matchedATX?.name;
+    values.atx_short_name = matchedATX?.short_name;
+});
 </script>
 
 <template>
@@ -154,7 +196,10 @@ const updateSimilarRecordsDebounced = debounce(updateSimilarRecords, 500);
                         :items="page.props.inns"
                         v-model="values.inn_id"
                         :error-messages="errors.inn_id"
-                        @update:modelValue="updateSimilarRecordsDebounced"
+                        @update:modelValue="
+                            updateSimilarRecordsDebounced();
+                            updateMatchedATXDebounced();
+                        "
                         required
                     />
                 </v-col>
@@ -165,7 +210,10 @@ const updateSimilarRecordsDebounced = debounce(updateSimilarRecords, 500);
                         :items="page.props.productForms"
                         v-model="values.form_id"
                         :error-messages="errors.form_id"
-                        @update:modelValue="updateSimilarRecordsDebounced"
+                        @update:modelValue="
+                            updateSimilarRecordsDebounced();
+                            updateMatchedATXDebounced();
+                        "
                         required
                     />
                 </v-col>
@@ -176,6 +224,13 @@ const updateSimilarRecordsDebounced = debounce(updateSimilarRecords, 500);
         <ProductsSimilarRecords
             v-if="similarRecords != undefined"
             :records="similarRecords"
+        />
+
+        <!-- Matched ATX -->
+        <ProductsMatchedATX
+            v-if="matchedATX != undefined"
+            :values="values"
+            :errors="errors"
         />
 
         <DefaultSheet>

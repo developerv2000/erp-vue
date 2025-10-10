@@ -82,6 +82,8 @@
     "messages.Smart filters update failed": "Обновление умного фильтра не удалось!",
     "messages.Similar records updated successfully": "Схожие записи успешно обновлены!",
     "messages.Similar records update failed": "Обновление схожих записей не удалось!",
+    "messages.ATX updated successfully": "ATX успешно обновлен!",
+    "messages.ATX update failed": "Обновление ATX не удалось!",
 
     "modals.Delete selected": "Удалить отмеченные",
     "modals.Delete selected question": "Вы уверены, что хотите удалить отмеченные",

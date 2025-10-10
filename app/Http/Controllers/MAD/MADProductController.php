@@ -4,6 +4,7 @@ namespace App\Http\Controllers\MAD;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MAD\ProductUpdateRequest;
+use App\Models\Atx;
 use App\Models\Country;
 use App\Models\Inn;
 use App\Models\Manufacturer;
@@ -92,6 +93,18 @@ class MADProductController extends Controller
     public function getSimilarRecordsForRequest(Request $request)
     {
         return Product::getSimilarRecordsForRequest($request);
+    }
+
+    /**
+     * AJAX request on products.create
+     */
+    public function getMatchedAtxForRequest(Request $request)
+    {
+        $atx = Atx::where('inn_id', $request->input('inn_id'))
+            ->where('form_id', $request->input('form_id'))
+            ->first();
+
+        return $atx;
     }
 
     /**

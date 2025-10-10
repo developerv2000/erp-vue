@@ -25,6 +25,7 @@ Route::middleware('auth', 'auth.session')->prefix('mad')->name('mad.')->group(fu
             'can:edit-MAD-IVP'
         );
 
-        Route::post('/get-similar-records', 'getSimilarRecordsForRequest')->name('get-similar-records');  // AJAX request on create form for uniqness
+        Route::post('/get-similar-records', 'getSimilarRecordsForRequest')->name('get-similar-records');  // AJAX request on products.create for uniqness
+        Route::post('/get-matched-atx', 'getMatchedAtxForRequest')->name('get-matched-atx');  // AJAX request on products.create
     });
 });

@@ -78,6 +78,8 @@
     "messages.Smart filters update failed": "Smart filters update failed!",
     "messages.Similar records updated successfully": "Similar records updated successfully!",
     "messages.Similar records update failed": "Similar records update failed!",
+    "messages.ATX updated successfully": "ATX updated successfully!",
+    "messages.ATX update failed": "ATX update failed!",
 
     "modals.Delete selected": "Delete selected",
     "modals.Delete selected question": "Are you sure you want to delete selected",

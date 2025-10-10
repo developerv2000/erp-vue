@@ -467,17 +467,6 @@ class Product extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
      */
     public static function storeMultipleRecordsByMADFromRequest($request)
     {
-        // Get 'atx_id' for each product
-        $atxID = Atx::where([
-            'inn_id' => $request->input('inn_id'),
-            'form_id' => $request->input('form_id'),
-        ])->first()->id;
-
-        // Merge the 'atx_id' into the request
-        $request->merge([
-            'atx_id' => $atxID,
-        ]);
-
         // Extract products from the request
         $products = $request->input('products', []);
 

@@ -45,6 +45,7 @@ export const useMessagesStore = defineStore('messages', {
                 color: 'error',
             });
         },
+        // Filter
         addSmartFiltersUpdatedSuccessfullyMessage() {
             this.add({
                 text: i18n.global.t('messages.Smart filters updated successfully'),
@@ -59,6 +60,7 @@ export const useMessagesStore = defineStore('messages', {
                 timeout: 1200
             });
         },
+        // Similar records
         addSimilarRecordsUpdatedSuccessfullyMessage() {
             this.add({
                 text: i18n.global.t('messages.Similar records updated successfully'),
@@ -69,6 +71,21 @@ export const useMessagesStore = defineStore('messages', {
         addSimilarRecordsUpdateFailedMessage() {
             this.add({
                 text: i18n.global.t('messages.Similar records update failed'),
+                color: 'error',
+                timeout: 2500
+            });
+        },
+        // Atx
+        addAtxUpdatedSuccessfullyMessage() {
+            this.add({
+                text: i18n.global.t('messages.ATX updated successfully'),
+                color: 'success',
+                timeout: 2500
+            });
+        },
+        addAtxUpdateFailedMessage() {
+            this.add({
+                text: i18n.global.t('messages.ATX update failed'),
                 color: 'error',
                 timeout: 2500
             });

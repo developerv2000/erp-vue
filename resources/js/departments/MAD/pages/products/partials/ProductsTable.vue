@@ -1,6 +1,7 @@
 <script setup>
 import { onMounted } from "vue";
 import { usePage } from "@inertiajs/vue3";
+import useQueryParams from "@/core/composables/useQueryParams";
 import { useMADProductsTableStore } from "@/departments/MAD/stores/productsTable";
 import { useI18n } from "vue-i18n";
 import { useDateFormat } from "@vueuse/core";
@@ -20,17 +21,23 @@ import TdAttachmentsList from "@/core/components/table/td/TdAttachmentsList.vue"
 import TdRecordAttachmentsLink from "@/core/components/table/td/TdRecordAttachmentsLink.vue";
 import TableNavigateToPage from "@/core/components/table/misc/TableNavigateToPage.vue";
 import TdMediumWeightText from "@/core/components/table/td/TdMediumWeightText.vue";
-import InertiaLinkedButton from "@/core/components/inertia/InertiaLinkedButton.vue";
 
 import { mdiArrowRight } from "@mdi/js";
 
 const { t } = useI18n();
+const { get } = useQueryParams();
 const page = usePage();
 const store = useMADProductsTableStore();
 
 onMounted(() => {
-    store.initFromInertiaPage(page); // Needs improovement. Make sure to run it only when redirected from other pages!
-    store.fetchRecords({ updateUrl: false });
+    if (
+        !store.initializedFromInertiaPage ||
+        get("initialize_from_inertia_page")
+    ) {
+        store.initFromInertiaPage(page);
+    }
+
+    store.fetchRecords({ updateUrl: true });
 });
 
 function handleTableOptionsUpdate(options) {

@@ -103,6 +103,12 @@ export const useMADProductsTableStore = defineStore('MADProductsTable', {
                 ...normalizeDateRangesToQueryFormat(this.filters, ['created_at', 'updated_at']),
             };
 
+            // Remove default pagination params if same as default
+            if (rawQuery.page === defaultPaginationOptions.page) delete rawQuery.page;
+            if (rawQuery.per_page === defaultPaginationOptions.per_page) delete rawQuery.per_page;
+            if (rawQuery.order_by === defaultPaginationOptions.order_by) delete rawQuery.order_by;
+            if (rawQuery.order_direction === defaultPaginationOptions.order_direction) delete rawQuery.order_direction;
+
             return cleanQueryParams(rawQuery);
         },
 

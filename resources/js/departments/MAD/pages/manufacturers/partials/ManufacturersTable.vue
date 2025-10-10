@@ -1,6 +1,7 @@
 <script setup>
 import { onMounted } from "vue";
 import { usePage } from "@inertiajs/vue3";
+import useQueryParams from "@/core/composables/useQueryParams";
 import { useMADManufacturersTableStore } from "@/departments/MAD/stores/manufacturersTable";
 import { useI18n } from "vue-i18n";
 import { useDateFormat } from "@vueuse/core";
@@ -21,12 +22,19 @@ import TableNavigateToPage from "@/core/components/table/misc/TableNavigateToPag
 import TdMediumWeightText from "@/core/components/table/td/TdMediumWeightText.vue";
 
 const { t } = useI18n();
+const { get } = useQueryParams();
 const page = usePage();
 const store = useMADManufacturersTableStore();
 
 onMounted(() => {
-    store.initFromInertiaPage(page); // Needs improovement. Make sure to run it only when redirected from other pages!
-    store.fetchRecords({ updateUrl: false });
+    if (
+        !store.initializedFromInertiaPage ||
+        get("initialize_from_inertia_page")
+    ) {
+        store.initFromInertiaPage(page);
+    }
+
+    store.fetchRecords({ updateUrl: true });
 });
 
 function handleTableOptionsUpdate(options) {
@@ -99,6 +107,7 @@ function handleTableOptionsUpdate(options) {
                 :link="
                     route('mad.products.index', {
                         'manufacturer_id[]': item.id,
+                        'initialize_from_inertia_page': true,
                     })
                 "
             >

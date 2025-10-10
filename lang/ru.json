@@ -2,7 +2,6 @@
     "Yes": "Да",
     "No": "Нет",
     "Attachments": "Вложения",
-    "Products": "Продукты",
     "Record": "Запись",
 
     "validations.required": "Это поле обязательно.",
@@ -121,6 +120,9 @@
 
     "Similar records": "Схожие записи",
     "similar records. Not found": "Схожие записи не найдены.",
+
+    "Products": "Продукты",
+    "products.Matched ATX": "Соответствующий ATX",
 
     "Processes": "Процессы",
     "processes.add": "Добавить процесс",

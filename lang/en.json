@@ -2,7 +2,6 @@
     "Yes": "Yes",
     "No": "No",
     "Attachments": "Attachments",
-    "Products": "Products",
     "Record": "Record",
 
     "validations.required": "This field is required.",
@@ -121,6 +120,9 @@
 
     "Similar records": "Similar records",
     "similar records. Not found": "Similar records not found.",
+
+    "Products": "Products",
+    "products.Matched ATX": "Matched ATX",
 
     "Processes": "Processes",
     "processes.add": "Add process",

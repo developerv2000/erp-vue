@@ -65,29 +65,29 @@ export const useMessagesStore = defineStore('messages', {
             this.add({
                 text: i18n.global.t('messages.Similar records updated successfully'),
                 color: 'success',
-                timeout: 2500
+                timeout: 1500
             });
         },
         addSimilarRecordsUpdateFailedMessage() {
             this.add({
                 text: i18n.global.t('messages.Similar records update failed'),
                 color: 'error',
-                timeout: 2500
+                timeout: 1500
             });
         },
-        // Atx
-        addAtxUpdatedSuccessfullyMessage() {
+        // Matched ATX
+        addMatchedATXUpdatedSuccessfullyMessage() {
             this.add({
                 text: i18n.global.t('messages.ATX updated successfully'),
                 color: 'success',
-                timeout: 2500
+                timeout: 1500
             });
         },
-        addAtxUpdateFailedMessage() {
+        addMatchedATXUpdateFailedMessage() {
             this.add({
                 text: i18n.global.t('messages.ATX update failed'),
                 color: 'error',
-                timeout: 2500
+                timeout: 1500
             });
         },
     },

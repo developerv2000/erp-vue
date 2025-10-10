@@ -158,10 +158,10 @@ const updateMatchedATX = () => {
                 short_name: null,
             };
 
-            messages.addAtxUpdatedSuccessfullyMessage();
+            messages.addMatchedATXUpdatedSuccessfullyMessage();
         })
         .catch(() => {
-            messages.addAtxUpdateFailedMessage();
+            messages.addMatchedATXUpdateFailedMessage();
         });
 };
 

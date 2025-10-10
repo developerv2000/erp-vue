@@ -98,7 +98,7 @@ class MADProductController extends Controller
     /**
      * AJAX request on products.create
      */
-    public function getMatchedAtxForRequest(Request $request)
+    public function getMatchedATXForRequest(Request $request)
     {
         $atx = Atx::where('inn_id', $request->input('inn_id'))
             ->where('form_id', $request->input('form_id'))

@@ -22,6 +22,6 @@ const title = computed(() => t("pages.EPP") + " — " + page.props.record.title)
             <template #title>{{ page.props.record.title }}</template>
         </PageIntro>
 
-        <!-- <ManufacturersEditForm /> -->
+        <ManufacturersEditForm />
     </MainLayout>
 </template>

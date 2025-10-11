@@ -456,6 +456,7 @@ class Product extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
 
     /**
      * Create multiple instances of the model from the request data.
+     *
      * AJAX request.
      *
      * This method iterates over each products,
@@ -463,10 +464,16 @@ class Product extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
      * and creates new instances on validation success.
      *
      * @param \Illuminate\Http\Request $request The request containing data.
+     * @param \App\Models\ATX $atx The ATX instance.
      * @return void
      */
-    public static function storeMultipleRecordsByMADFromRequest($request)
+    public static function storeMultipleRecordsByMADFromRequest($request, $atx)
     {
+        // Merge the 'atx_id' into the request
+        $request->merge([
+            'atx_id' => $atx->id,
+        ]);
+
         // Extract products from the request
         $products = $request->input('products', []);
 

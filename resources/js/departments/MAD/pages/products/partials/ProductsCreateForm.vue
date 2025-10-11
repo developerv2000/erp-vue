@@ -2,7 +2,7 @@
 import { ref, watch } from "vue";
 import { usePage } from "@inertiajs/vue3";
 import { useI18n } from "vue-i18n";
-import { Form, useForm } from "vee-validate";
+import { Form, useForm, useFieldArray } from "vee-validate";
 import { object, string, number, array } from "yup";
 import { useVeeFormFields } from "@/core/composables/useVeeFormFields";
 import { useFormData } from "@/core/composables/useFormData";
@@ -12,6 +12,7 @@ import { debounce } from "@/core/scripts/utilities";
 
 import ProductsSimilarRecords from "./ProductsSimilarRecords.vue";
 import ProductsMatchedATX from "./ProductsMatchedATX.vue";
+import ProductsCreateRepeater from "./ProductsCreateRepeater.vue";
 import DefaultSheet from "@/core/components/containers/DefaultSheet.vue";
 import DefaultTextField from "@/core/components/form/inputs/DefaultTextField.vue";
 import DefaultAutocomplete from "@/core/components/form/inputs/DefaultAutocomplete.vue";
@@ -45,6 +46,14 @@ const schema = object({
     shelf_life_id: number().required(),
     zones: array().required().min(1),
     atx_name: string().required(),
+
+    // Dynamic products
+    products: array().of(
+        object({
+            dosage: string().required(),
+            pack: string().required(),
+        })
+    ),
 });
 
 // Default form values
@@ -65,9 +74,12 @@ const defaultFields = {
     attachments: [],
     comment: null,
 
-    atx_id: null,
+    // Dynamic ATX
     atx_name: null,
     atx_short_name: null,
+
+    // Dynamic products
+    products: [],
 };
 
 // VeeValidate form
@@ -78,6 +90,13 @@ const { errors, handleSubmit, resetForm, setErrors, meta } = useForm({
 
 // Get form values as ref
 const { values } = useVeeFormFields(Object.keys(defaultFields));
+
+// Get form dynamic 'products' array value
+const {
+    fields: productsFields,
+    push: pushProduct,
+    remove: removeProduct,
+} = useFieldArray("products");
 
 // Submit handler
 const submit = handleSubmit((values) => {
@@ -153,7 +172,6 @@ const updateMatchedATX = () => {
         })
         .then((response) => {
             matchedATX.value = response.data ?? {
-                id: null,
                 name: null,
                 short_name: null,
             };
@@ -169,7 +187,6 @@ const updateMatchedATXDebounced = debounce(updateMatchedATX, 500);
 
 // Watch for matchedATX changes and update binded form values
 watch(matchedATX, (matchedATX) => {
-    values.atx_id = matchedATX?.id;
     values.atx_name = matchedATX?.name;
     values.atx_short_name = matchedATX?.short_name;
 });
@@ -231,6 +248,13 @@ watch(matchedATX, (matchedATX) => {
             v-if="matchedATX != undefined"
             :values="values"
             :errors="errors"
+        />
+
+        <!-- Multiple records -->
+        <ProductsCreateRepeater
+            :fields="productsFields"
+            :push="pushProduct"
+            :remove="removeProduct"
         />
 
         <DefaultSheet>

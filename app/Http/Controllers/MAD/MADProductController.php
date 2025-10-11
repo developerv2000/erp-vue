@@ -110,10 +110,15 @@ class MADProductController extends Controller
     /**
      * AJAX request
      */
-    public function store($request)
+    public function store(Request $request)
     {
-        Product::storeMultipleRecordsByMADFromRequest($request);
+        // Sync ATX
+        $atx = Atx::syncAtxWithProductOnProductStoreOrUpdate($request);
 
+        // Store multiple records
+        Product::storeMultipleRecordsByMADFromRequest($request, $atx);
+
+        // Return success response
         return response()->json([
             'success' => true,
         ]);

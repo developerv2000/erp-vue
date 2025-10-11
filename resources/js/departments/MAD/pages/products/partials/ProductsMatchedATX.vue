@@ -23,8 +23,6 @@ const { t } = useI18n();
         <DefaultTitle>{{ t("products.Matched ATX") }}</DefaultTitle>
 
         <v-row>
-            <input type="hidden" name="atx_id" v-model="values.atx_id" />
-
             <v-col cols="4">
                 <DefaultTextField
                     :label="t('fields.ATX')"

@@ -3,3 +3,5 @@ Attachments:
 2) file_type => removed!
 3) file_size => file_size_in_mb // REQUIRES RECALCULATING!
     string => decimal(6,2)
+
+* Fix uploading attachments for muptiple "products" create.

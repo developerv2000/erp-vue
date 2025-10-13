@@ -1,25 +1,18 @@
 <script setup>
 import { useI18n } from "vue-i18n";
+import { debounce } from "@/core/scripts/utilities";
 
 import DefaultSheet from "@/core/components/containers/DefaultSheet.vue";
 import DefaultTitle from "@/core/components/titles/DefaultTitle.vue";
 import DefaultTextField from "@/core/components/form/inputs/DefaultTextField.vue";
 import DefaultButton from "@/core/components/buttons/DefaultButton.vue";
+import DefaultNumberInput from "@/core/components/form/inputs/DefaultNumberInput.vue";
 import { mdiClose, mdiPlus } from "@mdi/js";
 
 const props = defineProps({
-    fields: {
-        type: Array,
-        required: true,
-    },
-    push: {
-        type: Function,
-        required: true,
-    },
-    remove: {
-        type: Function,
-        required: true,
-    },
+    fields: { type: Array, required: true },
+    push: { type: Function, required: true },
+    remove: { type: Function, required: true },
 });
 
 const { t } = useI18n();
@@ -28,13 +21,40 @@ const { t } = useI18n();
 const newProduct = () => ({
     dosage: "",
     pack: "",
-    moq: "",
+    moq: null,
 });
 
 // Add a new product row
-const addProduct = () => {
-    props.push(newProduct());
-};
+const addProduct = () => props.push(newProduct());
+
+// Validation & formatting function
+function validateInput(value) {
+    if (!value) return "";
+
+    return (
+        value
+            // Add spaces before and after certain symbols
+            .replace(/([+%/*])/g, " $1 ")
+            // Replace consecutive whitespaces with a single space
+            .replace(/\s+/g, " ")
+            // Separate letters from numbers
+            .replace(/(\d+)([a-zA-Z]+)/g, "$1 $2")
+            .replace(/([a-zA-Z]+)(\d+)/g, "$1 $2")
+            // Remove non-English characters
+            .replace(/[^a-zA-Z0-9\s!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/g, "")
+            // Replace symbols ',' with '.'
+            .replace(/,/g, ".")
+            // Trim spaces
+            .trim()
+            // Convert the entire string to uppercase
+            .toUpperCase()
+    );
+}
+
+// Debounced version to reduce reactivity overhead
+const validateInputDebounced = debounce((value, field, key) => {
+    field.value[key] = validateInput(value);
+}, 300);
 </script>
 
 <template>
@@ -48,6 +68,10 @@ const addProduct = () => {
                         v-model="field.value.dosage"
                         :label="t('fields.Dosage')"
                         required
+                        @update:modelValue="
+                            (val) =>
+                                validateInputDebounced(val, field, 'dosage')
+                        "
                     />
                 </v-col>
 
@@ -56,13 +80,17 @@ const addProduct = () => {
                         v-model="field.value.pack"
                         :label="t('fields.Pack')"
                         required
+                        @update:modelValue="
+                            (val) => validateInputDebounced(val, field, 'pack')
+                        "
                     />
                 </v-col>
 
                 <v-col>
-                    <DefaultTextField
+                    <DefaultNumberInput
                         v-model="field.value.moq"
                         :label="t('fields.MOQ')"
+                        :min="0"
                     />
                 </v-col>
 

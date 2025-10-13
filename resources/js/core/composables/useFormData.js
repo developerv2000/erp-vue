@@ -8,16 +8,28 @@ export function useFormData() {
 
             if (value === null || value === undefined) continue;
 
+            // Handle Files correctly
             if (value instanceof File) {
                 form.append(formKey, value);
-            } else if (Array.isArray(value)) {
+            }
+            // Handle Arrays (recursively if array of objects)
+            else if (Array.isArray(value)) {
                 value.forEach((item, index) => {
-                    form.append(`${formKey}[${index}]`, item);
+                    const arrayKey = `${formKey}[${index}]`;
+                    if (typeof item === "object" && !(item instanceof File)) {
+                        objectToFormData(item, form, arrayKey); // recurse
+                    } else {
+                        form.append(arrayKey, item);
+                    }
                 });
-            } else if (typeof value === "object" && !(value instanceof Date)) {
+            }
+            // Handle nested objects
+            else if (typeof value === "object" && !(value instanceof Date)) {
                 objectToFormData(value, form, formKey);
-            } else {
-                form.append(formKey, value);
+            }
+            // Handle primitives and Date
+            else {
+                form.append(formKey, value instanceof Date ? value.toISOString() : value);
             }
         }
 

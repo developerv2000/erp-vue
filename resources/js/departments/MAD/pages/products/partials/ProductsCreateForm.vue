@@ -110,6 +110,8 @@ const submit = handleSubmit((values) => {
             similarRecords.value = undefined;
 
             if (resetFormOnSuccess.value) {
+                similarRecords.value = undefined;
+                matchedATX.value = undefined;
                 resetForm();
             }
 
@@ -374,8 +376,9 @@ watch(matchedATX, (matchedATX) => {
         <FormActionsContainer>
             <FormResetButton
                 @click="
-                    resetForm();
                     similarRecords = undefined;
+                    matchedATX = undefined;
+                    resetForm();
                 "
                 :loading="loading"
             />

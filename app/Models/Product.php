@@ -483,7 +483,7 @@ class Product extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
             $mergedRequest = $request->merge([
                 'dosage' => $product['dosage'],
                 'pack' => $product['pack'],
-                'moq' => $product['moq'],
+                'moq' => isset($product['moq']) ? $product['moq'] : null,
             ]);
 
             // Create a ProductStoreRequest instance from the merged request
@@ -507,7 +507,11 @@ class Product extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
 
             // HasMany relations
             $record->storeCommentFromRequest($request);
-            $record->storeAttachmentsFromRequest($request);
+
+            // Upload attachments if there is only one product
+            if (count($products) === 1) {
+                $record->storeAttachmentsFromRequest($request);
+            }
         }
     }
 

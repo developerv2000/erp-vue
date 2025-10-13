@@ -32,3 +32,30 @@ export function formatPrice(price) {
         maximumFractionDigits: 0,
     }).format(numeric)
 }
+
+/**
+ * Normalize inputs like 'inn', 'dosage', 'pack', etc.
+ *
+ * @param {string|null} value
+ * @returns {string}
+ */
+export function normalizeSpecificInput(value) {
+    if (!value) return "";
+
+    return value
+        // Add spaces before and after certain symbols
+        .replace(/([+%/*])/g, " $1 ")
+        // Replace consecutive whitespaces with a single space
+        .replace(/\s+/g, " ")
+        // Separate letters from numbers
+        .replace(/(\d+)([a-zA-Z]+)/g, "$1 $2")
+        .replace(/([a-zA-Z]+)(\d+)/g, "$1 $2")
+        // Remove non-English characters
+        .replace(/[^a-zA-Z0-9\s!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/g, "")
+        // Replace commas with dots
+        .replace(/,/g, ".")
+        // Trim spaces
+        .trim()
+        // Convert to uppercase
+        .toUpperCase();
+}

@@ -136,6 +136,9 @@ class MADProductController extends Controller
         $fetchedRecord->appendBasicAttributes();
         $fetchedRecord->append('title'); // Used on generating breadcrumbs
 
+        // Make sure that ATX exists for this product
+        $fetchedRecord->ensureAtxExists();
+
         return Inertia::render('departments/MAD/pages/products/Edit', [
             // Refetched after record update
             'record' => $fetchedRecord,
@@ -162,8 +165,12 @@ class MADProductController extends Controller
      */
     public function update(ProductUpdateRequest $request, $record)
     {
+        // Sync ATX
+        $atx = Atx::syncAtxWithProductOnProductStoreOrUpdate($request);
+
+        // Update record
         $fetchedRecord = Product::withTrashed()->findOrFail($record);
-        $fetchedRecord->updateByMADFromRequest($request);
+        $fetchedRecord->updateByMADFromRequest($request, $atx);
 
         return response()->json([
             'success' => true,

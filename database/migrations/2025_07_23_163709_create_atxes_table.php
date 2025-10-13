@@ -29,6 +29,8 @@ return new class extends Migration
                 ->foreign()
                 ->references('id')
                 ->on('product_forms');
+
+            $table->unique(['inn_id', 'form_id']);
         });
     }
 

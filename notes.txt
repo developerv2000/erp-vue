@@ -4,4 +4,9 @@ Attachments:
 3) file_size => file_size_in_mb // REQUIRES RECALCULATING!
     string => decimal(6,2)
 
+Atx:
+1) Added unique for 'inn_id' and 'form_id'
+
+
+
 * Fix uploading attachments for muptiple "products" create.

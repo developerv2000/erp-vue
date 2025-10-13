@@ -5,11 +5,12 @@ import { usePage } from "@inertiajs/vue3";
 import { useI18n } from "vue-i18n";
 import InertiaBreadcrumbs from "@/core/components/inertia/InertiaBreadcrumbs.vue";
 import PageIntro from "@/core/layouts/PageIntro.vue";
+import ProductsEditForm from "./partials/ProductsEditForm.vue";
 
 const page = usePage();
 const { t } = useI18n();
 
-const title = computed(() => t("pages.EPP") + " — " + page.props.record.title);
+const title = computed(() => t("pages.IVP") + " — " + page.props.record.title);
 </script>
 
 <template>
@@ -22,6 +23,6 @@ const title = computed(() => t("pages.EPP") + " — " + page.props.record.title)
             <template #title>{{ page.props.record.title }}</template>
         </PageIntro>
 
-        <ManufacturersEditForm />
+        <ProductsEditForm />
     </MainLayout>
 </template>

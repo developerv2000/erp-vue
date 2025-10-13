@@ -1,6 +1,7 @@
 <script setup>
 import { useI18n } from "vue-i18n";
 import { debounce } from "@/core/scripts/utilities";
+import { normalizeSpecificInput } from "@/core/scripts/utilities";
 
 import DefaultSheet from "@/core/components/containers/DefaultSheet.vue";
 import DefaultTitle from "@/core/components/titles/DefaultTitle.vue";
@@ -27,33 +28,9 @@ const newProduct = () => ({
 // Add a new product row
 const addProduct = () => props.push(newProduct());
 
-// Validation & formatting function
-function validateInput(value) {
-    if (!value) return "";
-
-    return (
-        value
-            // Add spaces before and after certain symbols
-            .replace(/([+%/*])/g, " $1 ")
-            // Replace consecutive whitespaces with a single space
-            .replace(/\s+/g, " ")
-            // Separate letters from numbers
-            .replace(/(\d+)([a-zA-Z]+)/g, "$1 $2")
-            .replace(/([a-zA-Z]+)(\d+)/g, "$1 $2")
-            // Remove non-English characters
-            .replace(/[^a-zA-Z0-9\s!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/g, "")
-            // Replace symbols ',' with '.'
-            .replace(/,/g, ".")
-            // Trim spaces
-            .trim()
-            // Convert the entire string to uppercase
-            .toUpperCase()
-    );
-}
-
-// Debounced version to reduce reactivity overhead
-const validateInputDebounced = debounce((value, field, key) => {
-    field.value[key] = validateInput(value);
+// Dosage & pack normalization
+const normalizeInputDebounced = debounce((value, field, key) => {
+    field.value[key] = normalizeSpecificInput(value);
 }, 300);
 </script>
 
@@ -67,11 +44,11 @@ const validateInputDebounced = debounce((value, field, key) => {
                     <DefaultTextField
                         v-model="field.value.dosage"
                         :label="t('fields.Dosage')"
-                        required
                         @update:modelValue="
                             (val) =>
-                                validateInputDebounced(val, field, 'dosage')
+                                normalizeInputDebounced(val, field, 'dosage')
                         "
+                        required
                     />
                 </v-col>
 
@@ -79,10 +56,10 @@ const validateInputDebounced = debounce((value, field, key) => {
                     <DefaultTextField
                         v-model="field.value.pack"
                         :label="t('fields.Pack')"
-                        required
                         @update:modelValue="
-                            (val) => validateInputDebounced(val, field, 'pack')
+                            (val) => normalizeInputDebounced(val, field, 'pack')
                         "
+                        required
                     />
                 </v-col>
 

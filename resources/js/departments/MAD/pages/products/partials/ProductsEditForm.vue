@@ -7,15 +7,16 @@ import { object, string, number, array } from "yup";
 import { useVeeFormFields } from "@/core/composables/useVeeFormFields";
 import { useFormData } from "@/core/composables/useFormData";
 import { useMessagesStore } from "@/core/stores/messages";
+import { debounce, normalizeSpecificInput } from "@/core/scripts/utilities";
 
+import ProductsMatchedATX from "./ProductsMatchedATX.vue";
 import DefaultSheet from "@/core/components/containers/DefaultSheet.vue";
 import DefaultTextField from "@/core/components/form/inputs/DefaultTextField.vue";
 import DefaultAutocomplete from "@/core/components/form/inputs/DefaultAutocomplete.vue";
-import DefaultCombobox from "@/core/components/form/inputs/DefaultCombobox.vue";
 import DefaultFileInput from "@/core/components/form/inputs/DefaultFileInput.vue";
 import DefaultSwitch from "@/core/components/form/inputs/DefaultSwitch.vue";
-import DefaultTextarea from "@/core/components/form/inputs/DefaultTextarea.vue";
 import DefaultWysiwyg from "@/core/components/form/inputs/DefaultWysiwyg.vue";
+import DefaultNumberInput from "@/core/components/form/inputs/DefaultNumberInput.vue";
 import FormActionsContainer from "@/core/components/form/containers/FormActionsContainer.vue";
 import FormResetButton from "@/core/components/form/buttons/FormResetButton.vue";
 import FormUpdateAndRedirectBack from "@/core/components/form/buttons/FormUpdateAndRedirectBack.vue";
@@ -33,31 +34,36 @@ const redirectBack = ref(false);
 
 // Yup schema
 const schema = object({
-    name: string().required(),
-    category_id: number().required(),
-    productClasses: array().required().min(1),
-    analyst_user_id: number().required(),
-    bdm_user_id: number().required(),
-    country_id: number().required(),
+    manufacturer_id: number().required(),
+    inn_id: number().required(),
+    form_id: number().required(),
+    class_id: number().required(),
+    shelf_life_id: number().required(),
     zones: array().required().min(1),
+    atx_name: string().required(),
 });
 
 // Backend-driven values (reactive to record)
 const baseInitialValues = computed(() => ({
-    name: record.value.name,
-    category_id: record.value.category_id,
-    productClasses: record.value.product_classes.map((pc) => pc.id),
-    analyst_user_id: record.value.analyst_user_id,
-    bdm_user_id: record.value.bdm_user_id,
-    country_id: record.value.country_id,
+    manufacturer_id: record.value.manufacturer_id,
+    inn_id: record.value.inn_id,
+    form_id: record.value.form_id,
+    class_id: record.value.class_id,
+    dosage: record.value.dosage,
+    pack: record.value.pack,
+    moq: record.value.moq,
+    shelf_life_id: record.value.shelf_life_id,
+    brand: record.value.brand,
     zones: record.value.zones.map((z) => z.id),
-    blacklists: record.value.blacklists.map((bl) => bl.id),
-    presences: record.value.presences.map((p) => p.name),
-    active: record.value.active,
-    important: record.value.important,
-    website: record.value.website,
-    relationship: record.value.relationship,
-    about: record.value.about,
+    dossier: record.value.dossier,
+    bioequivalence: record.value.bioequivalence,
+    down_payment: record.value.down_payment,
+    validity_period: record.value.validity_period,
+    registered_in_eu: record.value.registered_in_eu,
+    sold_in_eu: record.value.sold_in_eu,
+
+    atx_name: record.value.atx?.name,
+    atx_short_name: record.value.atx?.short_name,
 }));
 
 // Always-reset values
@@ -88,7 +94,7 @@ const submit = handleSubmit((values) => {
 
     axios
         .post(
-            route("mad.manufacturers.update", { record: record.value.id }),
+            route("mad.products.update", { record: record.value.id }),
             formData
         )
         .then(() => {
@@ -123,6 +129,36 @@ const reloadRequiredDataAndResetForm = () => {
         },
     });
 };
+
+// Matched ATX
+const updateMatchedATX = () => {
+    axios
+        .post(route("mad.products.get-matched-atx"), {
+            inn_id: values.inn_id,
+            form_id: values.form_id,
+        })
+        .then((response) => {
+            if (response.data) {
+                values.atx_name = response.data.name;
+                values.atx_short_name = response.data.short_name;
+            } else {
+                values.atx_name = null;
+                values.atx_short_name = null;
+            }
+
+            messages.addMatchedATXUpdatedSuccessfullyMessage();
+        })
+        .catch(() => {
+            messages.addMatchedATXUpdateFailedMessage();
+        });
+};
+
+const updateMatchedATXDebounced = debounce(updateMatchedATX, 500);
+
+// Dosage & pack normalization
+const normalizeInputDebounced = debounce((value, values, key) => {
+    values[key] = normalizeSpecificInput(value);
+}, 300);
 </script>
 
 <template>
@@ -130,62 +166,114 @@ const reloadRequiredDataAndResetForm = () => {
         <DefaultSheet>
             <v-row>
                 <v-col cols="4">
-                    <DefaultTextField
+                    <DefaultAutocomplete
                         :label="t('fields.Manufacturer')"
-                        v-model="values.name"
-                        :error-messages="errors.name"
+                        :items="page.props.manufacturers"
+                        v-model="values.manufacturer_id"
+                        :error-messages="errors.manufacturer_id"
                         required
                     />
                 </v-col>
 
                 <v-col cols="4">
                     <DefaultAutocomplete
-                        :label="t('fields.Category')"
-                        :items="page.props.categories"
-                        v-model="values.category_id"
-                        :error-messages="errors.category_id"
+                        :label="t('fields.Generic')"
+                        :items="page.props.inns"
+                        v-model="values.inn_id"
+                        :error-messages="errors.inn_id"
+                        @update:modelValue="updateMatchedATXDebounced"
                         required
                     />
                 </v-col>
 
+                <v-col cols="4">
+                    <DefaultAutocomplete
+                        :label="t('fields.Form')"
+                        :items="page.props.productForms"
+                        v-model="values.form_id"
+                        :error-messages="errors.form_id"
+                        @update:modelValue="updateMatchedATXDebounced"
+                        required
+                    />
+                </v-col>
+            </v-row>
+        </DefaultSheet>
+
+        <!-- Matched ATX -->
+        <ProductsMatchedATX :values="values" :errors="errors" />
+
+        <DefaultSheet>
+            <v-row>
+                <v-col cols="4">
+                    <DefaultTextField
+                        :label="t('fields.Dosage')"
+                        v-model="values.dosage"
+                        :error-messages="errors.dosage"
+                        @update:modelValue="
+                            (val) =>
+                                normalizeInputDebounced(val, values, 'dosage')
+                        "
+                    />
+                </v-col>
+
+                <v-col cols="4">
+                    <DefaultTextField
+                        :label="t('fields.Pack')"
+                        v-model="values.pack"
+                        :error-messages="errors.pack"
+                        @update:modelValue="
+                            (val) =>
+                                normalizeInputDebounced(val, values, 'pack')
+                        "
+                    />
+                </v-col>
+
+                <v-col cols="4">
+                    <DefaultNumberInput
+                        :label="t('fields.MOQ')"
+                        v-model="values.moq"
+                        :error-messages="errors.moq"
+                        :min="0"
+                    />
+                </v-col>
+            </v-row>
+        </DefaultSheet>
+
+        <DefaultSheet>
+            <v-row>
                 <v-col cols="4">
                     <DefaultAutocomplete
                         :label="t('fields.Product class')"
                         :items="page.props.productClasses"
-                        v-model="values.productClasses"
-                        :error-messages="errors.productClasses"
-                        multiple
+                        v-model="values.class_id"
+                        :error-messages="errors.class_id"
                         required
                     />
                 </v-col>
 
                 <v-col cols="4">
                     <DefaultAutocomplete
-                        :label="t('fields.Analyst')"
-                        :items="page.props.analystUsers"
-                        v-model="values.analyst_user_id"
-                        :error-messages="errors.analyst_user_id"
+                        :label="t('fields.Shelf life')"
+                        :items="page.props.shelfLifes"
+                        v-model="values.shelf_life_id"
+                        :error-messages="errors.shelf_life_id"
                         required
                     />
                 </v-col>
 
                 <v-col cols="4">
-                    <DefaultAutocomplete
-                        :label="t('fields.BDM')"
-                        :items="page.props.bdmUsers"
-                        v-model="values.bdm_user_id"
-                        :error-messages="errors.bdm_user_id"
-                        required
+                    <DefaultTextField
+                        :label="t('fields.Brand')"
+                        v-model="values.brand"
+                        :error-messages="errors.brand"
                     />
                 </v-col>
 
                 <v-col cols="4">
-                    <DefaultAutocomplete
-                        :label="t('fields.Country')"
-                        :items="page.props.countriesOrderedByName"
-                        v-model="values.country_id"
-                        :error-messages="errors.country_id"
-                        required
+                    <DefaultTextField
+                        :label="t('fields.Dossier')"
+                        v-model="values.dossier"
+                        :error-messages="errors.dossier"
                     />
                 </v-col>
 
@@ -201,60 +289,26 @@ const reloadRequiredDataAndResetForm = () => {
                 </v-col>
 
                 <v-col cols="4">
-                    <DefaultAutocomplete
-                        :label="t('fields.Blacklist')"
-                        :items="page.props.blacklists"
-                        v-model="values.blacklists"
-                        :error-messages="errors.blacklists"
-                        multiple
-                    />
-                </v-col>
-
-                <v-col cols="4">
-                    <DefaultCombobox
-                        :label="t('fields.Presence')"
-                        :items="[]"
-                        v-model="values.presences"
-                        :error-messages="errors.presences"
-                        multiple
-                    />
-                </v-col>
-            </v-row>
-        </DefaultSheet>
-
-        <DefaultSheet>
-            <v-row>
-                <v-col cols="12" class="d-flex ga-12">
-                    <DefaultSwitch
-                        :label="t('properties.Active')"
-                        v-model="values.active"
-                        color="green"
-                    ></DefaultSwitch>
-
-                    <DefaultSwitch
-                        :label="t('properties.Important')"
-                        v-model="values.important"
-                        color="red"
-                    ></DefaultSwitch>
-                </v-col>
-            </v-row>
-        </DefaultSheet>
-
-        <DefaultSheet>
-            <v-row>
-                <v-col cols="4">
                     <DefaultTextField
-                        :label="t('fields.Website')"
-                        v-model="values.website"
-                        :error-messages="errors.website"
+                        :label="t('fields.Bioequivalence')"
+                        v-model="values.bioequivalence"
+                        :error-messages="errors.bioequivalence"
                     />
                 </v-col>
 
                 <v-col cols="4">
                     <DefaultTextField
-                        :label="t('fields.Relationship')"
-                        v-model="values.relationship"
-                        :error-messages="errors.relationship"
+                        :label="t('fields.Down payment')"
+                        v-model="values.down_payment"
+                        :error-messages="errors.down_payment"
+                    />
+                </v-col>
+
+                <v-col cols="4">
+                    <DefaultTextField
+                        :label="t('fields.Validity period')"
+                        v-model="values.validity_period"
+                        :error-messages="errors.validity_period"
                     />
                 </v-col>
 
@@ -266,13 +320,23 @@ const reloadRequiredDataAndResetForm = () => {
                         multiple
                     />
                 </v-col>
+            </v-row>
+        </DefaultSheet>
 
-                <v-col rows="12">
-                    <DefaultTextarea
-                        :label="t('fields.About company')"
-                        v-model="values.about"
-                        :error-messages="errors.about"
-                    />
+        <DefaultSheet>
+            <v-row>
+                <v-col cols="12" class="d-flex ga-12">
+                    <DefaultSwitch
+                        color="pink-darken-3"
+                        :label="t('fields.Registered in EU')"
+                        v-model="values.registered_in_eu"
+                    ></DefaultSwitch>
+
+                    <DefaultSwitch
+                        color="indigo"
+                        :label="t('fields.Sold in EU')"
+                        v-model="values.sold_in_eu"
+                    ></DefaultSwitch>
                 </v-col>
             </v-row>
         </DefaultSheet>

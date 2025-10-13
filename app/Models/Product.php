@@ -518,12 +518,15 @@ class Product extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
     /**
      * AJAX request
      */
-    public function updateFromRequest(ProductUpdateRequest $request): void
+    public function updateByMADFromRequest(ProductUpdateRequest $request, $atx): void
     {
-        $this->update($request->all());
+        // Merge the 'atx_id' into the request
+        $request->merge([
+            'atx_id' => $atx->id,
+        ]);
 
-        // Validate ATX
-        $this->validateATX();
+        // Update record
+        $this->update($request->all());
 
         // BelongsToMany relations
         $this->zones()->sync($request->input('zones'));
@@ -540,20 +543,24 @@ class Product extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
     */
 
     /**
-     * Validate products ATX.
-     *
-     * Used after product update.
+     * Used on products.edit page
      */
-    public function validateATX(): void
+    public function ensureAtxExists()
     {
-        $atx = Atx::where([
-            'inn_id' => $this->inn_id,
-            'form_id' => $this->form_id,
-        ])->first();
+        if (!$this->atx) {
+            $atx = Atx::create([
+                'inn_id' => $this->inn_id,
+                'form_id' => $this->form_id,
+                'name' => '-',
+                'short_name' => null,
+            ]);
 
-        $this->update([
-            'atx_id' => $atx ? $atx->id : null,
-        ]);
+            $this->update([
+                'atx_id' => $atx->id
+            ]);
+
+            $this->load('atx');
+        }
     }
 
     // Used on filters

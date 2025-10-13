@@ -30,6 +30,7 @@ const page = usePage();
 const store = useMADProductsTableStore();
 
 onMounted(() => {
+    // Init from inertia page if needed
     if (
         !store.initializedFromInertiaPage ||
         get("initialize_from_inertia_page")
@@ -37,6 +38,10 @@ onMounted(() => {
         store.initFromInertiaPage(page);
     }
 
+    // Always detect current page (index or trash)
+    store.detectCurrentPage();
+
+    // Always refetch records
     store.fetchRecords({ updateUrl: true });
 });
 

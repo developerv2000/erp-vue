@@ -61,12 +61,11 @@ export const useMADProductsTableStore = defineStore('MADProductsTable', {
     }),
 
     actions: {
-        detectTrashPage() {
-            this.isTrashPage = route().current('*.trash');
+        detectCurrentPage() {
+            this.isTrashPage = route().current('*.trash'); // Used to differ index/trash pages
         },
 
         initFromInertiaPage(page) {
-            this.detectTrashPage(); // Set isTrashPage
             this.records = [];
             const query = page.props.query;
 

@@ -93,7 +93,10 @@ class Country extends Model
         ];
     }
 
-    public static function recalculateAllProcessCounts()
+    /**
+     * Executed by scheduler daily.
+     */
+    public static function recalculateAllProcessCountsInDatabase(): void
     {
         $records = self::withCount('processes')->get();
 

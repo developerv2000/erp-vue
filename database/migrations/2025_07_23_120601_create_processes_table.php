@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('processes', function (Blueprint $table) {
             // Globals
-            $table->unsignedInteger('id')->autoIncrement(); // auto
-            $table->boolean('contracted_in_asp')->default(false); // SPG
-            $table->boolean('registered_in_asp')->default(false); // SPG
+            $table->unsignedInteger('id')->autoIncrement();
+            $table->boolean('contracted_in_asp')->default(false); // ASP
+            $table->boolean('registered_in_asp')->default(false); // ASP
 
             // auto
             $table->unsignedInteger('product_id')
@@ -41,8 +41,8 @@ return new class extends Migration
                 ->references('id')
                 ->on('process_responsible_people');
 
-            // auto
-            $table->smallInteger('order_priority') // used in deadline status
+            // auto calculated on record update and by scheduler daily
+            $table->smallInteger('overdue_days') // used on getting 'deadline_status' attribute
                 ->default(0);
 
             // Stage 1 (ВП)

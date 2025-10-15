@@ -16,6 +16,8 @@ class ProcessStatus extends Model
     const CONTACTED_RECORD_ID = 11;
     const REGISTERED_RECORD_ID = 16;
 
+    const ALLOWED_DELAY_DAYS = 15;
+
     const STOPED_IDS = [
         2, // SВб
         4, // SПО
@@ -58,21 +60,6 @@ class ProcessStatus extends Model
     public function processes()
     {
         return $this->hasMany(Process::class, 'status_id');
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Additional attributes
-    |--------------------------------------------------------------------------
-    */
-
-    public function getDeadlineDaysAttribute()
-    {
-        if (!$this->hasDeadline()) {
-            return null;
-        }
-
-        return 15;
     }
 
     /*

@@ -462,12 +462,8 @@ class Product extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
      * This method iterates over each products,
      * validates request for uniqueness,
      * and creates new instances on validation success.
-     *
-     * @param \Illuminate\Http\Request $request The request containing data.
-     * @param \App\Models\ATX $atx The ATX instance.
-     * @return void
      */
-    public static function storeMultipleRecordsByMADFromRequest($request, $atx)
+    public static function storeMultipleRecordsByMADFromRequest(Request $request, Atx $atx): void
     {
         // Merge the 'atx_id' into the request
         $request->merge([
@@ -605,7 +601,7 @@ class Product extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
         if (Gate::forUser($user)->allows(Permission::extractAbilityName(Permission::CAN_EDIT_MAD_IVP_NAME))) {
             array_push(
                 $columns,
-                ['title' => 'Record', 'key' => 'edit', 'order' => $order++, 'width' => 60, 'visible' => 1, 'sortable' => false],
+                ['title' => 'Record', 'key' => 'edit', 'width' => 60, 'sortable' => false, 'visible' => 1, 'order' => $order++],
             );
         }
 
@@ -647,8 +643,8 @@ class Product extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
         foreach ($additionalColumns as $column) {
             array_push($columns, [
                 ...$column,
+                'visible' => 1,
                 'order' => $order++,
-                'visible' => 1
             ]);
         }
 

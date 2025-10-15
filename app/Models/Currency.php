@@ -51,7 +51,7 @@ class Currency extends Model
     /**
      * Update all currencies 'usd_ratio' using an external API.
      *
-     * This method is used for updating currencies 'usd_ratio' via a cron job every day.
+     * Executed by scheduler daily.
      *
      * @return void
      */

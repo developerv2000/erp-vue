@@ -54,8 +54,8 @@ class ProcessStatusHistory extends Model
     protected static function booted(): void
     {
         static::updated(function ($record) {
-            // Validate processes 'order_priority' after updating status history.
-            $record->process->validateOrderPriorityAttribute();
+            // Recalculate 'overdue_days' after updating processes status history.
+            $record->process->recalculateOverdueDays();
         });
 
         static::deleting(function ($record) {

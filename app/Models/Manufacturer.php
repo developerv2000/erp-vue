@@ -572,7 +572,7 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
         if (Gate::forUser($user)->allows(Permission::extractAbilityName(Permission::CAN_EDIT_MAD_EPP_NAME))) {
             array_push(
                 $columns,
-                ['title' => 'Record', 'key' => 'edit', 'order' => $order++, 'width' => 60, 'visible' => 1, 'sortable' => false],
+                ['title' => 'Record', 'key' => 'edit', 'width' => 60, 'sortable' => false, 'visible' => 1, 'order' => $order++],
             );
         }
 
@@ -605,8 +605,8 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
         foreach ($additionalColumns as $column) {
             array_push($columns, [
                 ...$column,
+                'visible' => 1,
                 'order' => $order++,
-                'visible' => 1
             ]);
         }
 

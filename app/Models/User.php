@@ -39,6 +39,7 @@ class User extends Authenticatable
     // MAD
     const MAD_EPP_HEADERS_KEY = 'MAD_EPP';
     const MAD_IVP_HEADERS_KEY = 'MAD_IVP';
+    const MAD_VPS_HEADERS_KEY = 'MAD_VPS';
 
     /*
     |--------------------------------------------------------------------------
@@ -172,6 +173,21 @@ class User extends Authenticatable
     public function scopeOnlyMADAnalysts($query)
     {
         return $query->whereRelation('roles', 'name', Role::MAD_ANALYST_NAME);
+    }
+
+    /**
+     * Load basic relations, while sending notifications.
+     *
+     * Roles with permissions must be loaded, because of using gates.
+     */
+    public function scopeWithBasicRelationsToNotify($query)
+    {
+        return $query->with([
+            'roles' => function ($rolesQuery) {
+                $rolesQuery->with('permissions');
+            },
+            'permissions'
+        ]);
     }
 
     /*
@@ -348,6 +364,7 @@ class User extends Authenticatable
         $defaultHeaders = match ($key) {
             self::MAD_EPP_HEADERS_KEY => Manufacturer::getMADTableHeadersForUser($this),
             self::MAD_IVP_HEADERS_KEY => Product::getMADTableHeadersForUser($this),
+            self::MAD_VPS_HEADERS_KEY => Process::getMADTableHeadersForUser($this),
 
             default => throw new InvalidArgumentException("Unknown key: $key"),
         };
@@ -413,6 +430,7 @@ class User extends Authenticatable
 
         $headersSettings[self::MAD_EPP_HEADERS_KEY] = Manufacturer::getMADTableHeadersForUser($this);
         $headersSettings[self::MAD_IVP_HEADERS_KEY] = Product::getMADTableHeadersForUser($this);
+        $headersSettings[self::MAD_VPS_HEADERS_KEY] = Process::getMADTableHeadersForUser($this);
 
         $settings['table_headers'] = $headersSettings;
         $this->settings = $settings;
@@ -472,6 +490,15 @@ class User extends Authenticatable
         return url('storage/' . self::PHOTO_PATH . '/' . self::DELETED_USER_PHOTO);
     }
 
+    public static function notifyUsersBasedOnPermission($notification, $permission)
+    {
+        self::withBasicRelationsToNotify()->each(function ($user) use ($notification, $permission) {
+            if (Gate::forUser($user)->allows($permission)) {
+                $user->notify($notification);
+            }
+        });
+    }
+
     public function uploadPhoto(): void
     {
         $this->uploadFile('photo', storage_path('app/public/' . self::PHOTO_PATH), $this->name);
@@ -486,6 +513,8 @@ class User extends Authenticatable
         $homepageRoutes = [
             // MAD
             'mad.manufacturers.index' => 'view-MAD-EPP',
+            'mad.products.index' => 'view-IVP-EPP',
+            'mad.processes.index' => 'view-VPS-EPP',
         ];
 
         foreach ($homepageRoutes as $routeName => $gate) {

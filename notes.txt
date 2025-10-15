@@ -7,6 +7,10 @@ Attachments:
 Atx:
 1) Added unique for 'inn_id' and 'form_id'
 
+processes:
+1) order_priority => overdue_days
 
+
+** Permissions fully updated. Reattach users direct permission manually
 
 * Fix uploading attachments for muptiple "products" create.

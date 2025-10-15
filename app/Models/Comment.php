@@ -62,8 +62,8 @@ class Comment extends Model
             }
 
             if ($record->commentable_type == Process::class) {
-                // Validate processes 'order_priority' after creating comment.
-                $record->commentable->validateOrderPriorityAttribute();
+                // Recalculate 'overdue_days' of process after creating comment.
+                $record->commentable->recalculateOverdueDays();
             }
         });
     }

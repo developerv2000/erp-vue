@@ -177,8 +177,20 @@ return [
     */
 
     'custom' => [
-        'attribute-name' => [
-            'rule-name' => 'custom-message',
+        'ivp' => [
+            'unique' => 'Product with a given manufacturer, IMN, form, dosage and pack already exists.',
+        ],
+
+        'process_status_history' => [
+            'is_active_history' => 'Active status history can not be deleted.',
+        ],
+
+        'kvpp' => [
+            'unique' => 'Record with a given INN, form, dosage, pack and country already exists.',
+        ],
+
+        'meetings' => [
+            'unique' => 'Meeting for such a year, with a current manufacturer already exists.',
         ],
     ],
 

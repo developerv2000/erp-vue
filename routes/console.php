@@ -1,7 +1,17 @@
 <?php
 
+use App\Models\Country;
+use App\Models\Currency;
+use App\Models\Process;
 use App\Models\User;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
+
+Schedule::call(function () {
+    Country::recalculateAllProcessCountsInDatabase();
+    Currency::updateAllUSDRatios();
+    Process::recalculateAllOverdueDays();
+})->daily();
 
 Artisan::command('users:reset-settings', function () {
     User::resetSettingsOfAllUsers();

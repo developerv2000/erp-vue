@@ -2,33 +2,37 @@
 
 namespace App\Models;
 
-use App\Notifications\ProcessMarkedAsReadyForOrder;
-use App\Notifications\ProcessStageUpdatedToContract;
-use App\Notifications\ProcessUnmarkedAsReadyForOrder;
-use App\Support\Abstracts\BaseModel;
-use App\Support\Contracts\Model\CanExportRecordsAsExcel;
-use App\Support\Contracts\Model\ExportsProductSelection;
-use App\Support\Contracts\Model\HasTitle;
+use App\Http\Requests\MAD\ProcessStoreRequest;
+use App\Support\Contracts\Model\ExportsRecordsAsExcel;
+use App\Support\Contracts\Model\GeneratesBreadcrumbs;
+use App\Support\Contracts\Model\HasTitleAttribute;
 use App\Support\Contracts\Model\PreparesFetchedRecordsForExport;
 use App\Support\Helpers\GeneralHelper;
+use App\Support\Helpers\ModelHelper;
 use App\Support\Helpers\QueryFilterHelper;
-use App\Support\Traits\Model\Commentable;
-use App\Support\Traits\Model\ExportsRecordsAsExcel;
-use Carbon\Carbon;
+use App\Support\Traits\Model\AddsDefaultQueryParamsToRequest;
+use App\Support\Traits\Model\GetsMinifiedRecordsWithName;
+use App\Support\Traits\Model\HasAttachments;
+use App\Support\Traits\Model\HasComments;
+use App\Support\Traits\Model\HasModelNamespaceAttributes;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
-class Process extends Model
+class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, ExportsRecordsAsExcel, PreparesFetchedRecordsForExport
 {
     /** @use HasFactory<\Database\Factories\ProcessFactory> */
     use HasFactory;
     use SoftDeletes;
+    use HasComments;
+    use HasAttachments;
+    use HasModelNamespaceAttributes;
+    use AddsDefaultQueryParamsToRequest;
+    use GetsMinifiedRecordsWithName;
 
     /*
     |--------------------------------------------------------------------------
@@ -36,16 +40,13 @@ class Process extends Model
     |--------------------------------------------------------------------------
     */
 
-    const SETTINGS_MAD_TABLE_COLUMNS_KEY = 'MAD_VPS_table_columns';
-    const SETTINGS_MAD_DH_TABLE_COLUMNS_KEY = 'MAD_DH_table_columns';
-
     const DEFAULT_ORDER_BY = 'updated_at';
-    const DEFAULT_ORDER_TYPE = 'desc';
-    const DEFAULT_PAGINATION_LIMIT = 50;
+    const DEFAULT_ORDER_DIRECTION = 'desc';
+    const DEFAULT_PER_PAGE = 50;
 
     const LIMITED_RECORDS_COUNT_ON_EXPORT_TO_EXCEL = 15;
-    const STORAGE_PATH_OF_EXCEL_TEMPLATE_FILE_FOR_EXPORT = 'app/excel/export-templates/vps.xlsx';
-    const STORAGE_PATH_FOR_EXPORTING_EXCEL_FILES = 'app/excel/exports/vps';
+    const STORAGE_PATH_OF_EXCEL_TEMPLATE_FILE_FOR_EXPORT = 'app/private/excel/export-templates/vps.xlsx';
+    const STORAGE_PATH_FOR_EXPORTING_EXCEL_FILES = 'app/private/excel/exports/vps';
 
     const DEADLINE_EXPIRED_STATUS_NAME = 'Expired';
     const DEADLINE_NOT_EXPIRED_STATUS_NAME = 'Not expired';
@@ -97,11 +98,6 @@ class Process extends Model
         )->withTrashedParents()->withTrashed();
     }
 
-    public function orderProducts()
-    {
-        return $this->hasMany(OrderProduct::class);
-    }
-
     public function status()
     {
         return $this->belongsTo(ProcessStatus::class, 'status_id');
@@ -143,22 +139,31 @@ class Process extends Model
         return $this->belongsToMany(Country::class, 'clinical_trial_country_process');
     }
 
-    public function invoices()
-    {
-        return $this->belongsToMany(Invoice::class);
-    }
-
     /*
     |--------------------------------------------------------------------------
-    | Additional attributes
+    | Additional attributes & appends
     |--------------------------------------------------------------------------
     */
 
-    public function getDeadlineStatusAttribute()
+    public static function appendRecordsBasicAttributes($records): void
     {
-        if ($this->order_priority == -1) {
+        foreach ($records as $record) {
+            $record->appendBasicAttributes();
+        }
+    }
+
+    public function appendBasicAttributes(): void
+    {
+        $this->append([
+            'base_model_class',
+        ]);
+    }
+
+    public function getDeadlineStatusAttribute(): string
+    {
+        if ($this->overdue_days == -1) {
             return self::DEADLINE_STOPPED_STATUS_NAME;
-        } else if ($this->order_priority == 0) {
+        } else if ($this->overdue_days == 0) {
             return self::DEADLINE_NOT_EXPIRED_STATUS_NAME;
         } else {
             return self::DEADLINE_EXPIRED_STATUS_NAME;
@@ -168,7 +173,7 @@ class Process extends Model
     /**
      * Also used while exporting product selection.
      */
-    public function getMatchedProductSearchesAttribute()
+    public function getMatchedProductSearchesAttribute(): Collection
     {
         return ProductSearch::where([
             'inn_id' => $this->product->inn_id,
@@ -233,41 +238,30 @@ class Process extends Model
             : null;
     }
 
-    public function getIsReadyForOrderAttribute()
+    /**
+     * CHeck whether process can be added to ASP (СПГ) as contracted
+     */
+    public function getIsReadyForAspContractAttribute()
+    {
+        return $this->status->generalStatus->stage >= 5;
+    }
+
+    /**
+     * CHeck whether process can be added to ASP (СПГ) as registered
+     */
+    public function getIsReadyForAspRegistrationAttribute()
+    {
+        return $this->status->generalStatus->stage >= 7;
+    }
+
+    public function canBeMarkedAsReadyForOrder(): bool
+    {
+        return $this->status->generalStatus->stage >= 8;
+    }
+
+    public function getIsReadyForOrderAttribute(): bool
     {
         return $this->readiness_for_order_date ? true : false;
-    }
-
-    /**
-     * Used on order pages.
-     */
-    public function getFullTrademarkEnAttribute()
-    {
-        return $this->trademark_en . ' ' . $this->product->form->name . ' ' . $this->product->dosage . ' ' . $this->product->pack;
-    }
-
-    /**
-     * Used on plpd.orders.create and plpd.orders.edit pages.
-     */
-    public function getFullTrademarkEnWithIdAttribute()
-    {
-        return $this->trademark_en . ' ' . $this->product->form->name . ' ' . $this->product->dosage . ' ' . $this->product->pack . ' — #' . $this->id;
-    }
-
-    /**
-     * Used on order pages.
-     */
-    public function getFullTrademarkRuAttribute()
-    {
-        return $this->trademark_ru . ' ' . $this->product->form->name . ' ' . $this->product->dosage . ' ' . $this->product->pack;
-    }
-
-    /**
-     * Used on plpd.orders.create and plpd.orders.edit pages.
-     */
-    public function getMahNameWithIdAttribute()
-    {
-        return $this->MAH->name . ' — #' . $this->id;
     }
 
     /*
@@ -285,8 +279,7 @@ class Process extends Model
 
         static::created(function ($record) {
             $record->addStatusHistoryForCurrentStatus($record->created_at);
-            // Validate 'order_priority' after creating status history.
-            $record->validateOrderPriorityAttribute();
+            $record->recalculateOverdueDays(); // Must be executed only AFTER creating status_history!
         });
 
         static::updating(function ($record) {
@@ -296,8 +289,8 @@ class Process extends Model
         });
 
         static::updated(function ($record) {
-            // Validate 'order_priority' after updating event, because status history can be updated.
-            $record->validateOrderPriorityAttribute();
+            // Recalculate 'overdue_days' after updating event, because records status maybe be updated.
+            $record->recalculateOverdueDays();
         });
 
         static::saving(function ($record) {
@@ -321,10 +314,6 @@ class Process extends Model
             foreach ($record->statusHistory as $history) {
                 $history->delete();
             }
-
-            // foreach ($record->orderProducts as $orderProduct) {
-            //     $orderProduct->delete();
-            // }
         });
     }
 
@@ -334,12 +323,7 @@ class Process extends Model
     |--------------------------------------------------------------------------
     */
 
-    public function scopeOnlyReadyForOrder($query)
-    {
-        return $query->whereNotNull('readiness_for_order_date');
-    }
-
-    public function scopeWithBasicRelations($query)
+    public function scopeWithBasicRelations($query): Builder
     {
         return $query->with([
             'searchCountry',
@@ -399,12 +383,20 @@ class Process extends Model
         ]);
     }
 
+    public function scopeWithBasicRelationCounts($query): Builder
+    {
+        return $query->withCount([
+            'comments',
+        ]);
+    }
+
+
     /**
      * Add 'product_manufacturer_name' attribute.
      *
-     * Used while ordering processes by 'product_manufacturer_name'
+     * Used when ordering processes by 'product_manufacturer_name'
      */
-    public function scopeWithProductsManufacturerNameAttribute($query)
+    public function scopeWithProductsManufacturerNameAttribute($query): Builder
     {
         return $query
             ->join('products', 'products.id', '=', 'processes.product_id')
@@ -415,9 +407,9 @@ class Process extends Model
     /**
      * Add 'product_inn_name' attribute.
      *
-     * Used while ordering processes by 'product_inn_name'
+     * Used when ordering processes by 'product_inn_name'
      */
-    public function scopeWithProductsInnNameAttribute($query)
+    public function scopeWithProductsInnNameAttribute($query): Builder
     {
         return $query
             ->join('products', 'products.id', '=', 'processes.product_id')
@@ -428,9 +420,9 @@ class Process extends Model
     /**
      * Add 'product_form_name' attribute.
      *
-     * Used while ordering processes by 'product_form_name'
+     * Used when ordering processes by 'product_form_name'
      */
-    public function scopeWithProductsFormNameAttribute($query)
+    public function scopeWithProductsFormNameAttribute($query): Builder
     {
         return $query
             ->join('products', 'products.id', '=', 'processes.product_id')
@@ -441,9 +433,9 @@ class Process extends Model
     /**
      * Add 'product_dosage' attribute.
      *
-     * Used while ordering processes by 'product_dosage'
+     * Used when ordering processes by 'product_dosage'
      */
-    public function scopeWithProductsDosageAttribute($query)
+    public function scopeWithProductsDosageAttribute($query): Builder
     {
         return $query
             ->join('products', 'products.id', '=', 'processes.product_id')
@@ -453,7 +445,7 @@ class Process extends Model
     /**
      * Scope the query to include basic relation for process status history pages.
      */
-    public function scopeWitRelationsForHistoryPage($query)
+    public function scopeWitRelationsForHistoryPage($query): Builder
     {
         return $query->with([
             'statusHistory' => function ($historyQuery) {
@@ -496,173 +488,71 @@ class Process extends Model
         ]);
     }
 
-    public function scopeWithBasicRelationCounts($query)
-    {
-        return $query->withCount([
-            'comments',
-        ]);
-    }
-
-    public function scopeWithRelationsForOrder($query)
-    {
-        return $query->with([
-            'searchCountry',
-            'MAH',
-
-            'product' => function ($productQuery) {
-                $productQuery->select(
-                    'products.id',
-                    'products.manufacturer_id',
-                    'inn_id',
-                    'form_id',
-                    'dosage',
-                    'pack',
-                )
-                    ->with([
-                        'inn',
-                        'form',
-
-                        'manufacturer' => function ($manufQuery) {
-                            $manufQuery->select(
-                                'manufacturers.id',
-                                'manufacturers.name',
-                                'bdm_user_id',
-                            )
-                                ->with([
-                                    'bdm:id,name,photo',
-                                ]);
-                        },
-                    ]);
-            },
-        ]);
-    }
-
-    public function scopeWithRelationCountsForOrder($query)
-    {
-        return $query->withCount([
-            'orderProducts',
-        ]);
-    }
-
-    public function scopeWithOnlyRequiredSelectsForOrder($query)
-    {
-        return $query->select(
-            'processes.id',
-            'readiness_for_order_date',
-            'trademark_en',
-            'trademark_ru',
-            'processes.product_id',
-            'processes.country_id',
-            'processes.marketing_authorization_holder_id',
-        );
-    }
-
-    /**
-     * Manufacturer is not required, because its directly loaded while querying order products
-     */
-    public function scopeWithRelationsForOrderProduct($query)
-    {
-        return $query->with([
-            'searchCountry',
-            'MAH',
-
-            'product' => function ($productQuery) {
-                $productQuery->select(
-                    'products.id',
-                    'products.manufacturer_id',
-                    'inn_id',
-                    'form_id',
-                    'dosage',
-                    'pack',
-                )
-                    ->with([
-                        'inn',
-                        'form',
-                    ]);
-            },
-        ]);
-    }
-
-    public function scopeWithOnlyRequiredSelectsForOrderProduct($query)
-    {
-        return $query->select(
-            'processes.id',
-            'trademark_en',
-            'trademark_ru',
-            'processes.product_id',
-            'processes.country_id',
-            'processes.marketing_authorization_holder_id',
-        );
-    }
-
     /*
     |--------------------------------------------------------------------------
     | Contracts
     |--------------------------------------------------------------------------
     */
 
-    // Implement method defined in BaseModel abstract class
-    public function generateBreadcrumbs($department = null): array
-    {
-        $breadcrumbs = [
-            ['link' => route('mad.processes.index'), 'text' => __('VPS')],
-        ];
-
-        if ($this->trashed()) {
-            $breadcrumbs[] = ['link' => route('mad.processes.trash'), 'text' => __('Trash')];
-        }
-
-        $breadcrumbs[] = ['link' => route('mad.processes.edit', $this->id), 'text' => $this->title];
-
-        return $breadcrumbs;
-    }
-
-    // Implement method declared in HasTitle Interface
+    // Implement method declared in HasTitleAttribute Interface
     public function getTitleAttribute(): string
     {
         return __('Process') . ' #' . $this->id . ' / ' . $this->searchCountry->code;
     }
 
-    // Implement method declared in CanExportRecordsAsExcel Interface
-    public function scopeWithRelationsForExport($query)
+    // Implement method declared in GeneratesBreadcrumbs Interface
+    public function generateBreadcrumbs($department = null): array
     {
-        return $query->withBasicRelations()
+        $lowercasedDepartment = strtolower($department);
+
+        // Index page
+        $breadcrumbs = [
+            ['title' => __('pages.VPS'), 'link' => route($lowercasedDepartment . '.processes.index')],
+        ];
+
+        // Trash page
+        if ($this->trashed()) {
+            $breadcrumbs[] = ['title' => __('pages.Trash'), 'link' => route($lowercasedDepartment . '.processes.trash')];
+        }
+
+        // Edit page
+        $breadcrumbs[] = ['title' => $this->title, 'link' => null];
+
+        return $breadcrumbs;
+    }
+
+    // Implement method declared in ExportsRecordsAsExcel Interface
+    public static function queryRecordsForExportFromRequest(Request $request): Builder
+    {
+        $query = self::withBasicRelations()
             ->withBasicRelationCounts()
-            ->with(['comments']);
+            ->with('comments'); // Important
+
+        // Normalize request parameters
+        self::addDefaultQueryParamsToRequest($request);
+
+        // Apply filters
+        self::filterQueryForRequest($query, $request);
+
+        // Finalize (sorting)
+        ModelHelper::finalizeQueryForRequest($query, $request, 'query');
+
+        return $query;
     }
 
     // Implement method declared in PreparesFetchedRecordsForExport Interface
-    public static function prepareFetchedRecordsForExport($records)
+    public static function prepareFetchedRecordsForExport($records): void
     {
         self::addGeneralStatusPeriodsForRecords($records);
     }
 
-    /**
-     * Implement method declared in ExportsProductSelection Interface.
-     *
-     * No eager loads are required for the product selection export.
-     */
-    public function scopeWithRelationsForProductSelection($query)
-    {
-        return $query->with([
-            'product' => function ($productQuery) {
-                $productQuery->withRelationsForProductSelection();
-            },
-        ])
-            ->select(
-                'processes.id',
-                'product_id',
-                'country_id',
-            );
-    }
-
-    // Implement method declared in CanExportRecordsAsExcel Interface
+    // Implement method declared in ExportsRecordsAsExcel Interface
     public function getExcelColumnValuesForExport(): array
     {
         return [
             $this->id,
             $this->statusHistory->last()->start_date,
-            trans($this->deadline_status) . ($this->order_priority > 0 ? (' ' . $this->order_priority . ' ' . trans('days')) : ''),
+            trans($this->deadline_status) . ($this->overdue_days > 0 ? (' ' . $this->overdue_days . ' ' . trans('days')) : ''),
             $this->searchCountry->code,
             $this->status->name,
             $this->status->generalStatus->name_for_analysts,
@@ -728,18 +618,109 @@ class Process extends Model
 
     /*
     |--------------------------------------------------------------------------
+    | Queries
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Build and execute a model query based on request parameters.
+     *
+     * Steps:
+     *  - Apply default relations & counts
+     *  - Apply soft delete scope (if requested)
+     *  - Normalize query params (pagination, sorting, etc.)
+     *  - Apply filters
+     *  - Finalize query with sorting & pagination
+     *  - Append basic attributes (if requested and unless returning raw query)
+     *
+     * @param $action  ('paginate', 'get' or 'query')
+     * @return mixed
+     */
+    public static function queryRecordsFromRequest(Request $request, string $action = 'paginate', bool $appendAttributes = false)
+    {
+        $query = self::withBasicRelations()->withBasicRelationCounts();
+
+        // Apply trashed filter
+        if ($request->boolean('only_trashed')) {
+            $query->onlyTrashed();
+        }
+
+        // Normalize request parameters
+        self::addDefaultQueryParamsToRequest($request);
+
+        // Apply filters
+        self::filterQueryForRequest($query, $request);
+
+        // Finalize (sorting & pagination)
+        $records = self::finalizeQueryForRequest($query, $request, $action); // Almost the same as ModelHlper::finalizeQueryForRequest()
+
+        // Append attributes unless raw query is requested
+        if ($appendAttributes && $action !== 'query') {
+            self::appendRecordsBasicAttributes($records);
+        }
+
+        return $records;
+    }
+
+    /**
+     * Finalizes the query by applying ordering, pagination, or retrieving data based on the specified action.
+     *
+     * Almost the same as ModelHlper::finalizeQueryForRequest(), only adds ordering by 'overdue_days'.
+     *
+     * @param Builder|Relation $query The Eloquent query builder or relation instance.
+     * @param Request $request The request containing ordering and pagination parameters.
+     * @param string $action Action to perform on the query: 'paginate', 'get', or 'query'.
+     * @param string $defaultOrderBy Default column for ordering if none is specified.
+     * @param string $defaultOrderDirection Default ordering direction ('asc' or 'desc').
+     * @return mixed
+     */
+    public static function finalizeQueryForRequest(
+        Builder|Relation $query,
+        Request $request,
+        string $action = 'query',
+        string $defaultOrderBy = 'created_at',
+        string $defaultOrderDirection = 'desc',
+    ) {
+        // Apply primary and secondary ordering
+        $query->when($request->input('order_by_overdue_days'), function ($q) { // The only difference from ModelHlper
+            return $q->orderBy('overdue_days', 'desc');
+        })
+            ->orderBy($request->input('order_by', $defaultOrderBy), $request->input('order_direction', $defaultOrderDirection))
+            ->orderBy('id', $request->input('order_direction', $defaultOrderDirection));
+
+        // Handle pagination or retrieval based on the action parameter
+        switch ($action) {
+            case 'paginate':
+                return $query->paginate(
+                    $request->input('per_page', 20),
+                    ['*'],
+                    'page',
+                    $request->input('page', 1)
+                )->appends($request->except(['page']));
+
+            case 'get':
+                return $query->get();
+
+            case 'query':
+            default:
+                return $query;
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Filtering
     |--------------------------------------------------------------------------
     */
 
-    public static function filterQueryForRequest($query, $request, $applyPermissionsFilter = true)
+    public static function filterQueryForRequest($query, $request, $applyPermissionsFilter = true): Builder
     {
         // Apply base filters using helper
         $query = QueryFilterHelper::applyFilters($query, $request, self::getFilterConfig());
 
         // Additional filters
         if ($applyPermissionsFilter) {
-            self::applyPermissionsFilter($query, $request);
+            self::applyPermissionsFilter($query);
         }
 
         self::applyManufacturerRegionFilter($query, $request);
@@ -758,12 +739,8 @@ class Process extends Model
      * This static method applies filtering to the provided query based on the user's permissions,
      * their responsible countries, and whether they are the assigned analyst for a manufacturer.
      * If the user does not have the "view-MAD-VPS-of-all-analysts" permission, restrictions are applied.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query The query to be filtered.
-     * @param \Illuminate\Http\Request $request The current request, used to access the authenticated user.
-     * @return void
      */
-    public static function applyPermissionsFilter($query, $request)
+    public static function applyPermissionsFilter($query): Builder
     {
         // Get the authenticated user
         $user = auth()->user();
@@ -783,6 +760,8 @@ class Process extends Model
                     });
             });
         }
+
+        return $query;
     }
 
     /**
@@ -800,12 +779,14 @@ class Process extends Model
         $query->whereHas('manufacturer', function ($manufacturersQuery) use ($request) {
             return Manufacturer::applyRegionFilter($manufacturersQuery, $request);
         });
+
+        return $query;
     }
 
     /**
      * Apply date range filtering based on the active status start date.
      */
-    public static function applyActiveStatusStartDateRangeFilter($query, $request)
+    public static function applyActiveStatusStartDateRangeFilter($query, $request): Builder
     {
         $filterConfig = [
             'relationDateRangeAmbiguous' => [
@@ -817,7 +798,7 @@ class Process extends Model
             ],
         ];
 
-        $query = QueryFilterHelper::applyFilters($query, $request, $filterConfig);
+        return QueryFilterHelper::applyFilters($query, $request, $filterConfig);
     }
 
     /**
@@ -826,7 +807,7 @@ class Process extends Model
      *
      * IMPORTANT: Only 'Kk' ignore 'SKk' and 'Nkk'.
      */
-    public static function applyContractedOnSpecificMonthFilter($query, $request)
+    public static function applyContractedOnSpecificMonthFilter($query, $request): Builder
     {
         if ($request->filled('contracted_on_specific_month')) {
             return $query->whereHas('statusHistory', function ($historyQuery) use ($request) {
@@ -845,6 +826,8 @@ class Process extends Model
                     ->where('status_id', ProcessStatus::CONTACTED_RECORD_ID);
             });
         }
+
+        return $query;
     }
 
     /**
@@ -853,7 +836,7 @@ class Process extends Model
      *
      * IMPORTANT: Only 'Пцр' ignore 'SПцр'.
      */
-    public static function applyRegisteredOnSpecificMonthFilter($query, $request)
+    public static function applyRegisteredOnSpecificMonthFilter($query, $request): Builder
     {
         if ($request->filled('registered_on_specific_month')) {
             return $query->whereHas('statusHistory', function ($historyQuery) use ($request) {
@@ -872,13 +855,15 @@ class Process extends Model
                     ->where('status_id', ProcessStatus::REGISTERED_RECORD_ID);
             });
         }
+
+        return $query;
     }
 
     /**
      * Filter only processes which have specific general status history,
      * for the requested month and year.
      */
-    public static function applyGeneralStatusHistoryFilter($query, $request)
+    public static function applyGeneralStatusHistoryFilter($query, $request): Builder
     {
         if ($request->filled('has_general_status_history')) {
             return $query->whereHas('statusHistory', function ($historyQuery) use ($request) {
@@ -890,6 +875,8 @@ class Process extends Model
                     });
             });
         }
+
+        return $query;
     }
 
     /**
@@ -900,16 +887,16 @@ class Process extends Model
         if (!$request->filled('deadline_status')) return;
 
         switch ($request->input('deadline_status')) {
-            case trans(self::DEADLINE_STOPPED_STATUS_NAME):
-                return $query->where('order_priority', -1);
+            case self::DEADLINE_STOPPED_STATUS_NAME:
+                return $query->where('overdue_days', -1);
                 break;
 
-            case trans(self::DEADLINE_NOT_EXPIRED_STATUS_NAME):
-                return $query->where('order_priority', 0);
+            case self::DEADLINE_NOT_EXPIRED_STATUS_NAME:
+                return $query->where('overdue_days', 0);
                 break;
 
-            case trans(self::DEADLINE_EXPIRED_STATUS_NAME):
-                return $query->where('order_priority', '>', 1);
+            case self::DEADLINE_EXPIRED_STATUS_NAME:
+                return $query->where('overdue_days', '>=', 1);
                 break;
         }
     }
@@ -924,74 +911,83 @@ class Process extends Model
 
             'relationEqual' => [
                 [
-                    'name' => 'product',
-                    'attribute' => 'dosage',
+                    'inputName' => 'product_dosage',
+                    'relationName' => 'product',
+                    'relationAttribute' => 'products.dosage',
                 ],
 
                 [
-                    'name' => 'product',
-                    'attribute' => 'pack',
+                    'inputName' => 'product_pack',
+                    'relationName' => 'product',
+                    'relationAttribute' => 'products.pack',
                 ],
 
                 [
-                    'name' => 'manufacturer',
-                    'attribute' => 'analyst_user_id',
+                    'inputName' => 'manufacturer_analyst_user_id',
+                    'relationName' => 'manufacturer',
+                    'relationAttribute' => 'manufacturers.analyst_user_id',
                 ],
 
                 [
-                    'name' => 'manufacturer',
-                    'attribute' => 'bdm_user_id',
+                    'inputName' => 'manufacturer_bdm_user_id',
+                    'relationName' => 'manufacturer',
+                    'relationAttribute' => 'manufacturers.bdm_user_id',
                 ],
 
                 [
-                    'name' => 'manufacturer',
-                    'attribute' => 'category_id',
+                    'inputName' => 'manufacturer_category_id',
+                    'relationName' => 'manufacturer',
+                    'relationAttribute' => 'manufacturers.category_id',
                 ],
             ],
 
             'relationIn' => [
                 [
-                    'name' => 'status.generalStatus',
-                    'attribute' => 'name_for_analysts',
+                    'inputName' => 'general_status_name_for_analysts',
+                    'relationName' => 'status.generalStatus',
+                    'relationAttribute' => 'process_general_statuses.name_for_analysts',
                 ],
 
                 [
-                    'name' => 'status',
-                    'attribute' => 'general_status_id',
+                    'inputName' => 'status_general_status_id',
+                    'relationName' => 'status',
+                    'relationAttribute' => 'process_statuses.general_status_id',
                 ],
 
                 [
-                    'name' => 'product',
-                    'attribute' => 'inn_id',
+                    'inputName' => 'product_inn_id',
+                    'relationName' => 'product',
+                    'relationAttribute' => 'products.inn_id',
                 ],
 
                 [
-                    'name' => 'product',
-                    'attribute' => 'form_id',
+                    'inputName' => 'product_form_id',
+                    'relationName' => 'product',
+                    'relationAttribute' => 'products.form_id',
                 ],
 
                 [
-                    'name' => 'product',
-                    'attribute' => 'class_id',
+                    'inputName' => 'product_class_id',
+                    'relationName' => 'product',
+                    'relationAttribute' => 'products.class_id',
                 ],
 
                 [
-                    'name' => 'product',
-                    'attribute' => 'brand',
-                ],
-            ],
-
-            'relationInAmbiguous' => [
-                [
-                    'name' => 'manufacturer',
-                    'attribute' => 'manufacturer_id',
-                    'ambiguousAttribute' => 'manufacturers.id',
+                    'inputName' => 'product_brand',
+                    'relationName' => 'product',
+                    'relationAttribute' => 'products.brand',
                 ],
 
                 [
-                    'name' => 'manufacturer',
-                    'attribute' => 'manufacturer_country_id',
-                    'ambiguousAttribute' => 'manufacturers.country_id',
+                    'inputName' => 'manufacturer_id',
+                    'relationName' => 'manufacturer',
+                    'relationAttribute' => 'manufacturers.id',
+                ],
+
+                [
+                    'inputName' => 'manufacturer_country_id',
+                    'relationName' => 'manufacturer',
+                    'relationAttribute' => 'manufacturers.country_id',
                 ],
             ],
         ];
@@ -999,22 +995,21 @@ class Process extends Model
 
     /*
     |--------------------------------------------------------------------------
-    | Create, Update and Duplicate
+    | Store, Update and Duplicate
     |--------------------------------------------------------------------------
     */
 
     /**
      * Create multiple instances of the model from the request data.
      *
+     * AJAX request.
+     *
      * This method processes an array of country IDs from the request,
      * merges specific forecast year data for each country, and creates
      * model instances with the combined data. It also attaches related
      * clinical trial countries and responsible people, and stores comments.
-     *
-     * @param App\Http\Requests\ProcessStoreRequest $request The request containing the input data.
-     * @return void
      */
-    public static function createMultipleRecordsFromRequest($request)
+    public static function storeMultipleRecordsByMADFromRequest(ProcessStoreRequest $request): void
     {
         $countryIDs = $request->input('country_ids');
 
@@ -1039,7 +1034,10 @@ class Process extends Model
         }
     }
 
-    public function updateFromRequest($request)
+    /**
+     * AJAX request
+     */
+    public function updateByMADFromRequest($request)
     {
         $this->update($request->all());
 
@@ -1050,7 +1048,10 @@ class Process extends Model
         $this->storeCommentFromRequest($request);
     }
 
-    public static function duplicateFromRequest($request)
+    /**
+     * AJAX request
+     */
+    public static function duplicateByMADFromRequest($request)
     {
         $record = self::create($request->all());
 
@@ -1063,7 +1064,7 @@ class Process extends Model
 
     /*
     |--------------------------------------------------------------------------
-    | Misc date validations
+    | Date validations of model on saving & updating events
     |--------------------------------------------------------------------------
     */
 
@@ -1117,7 +1118,7 @@ class Process extends Model
 
     /*
     |--------------------------------------------------------------------------
-    | Status helpers
+    | Status history helpers
     |--------------------------------------------------------------------------
     */
 
@@ -1168,230 +1169,83 @@ class Process extends Model
 
     /*
     |--------------------------------------------------------------------------
-    | Order part
+    | Ordering by 'overdue_days' and related helpers
     |--------------------------------------------------------------------------
     */
 
-    /**
-     * CHeck whether process can be marked as ready for order
-     */
-    public function canBeMarkedAsReadyForOrder()
+    public static function addOrderByOverdueDaysToRequestIfMissing($request, $orderByOverdueDays = true)
     {
-        return $this->status->generalStatus->stage >= 8;
-    }
-
-    public function toggleReadyForOrderStatus($request)
-    {
-        if (!$this->canBeMarkedAsReadyForOrder()) {
-            return [
-                'success' => false,
-                'is_ready_for_order' => $this->is_ready_for_order,
-                'message' => __('Error') . '!'
-            ];
+        // Set as default 'false' for "Фирдавс Киличбеков"
+        if (auth()->user()->id == 1 && !$request->has('order_by_overdue_days')) {
+            $orderByOverdueDays = false;
         }
 
-        // Mark as ready for order
-        if ($request->input('mark_as_ready_for_order')) {
-            if (!$this->is_ready_for_order) {
-                $this->readiness_for_order_date = now();
-                $this->timestamps = false;
-                $this->saveQuietly();
-
-                // Notify users
-                $notification = new ProcessMarkedAsReadyForOrder($this);
-                User::notifyUsersBasedOnPermission($notification, 'receive-notification-when-MAD-VPS-is-marked-as-ready-for-order');
-            }
-
-            return [
-                'success' => true,
-                'is_ready_for_order' => true,
-            ];
-        } else {
-            // // Return error if process already has orders
-            if ($this->orders()->count() > 0) {
-                return [
-                    'success' => false,
-                    'is_ready_for_order' => $this->is_ready_for_order,
-                    'message' => __('Error') . '. ' . __('Process already has orders') . '!'
-                ];
-            }
-
-            // Else remove ready for order status
-            $this->readiness_for_order_date = null;
-            $this->timestamps = false;
-            $this->saveQuietly();
-
-            $notification = new ProcessUnmarkedAsReadyForOrder($this);
-            User::notifyUsersBasedOnPermission($notification, 'receive-notification-when-MAD-VPS-is-marked-as-ready-for-order');
-
-            return [
-                'success' => true,
-                'is_ready_for_order' => false,
-            ];
-        }
-    }
-
-    /**
-     * Retrieve ready-for-order Process records for a given manufacturer and country.
-     *
-     * This method is used on the `plpd.orders.create` and `plpd.orders.edit` pages to populate
-     * the list of available products for a selected manufacturer and country.
-     *
-     * @param int  $manufacturerID          ID of the manufacturer.
-     * @param int  $countryID               ID of the country.
-     * @param bool $appendFullTrademarkEnWithId   Whether to append the 'full_trademark_en_with_id' attribute.
-     *
-     * @return \Illuminate\Support\Collection<\App\Models\Process>
-     */
-    public static function getReadyForOrderRecordsOfManufacturer(int $manufacturerID, int $countryID, bool $appendFullTrademarkEnWithId = false)
-    {
-        $processes = self::onlyReadyForOrder()
-            ->withRelationsForOrder()
-            ->withOnlyRequiredSelectsForOrder()
-            ->whereHas(
-                'product.manufacturer',
-                fn($query) =>
-                $query->where('manufacturers.id', $manufacturerID)
-            )
-            ->where('country_id', $countryID)
-            ->get();
-
-        if ($appendFullTrademarkEnWithId) {
-            $processes->each->append('full_trademark_en_with_id');
-        }
-
-        return $processes;
-    }
-
-    /**
-     * Get process with all its similar records for order.
-     *
-     * This method is used on the `plpd.orders.create` and `plpd.orders.edit` pages to fetch
-     * processes with MAHs related to the current process's product and country context.
-     */
-    public function getProcessWithItSimilarRecordsForOrder($appendMahNameWithId = false)
-    {
-        $processes = self::onlyReadyForOrder()
-            ->where('product_id', $this->product_id)
-            ->where('country_id', $this->country_id)
-            ->with('MAH')
-            ->get();
-
-        if ($appendMahNameWithId) {
-            $processes->each->append('mah_name_with_id');
-        }
-
-        return $processes;
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Ordering by priority
-    |--------------------------------------------------------------------------
-    */
-
-    public static function addOrderByPriorityQueryParamToRequest($request, $orderByPriority = true)
-    {
         $request->mergeIfMissing([
-            'order_by_priority' => $request->input('order_by_priority', $orderByPriority),
+            'order_by_overdue_days' => $request->input('order_by_overdue_days', $orderByOverdueDays),
         ]);
     }
 
     /**
-     * Finalizes the query by applying ordering by priority and secondary orderings,
-     * pagination, or retrieving data based on the specified action.
-     */
-    public static function finalizeQueryOrderedByPriorityForRequest(
-        Builder|Relation $query,
-        Request $request,
-        string $action = 'query',
-        string $defaultOrderBy = 'created_at',
-        string $defaultOrderType = 'desc',
-    ) {
-        // Apply primary and secondary ordering
-        $query->when($request->input('order_by_priority'), function ($q) {
-            return $q->orderBy('order_priority', 'desc');
-        })
-            ->orderBy($request->input('order_by', $defaultOrderBy), $request->input('order_type', $defaultOrderType))
-            ->orderBy('id', $request->input('order_type', $defaultOrderType));
-
-        // Handle pagination or retrieval based on the action parameter
-        switch ($action) {
-            case 'paginate':
-                return $query->paginate(
-                    $request->input('pagination_limit', 20),
-                    ['*'],
-                    'page',
-                    $request->input('page', 1)
-                )->appends($request->except(['page', 'reversed_order_url']));
-
-            case 'get':
-                return $query->get();
-
-            case 'query':
-            default:
-                return $query;
-        }
-    }
-
-    /**
-     * Validates and sets the 'order_priority' attribute of the record.
+     * Recalculates and updates the 'overdue_days' attribute for the record.
      *
-     * This method is typically called on model 'created'/'updated' events,
-     * after storing comments and on 'updating' event of ProcessStatusHistory model.
+     * This method is typically invoked:
+     * - On model 'created' or 'updated' events,
+     * - After storing related comments,
+     * - On 'updating' event of the ProcessStatusHistory model.
      *
-     * It assigns 'order_priority' based on the following logic:
-     * - **-1**: For records with a 'stopped' status.
-     * - **0**: For records that either have no deadline or whose deadline has not yet expired.
-     * - **Days past deadline**: For records with an expired deadline, it's set to the number of days past the deadline.
+     * Logic overview:
+     * - **-1** → If the process status is "stopped".
+     * - **0**  → If there is no deadline or the allowed delay has not yet passed.
+     * - **N**  → Number of days past the allowed delay (if deadline exceeded).
      *
+     * @param bool $refresh  Whether to refresh the model before recalculating.
      * @return void
      */
-    public function validateOrderPriorityAttribute($refresh = true): void
+    public function recalculateOverdueDays(bool $refresh = true): void
     {
-        // Refresh record, because activeStatusHistory and lastComments can be updated!
+        // Refresh model to ensure related data (status history, comments) is up to date.
         if ($refresh) {
             $this->refresh();
         }
 
-        // Escape errors while processes activeStatusHistory can be null,
-        // right after closing active status history on ProcessStatusHistory updated event.
+        // Guard clause: activeStatusHistory may be null right after status update.
         if (!$this->activeStatusHistory) {
             return;
         }
 
-        // If the record's status is "stopped", set priority to -1 and exit.
+        // Case 1: Process is stopped → mark as -1 and exit early.
         if ($this->status->isStopedStatus()) {
-            $this->order_priority = -1;
+            $this->overdue_days = -1;
             $this->timestamps = false;
             $this->saveQuietly();
             return;
         }
 
-        // Initialize order_priority to 0 as a default for non-stopped statuses.
-        // This covers cases where there's no deadline or the deadline hasn't passed.
-        $this->order_priority = 0;
+        // Default: assume no overdue days (0).
+        $this->overdue_days = 0;
 
-        // If the status has a deadline, calculate priority based on deadline expiration.
+        // Case 2: Status has a deadline → compute overdue days.
         if ($this->status->hasDeadline()) {
-            $deadlineDays = $this->status->deadline_days;
+            $allowedDelayDays = ProcessStatus::ALLOWED_DELAY_DAYS;
             $lastActivityDate = $this->getLastActivityDateByStatusUpdateOrCommentCreate();
             $diffInDays = $lastActivityDate->diffInDays(now());
 
-            // If the difference in days exceeds the deadline days,
-            // set order_priority to the number of days past the deadline.
-            if ($diffInDays > $deadlineDays) {
-                $this->order_priority = $diffInDays - $deadlineDays;
+            // If actual days exceed allowed delay → store overdue days.
+            if ($diffInDays > $allowedDelayDays) {
+                $this->overdue_days = $diffInDays - $allowedDelayDays;
             }
         }
 
-        // Save the model silently without updating timestamps.
+        // Save silently without touching timestamps.
         $this->timestamps = false;
         $this->saveQuietly();
     }
 
+
     /**
      * Get the latest activity date between the last status update and the last comment creation.
+     *
+     * Used when recalculating overdue days of process.
      *
      * This function compares two dates:
      * 1. The start_date from the associated activeStatusHistory (which is always expected to exist).
@@ -1414,11 +1268,14 @@ class Process extends Model
         return $lastStatusUpdateDate;
     }
 
-    public static function validateAllOrderPriorityAttributes()
+    /**
+     * Executed by scheduler daily.
+     */
+    public static function recalculateAllOverdueDays(): void
     {
         self::withTrashed()->with(['activeStatusHistory', 'lastComment'])->chunk(500, function ($records) {
             foreach ($records as $record) {
-                $record->validateOrderPriorityAttribute();
+                $record->recalculateOverdueDays();
             }
         });
     }
@@ -1476,23 +1333,7 @@ class Process extends Model
     }
 
     /**
-     * CHeck whether process can be added to ASP (СПГ) as contracted
-     */
-    public function isReadyForASPContract()
-    {
-        return $this->status->generalStatus->stage >= 5;
-    }
-
-    /**
-     * CHeck whether process can be added to ASP (СПГ) as registered
-     */
-    public function isReadyForASPRegistration()
-    {
-        return $this->status->generalStatus->stage >= 7;
-    }
-
-    /**
-     * Check wether current status of process can be edited by authenticated user or not.
+     * Check wether current process can be edited by authenticated user or not.
      *
      * Used in processes.edit & processes.duplicate pages.
      */
@@ -1517,9 +1358,9 @@ class Process extends Model
     }
 
     /**
-     * Used on processes.index page for ordering.
+     * Used on processes.index/trash pages for query ordering.
      */
-    public static function addJoinsForOrdering($query, $request)
+    public static function addJoinsForQueryOrdering($query, $request)
     {
         if ($request->input('order_by') == 'product_manufacturer_name') {
             $query->withProductsManufacturerNameAttribute();
@@ -1540,6 +1381,7 @@ class Process extends Model
         return $query;
     }
 
+    // Used on filters.
     public static function pluckAllEnTrademarks()
     {
         return self::select('trademark_en')
@@ -1548,6 +1390,7 @@ class Process extends Model
             ->pluck('trademark_en');
     }
 
+    // Used on filters.
     public static function pluckAllRuTrademarks()
     {
         return self::select('trademark_ru')
@@ -1556,15 +1399,13 @@ class Process extends Model
             ->pluck('trademark_ru');
     }
 
-    /**
-     * Used in filtering dropdown for deadline status.
-     */
+    // Used on filters.
     public static function getDeadlineStatusOptions()
     {
         return [
-            trans(self::DEADLINE_STOPPED_STATUS_NAME),
-            trans(self::DEADLINE_NOT_EXPIRED_STATUS_NAME),
-            trans(self::DEADLINE_EXPIRED_STATUS_NAME)
+            self::DEADLINE_STOPPED_STATUS_NAME,
+            self::DEADLINE_NOT_EXPIRED_STATUS_NAME,
+            self::DEADLINE_EXPIRED_STATUS_NAME,
         ];
     }
 
@@ -1633,193 +1474,145 @@ class Process extends Model
         }
     }
 
-    /**
-     * Provides the default MAD table columns along with their properties.
-     *
-     * These columns are typically used to display data in tables,
-     * such as on index and trash pages, and are iterated over in a loop.
-     *
-     * @return array
-     */
-    public static function getDefaultMADTableSettingsForUser($user)
+    public static function getMADTableHeadersForUser($user): array|null
     {
-        if (Gate::forUser($user)->denies('view-MAD-VPS')) {
+        if (Gate::forUser($user)->denies(Permission::extractAbilityName(Permission::CAN_VIEW_MAD_VPS_NAME))) {
             return null;
         }
 
         $order = 1;
         $columns = array();
 
-        if (Gate::forUser($user)->allows('edit-MAD-VPS')) {
+        if (Gate::forUser($user)->allows(Permission::extractAbilityName(Permission::CAN_EDIT_MAD_VPS_NAME))) {
             array_push(
                 $columns,
-                ['name' => 'Edit', 'order' => $order++, 'width' => 40, 'visible' => 1],
-                ['name' => 'Duplicate', 'order' => $order++, 'width' => 40, 'visible' => 1],
+                ['title' => 'Record', 'key' => 'edit', 'width' => 60, 'sortable' => false, 'visible' => 1, 'order' => $order++],
+                ['title' => 'actions.Duplicate_short', 'key' => 'duplicate', 'width' => 60, 'sortable' => false, 'visible' => 1, 'order' => $order++],
             );
         }
 
         array_push(
             $columns,
-            ['name' => 'ID', 'order' => $order++, 'width' => 62, 'visible' => 1],
-            ['name' => 'Status date', 'order' => $order++, 'width' => 100, 'visible' => 1],
-            ['name' => 'Deadline', 'order' => $order++, 'width' => 118, 'visible' => 1],
+            ['title' => 'ID', 'key' => 'id', 'width' => 62, 'sortable' => true, 'visible' => 1, 'order' => $order++],
+            ['title' => 'fields.Status date', 'key' => 'last_status_date', 'width' => 100, 'sortable' => false, 'visible' => 1, 'order' => $order++],
+            ['title' => 'fields.Deadline', 'key' => 'deadline', 'width' => 118, 'sortable' => false, 'visible' => 1, 'order' => $order++],
         );
 
-        if (Gate::forUser($user)->allows('control-MAD-ASP-processes')) {
+        if (Gate::forUser($user)->allows(Permission::extractAbilityName(Permission::CAN_CONTROL_MAD_ASP_PROCESSES))) {
             array_push(
                 $columns,
-                ['name' => '5Кк', 'order' => $order++, 'width' => 40, 'visible' => 1],
-                ['name' => '7НПР', 'order' => $order++, 'width' => 50, 'visible' => 1],
+                ['title' => 'statuses.5Кк', 'key' => 'contracted_in_asp', 'width' => 60, 'sortable' => true, 'visible' => 1, 'order' => $order++],
+                ['title' => 'statuses.7НПР', 'key' => 'registered_in_asp', 'width' => 70, 'sortable' => true, 'visible' => 1, 'order' => $order++],
             );
         }
 
-        if (Gate::forUser($user)->allows('mark-MAD-VPS-as-ready-for-order')) {
+        if (Gate::forUser($user)->allows(Permission::extractAbilityName(Permission::CAN_MARK_MAD_VPS_AS_READY_FOR_ORDER))) {
             array_push(
                 $columns,
-                ['name' => '8Р', 'order' => $order++, 'width' => 40, 'visible' => 1],
+                ['title' => 'statuses.8Р', 'key' => 'readiness_for_order_date', 'width' => 60, 'sortable' => true, 'visible' => 1, 'order' => $order++],
             );
         }
 
-        array_push(
-            $columns,
-            ['name' => 'Status', 'order' => $order++, 'width' => 76, 'visible' => 1],
-            ['name' => 'Status An*', 'order' => $order++, 'width' => 80, 'visible' => 1],
-            ['name' => 'General status', 'order' => $order++, 'width' => 106, 'visible' => 1],
+        $additionalColumns = [
+            ['title' => 'fields.Status', 'key' => 'status_id', 'width' => 76, 'sortable' => true],
+            ['title' => 'fields.Status An*', 'key' => 'general_status_name_for_analyst', 'width' => 80, 'sortable' => false],
+            ['title' => 'fields.General status', 'key' => 'general_status_name', 'width' => 106, 'sortable' => false],
 
-            ['name' => 'BDM', 'order' => $order++, 'width' => 142, 'visible' => 1],
-            ['name' => 'Analyst', 'order' => $order++, 'width' => 142, 'visible' => 1],
-            ['name' => 'Search country', 'order' => $order++, 'width' => 130, 'visible' => 1],
+            ['title' => 'fields.BDM', 'key' => 'manufacturer_bdm', 'width' => 146, 'sortable' => false],
+            ['title' => 'fields.Analyst', 'key' => 'manufacturer_analyst', 'width' => 146, 'sortable' => false],
+            ['title' => 'fields.Search country', 'key' => 'country_id', 'width' => 130, 'sortable' => false],
 
-            ['name' => 'Manufacturer category', 'order' => $order++, 'width' => 110, 'visible' => 1],
-            ['name' => 'Manufacturer country', 'order' => $order++, 'width' => 140, 'visible' => 1],
-            ['name' => 'Manufacturer', 'order' => $order++, 'width' => 140, 'visible' => 1],
+            ['title' => 'fields.Manufacturer category', 'key' => 'manufacturer_category_name', 'width' => 110, 'sortable' => false],
+            ['title' => 'fields.Manufacturer country', 'key' => 'manufacturer_country_name', 'width' => 140, 'sortable' => false],
+            ['title' => 'fields.Manufacturer', 'key' => 'product_manufacturer_name', 'width' => 140, 'sortable' => true],
 
-            ['name' => 'Generic', 'order' => $order++, 'width' => 180, 'visible' => 1],
-            ['name' => 'Form', 'order' => $order++, 'width' => 120, 'visible' => 1],
-            ['name' => 'Dosage', 'order' => $order++, 'width' => 120, 'visible' => 1],
-            ['name' => 'Pack', 'order' => $order++, 'width' => 120, 'visible' => 1],
-            ['name' => 'MOQ', 'order' => $order++, 'width' => 140, 'visible' => 1],
-            ['name' => 'Shelf life', 'order' => $order++, 'width' => 112, 'visible' => 1],
+            ['title' => 'fields.Generic', 'key' => 'product_inn_name', 'width' => 180, 'sortable' => true],
+            ['title' => 'fields.Form', 'key' => 'product_form_name', 'width' => 120, 'sortable' => true],
+            ['title' => 'fields.Dosage', 'key' => 'product_dosage', 'width' => 120, 'sortable' => true],
+            ['title' => 'fields.Pack', 'key' => 'product_pack', 'width' => 120, 'sortable' => false],
+            ['title' => 'fields.MOQ', 'key' => 'product_moq', 'width' => 140, 'sortable' => false],
+            ['title' => 'fields.Shelf life', 'key' => 'product_shelf_life', 'width' => 112, 'sortable' => false],
 
-            ['name' => 'Manufacturer price 1', 'order' => $order++, 'width' => 106, 'visible' => 1],
-            ['name' => 'Manufacturer price 2', 'order' => $order++, 'width' => 106, 'visible' => 1],
-            ['name' => 'Currency', 'order' => $order++, 'width' => 86, 'visible' => 1],
-            ['name' => 'Price in USD', 'order' => $order++, 'width' => 94, 'visible' => 1],
-            ['name' => 'Agreed price', 'order' => $order++, 'width' => 104, 'visible' => 1],
-            ['name' => 'Our price 2', 'order' => $order++, 'width' => 118, 'visible' => 1],
-            ['name' => 'Our price 1', 'order' => $order++, 'width' => 118, 'visible' => 1],
-            ['name' => 'Increased price', 'order' => $order++, 'width' => 158, 'visible' => 1],
-            ['name' => 'Increased price %', 'order' => $order++, 'width' => 154, 'visible' => 1],
-            ['name' => 'Increased price date', 'order' => $order++, 'width' => 146, 'visible' => 1],
+            ['title' => 'fields.Manufacturer price 1', 'key' => 'manufacturer_first_offered_price', 'width' => 106, 'sortable' => true],
+            ['title' => 'fields.Manufacturer price 2', 'key' => 'manufacturer_followed_offered_price', 'width' => 106, 'sortable' => true],
+            ['title' => 'fields.Currency', 'key' => 'currency_id', 'width' => 86, 'sortable' => true],
+            ['title' => 'fields.Price in USD', 'key' => 'manufacturer_offered_price_in_usd', 'width' => 94, 'sortable' => false],
+            ['title' => 'fields.Agreed price', 'key' => 'agreed_price', 'width' => 104, 'sortable' => true],
+            ['title' => 'fields.Our price 2', 'key' => 'our_followed_offered_price', 'width' => 118, 'sortable' => true],
+            ['title' => 'fields.Our price 1', 'key' => 'our_first_offered_price', 'width' => 118, 'sortable' => true],
+            ['title' => 'fields.Increased price', 'key' => 'increased_price', 'width' => 158, 'sortable' => true],
+            ['title' => 'fields.Increased price %', 'key' => 'increased_price_percentage', 'width' => 154, 'sortable' => false],
+            ['title' => 'fields.Increased price date', 'key' => 'increased_price_date', 'width' => 146, 'sortable' => false],
 
-            ['name' => 'Product class', 'order' => $order++, 'width' => 80, 'visible' => 1],
-            ['name' => 'ATX', 'order' => $order++, 'width' => 190, 'visible' => 1],
-            ['name' => 'Our ATX', 'order' => $order++, 'width' => 150, 'visible' => 1],
-            ['name' => 'MAH', 'order' => $order++, 'width' => 102, 'visible' => 1],
-            ['name' => 'TM Eng', 'order' => $order++, 'width' => 110, 'visible' => 1],
-            ['name' => 'TM Rus', 'order' => $order++, 'width' => 110, 'visible' => 1],
+            ['title' => 'fields.Product class', 'key' => 'product_class', 'width' => 80, 'sortable' => false],
+            ['title' => 'fields.ATX', 'key' => 'product_atx_name', 'width' => 190, 'sortable' => false],
+            ['title' => 'fields.Our ATX', 'key' => 'product_atx_short_name', 'width' => 150, 'sortable' => false],
+            ['title' => 'fields.MAH', 'key' => 'marketing_authorization_holder_id', 'width' => 102, 'sortable' => false],
+            ['title' => 'fields.TM Eng', 'key' => 'trademark_en', 'width' => 110, 'sortable' => true],
+            ['title' => 'fields.TM Rus', 'key' => 'trademark_ru', 'width' => 110, 'sortable' => true],
 
-            ['name' => 'Date of forecast', 'order' => $order++, 'width' => 96, 'visible' => 1],
-            ['name' => 'Forecast 1 year', 'order' => $order++, 'width' => 130, 'visible' => 1],
-            ['name' => 'Forecast 2 year', 'order' => $order++, 'width' => 130, 'visible' => 1],
-            ['name' => 'Forecast 3 year', 'order' => $order++, 'width' => 130, 'visible' => 1],
+            ['title' => 'fields.Date of forecast', 'key' => 'forecast_year_1_update_date', 'width' => 96, 'sortable' => true],
+            ['title' => 'fields.Forecast 1 year', 'key' => 'forecast_year_1', 'width' => 130, 'sortable' => true],
+            ['title' => 'fields.Forecast 2 year', 'key' => 'forecast_year_2', 'width' => 130, 'sortable' => true],
+            ['title' => 'fields.Forecast 3 year', 'key' => 'forecast_year_3', 'width' => 130, 'sortable' => true],
 
-            ['name' => 'Dossier status', 'order' => $order++, 'width' => 120, 'visible' => 1],
-            ['name' => 'Year Cr/Be', 'order' => $order++, 'width' => 180, 'visible' => 1],
-            ['name' => 'Countries Cr/Be', 'order' => $order++, 'width' => 116, 'visible' => 1],
-            ['name' => 'Country ich', 'order' => $order++, 'width' => 108, 'visible' => 1],
-            ['name' => 'Zones', 'order' => $order++, 'width' => 54, 'visible' => 1],
-            ['name' => 'Down payment 1', 'order' => $order++, 'width' => 124, 'visible' => 1],
-            ['name' => 'Down payment 2', 'order' => $order++, 'width' => 124, 'visible' => 1],
-            ['name' => 'Down payment condition', 'order' => $order++, 'width' => 110, 'visible' => 1],
+            ['title' => 'fields.Dossier status', 'key' => 'dossier_status', 'width' => 120, 'sortable' => true],
+            ['title' => 'fields.Year Cr/Be', 'key' => 'clinical_trial_year', 'width' => 180, 'sortable' => true],
+            ['title' => 'fields.Countries Cr/Be', 'key' => 'clinical_trial_countries_name', 'width' => 116, 'sortable' => false],
+            ['title' => 'fields.Country ich', 'key' => 'clinical_trial_ich_country', 'width' => 108, 'sortable' => true],
+            ['title' => 'fields.Zones', 'key' => 'product_zones_name', 'width' => 54, 'sortable' => false],
+            ['title' => 'fields.Down payment 1', 'key' => 'down_payment_1', 'width' => 124, 'sortable' => true],
+            ['title' => 'fields.Down payment 2', 'key' => 'down_payment_2', 'width' => 124, 'sortable' => true],
+            ['title' => 'fields.Down payment condition', 'key' => 'down_payment_condition', 'width' => 110, 'sortable' => true],
 
-            ['name' => 'Responsible', 'order' => $order++, 'width' => 120, 'visible' => 1],
-            ['name' => 'Responsible update date', 'order' => $order++, 'width' => 250, 'visible' => 1],
-            ['name' => 'Days have passed', 'order' => $order++, 'width' => 110, 'visible' => 1],
+            ['title' => 'fields.Responsible', 'key' => 'responsible_person_id', 'width' => 120, 'sortable' => true],
+            ['title' => 'fields.Responsible update date', 'key' => 'responsible_person_update_date', 'width' => 250, 'sortable' => true],
+            ['title' => 'fields.Days have passed', 'key' => 'days_past', 'width' => 110, 'sortable' => false],
 
-            ['name' => 'Date of creation', 'order' => $order++, 'width' => 130, 'visible' => 1],
-            ['name' => 'Update date', 'order' => $order++, 'width' => 150, 'visible' => 1],
+            ['title' => 'dates.Date of creation', 'key' => 'created_at', 'width' => 130, 'sortable' => true],
+            ['title' => 'dates.Update date', 'key' => 'updated_at', 'width' => 150, 'sortable' => true],
 
-            ['name' => 'Comments', 'order' => $order++, 'width' => 132, 'visible' => 1],
-            ['name' => 'Last comment', 'order' => $order++, 'width' => 240, 'visible' => 1],
-            ['name' => 'Comments date', 'order' => $order++, 'width' => 116, 'visible' => 1],
-        );
-
-        if (Gate::forUser($user)->allows('edit-MAD-VPS-status-history')) {
-            array_push(
-                $columns,
-                ['name' => 'History', 'order' => $order++, 'width' => 72, 'visible' => 1]
-            );
-        }
-
-        array_push(
-            $columns,
-            ['name' => 'ВП', 'order' => $order++, 'width' => 174, 'visible' => 1],
-            ['name' => 'ПО', 'order' => $order++, 'width' => 174, 'visible' => 1],
-            ['name' => 'АЦ', 'order' => $order++, 'width' => 174, 'visible' => 1],
-            ['name' => 'СЦ', 'order' => $order++, 'width' => 174, 'visible' => 1],
-            ['name' => 'Кк', 'order' => $order++, 'width' => 174, 'visible' => 1],
-            ['name' => 'КД', 'order' => $order++, 'width' => 174, 'visible' => 1],
-            ['name' => 'НПР', 'order' => $order++, 'width' => 174, 'visible' => 1],
-            ['name' => 'Р', 'order' => $order++, 'width' => 174, 'visible' => 1],
-            ['name' => 'Зя', 'order' => $order++, 'width' => 174, 'visible' => 1],
-            ['name' => 'Отмена', 'order' => $order++, 'width' => 174, 'visible' => 1],
-        );
-
-        return $columns;
-    }
-
-    /**
-     * Provides the default MAD DH & DSS table columns along with their properties.
-     *
-     * These columns are typically used to display data in tables,
-     * such as on index and trash pages, and are iterated over in a loop.
-     *
-     * @return array
-     */
-    public static function getDefaultMADDHTableSettingsForUser($user)
-    {
-        if (Gate::forUser($user)->denies('view-MAD-Decision-hub')) {
-            return null;
-        }
-
-        $order = 1;
-
-        $columns = [
-            ['name' => 'Status date', 'order' => $order++, 'width' => 116, 'visible' => 1],
-            ['name' => 'Search country', 'order' => $order++, 'width' => 130, 'visible' => 1],
-            ['name' => 'Status', 'order' => $order++, 'width' => 76, 'visible' => 1],
-            ['name' => 'Status An*', 'order' => $order++, 'width' => 80, 'visible' => 1],
-
-            ['name' => 'Manufacturer', 'order' => $order++, 'width' => 140, 'visible' => 1],
-            ['name' => 'Manufacturer country', 'order' => $order++, 'width' => 140, 'visible' => 1],
-            ['name' => 'BDM', 'order' => $order++, 'width' => 142, 'visible' => 1],
-            ['name' => 'Analyst', 'order' => $order++, 'width' => 142, 'visible' => 1],
-
-            ['name' => 'Generic', 'order' => $order++, 'width' => 180, 'visible' => 1],
-            ['name' => 'Form', 'order' => $order++, 'width' => 120, 'visible' => 1],
-            ['name' => 'Dosage', 'order' => $order++, 'width' => 120, 'visible' => 1],
-            ['name' => 'Pack', 'order' => $order++, 'width' => 120, 'visible' => 1],
-            ['name' => 'MOQ', 'order' => $order++, 'width' => 140, 'visible' => 1],
-            ['name' => 'Shelf life', 'order' => $order++, 'width' => 112, 'visible' => 1],
-            ['name' => 'Last comment', 'order' => $order++, 'width' => 240, 'visible' => 1],
-
-            ['name' => 'Manufacturer price 1', 'order' => $order++, 'width' => 106, 'visible' => 1],
-            ['name' => 'Manufacturer price 2', 'order' => $order++, 'width' => 106, 'visible' => 1],
-            ['name' => 'Currency', 'order' => $order++, 'width' => 86, 'visible' => 1],
-            ['name' => 'Price in USD', 'order' => $order++, 'width' => 94, 'visible' => 1],
-            ['name' => 'Agreed price', 'order' => $order++, 'width' => 104, 'visible' => 1],
-            ['name' => 'Our price 2', 'order' => $order++, 'width' => 118, 'visible' => 1],
-            ['name' => 'Our price 1', 'order' => $order++, 'width' => 118, 'visible' => 1],
-
-            ['name' => 'MAH', 'order' => $order++, 'width' => 102, 'visible' => 1],
-            ['name' => 'TM Eng', 'order' => $order++, 'width' => 110, 'visible' => 1],
-            ['name' => 'TM Rus', 'order' => $order++, 'width' => 110, 'visible' => 1],
-
-            ['name' => 'Forecast 1 year', 'order' => $order++, 'width' => 130, 'visible' => 1],
-            ['name' => 'Forecast 2 year', 'order' => $order++, 'width' => 130, 'visible' => 1],
-            ['name' => 'Forecast 3 year', 'order' => $order++, 'width' => 146, 'visible' => 1],
+            ['title' => 'Comments', 'key' => 'comments_count', 'width' => 132, 'sortable' => false],
+            ['title' => 'comments.Last', 'key' => 'last_comment_body', 'width' => 240, 'sortable' => false],
+            ['title' => 'comments.Date', 'key' => 'last_comment_created_at', 'width' => 116, 'sortable' => false],
         ];
+
+        foreach ($additionalColumns as $column) {
+            array_push($columns, [
+                ...$column,
+                'visible' => 1,
+                'order' => $order++,
+            ]);
+        }
+
+        if (Gate::forUser($user)->allows(Permission::extractAbilityName(Permission::CAN_EDIT_MAD_VPS_STATUS_HISTORY_NAME))) {
+            array_push(
+                $columns,
+                ['title' => 'History', 'key' => 'status_history', 'width' => 72, 'sortable' => true, 'visible' => 1, 'order' => $order++],
+            );
+        }
+
+        $statusColumns = [
+            ['title' => 'statuses.ВП', 'key' => 'general_status_periods_1'],
+            ['title' => 'statuses.ПО', 'key' => 'general_status_periods_2'],
+            ['title' => 'statuses.АЦ', 'key' => 'general_status_periods_3'],
+            ['title' => 'statuses.СЦ', 'key' => 'general_status_periods_4'],
+            ['title' => 'statuses.Кк', 'key' => 'general_status_periods_5'],
+            ['title' => 'statuses.КД', 'key' => 'general_status_periods_6'],
+            ['title' => 'statuses.НПР', 'key' => 'general_status_periods_7'],
+            ['title' => 'statuses.Р', 'key' => 'general_status_periods_8'],
+            ['title' => 'statuses.Зя', 'key' => 'general_status_periods_9'],
+            ['title' => 'statuses.Отмена', 'key' => 'general_status_periods_10'],
+        ];
+
+        foreach ($statusColumns as $column) {
+            array_push($columns, [
+                ...$column,
+                'sortable' => false,
+                'visible' => 1,
+                'order' => $order++,
+            ]);
+        }
 
         return $columns;
     }

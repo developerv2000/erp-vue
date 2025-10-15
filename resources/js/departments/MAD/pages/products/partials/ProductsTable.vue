@@ -100,7 +100,7 @@ function handleTableOptionsUpdate(options) {
 
         <template v-slot:item.processes_count="{ item }">
             <InertiaLink
-                class="d-flex ga-2 mb-3 text-high-emphasis"
+                class="d-flex ga-2 mb-2 text-high-emphasis"
                 :link="item.index_link_of_related_processes"
             >
                 <span>{{

@@ -42,13 +42,13 @@ const listItems = computed(() => [
         prependIcon: mdiPill,
     },
 
-    // {
-    //     title: t("pages.VPS"),
-    //     routeName: "mad.processes.index",
-    //     routeParams: null,
-    //     activeOnRoutes: "mad.processes.*",
-    //     prependIcon: mdiLayers,
-    // },
+    {
+        title: t("pages.VPS"),
+        routeName: "mad.processes.index",
+        routeParams: null,
+        activeOnRoutes: "mad.processes.*",
+        prependIcon: mdiLayers,
+    },
 
     // {
     //     title: t("pages.Meetings"),

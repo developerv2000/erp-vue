@@ -42,45 +42,39 @@ class Permission extends Model
 
     // View
     const CAN_VIEW_MAD_EPP_NAME = 'can-view-MAD-EPP';
-    const CAN_VIEW_MAD_KVPP_NAME = 'can-view-MAD-KVPP';
     const CAN_VIEW_MAD_IVP_NAME = 'can-view-MAD-IVP';
     const CAN_VIEW_MAD_VPS_NAME = 'can-view-MAD-VPS';
+    const CAN_VIEW_MAD_KVPP_NAME = 'can-view-MAD-KVPP';
     const CAN_VIEW_MAD_MEETINGS_NAME = 'can-view-MAD-Meetings';
     const CAN_VIEW_MAD_KPI_NAME = 'can-view-MAD-KPI';
     const CAN_VIEW_MAD_ASP_NAME = 'can-view-MAD-ASP';
     const CAN_VIEW_MAD_MISC_NAME = 'can-view-MAD-Misc';
-    const CAN_VIEW_MAD_USERS_NAME = 'can-view-MAD-Users';
-    const CAN_VIEW_MAD_DH_NAME = 'can-view-MAD-Decision-Hub';
 
     const CAN_NOT_VIEW_MAD_EPP_NAME = 'can`t-view-MAD-EPP';
-    const CAN_NOT_VIEW_MAD_KVPP_NAME = 'can`t-view-MAD-KVPP';
     const CAN_NOT_VIEW_MAD_IVP_NAME = 'can`t-view-MAD-IVP';
     const CAN_NOT_VIEW_MAD_VPS_NAME = 'can`t-view-MAD-VPS';
+    const CAN_NOT_VIEW_MAD_KVPP_NAME = 'can`t-view-MAD-KVPP';
     const CAN_NOT_VIEW_MAD_MEETINGS_NAME = 'can`t-view-MAD-Meetings';
     const CAN_NOT_VIEW_MAD_KPI_NAME = 'can`t-view-MAD-KPI';
     const CAN_NOT_VIEW_MAD_ASP_NAME = 'can`t-view-MAD-ASP';
     const CAN_NOT_VIEW_MAD_MISC_NAME = 'can`t-view-MAD-Misc';
-    const CAN_NOT_VIEW_MAD_USERS_NAME = 'can`t-view-MAD-Users';
-    const CAN_NOT_VIEW_MAD_DH_NAME = 'can`t-view-MAD-Decision-Hub';
 
     // Edit
     const CAN_EDIT_MAD_EPP_NAME = 'can-edit-MAD-EPP';
-    const CAN_EDIT_MAD_KVPP_NAME = 'can-edit-MAD-KVPP';
     const CAN_EDIT_MAD_IVP_NAME = 'can-edit-MAD-IVP';
     const CAN_EDIT_MAD_VPS_NAME = 'can-edit-MAD-VPS';
+    const CAN_EDIT_MAD_KVPP_NAME = 'can-edit-MAD-KVPP';
     const CAN_EDIT_MAD_MEETINGS_NAME = 'can-edit-MAD-Meetings';
     const CAN_EDIT_MAD_ASP_NAME = 'can-edit-MAD-ASP';
     const CAN_EDIT_MAD_MISC_NAME = 'can-edit-MAD-Misc';
-    const CAN_EDIT_MAD_USERS_NAME = 'can-edit-MAD-Users';
 
     const CAN_NOT_EDIT_MAD_EPP_NAME = 'can`t-edit-MAD-EPP';
-    const CAN_NOT_EDIT_MAD_KVPP_NAME = 'can`t-edit-MAD-KVPP';
     const CAN_NOT_EDIT_MAD_IVP_NAME = 'can`t-edit-MAD-IVP';
     const CAN_NOT_EDIT_MAD_VPS_NAME = 'can`t-edit-MAD-VPS';
+    const CAN_NOT_EDIT_MAD_KVPP_NAME = 'can`t-edit-MAD-KVPP';
     const CAN_NOT_EDIT_MAD_MEETINGS_NAME = 'can`t-edit-MAD-Meetings';
     const CAN_NOT_EDIT_MAD_ASP_NAME = 'can`t-edit-MAD-ASP';
     const CAN_NOT_EDIT_MAD_MISC_NAME = 'can`t-edit-MAD-Misc';
-    const CAN_NOT_EDIT_MAD_USERS_NAME = 'can`t-edit-MAD-Users';
 
     // Other MAD permissions
 
@@ -186,8 +180,8 @@ class Permission extends Model
         return [
             // Only view
             self::CAN_VIEW_MAD_EPP_NAME,
-            self::CAN_VIEW_MAD_KVPP_NAME,
             self::CAN_VIEW_MAD_IVP_NAME,
+            self::CAN_VIEW_MAD_KVPP_NAME,
         ];
     }
 
@@ -196,26 +190,28 @@ class Permission extends Model
         return [
             // View and edit only EPP and IVP
             self::CAN_VIEW_MAD_EPP_NAME,
-            self::CAN_EDIT_MAD_EPP_NAME,
             self::CAN_VIEW_MAD_IVP_NAME,
+
+            self::CAN_EDIT_MAD_EPP_NAME,
             self::CAN_EDIT_MAD_IVP_NAME,
         ];
     }
 
     public static function getMADModeratorPermissionNames()
     {
-        $guestPermissions = self::getMADGuestPermissionNames();
+        $guestPermissions = self::getMADInternPermissionNames();
 
         return array_merge($guestPermissions, [
             // Additional views
             self::CAN_VIEW_MAD_VPS_NAME,
+            self::CAN_VIEW_MAD_KVPP_NAME,
+            self::CAN_VIEW_MAD_MEETINGS_NAME,
             self::CAN_VIEW_MAD_KPI_NAME,
+            self::CAN_VIEW_MAD_ASP_NAME,
 
             // Edits
-            self::CAN_EDIT_MAD_EPP_NAME,
-            self::CAN_EDIT_MAD_KVPP_NAME,
-            self::CAN_EDIT_MAD_IVP_NAME,
             self::CAN_EDIT_MAD_VPS_NAME,
+            self::CAN_EDIT_MAD_KVPP_NAME,
             self::CAN_EDIT_MAD_MEETINGS_NAME,
             self::CAN_EDIT_MAD_ASP_NAME,
 
@@ -232,12 +228,9 @@ class Permission extends Model
         return array_merge($moderatorPermissions, [
             // Additional views
             self::CAN_VIEW_MAD_MISC_NAME,
-            self::CAN_VIEW_MAD_USERS_NAME,
-            self::CAN_VIEW_MAD_DH_NAME,
 
             // Additional edits
             self::CAN_EDIT_MAD_MISC_NAME,
-            self::CAN_EDIT_MAD_USERS_NAME,
 
             // Additional other global permissions
             self::CAN_DELETE_FROM_TRASH_NAME,

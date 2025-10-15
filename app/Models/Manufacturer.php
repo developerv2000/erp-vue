@@ -406,34 +406,37 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
     }
 
     /**
-     * Apply filters to the query based on the specific manufacturer countries.
+     * Apply filters to the query based on 'region' or 'manufacturer_region'.
      *
-     * @param Illuminate\Database\Eloquent\Builder $query The query builder instance to apply filters to.
-     * @param Illuminate\Http\Request $request The HTTP request object containing filter parameters.
-     * @return Illuminate\Database\Eloquent\Builder The modified query builder instance.
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Database\Eloquent\Builder
      */
     public static function applyRegionFilter($query, $request)
     {
-        $region = $request->input('region');
+        $region = $request->input('region') ?? $request->input('manufacturer_region');
 
-        if ($region) {
-            // Get the ID of the country 'INDIA' for comparison
-            $indiaCountryId = Country::getIndiaCountryID();
-
-            // Apply conditions based on the region
-            switch ($region) {
-                case 'Europe':
-                    // Exclude manufacturers from India
-                    $query->where('country_id', '!=', $indiaCountryId);
-                    break;
-
-                case 'India':
-                    // Include only manufacturers from India
-                    $query->where('country_id', $indiaCountryId);
-                    break;
-            }
+        if (!$region) {
+            return $query; // nothing to filter
         }
+
+        $indiaCountryId = Country::getIndiaCountryID();
+
+        switch ($region) {
+            case 'Europe':
+                // Exclude manufacturers from India
+                $query->where('country_id', '!=', $indiaCountryId);
+                break;
+
+            case 'India':
+                // Include only manufacturers from India
+                $query->where('country_id', $indiaCountryId);
+                break;
+        }
+
+        return $query;
     }
+
 
     /**
      * Apply filters to the query based on the country ID of related processes.

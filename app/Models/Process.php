@@ -534,6 +534,11 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
         // Apply filters
         self::filterQueryForRequest($query, $request);
 
+        // Add ordering by 'overdue_days' before finalizing
+        $query->when($request->input('order_by_overdue_days'), function ($q) {
+            return $q->orderBy('overdue_days', 'desc');
+        });
+
         // Finalize (sorting)
         ModelHelper::finalizeQueryForRequest($query, $request, 'query');
 
@@ -651,8 +656,13 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
         // Apply filters
         self::filterQueryForRequest($query, $request);
 
+        // Add ordering by 'overdue_days' before finalizing
+        $query->when($request->input('order_by_overdue_days'), function ($q) {
+            return $q->orderBy('overdue_days', 'desc');
+        });
+
         // Finalize (sorting & pagination)
-        $records = self::finalizeQueryForRequest($query, $request, $action); // Almost the same as ModelHlper::finalizeQueryForRequest()
+        $records = self::finalizeQueryForRequest($query, $request, $action);
 
         // Append attributes unless raw query is requested
         if ($appendAttributes && $action !== 'query') {
@@ -660,51 +670,6 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
         }
 
         return $records;
-    }
-
-    /**
-     * Finalizes the query by applying ordering, pagination, or retrieving data based on the specified action.
-     *
-     * Almost the same as ModelHlper::finalizeQueryForRequest(), only adds ordering by 'overdue_days'.
-     *
-     * @param Builder|Relation $query The Eloquent query builder or relation instance.
-     * @param Request $request The request containing ordering and pagination parameters.
-     * @param string $action Action to perform on the query: 'paginate', 'get', or 'query'.
-     * @param string $defaultOrderBy Default column for ordering if none is specified.
-     * @param string $defaultOrderDirection Default ordering direction ('asc' or 'desc').
-     * @return mixed
-     */
-    public static function finalizeQueryForRequest(
-        Builder|Relation $query,
-        Request $request,
-        string $action = 'query',
-        string $defaultOrderBy = 'created_at',
-        string $defaultOrderDirection = 'desc',
-    ) {
-        // Apply primary and secondary ordering
-        $query->when($request->input('order_by_overdue_days'), function ($q) { // The only difference from ModelHlper
-            return $q->orderBy('overdue_days', 'desc');
-        })
-            ->orderBy($request->input('order_by', $defaultOrderBy), $request->input('order_direction', $defaultOrderDirection))
-            ->orderBy('id', $request->input('order_direction', $defaultOrderDirection));
-
-        // Handle pagination or retrieval based on the action parameter
-        switch ($action) {
-            case 'paginate':
-                return $query->paginate(
-                    $request->input('per_page', 20),
-                    ['*'],
-                    'page',
-                    $request->input('page', 1)
-                )->appends($request->except(['page']));
-
-            case 'get':
-                return $query->get();
-
-            case 'query':
-            default:
-                return $query;
-        }
     }
 
     /*
@@ -767,14 +732,12 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
     /**
      * Apply filters to the query based on the manufacturer's country.
      *
+     * 'manufacturer_region' input is used for this filter.
+     *
      * This function filters the processes based on the manufacturer’s country,
      * delegating the filtering logic to the Manufacturer model.
-     *
-     * @param Illuminate\Http\Request $request The HTTP request object containing filter parameters.
-     * @param Illuminate\Database\Eloquent\Builder $query The query builder instance to apply filters to.
-     * @return Illuminate\Database\Eloquent\Builder The modified query builder instance.
      */
-    public static function applyManufacturerRegionFilter($query, $request)
+    public static function applyManufacturerRegionFilter($query, $request): Builder
     {
         $query->whereHas('manufacturer', function ($manufacturersQuery) use ($request) {
             return Manufacturer::applyRegionFilter($manufacturersQuery, $request);
@@ -789,11 +752,11 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
     public static function applyActiveStatusStartDateRangeFilter($query, $request): Builder
     {
         $filterConfig = [
-            'relationDateRangeAmbiguous' => [
+            'relationDateRange' => [
                 [
-                    'name' => 'activeStatusHistory',
-                    'attribute' => 'active_status_start_date_range',
-                    'ambiguousAttribute' => 'start_date',
+                    'inputName' => 'active_status_start_date_range',
+                    'relationName' => 'activeStatusHistory',
+                    'relationAttribute' => 'process_status_histories.start_date',
                 ]
             ],
         ];

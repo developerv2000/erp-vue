@@ -21,7 +21,7 @@ const { t } = useI18n();
         }}</DefaultTitle>
 
         <p v-if="records.length == 0">
-            {{ t("similar records. Not found") }}
+            {{ t("similar records.Not found") }}
         </p>
 
         <v-card v-else>

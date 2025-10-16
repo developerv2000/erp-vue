@@ -2,7 +2,10 @@
 
 namespace App\Models;
 
+use App\Http\Requests\MAD\ProcessDuplicateRequest;
 use App\Http\Requests\MAD\ProcessStoreRequest;
+use App\Http\Requests\MAD\ProcessUpdateRequest;
+use App\Notifications\ProcessStageChangedToContract;
 use App\Support\Contracts\Model\ExportsRecordsAsExcel;
 use App\Support\Contracts\Model\GeneratesBreadcrumbs;
 use App\Support\Contracts\Model\HasTitleAttribute;
@@ -51,6 +54,7 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
     const DEADLINE_EXPIRED_STATUS_NAME = 'Expired';
     const DEADLINE_NOT_EXPIRED_STATUS_NAME = 'Not expired';
     const DEADLINE_STOPPED_STATUS_NAME = 'Stopped';
+    const NO_DEADLINE_STATUS_NAME = 'No deadline';
 
     /*
     |--------------------------------------------------------------------------
@@ -156,14 +160,17 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
     {
         $this->append([
             'base_model_class',
+            'deadline_status',
         ]);
     }
 
-    public function getDeadlineStatusAttribute(): string
+    public function getDeadlineStatusAttribute()
     {
-        if ($this->overdue_days == -1) {
+        if ($this->days_past_since_last_activity == -1) {
             return self::DEADLINE_STOPPED_STATUS_NAME;
-        } else if ($this->overdue_days == 0) {
+        } else if (!$this->status->hasDeadline()) {
+            return self::NO_DEADLINE_STATUS_NAME;
+        } else if ($this->days_past_since_last_activity <= ProcessStatus::MAX_PROCESS_ACTIVITY_DELAY_DAYS) {
             return self::DEADLINE_NOT_EXPIRED_STATUS_NAME;
         } else {
             return self::DEADLINE_EXPIRED_STATUS_NAME;
@@ -279,7 +286,7 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
 
         static::created(function ($record) {
             $record->addStatusHistoryForCurrentStatus($record->created_at);
-            $record->recalculateOverdueDays(); // Must be executed only AFTER creating status_history!
+            $record->recalculateDaysPastSinceLastActivity(); // Must be executed only AFTER creating status_history!
         });
 
         static::updating(function ($record) {
@@ -289,8 +296,8 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
         });
 
         static::updated(function ($record) {
-            // Recalculate 'overdue_days' after updating event, because records status maybe be updated.
-            $record->recalculateOverdueDays();
+            // Recalculate 'days_past_since_last_activity' after updating event, because records status maybe be updated.
+            $record->recalculateDaysPastSinceLastActivity();
         });
 
         static::saving(function ($record) {
@@ -534,10 +541,11 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
         // Apply filters
         self::filterQueryForRequest($query, $request);
 
-        // Add ordering by 'overdue_days' before finalizing
-        $query->when($request->input('order_by_overdue_days'), function ($q) {
-            return $q->orderBy('overdue_days', 'desc');
-        });
+        // Merge 'order_by_days_past_since_last_activity' into request if missing
+        self::ensureOrderByActivityFlag($request);
+
+        // Add ordering by 'days_past_since_last_activity' before default ordering
+        self::orderQueryByActivityIfRequested($query, $request);
 
         // Finalize (sorting)
         ModelHelper::finalizeQueryForRequest($query, $request, 'query');
@@ -557,7 +565,7 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
         return [
             $this->id,
             $this->statusHistory->last()->start_date,
-            trans($this->deadline_status) . ($this->overdue_days > 0 ? (' ' . $this->overdue_days . ' ' . trans('days')) : ''),
+            $this->deadline_status,
             $this->searchCountry->code,
             $this->status->name,
             $this->status->generalStatus->name_for_analysts,
@@ -656,13 +664,14 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
         // Apply filters
         self::filterQueryForRequest($query, $request);
 
-        // Add ordering by 'overdue_days' before finalizing
-        $query->when($request->input('order_by_overdue_days'), function ($q) {
-            return $q->orderBy('overdue_days', 'desc');
-        });
+        // Merge 'order_by_days_past_since_last_activity' into request if missing
+        self::ensureOrderByActivityFlag($request);
+
+        // Add ordering by 'days_past_since_last_activity' before default ordering
+        self::orderQueryByActivityIfRequested($query, $request);
 
         // Finalize (sorting & pagination)
-        $records = self::finalizeQueryForRequest($query, $request, $action);
+        $records = ModelHelper::finalizeQueryForRequest($query, $request, $action);
 
         // Append attributes unless raw query is requested
         if ($appendAttributes && $action !== 'query') {
@@ -851,15 +860,22 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
 
         switch ($request->input('deadline_status')) {
             case self::DEADLINE_STOPPED_STATUS_NAME:
-                return $query->where('overdue_days', -1);
+                return $query->where('days_past_since_last_activity', -1);
+                break;
+
+            case self::NO_DEADLINE_STATUS_NAME:
+                return $query->where('days_past_since_last_activity', 0);
                 break;
 
             case self::DEADLINE_NOT_EXPIRED_STATUS_NAME:
-                return $query->where('overdue_days', 0);
+                return $query->where(function ($subquery) {
+                    $subquery->where('days_past_since_last_activity', '>', 0)
+                        ->where('days_past_since_last_activity', '<=', ProcessStatus::MAX_PROCESS_ACTIVITY_DELAY_DAYS);
+                });
                 break;
 
             case self::DEADLINE_EXPIRED_STATUS_NAME:
-                return $query->where('overdue_days', '>=', 1);
+                return $query->where('days_past_since_last_activity', '>', ProcessStatus::MAX_PROCESS_ACTIVITY_DELAY_DAYS);
                 break;
         }
     }
@@ -1000,7 +1016,7 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
     /**
      * AJAX request
      */
-    public function updateByMADFromRequest($request)
+    public function updateByMADFromRequest(ProcessUpdateRequest $request): void
     {
         $this->update($request->all());
 
@@ -1014,7 +1030,7 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
     /**
      * AJAX request
      */
-    public static function duplicateByMADFromRequest($request)
+    public static function duplicateByMADFromRequest(ProcessDuplicateRequest $request): void
     {
         $record = self::create($request->all());
 
@@ -1132,71 +1148,71 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
 
     /*
     |--------------------------------------------------------------------------
-    | Ordering by 'overdue_days' and related helpers
+    | Ordering by 'days_past_since_last_activity' and related helpers
     |--------------------------------------------------------------------------
     */
 
-    public static function addOrderByOverdueDaysToRequestIfMissing($request, $orderByOverdueDays = true)
+    public static function ensureOrderByActivityFlag(Request $request, bool $default = true): void
     {
-        // Set as default 'false' for "Фирдавс Киличбеков"
-        if (auth()->user()->id == 1 && !$request->has('order_by_overdue_days')) {
-            $orderByOverdueDays = false;
+        // Disable ordering by default for specific user (e.g., Фирдавс Киличбеков)
+        if (auth()->id() === 1 && !$request->has('order_by_days_past_since_last_activity')) {
+            $default = false;
         }
 
         $request->mergeIfMissing([
-            'order_by_overdue_days' => $request->input('order_by_overdue_days', $orderByOverdueDays),
+            'order_by_days_past_since_last_activity' => $request->boolean('order_by_days_past_since_last_activity', $default),
         ]);
     }
 
+    private static function orderQueryByActivityIfRequested($query, $request): void
+    {
+        $query->when($request->input('order_by_days_past_since_last_activity'), function ($q) {
+            return $q->orderBy('days_past_since_last_activity', 'desc');
+        });
+    }
+
     /**
-     * Recalculates and updates the 'overdue_days' attribute for the record.
+     * Validates and sets the 'days_past_since_last_activity' attribute of the record.
      *
-     * This method is typically invoked:
-     * - On model 'created' or 'updated' events,
-     * - After storing related comments,
-     * - On 'updating' event of the ProcessStatusHistory model.
+     * This method is typically called on model 'created'/'updated' events,
+     * after storing comments and on 'updating' event of ProcessStatusHistory model.
      *
-     * Logic overview:
-     * - **-1** → If the process status is "stopped".
-     * - **0**  → If there is no deadline or the allowed delay has not yet passed.
-     * - **N**  → Number of days past the allowed delay (if deadline exceeded).
-     *
-     * @param bool $refresh  Whether to refresh the model before recalculating.
-     * @return void
+     * It assigns 'days_past_since_last_activity' based on the following logic:
+     * - **-1**: For records with a 'stopped' status.
+     * - **0**: For records that have no deadline.
+     * - **[0 to 15]**: For records whose deadline is coming but has not yet expired. it's set to the number of days past the last activity.
+     * - **[16 and bigger]**: For records with an expired deadline, it's set to the number of days past the last activity.
      */
-    public function recalculateOverdueDays(bool $refresh = true): void
+    public function recalculateDaysPastSinceLastActivity(bool $refresh = true): void
     {
         // Refresh model to ensure related data (status history, comments) is up to date.
         if ($refresh) {
             $this->refresh();
         }
 
-        // Guard clause: activeStatusHistory may be null right after status update.
+        // Escape errors while processes activeStatusHistory can be null,
+        // right after closing active status history on ProcessStatusHistory updated event.
         if (!$this->activeStatusHistory) {
             return;
         }
 
-        // Case 1: Process is stopped → mark as -1 and exit early.
+        // If the record's status is "stopped", set priority to -1 and exit.
         if ($this->status->isStopedStatus()) {
-            $this->overdue_days = -1;
+            $this->days_past_since_last_activity = -1;
             $this->timestamps = false;
             $this->saveQuietly();
             return;
         }
 
-        // Default: assume no overdue days (0).
-        $this->overdue_days = 0;
+        // Initialize days_past_since_last_activity to 0, as a default value,
+        // for non-stopped statuses which don`t have deadline.
+        $this->days_past_since_last_activity = 0;
 
-        // Case 2: Status has a deadline → compute overdue days.
+        // If the status has a deadline, calculate 'days_past_since_last_activity'.
         if ($this->status->hasDeadline()) {
-            $allowedDelayDays = ProcessStatus::ALLOWED_DELAY_DAYS;
             $lastActivityDate = $this->getLastActivityDateByStatusUpdateOrCommentCreate();
-            $diffInDays = $lastActivityDate->diffInDays(now());
-
-            // If actual days exceed allowed delay → store overdue days.
-            if ($diffInDays > $allowedDelayDays) {
-                $this->overdue_days = $diffInDays - $allowedDelayDays;
-            }
+            $daysPast = $lastActivityDate->diffInDays(now());
+            $this->days_past_since_last_activity = $daysPast;
         }
 
         // Save silently without touching timestamps.
@@ -1208,7 +1224,7 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
     /**
      * Get the latest activity date between the last status update and the last comment creation.
      *
-     * Used when recalculating overdue days of process.
+     * Used when recalculating 'days_past_since_last_activity' of process.
      *
      * This function compares two dates:
      * 1. The start_date from the associated activeStatusHistory (which is always expected to exist).
@@ -1216,7 +1232,7 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
      *
      * @return Carbon|null The latest Carbon date, or null if neither date is available (though activeStatusHistory should always provide one).
      */
-    public function getLastActivityDateByStatusUpdateOrCommentCreate(): ?Carbon
+    public function getLastActivityDateByStatusUpdateOrCommentCreate()
     {
         $lastStatusUpdateDate = $this->activeStatusHistory->start_date;
         $lastCommentCreateDate = $this->lastComment?->created_at;
@@ -1234,11 +1250,11 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
     /**
      * Executed by scheduler daily.
      */
-    public static function recalculateAllOverdueDays(): void
+    public static function recalculateAllDaysPastSinceLastActivity(): void
     {
         self::withTrashed()->with(['activeStatusHistory', 'lastComment'])->chunk(500, function ($records) {
             foreach ($records as $record) {
-                $record->recalculateOverdueDays();
+                $record->recalculateDaysPastSinceLastActivity();
             }
         });
     }
@@ -1289,7 +1305,7 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
             $status = ProcessStatus::find($this->status_id);
 
             if ($status->generalStatus->stage == 5) {
-                $notification = new ProcessStageUpdatedToContract($this, $status->name);
+                $notification = new ProcessStageChangedToContract($this, $status->name);
                 User::notifyUsersBasedOnPermission($notification, 'receive-notification-on-MAD-VPS-contract');
             }
         }
@@ -1367,6 +1383,7 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
     {
         return [
             self::DEADLINE_STOPPED_STATUS_NAME,
+            self::NO_DEADLINE_STATUS_NAME,
             self::DEADLINE_NOT_EXPIRED_STATUS_NAME,
             self::DEADLINE_EXPIRED_STATUS_NAME,
         ];
@@ -1457,8 +1474,8 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
         array_push(
             $columns,
             ['title' => 'ID', 'key' => 'id', 'width' => 62, 'sortable' => true, 'visible' => 1, 'order' => $order++],
-            ['title' => 'fields.Status date', 'key' => 'last_status_date', 'width' => 100, 'sortable' => false, 'visible' => 1, 'order' => $order++],
-            ['title' => 'fields.Deadline', 'key' => 'deadline', 'width' => 118, 'sortable' => false, 'visible' => 1, 'order' => $order++],
+            ['title' => 'status.Date', 'key' => 'last_status_date', 'width' => 100, 'sortable' => false, 'visible' => 1, 'order' => $order++],
+            ['title' => 'Deadline', 'key' => 'deadline_status', 'width' => 118, 'sortable' => false, 'visible' => 1, 'order' => $order++],
         );
 
         if (Gate::forUser($user)->allows(Permission::extractAbilityName(Permission::CAN_CONTROL_MAD_ASP_PROCESSES))) {
@@ -1477,9 +1494,9 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
         }
 
         $additionalColumns = [
-            ['title' => 'fields.Status', 'key' => 'status_id', 'width' => 76, 'sortable' => true],
-            ['title' => 'fields.Status An*', 'key' => 'general_status_name_for_analyst', 'width' => 80, 'sortable' => false],
-            ['title' => 'fields.General status', 'key' => 'general_status_name', 'width' => 106, 'sortable' => false],
+            ['title' => 'Status', 'key' => 'status_id', 'width' => 76, 'sortable' => true],
+            ['title' => 'status.An*', 'key' => 'general_status_name_for_analyst', 'width' => 80, 'sortable' => false],
+            ['title' => 'status.General', 'key' => 'general_status_name', 'width' => 106, 'sortable' => false],
 
             ['title' => 'fields.BDM', 'key' => 'manufacturer_bdm', 'width' => 146, 'sortable' => false],
             ['title' => 'fields.Analyst', 'key' => 'manufacturer_analyst', 'width' => 146, 'sortable' => false],
@@ -1571,6 +1588,7 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
         foreach ($statusColumns as $column) {
             array_push($columns, [
                 ...$column,
+                'width' => 174,
                 'sortable' => false,
                 'visible' => 1,
                 'order' => $order++,

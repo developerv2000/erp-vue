@@ -6,7 +6,7 @@ use App\Models\Inn;
 use App\Models\Manufacturer;
 use App\Models\ProductForm;
 
-class ProductsSmartFilterDependencies
+class ProductsSmartFilter
 {
     public static function getAllDependencies()
     {

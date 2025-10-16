@@ -5,6 +5,7 @@
     "Attachments": "Attachments",
     "Record": "Record",
     "Multiple records": "Multiple records",
+    "History": "History",
 
     "validations.required": "This field is required.",
     "validations.invalid": "The value is invalid.",
@@ -124,7 +125,7 @@
     "filter.Has VPS for country": "Has VPS for country",
 
     "Similar records": "Similar records",
-    "similar records. Not found": "Similar records not found.",
+    "similar records.Not found": "Similar records not found.",
 
     "Products": "Products",
     "products.Matched ATX": "Matched ATX",
@@ -133,6 +134,10 @@
     "processes.add": "Add process",
     "processes.count": "{count} processes",
 
+    "Status": "Status",
+    "status.Date": "Status date",
+    "status.An*": "Status An*",
+    "status.General": "General status",
     "statuses.ВП" : "ВП",
     "statuses.ПО" : "ПО",
     "statuses.АЦ" : "АЦ",
@@ -151,6 +156,9 @@
     "deadline.Expired": "Expired",
     "eadline.Not expired": "Not expired",
     "eadline.No deadline": "No deadline",
+
+    "Days": "Days",
+    "days.past": "Days past",
 
     "fields.Email": "Email",
     "fields.Password": "Password",
@@ -192,9 +200,6 @@
     "fields.Down payment": "Down payment",
     "fields.Matched KVPP": "Matched KVPP",
 
-    "fields.Status date": "Status date",
-    "fields.Status An*": "Status An*",
-    "fields.General status": "General status",
     "fields.Search country": "Search country",
     "fields.Manufacturer category": "Manufacturer category",
     "fields.Manufacturer country": "Manufacturer country",
@@ -228,7 +233,6 @@
     "fields.Responsible": "Responsible",
     "fields.Responsible update date": "Responsible update date",
     "fields.Days have passed": "Days have passed",
-    "fields.History": "History",
 
     "AAAAAAAAAAAAAA": "AAAAAAAAAAAAAA"
 }

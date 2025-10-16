@@ -54,8 +54,8 @@ class ProcessStatusHistory extends Model
     protected static function booted(): void
     {
         static::updated(function ($record) {
-            // Recalculate 'overdue_days' after updating processes status history.
-            $record->process->recalculateOverdueDays();
+            // Recalculate 'days_past_since_last_activity' after updating processes status history.
+            $record->process->recalculateDaysPastSinceLastActivity();
         });
 
         static::deleting(function ($record) {

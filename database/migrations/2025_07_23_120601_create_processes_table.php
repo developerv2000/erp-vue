@@ -41,8 +41,8 @@ return new class extends Migration
                 ->references('id')
                 ->on('process_responsible_people');
 
-            // auto calculated on record update and by scheduler daily
-            $table->smallInteger('overdue_days') // used on getting 'deadline_status' attribute
+            // auto calculated on records update event and also by scheduler daily
+            $table->smallInteger('days_past_since_last_activity') // used on getting 'deadline_status' attribute
                 ->default(0);
 
             // Stage 1 (ВП)

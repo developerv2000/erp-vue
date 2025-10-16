@@ -15,8 +15,8 @@ use App\Models\ProductForm;
 use App\Models\ProductShelfLife;
 use App\Models\User;
 use App\Models\Zone;
-use App\Support\FilterDependencies\SimpleFilters\MAD\ProductsSimpleFilterDependencies;
-use App\Support\FilterDependencies\SmartFilters\MAD\ProductsSmartFilterDependencies;
+use App\Support\FilterDependencies\SimpleFilters\MAD\ProductsSimpleFilter;
+use App\Support\FilterDependencies\SmartFilters\MAD\ProductsSmartFilter;
 use App\Support\Helpers\ControllerHelper;
 use App\Support\Traits\Controller\DestroysModelRecords;
 use App\Support\Traits\Controller\RestoresModelRecords;
@@ -38,10 +38,10 @@ class MADProductController extends Controller
 
         return Inertia::render('departments/MAD/pages/products/Index', [
             // Refetched on smart filters change and filter form submit
-            'smartFilterDependencies' => ProductsSmartFilterDependencies::getAllDependencies(),
+            'smartFilterDependencies' => ProductsSmartFilter::getAllDependencies(),
 
             // Lazy loads
-            'simpleFilterDependencies' => fn() => ProductsSimpleFilterDependencies::getAllDependencies(),
+            'simpleFilterDependencies' => fn() => ProductsSimpleFilter::getAllDependencies(),
             'allTableHeaders' => $getAllTableHeaders, // Refetched only on headers update
             'tableVisibleHeaders' => $getVisibleHeaders, // Refetched only on headers update
         ]);
@@ -57,10 +57,10 @@ class MADProductController extends Controller
 
         return Inertia::render('departments/MAD/pages/products/Trash', [
             // Refetched on smart filters change and filter form submit
-            'smartFilterDependencies' => ProductsSmartFilterDependencies::getAllDependencies(),
+            'smartFilterDependencies' => ProductsSmartFilter::getAllDependencies(),
 
             // Lazy loads, never refetched again
-            'simpleFilterDependencies' => fn() => ProductsSimpleFilterDependencies::getAllDependencies(),
+            'simpleFilterDependencies' => fn() => ProductsSimpleFilter::getAllDependencies(),
             'tableVisibleHeaders' => $getVisibleHeaders,
         ]);
     }

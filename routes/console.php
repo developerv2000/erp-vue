@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Schedule;
 Schedule::call(function () {
     Country::recalculateAllProcessCountsInDatabase();
     Currency::updateAllUSDRatios();
-    Process::recalculateAllOverdueDays();
+    Process::recalculateAllDaysPastSinceLastActivity();
 })->daily();
 
 Artisan::command('users:reset-settings', function () {

@@ -10,7 +10,7 @@ use App\Models\ProductShelfLife;
 use App\Models\User;
 use App\Models\Zone;
 
-class ProductsSimpleFilterDependencies
+class ProductsSimpleFilter
 {
     public static function getAllDependencies()
     {

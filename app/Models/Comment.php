@@ -62,8 +62,8 @@ class Comment extends Model
             }
 
             if ($record->commentable_type == Process::class) {
-                // Recalculate 'overdue_days' of process after creating comment.
-                $record->commentable->recalculateOverdueDays();
+                // Recalculate 'days_past_since_last_activity' of process after creating comment.
+                $record->commentable->recalculateDaysPastSinceLastActivity();
             }
         });
     }

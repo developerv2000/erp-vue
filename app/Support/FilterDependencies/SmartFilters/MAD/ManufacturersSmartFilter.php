@@ -6,7 +6,7 @@ use App\Models\Country;
 use App\Models\Manufacturer;
 use App\Models\User;
 
-class ManufacturersSmartFilterDependencies
+class ManufacturersSmartFilter
 {
     public static function getAllDependencies()
     {

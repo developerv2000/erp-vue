@@ -73,7 +73,7 @@ const normalizeInputDebounced = debounce((value, field, key) => {
 
                 <v-col cols="1" class="d-flex align-center justify-center">
                     <v-btn
-                        class="mt-4"
+                        class="mt-6"
                         color="error"
                         size="small"
                         :icon="mdiClose"

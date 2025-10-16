@@ -9,7 +9,7 @@ use App\Models\ProductClass;
 use App\Models\User;
 use App\Models\Zone;
 
-class ManufacturersSimpleFilterDependencies
+class ManufacturersSimpleFilter
 {
     public static function getAllDependencies()
     {

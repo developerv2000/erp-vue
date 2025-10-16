@@ -5,6 +5,7 @@
     "Attachments": "Вложения",
     "Record": "Запись",
     "Multiple records": "Множество записей",
+    "History": "История",
 
     "validations.required": "Это поле обязательно.",
     "validations.invalid": "Недопустимое значение.",
@@ -124,7 +125,7 @@
     "dates.Deletion date": "Дата удаления",
 
     "Similar records": "Схожие записи",
-    "similar records. Not found": "Схожие записи не найдены.",
+    "similar records.Not found": "Схожие записи не найдены.",
 
     "Products": "Продукты",
     "products.Matched ATX": "Соответствующий ATX",
@@ -133,6 +134,10 @@
     "processes.add": "Добавить процесс",
     "processes.count": "{count} процесса",
 
+    "Status": "Статус",
+    "status.Date": "Дата Статуса",
+    "status.An*": "Статус Ан*",
+    "status.General": "Общий Статус",
     "statuses.ВП" : "ВП",
     "statuses.ПО" : "ПО",
     "statuses.АЦ" : "АЦ",
@@ -151,6 +156,9 @@
     "deadline.Expired": "Просрочен",
     "eadline.Not expired": "Непросрочен",
     "eadline.No deadline": "Без дедлайна",
+
+    "Days": "Дней",
+    "days.past": "Дней прошло",
 
     "fields.Email": "Электронная почта",
     "fields.Password": "Пароль",
@@ -192,9 +200,6 @@
     "fields.Down payment": "Доп. платёж",
     "fields.Matched KVPP": "Совпадение с КВПП",
 
-    "fields.Status date": "Дата Статуса",
-    "fields.Status An*": "Статус Ан*",
-    "fields.General status": "Общий Статус",
     "fields.Search country": "Страна поиска",
     "fields.Manufacturer category": "Категория Пр*",
     "fields.Manufacturer country": "Страна Пр*",
@@ -228,7 +233,6 @@
     "fields.Responsible": "Ответственный",
     "fields.Responsible update date": "Дата обновления ответственных",
     "fields.Days have passed": "Дней прошло",
-    "fields.History": "История",
 
     "AAAAAAAAAAAAAA": "AAAAAAAAAAAAAA"
 }

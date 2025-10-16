@@ -12,7 +12,7 @@ import ProductsTableTop from "./ProductsTableTop.vue";
 import InertiaLink from "@/core/components/inertia/InertiaLink.vue";
 import TableDefaultSkeleton from "@/core/components/table/misc/TableDefaultSkeleton.vue";
 import TdEditButton from "@/core/components/table/td/TdEditButton.vue";
-import ManufacturerCategory from "@/core/components/table/td/MAD/manufacturers/ManufacturerCategory.vue";
+import TdManufacturerCategory from "@/core/components/table/td/MAD/manufacturers/TdManufacturerCategory.vue";
 import TdAva from "@/core/components/table/td/TdAva.vue";
 import TdInertiaLink from "@/core/components/table/td/TdInertiaLink.vue";
 import TogglableThreeLinesLimitedText from "@/core/components/misc/TogglableThreeLinesLimitedText.vue";
@@ -121,7 +121,7 @@ function handleTableOptionsUpdate(options) {
         </template>
 
         <template v-slot:item.manufacturer_category_name="{ item }">
-            <ManufacturerCategory :name="item.manufacturer.category.name" />
+            <TdManufacturerCategory :name="item.manufacturer.category.name" />
         </template>
 
         <template v-slot:item.manufacturer_country_name="{ item }">

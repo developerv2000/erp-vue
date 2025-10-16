@@ -12,8 +12,8 @@ use App\Models\ManufacturerCategory;
 use App\Models\ProductClass;
 use App\Models\User;
 use App\Models\Zone;
-use App\Support\FilterDependencies\SimpleFilters\MAD\ManufacturersSimpleFilterDependencies;
-use App\Support\FilterDependencies\SmartFilters\MAD\ManufacturersSmartFilterDependencies;
+use App\Support\FilterDependencies\SimpleFilters\MAD\ManufacturersSimpleFilter;
+use App\Support\FilterDependencies\SmartFilters\MAD\ManufacturersSmartFilter;
 use App\Support\Helpers\ControllerHelper;
 use App\Support\Traits\Controller\DestroysModelRecords;
 use App\Support\Traits\Controller\RestoresModelRecords;
@@ -35,10 +35,10 @@ class MADManufacturerController extends Controller
 
         return Inertia::render('departments/MAD/pages/manufacturers/Index', [
             // Refetched on smart filters change and filter form submit
-            'smartFilterDependencies' => ManufacturersSmartFilterDependencies::getAllDependencies(),
+            'smartFilterDependencies' => ManufacturersSmartFilter::getAllDependencies(),
 
             // Lazy loads
-            'simpleFilterDependencies' => fn() => ManufacturersSimpleFilterDependencies::getAllDependencies(),
+            'simpleFilterDependencies' => fn() => ManufacturersSimpleFilter::getAllDependencies(),
             'allTableHeaders' => $getAllTableHeaders, // Refetched only on headers update
             'tableVisibleHeaders' => $getVisibleHeaders, // Refetched only on headers update
         ]);
@@ -54,10 +54,10 @@ class MADManufacturerController extends Controller
 
         return Inertia::render('departments/MAD/pages/manufacturers/Trash', [
             // Refetched on smart filters change and filter form submit
-            'smartFilterDependencies' => ManufacturersSmartFilterDependencies::getAllDependencies(),
+            'smartFilterDependencies' => ManufacturersSmartFilter::getAllDependencies(),
 
             // Lazy loads, never refetched again
-            'simpleFilterDependencies' => fn() => ManufacturersSimpleFilterDependencies::getAllDependencies(),
+            'simpleFilterDependencies' => fn() => ManufacturersSimpleFilter::getAllDependencies(),
             'tableVisibleHeaders' => $getVisibleHeaders,
         ]);
     }

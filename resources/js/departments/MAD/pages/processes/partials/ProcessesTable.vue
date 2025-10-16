@@ -2,18 +2,20 @@
 import { onMounted } from "vue";
 import { usePage } from "@inertiajs/vue3";
 import useQueryParams from "@/core/composables/useQueryParams";
-import { useMADManufacturersTableStore } from "@/departments/MAD/stores/manufacturersTable";
+import { useMADProcessesTableStore } from "@/departments/MAD/stores/processesTable";
 import { useI18n } from "vue-i18n";
 import { useDateFormat } from "@vueuse/core";
+import { formatPrice } from "@/core/scripts/utilities";
 import { DEFAULT_PER_PAGE_OPTIONS } from "@/core/scripts/constants";
 
-import ManufacturersTableTop from "./ManufacturersTableTop.vue";
+import ProcessesTableTop from "./ProcessesTableTop.vue";
+import InertiaLink from "@/core/components/inertia/InertiaLink.vue";
 import TableDefaultSkeleton from "@/core/components/table/misc/TableDefaultSkeleton.vue";
 import TdEditButton from "@/core/components/table/td/TdEditButton.vue";
-import TdManufacturerCategory from "@/core/components/table/td/MAD/manufacturers/TdManufacturerCategory.vue";
+import TdDuplicateButton from "@/core/components/table/td/TdDuplicateButton.vue";
+import TdProcessDeadlineStatus from "@/core/components/table/td/MAD/processes/TdProcessDeadlineStatus.vue";
 import TdAva from "@/core/components/table/td/TdAva.vue";
 import TdInertiaLink from "@/core/components/table/td/TdInertiaLink.vue";
-import TdLink from "@/core/components/table/td/TdLink.vue";
 import TogglableThreeLinesLimitedText from "@/core/components/misc/TogglableThreeLinesLimitedText.vue";
 import TdRecordCommentsLink from "@/core/components/table/td/TdRecordCommentsLink.vue";
 import TdAttachmentsList from "@/core/components/table/td/TdAttachmentsList.vue";
@@ -24,7 +26,7 @@ import TdMediumWeightText from "@/core/components/table/td/TdMediumWeightText.vu
 const { t } = useI18n();
 const { get } = useQueryParams();
 const page = usePage();
-const store = useMADManufacturersTableStore();
+const store = useMADProcessesTableStore();
 
 onMounted(() => {
     // Init from inertia page if needed
@@ -73,7 +75,7 @@ function handleTableOptionsUpdate(options) {
     >
         <!-- Top slot -->
         <template #top>
-            <ManufacturersTableTop />
+            <ProcessesTableTop />
         </template>
 
         <!-- Loading slot -->
@@ -92,94 +94,25 @@ function handleTableOptionsUpdate(options) {
         </template>
 
         <template v-slot:item.edit="{ item }">
-            <TdEditButton :link="route('mad.manufacturers.edit', item.id)" />
+            <TdEditButton :link="route('mad.processes.edit', item.id)" />
         </template>
 
-        <template v-slot:item.bdm_user_id="{ item }">
-            <TdAva :user="item.bdm" />
+        <template v-slot:item.duplicate="{ item }">
+            <TdDuplicateButton :link="route('mad.processes.edit', item.id)" />
         </template>
 
-        <template v-slot:item.analyst_user_id="{ item }">
-            <TdAva :user="item.analyst" />
+        <template v-slot:item.last_status_date="{ item }">
+            {{
+                useDateFormat(
+                    item.status_history[item.status_history.length - 1]
+                        .start_date,
+                    "DD MMM YYYY"
+                )
+            }}
         </template>
 
-        <template v-slot:item.country_id="{ item }">
-            {{ item.country.name }}
-        </template>
-
-        <template v-slot:item.products_count="{ item }">
-            <TdInertiaLink
-                :link="
-                    route('mad.products.index', {
-                        'manufacturer_id[]': item.id,
-                        initialize_from_inertia_page: true,
-                    })
-                "
-            >
-                {{ item.products_count }}
-                <span class="text-lowercase">{{ t("Products") }}</span>
-            </TdInertiaLink>
-        </template>
-
-        <template v-slot:item.name="{ item }">
-            {{ item.name }}
-        </template>
-
-        <template v-slot:item.category_id="{ item }">
-            <TdManufacturerCategory :name="item.category.name" />
-        </template>
-
-        <template v-slot:item.active="{ item }">
-            <TdMediumWeightText
-                :class="{
-                    'text-green': item.active,
-                    'text-brown': !item.active,
-                }"
-            >
-                {{
-                    item.active
-                        ? t("properties.Active")
-                        : t("properties.Stopped")
-                }}
-            </TdMediumWeightText>
-        </template>
-
-        <template v-slot:item.important="{ item }">
-            <TdMediumWeightText v-if="item.important" class="text-red">
-                {{ t("properties.Important") }}
-            </TdMediumWeightText>
-        </template>
-
-        <template v-slot:item.product_classes_name="{ item }">
-            <span>{{
-                item.product_classes.map((obj) => obj.name).join(" ")
-            }}</span>
-        </template>
-
-        <template v-slot:item.zones_name="{ item }">
-            <span>{{ item.zones.map((obj) => obj.name).join(" ") }}</span>
-        </template>
-
-        <template v-slot:item.blacklists_name="{ item }">
-            <span>{{ item.blacklists.map((obj) => obj.name).join(" ") }}</span>
-        </template>
-
-        <template v-slot:item.presences_name="{ item }">
-            <span>{{ item.presences.map((obj) => obj.name).join(" ") }}</span>
-        </template>
-
-        <template v-slot:item.website="{ item }">
-            <TdLink :link="item.website" target="_blank">
-                <TogglableThreeLinesLimitedText :text="item.website" />
-            </TdLink>
-        </template>
-
-        <template v-slot:item.about="{ item }">
-            <TogglableThreeLinesLimitedText :text="item.about" />
-        </template>
-
-        <template v-slot:item.relationship="{ item }">
-            <TogglableThreeLinesLimitedText :text="item.relationship" />
+        <template v-slot:item.deadline_status="{ item }">
+            <TdProcessDeadlineStatus :item="item" />
         </template>
 
         <template v-slot:item.comments_count="{ item }">
@@ -202,16 +135,11 @@ function handleTableOptionsUpdate(options) {
             {{ useDateFormat(item.updated_at, "DD MMM YYYY") }}
         </template>
 
-        <template v-slot:item.meetings_count="{ item }">
+        <template v-slot:item.status_history="{ item }">
             <TdInertiaLink
-                :link="
-                    route('mad.manufacturers.index', {
-                        'manufacturer_id[]': item.id,
-                    })
-                "
+                :link="route('mad.processes.status-history.index', item.id)"
             >
-                {{ item.meetings_count }}
-                <span class="text-lowercase">{{ t("pages.Meetings") }}</span>
+                {{ t("History") }}
             </TdInertiaLink>
         </template>
 

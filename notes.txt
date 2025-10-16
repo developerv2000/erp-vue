@@ -8,7 +8,7 @@ Atx:
 1) Added unique for 'inn_id' and 'form_id'
 
 processes:
-1) order_priority => overdue_days
+1) order_priority => days_past_since_last_activity
 
 
 ** Permissions fully updated. Reattach users direct permission manually

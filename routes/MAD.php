@@ -40,6 +40,19 @@ Route::middleware('auth', 'auth.session')->prefix('mad')->name('mad.')->group(fu
             'can:edit-MAD-VPS'
         );
 
+        // Ajax requests on checkbox toggles
+        Route::post('/update-contracted-in-asp-value', 'updateContractedInAspValue')
+            ->name('update-contracted-in-asp-value')
+            ->middleware('can:control-MAD-ASP-processes');
+
+        Route::post('/update-registered-in-asp-value', 'updateRegisteredInAspValue')
+            ->name('update-registered-in-asp-value')
+            ->middleware('can:control-MAD-ASP-processes');
+
+        Route::post('/update-ready-for-order-value', 'updateReadyForOrderValue')
+            ->name('update-ready-for-order-value')
+            ->middleware('can:mark-MAD-VPS-as-ready-for-order');
+
         // Status history
         Route::prefix('/{process}/status-history')
             ->controller(MADProcessStatusHistoryController::class)

@@ -9,6 +9,27 @@ export const useMessagesStore = defineStore('messages', {
         add(message) {
             this.queue.push(message);
         },
+        // Success
+        addSuccessMessage() {
+            this.add({
+                text: i18n.global.t('messages.Success'),
+                color: 'success',
+            });
+        },
+        // Fails
+        addSubmitionFailedMessage() {
+            this.add({
+                text: i18n.global.t('messages.Submition failed'),
+                color: 'error',
+            });
+        },
+        addFixErrorsMessage() {
+            this.add({
+                text: i18n.global.t('messages.Fix errors'),
+                color: 'error',
+            });
+        },
+        // CRUD
         addCreatedSuccessfullyMessage() {
             this.add({
                 text: i18n.global.t('messages.Created successfully'),
@@ -31,18 +52,6 @@ export const useMessagesStore = defineStore('messages', {
             this.add({
                 text: i18n.global.t('messages.Restored successfully', { count: count }),
                 color: 'success',
-            });
-        },
-        addSubmitionFailedMessage() {
-            this.add({
-                text: i18n.global.t('messages.Submition failed'),
-                color: 'error',
-            });
-        },
-        addFixErrorsMessage() {
-            this.add({
-                text: i18n.global.t('messages.Fix errors'),
-                color: 'error',
             });
         },
         // Filter

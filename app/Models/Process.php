@@ -161,6 +161,8 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
         $this->append([
             'base_model_class',
             'deadline_status',
+            'is_ready_for_asp_contract',
+            'is_ready_for_asp_registration',
         ]);
     }
 

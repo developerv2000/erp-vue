@@ -22,6 +22,7 @@ import TdAttachmentsList from "@/core/components/table/td/TdAttachmentsList.vue"
 import TdRecordAttachmentsLink from "@/core/components/table/td/TdRecordAttachmentsLink.vue";
 import TableNavigateToPage from "@/core/components/table/misc/TableNavigateToPage.vue";
 import TdMediumWeightText from "@/core/components/table/td/TdMediumWeightText.vue";
+import TdProcessContractedInAsp from "@/core/components/table/td/MAD/processes/TdProcessContractedInAsp.vue";
 
 const { t } = useI18n();
 const { get } = useQueryParams();
@@ -112,7 +113,14 @@ function handleTableOptionsUpdate(options) {
         </template>
 
         <template v-slot:item.deadline_status="{ item }">
-            <TdProcessDeadlineStatus :item="item" />
+            <TdProcessDeadlineStatus :record="item" />
+        </template>
+
+        <template v-slot:item.contracted_in_asp="{ item }">
+            <TdProcessContractedInAsp
+                v-if="item.is_ready_for_asp_contract"
+                :record="item"
+            />
         </template>
 
         <template v-slot:item.comments_count="{ item }">

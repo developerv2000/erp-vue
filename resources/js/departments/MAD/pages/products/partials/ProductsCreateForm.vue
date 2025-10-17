@@ -241,10 +241,12 @@ const updateMatchedATX = () => {
         </DefaultSheet>
 
         <!-- Similar records -->
-        <ProductsSimilarRecords
-            v-if="similarRecords != undefined"
-            :records="similarRecords"
-        />
+        <v-slide-y-transition>
+            <ProductsSimilarRecords
+                v-if="similarRecords != undefined"
+                :records="similarRecords"
+            />
+        </v-slide-y-transition>
 
         <!-- Matched ATX -->
         <v-slide-y-transition>

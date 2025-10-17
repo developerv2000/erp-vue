@@ -18,6 +18,7 @@ use App\Support\Helpers\ControllerHelper;
 use App\Support\Traits\Controller\DestroysModelRecords;
 use App\Support\Traits\Controller\RestoresModelRecords;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
 class MADProcessController extends Controller
@@ -133,5 +134,30 @@ class MADProcessController extends Controller
         return response()->json([
             'success' => true,
         ]);
+    }
+
+    /**
+     * AJAX request
+     */
+    public function updateContractedInAspValue(Request $request)
+    {
+        $record = Process::withTrashed()
+            ->withBasicRelations()
+            ->withBasicRelationCounts()
+            ->findOrFail($request->input('id'));
+
+        // Return error if record isn`t ready for ASP contract
+        if (!$record->is_ready_for_asp_contract) {
+            abort(403);
+        }
+
+        // Update record
+        $record->update([
+            'contracted_in_asp' => $request->input('value'),
+        ]);
+
+        // Append basic attributes and return record
+        $record->appendBasicAttributes();
+        return $record;
     }
 }

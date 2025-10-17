@@ -4,13 +4,13 @@ import TdChip from "../../TdChip.vue";
 import { computed } from "vue";
 
 const props = defineProps({
-    item: Object,
+    record: Object,
 });
 
 const { t } = useI18n();
 
 const color = computed(() => {
-    switch (props.item.deadline_status) {
+    switch (props.record.deadline_status) {
         case "Stopped":
             return "grey-lighten-3";
         case "No deadline":
@@ -25,18 +25,18 @@ const color = computed(() => {
 
 <template>
     <TdChip class="mb-1" :color="color">
-        {{ item.deadline_status }}
+        {{ record.deadline_status }}
     </TdChip>
 
     <br />
 
     <span class="mt-1 text-lowercase">
-        <template v-if="item.deadline_status == 'Not expired'">
-            {{ item.days_past_since_last_activity }} {{ t("days.past") }}
+        <template v-if="record.deadline_status == 'Not expired'">
+            {{ record.days_past_since_last_activity }} {{ t("days.past") }}
         </template>
 
-        <template v-if="item.deadline_status == 'Expired'">
-            {{ item.days_past_since_last_activity - 15 }} {{ t("Days") }}
+        <template v-if="record.deadline_status == 'Expired'">
+            {{ record.days_past_since_last_activity - 15 }} {{ t("Days") }}
         </template>
     </span>
 </template>

@@ -85,6 +85,7 @@
     "messages.Similar records update failed": "Similar records update failed!",
     "messages.ATX updated successfully": "ATX updated successfully!",
     "messages.ATX update failed": "ATX update failed!",
+    "messages.Loading text": "Loading, please wait a little...",
 
     "modals.Delete selected": "Delete selected",
     "modals.Delete selected question": "Are you sure you want to delete selected",

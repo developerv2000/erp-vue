@@ -89,6 +89,7 @@
     "messages.Similar records update failed": "Обновление схожих записей не удалось!",
     "messages.ATX updated successfully": "ATX успешно обновлен!",
     "messages.ATX update failed": "Обновление ATX не удалось!",
+    "messages.Loading text": "Загрузка, пожалуйста, подождите немного...",
 
     "modals.Delete selected": "Удалить отмеченные",
     "modals.Delete selected question": "Вы уверены, что хотите удалить отмеченные",

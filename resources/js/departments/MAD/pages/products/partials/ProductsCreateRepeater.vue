@@ -39,48 +39,55 @@ const normalizeInputDebounced = debounce((value, field, key) => {
         <DefaultTitle>{{ t("Multiple records") }}</DefaultTitle>
 
         <div v-if="fields.length" class="mb-5">
-            <v-row v-for="(field, index) in fields" :key="field.key">
-                <v-col>
-                    <DefaultTextField
-                        v-model="field.value.dosage"
-                        :label="t('fields.Dosage')"
-                        @update:modelValue="
-                            (val) =>
-                                normalizeInputDebounced(val, field, 'dosage')
-                        "
-                        required
-                    />
-                </v-col>
+            <v-slide-y-transition group tag="div">
+                <v-row v-for="(field, index) in fields" :key="field.key">
+                    <v-col>
+                        <DefaultTextField
+                            v-model="field.value.dosage"
+                            :label="t('fields.Dosage')"
+                            @update:modelValue="
+                                (val) =>
+                                    normalizeInputDebounced(
+                                        val,
+                                        field,
+                                        'dosage'
+                                    )
+                            "
+                            required
+                        />
+                    </v-col>
 
-                <v-col>
-                    <DefaultTextField
-                        v-model="field.value.pack"
-                        :label="t('fields.Pack')"
-                        @update:modelValue="
-                            (val) => normalizeInputDebounced(val, field, 'pack')
-                        "
-                        required
-                    />
-                </v-col>
+                    <v-col>
+                        <DefaultTextField
+                            v-model="field.value.pack"
+                            :label="t('fields.Pack')"
+                            @update:modelValue="
+                                (val) =>
+                                    normalizeInputDebounced(val, field, 'pack')
+                            "
+                            required
+                        />
+                    </v-col>
 
-                <v-col>
-                    <DefaultNumberInput
-                        v-model="field.value.moq"
-                        :label="t('fields.MOQ')"
-                        :min="0"
-                    />
-                </v-col>
+                    <v-col>
+                        <DefaultNumberInput
+                            v-model="field.value.moq"
+                            :label="t('fields.MOQ')"
+                            :min="0"
+                        />
+                    </v-col>
 
-                <v-col cols="1" class="d-flex align-center justify-center">
-                    <v-btn
-                        class="mt-6"
-                        color="error"
-                        size="small"
-                        :icon="mdiClose"
-                        @click="remove(index)"
-                    />
-                </v-col>
-            </v-row>
+                    <v-col cols="1" class="d-flex align-center justify-center">
+                        <v-btn
+                            class="mt-6"
+                            color="error"
+                            size="small"
+                            :icon="mdiClose"
+                            @click="remove(index)"
+                        />
+                    </v-col>
+                </v-row>
+            </v-slide-y-transition>
         </div>
 
         <DefaultButton

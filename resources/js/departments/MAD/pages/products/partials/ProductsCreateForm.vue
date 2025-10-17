@@ -1,11 +1,12 @@
 <script setup>
-import { ref, watch } from "vue";
+import { ref } from "vue";
 import { usePage } from "@inertiajs/vue3";
 import { useI18n } from "vue-i18n";
 import { Form, useForm, useFieldArray } from "vee-validate";
 import { object, string, number, array } from "yup";
 import { useVeeFormFields } from "@/core/composables/useVeeFormFields";
 import { useFormData } from "@/core/composables/useFormData";
+import { useGlobalStore } from "@/core/stores/global";
 import { useMessagesStore } from "@/core/stores/messages";
 import axios from "axios";
 import { debounce } from "@/core/scripts/utilities";
@@ -29,10 +30,11 @@ import FormStoreWithoutReseting from "@/core/components/form/buttons/FormStoreWi
 const { t } = useI18n();
 const { objectToFormData } = useFormData();
 const page = usePage();
+const globalStore = useGlobalStore();
 const messages = useMessagesStore();
 
 const similarRecords = ref(undefined);
-const matchedATX = ref(undefined);
+const displayMatchedATX = ref(false);
 const loading = ref(false);
 const redirectBack = ref(false);
 const resetFormOnSuccess = ref(false);
@@ -111,7 +113,7 @@ const submit = handleSubmit((values) => {
 
             if (resetFormOnSuccess.value) {
                 similarRecords.value = undefined;
-                matchedATX.value = undefined;
+                displayMatchedATX.value = false;
                 resetForm();
             }
 
@@ -140,6 +142,8 @@ const updateSimilarRecords = () => {
         return;
     }
 
+    globalStore.loading = true;
+
     // Update similar products
     axios
         .post(route("mad.products.get-similar-records"), {
@@ -153,18 +157,22 @@ const updateSimilarRecords = () => {
         })
         .catch(() => {
             messages.addSimilarRecordsUpdateFailedMessage();
+        })
+        .finally(() => {
+            globalStore.loading = false;
         });
 };
-
-const updateSimilarRecordsDebounced = debounce(updateSimilarRecords, 500);
 
 // Matched ATX
 const updateMatchedATX = () => {
     // Return if required fields are not selected
     if (!values.inn_id || !values.form_id) {
-        matchedATX.value = undefined;
+        displayMatchedATX.value = false;
         return;
     }
+
+    displayMatchedATX.value = true;
+    globalStore.loading = true;
 
     // Get matched ATX
     axios
@@ -173,25 +181,18 @@ const updateMatchedATX = () => {
             form_id: values.form_id,
         })
         .then((response) => {
-            matchedATX.value = response.data ?? {
-                name: null,
-                short_name: null,
-            };
+            values.atx_name = response.data?.name;
+            values.atx_short_name = response.data?.short_name;
 
             messages.addMatchedATXUpdatedSuccessfullyMessage();
         })
         .catch(() => {
             messages.addMatchedATXUpdateFailedMessage();
+        })
+        .finally(() => {
+            globalStore.loading = false;
         });
 };
-
-const updateMatchedATXDebounced = debounce(updateMatchedATX, 500);
-
-// Watch for matchedATX changes and update binded form values
-watch(matchedATX, (matchedATX) => {
-    values.atx_name = matchedATX?.name;
-    values.atx_short_name = matchedATX?.short_name;
-});
 </script>
 
 <template>
@@ -204,7 +205,7 @@ watch(matchedATX, (matchedATX) => {
                         :items="page.props.manufacturers"
                         v-model="values.manufacturer_id"
                         :error-messages="errors.manufacturer_id"
-                        @update:modelValue="updateSimilarRecordsDebounced"
+                        @update:modelValue="updateSimilarRecords"
                         required
                     />
                 </v-col>
@@ -216,8 +217,8 @@ watch(matchedATX, (matchedATX) => {
                         v-model="values.inn_id"
                         :error-messages="errors.inn_id"
                         @update:modelValue="
-                            updateSimilarRecordsDebounced();
-                            updateMatchedATXDebounced();
+                            updateSimilarRecords();
+                            updateMatchedATX();
                         "
                         required
                     />
@@ -230,8 +231,8 @@ watch(matchedATX, (matchedATX) => {
                         v-model="values.form_id"
                         :error-messages="errors.form_id"
                         @update:modelValue="
-                            updateSimilarRecordsDebounced();
-                            updateMatchedATXDebounced();
+                            updateSimilarRecords();
+                            updateMatchedATX();
                         "
                         required
                     />
@@ -246,11 +247,13 @@ watch(matchedATX, (matchedATX) => {
         />
 
         <!-- Matched ATX -->
-        <ProductsMatchedATX
-            v-if="matchedATX != undefined"
-            :values="values"
-            :errors="errors"
-        />
+        <v-slide-y-transition>
+            <ProductsMatchedATX
+                v-if="displayMatchedATX"
+                :values="values"
+                :errors="errors"
+            />
+        </v-slide-y-transition>
 
         <!-- Multiple records -->
         <ProductsCreateRepeater

@@ -2,8 +2,10 @@
 import { Head } from "@inertiajs/vue3";
 import { usePage } from "@inertiajs/vue3";
 import { useUserSettingsStore } from "@/core/stores/userSettings";
+
 import Leftbar from "./Leftbar.vue";
 import Header from "./Header.vue";
+import GlobalLoader from "../components/misc/GlobalLoader.vue";
 import SnackbarQueue from "../components/misc/SnackbarQueue.vue";
 
 defineProps({
@@ -37,6 +39,7 @@ userSettings.initFromInertiaPage(page);
             </div>
         </v-main>
 
+        <GlobalLoader />
         <SnackbarQueue />
     </v-app>
 </template>

@@ -10,15 +10,15 @@ defineProps({
 const { t } = useI18n();
 
 const backgroundColors = [
-    "blue",
-    "indigo",
+    "secondary",
+    "primary",
     "purple",
     "pink",
-    "yellow",
     "orange",
-    "green-accent-4",
-    "purple-darken-4",
-    "brown-darken-1",
+    "lime",
+    "green-accent-3",
+    "cyan-accent-3",
+    "brown",
     "grey",
 ];
 </script>
@@ -26,7 +26,7 @@ const backgroundColors = [
 <template>
     <div
         v-if="record.general_statuses_with_periods[arrayKey].duration_days"
-        class="d-flex flex-column ga-2"
+        class="d-flex flex-column ga-1"
     >
         <span class="text-lowercase">
             {{ record.general_statuses_with_periods[arrayKey].duration_days }}

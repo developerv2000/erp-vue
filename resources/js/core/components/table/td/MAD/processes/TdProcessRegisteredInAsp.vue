@@ -13,13 +13,13 @@ const processesStore = useMADProcessesTableStore();
 const globalStore = useGlobalStore();
 const messagesStore = useMessagesStore();
 
-const checked = ref(props.record.contracted_in_asp ? true : false);
+const checked = ref(props.record.registered_in_asp ? true : false);
 
 const toggle = (value) => {
     globalStore.loading = true;
 
     axios
-        .post(route("mad.processes.update-contracted-in-asp-value"), {
+        .post(route("mad.processes.update-registered-in-asp-value"), {
             id: props.record.id,
             new_value: value,
         })

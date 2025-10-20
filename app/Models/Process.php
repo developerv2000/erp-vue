@@ -128,7 +128,7 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
         return $this->belongsTo(Currency::class);
     }
 
-    public function MAH()
+    public function mah()
     {
         return $this->belongsTo(MarketingAuthorizationHolder::class, 'marketing_authorization_holder_id');
     }
@@ -163,6 +163,11 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
             'deadline_status',
             'is_ready_for_asp_contract',
             'is_ready_for_asp_registration',
+            'can_be_marked_as_ready_for_order',
+            'is_ready_for_order',
+            'manufacturer_offered_price_in_usd',
+            'increased_price_percentage',
+            'days_past',
         ]);
     }
 
@@ -263,7 +268,7 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
         return $this->status->generalStatus->stage >= 7;
     }
 
-    public function canBeMarkedAsReadyForOrder(): bool
+    public function getCanBeMarkedAsReadyForOrderAttribute(): bool
     {
         return $this->status->generalStatus->stage >= 8;
     }
@@ -337,7 +342,7 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
         return $query->with([
             'searchCountry',
             'currency',
-            'MAH',
+            'mah',
             'clinicalTrialCountries',
             'responsiblePerson',
             'lastComment',
@@ -583,7 +588,7 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
             $this->product->pack,
             $this->product->atx?->name,
             $this->product->atx?->short_name,
-            $this->MAH?->name,
+            $this->mah?->name,
             $this->comments->pluck('plain_text')->implode(' / '),
             $this->lastComment?->created_at,
             $this->manufacturer_first_offered_price,
@@ -678,6 +683,9 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
         // Append attributes unless raw query is requested
         if ($appendAttributes && $action !== 'query') {
             self::appendRecordsBasicAttributes($records);
+
+            // Append 'general_statuses_with_periods'
+            self::addGeneralStatusPeriodsForRecords($records);
         }
 
         return $records;
@@ -1431,7 +1439,7 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
                 $generalStatus->start_date = $firstHistory->start_date;
 
                 // Set the end_date of the general status
-                $generalStatus->end_date = $lastHistory->end_date ?: Carbon::now();
+                $generalStatus->end_date = $lastHistory->end_date ?: now();
 
                 // Calculate duration_days for not closed status history
                 // Process current status last history must not be closed logically
@@ -1497,7 +1505,7 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
 
         $additionalColumns = [
             ['title' => 'Status', 'key' => 'status_id', 'width' => 76, 'sortable' => true],
-            ['title' => 'status.An*', 'key' => 'general_status_name_for_analyst', 'width' => 80, 'sortable' => false],
+            ['title' => 'status.An*', 'key' => 'general_status_name_for_analysts', 'width' => 80, 'sortable' => false],
             ['title' => 'status.General', 'key' => 'general_status_name', 'width' => 106, 'sortable' => false],
 
             ['title' => 'fields.BDM', 'key' => 'manufacturer_bdm', 'width' => 146, 'sortable' => false],
@@ -1547,7 +1555,7 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
             ['title' => 'fields.Down payment 2', 'key' => 'down_payment_2', 'width' => 124, 'sortable' => true],
             ['title' => 'fields.Down payment condition', 'key' => 'down_payment_condition', 'width' => 110, 'sortable' => true],
 
-            ['title' => 'fields.Responsible', 'key' => 'responsible_person_id', 'width' => 120, 'sortable' => true],
+            ['title' => 'fields.Responsible', 'key' => 'responsible_person_id', 'width' => 132, 'sortable' => true],
             ['title' => 'fields.Responsible update date', 'key' => 'responsible_person_update_date', 'width' => 250, 'sortable' => true],
             ['title' => 'fields.Days have passed', 'key' => 'days_past', 'width' => 110, 'sortable' => false],
 

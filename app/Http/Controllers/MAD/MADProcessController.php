@@ -153,7 +153,59 @@ class MADProcessController extends Controller
 
         // Update record
         $record->update([
-            'contracted_in_asp' => $request->input('value'),
+            'contracted_in_asp' => $request->input('new_value'),
+        ]);
+
+        // Append basic attributes and return record
+        $record->appendBasicAttributes();
+        return $record;
+    }
+
+    /**
+     * AJAX request
+     */
+    public function updateRegisteredInAspValue(Request $request)
+    {
+        $record = Process::withTrashed()
+            ->withBasicRelations()
+            ->withBasicRelationCounts()
+            ->findOrFail($request->input('id'));
+
+        // Return error if record isn`t ready for ASP registration
+        if (!$record->is_ready_for_asp_registration) {
+            abort(403);
+        }
+
+        // Update record
+        $record->update([
+            'registered_in_asp' => $request->input('new_value'),
+        ]);
+
+        // Append basic attributes and return record
+        $record->appendBasicAttributes();
+        return $record;
+    }
+
+    /**
+     * AJAX request
+     */
+    public function updateReadyForOrderValue(Request $request)
+    {
+        $record = Process::withTrashed()
+            ->withBasicRelations()
+            ->withBasicRelationCounts()
+            ->findOrFail($request->input('id'));
+
+        // Return error if record isn`t ready for ASP contract
+        if (!$record->can_be_marked_as_ready_for_order) {
+            abort(403);
+        }
+
+        // Update record
+        $isReady = $request->input('is_ready');
+
+        $record->update([
+            'readiness_for_order_date' => $isReady ? now() : null,
         ]);
 
         // Append basic attributes and return record

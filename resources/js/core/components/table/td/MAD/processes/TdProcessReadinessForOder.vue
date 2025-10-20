@@ -13,15 +13,15 @@ const processesStore = useMADProcessesTableStore();
 const globalStore = useGlobalStore();
 const messagesStore = useMessagesStore();
 
-const checked = ref(props.record.contracted_in_asp ? true : false);
+const checked = ref(props.record.is_ready_for_order ? true : false);
 
 const toggle = (value) => {
     globalStore.loading = true;
 
     axios
-        .post(route("mad.processes.update-contracted-in-asp-value"), {
+        .post(route("mad.processes.update-ready-for-order-value"), {
             id: props.record.id,
-            new_value: value,
+            is_ready: value,
         })
         .then((response) => {
             messagesStore.addSuccessMessage();
@@ -45,3 +45,4 @@ const toggle = (value) => {
         @update:modelValue="toggle"
     />
 </template>
+

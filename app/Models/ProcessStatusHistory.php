@@ -59,10 +59,10 @@ class ProcessStatusHistory extends Model
         });
 
         static::deleting(function ($record) {
-            // Escape errors on processes.destroy route
+            // Active status history cannot be deleted from "mad.processes.status-history.destroy" route.
+            // But it can be deleted from "mad.processes.destroy" route.
             $currentRouteName = request()->route()->getName();
-
-            // Active status history cannot be deleted
+            
             if ($record->isActiveStatusHistory() && $currentRouteName == 'mad.processes.status-history.destroy') {
                 throw ValidationException::withMessages([
                     'process_status_history_deletion' => trans('validation.custom.process_status_history.is_active_history'),

@@ -161,8 +161,8 @@ function handleTableOptionsUpdate(options) {
             <TdAva :user="item.product.manufacturer.analyst" />
         </template>
 
-        <template v-slot:item.analyst_user_id="{ item }">
-            <TdAva :user="item.analyst" />
+        <template v-slot:item.country_id="{ item }">
+            {{ item.search_country.code }}
         </template>
 
         <template v-slot:item.manufacturer_category_name="{ item }">

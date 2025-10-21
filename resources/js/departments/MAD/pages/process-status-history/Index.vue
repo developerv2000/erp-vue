@@ -4,21 +4,21 @@ import { usePage } from "@inertiajs/vue3";
 import { useI18n } from "vue-i18n";
 import { computed } from "vue";
 import DefaultTableWrapper from "@/core/components/table/containers/DefaultTableWrapper.vue";
-import AttachmentsTable from "./partials/AttachmentsTable.vue";
 import PageIntro from "@/core/layouts/PageIntro.vue";
 import InertiaBreadcrumbs from "@/core/components/inertia/InertiaBreadcrumbs.vue";
+import ProcessStatusHistoryTable from "./partials/ProcessStatusHistoryTable.vue";
 
 const page = usePage();
 const { t } = useI18n();
 
 const title = computed(
-    () => t("Attachments") + " — " + page.props.record.title
+    () => t("pages.Status history") + " — " + page.props.record.title
 );
 
 const breadcrumbs = [
     ...page.props.breadcrumbs,
     {
-        title: computed(() => t("Attachments")),
+        title: computed(() => t("pages.Status history")),
         link: window.location.href,
     },
 ];
@@ -31,11 +31,11 @@ const breadcrumbs = [
                 <InertiaBreadcrumbs :breadcrumbs="breadcrumbs" />
             </template>
 
-            <template #title>{{ t("Attachments") }}</template>
+            <template #title>{{ t("pages.Status history") }}</template>
         </PageIntro>
 
         <DefaultTableWrapper>
-            <AttachmentsTable />
+            <ProcessStatusHistoryTable />
         </DefaultTableWrapper>
     </MainLayout>
 </template>

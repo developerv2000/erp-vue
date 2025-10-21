@@ -259,7 +259,7 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
         }
 
         // Edit page
-        $breadcrumbs[] = ['title' => $this->title, 'link' => null];
+        $breadcrumbs[] = ['title' => $this->title, 'link' => route($lowercasedDepartment . '.manufacturers.edit', $this->id)];
 
         return $breadcrumbs;
     }

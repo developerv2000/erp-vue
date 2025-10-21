@@ -107,7 +107,7 @@ class MADProcessController extends Controller
         return Inertia::render('departments/MAD/pages/processes/Edit', [
             // Refetched after record update
             'record' => $fetchedRecord,
-            'breadcrumbs' => $fetchedRecord->generateBreadcrumbs('mad'),
+            'breadcrumbs' => $fetchedRecord->generateBreadcrumbs('MAD'),
 
             // Lazy loads, never refetched again
             'countriesOrderedByProcessesCount' => Country::orderByProcessesCount()->get(),

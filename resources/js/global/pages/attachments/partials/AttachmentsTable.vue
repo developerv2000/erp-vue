@@ -1,11 +1,11 @@
 <script setup>
-import TableDefaultSkeleton from "@/core/components/table/misc/TableDefaultSkeleton.vue";
 import { usePage } from "@inertiajs/vue3";
-import { ref } from "vue";
 import { useI18n } from "vue-i18n";
-import AttachmentsTableTop from "./AttachmentsTableTop.vue";
 import { useDateFormat } from "@vueuse/core";
 import { useAttachmentsStore } from "@/global/stores/attachments";
+
+import TableDefaultSkeleton from "@/core/components/table/misc/TableDefaultSkeleton.vue";
+import AttachmentsTableTop from "./AttachmentsTableTop.vue";
 
 const { t } = useI18n();
 const page = usePage();

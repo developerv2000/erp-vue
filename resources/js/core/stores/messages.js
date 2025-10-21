@@ -9,6 +9,24 @@ export const useMessagesStore = defineStore('messages', {
         add(message) {
             this.queue.push(message);
         },
+        /**
+         * Extracts and displays validation messages from a Laravel 422 error response.
+         * Automatically joins multiple field errors into a single readable string.
+         */
+        addValidationErrors(error) {
+            const errors = error?.response?.data?.errors || {};
+
+            // Convert all arrays of messages into one single string
+            const joinedErrors = Object.values(errors)
+                .flat()
+                .join("\n") || i18n.global.t('messages.UnknownError');
+
+            this.add({
+                text: joinedErrors,
+                color: "error",
+                timeout: 5000,
+            });
+        },
         // Success
         addSuccessMessage() {
             this.add({

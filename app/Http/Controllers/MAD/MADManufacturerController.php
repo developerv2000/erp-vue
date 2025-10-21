@@ -104,7 +104,7 @@ class MADManufacturerController extends Controller
         return Inertia::render('departments/MAD/pages/manufacturers/Edit', [
             // Refetched after record update
             'record' => $fetchedRecord,
-            'breadcrumbs' => $fetchedRecord->generateBreadcrumbs('mad'),
+            'breadcrumbs' => $fetchedRecord->generateBreadcrumbs('MAD'),
 
             // Lazy loads, never refetched again
             'categories' => fn() => ManufacturerCategory::orderByName()->get(),

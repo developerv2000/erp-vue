@@ -18,6 +18,7 @@ const { t } = useI18n();
 const { can } = useAuth();
 
 const actionAfterSuccessDelete = () => {
+    store.selected = [];
     store.fetchRecords({ updateUrl: false });
 };
 </script>

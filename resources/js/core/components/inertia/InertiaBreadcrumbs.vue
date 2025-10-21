@@ -12,6 +12,13 @@ const props = defineProps({
 const navigate = (link) => {
     if (link) router.visit(link);
 };
+
+const handleMouseDown = (event, link) => {
+    // Middle click = event.button === 1
+    if (event.button === 1 && link) {
+        window.open(link, "_blank");
+    }
+};
 </script>
 
 <template>
@@ -21,7 +28,11 @@ const navigate = (link) => {
             :key="index"
             :disabled="!crumb.link || index === breadcrumbs.length - 1"
         >
-            <span class="cursor-pointer" @click="() => navigate(crumb.link)">
+            <span
+                class="cursor-pointer"
+                @click.prevent.stop="navigate(crumb.link)"
+                @mousedown="handleMouseDown($event, crumb.link)"
+            >
                 {{ crumb.title }}
             </span>
 

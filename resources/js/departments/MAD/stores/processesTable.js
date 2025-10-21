@@ -136,7 +136,6 @@ export const useMADProcessesTableStore = defineStore('MADProcessesTable', {
                 .finally(() => {
                     this.loading = false;
                     this.selected = [];
-                    console.log(this.records[0]);
                 })
         },
 

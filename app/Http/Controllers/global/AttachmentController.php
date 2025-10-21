@@ -16,7 +16,7 @@ class AttachmentController extends Controller
 {
     use DestroysModelRecords;
 
-    // used in multiple destroy trait
+    // Required for DestroysModelRecords trait
     public static $model = Attachment::class;
 
     public function viewModelAttachments(Request $request)
@@ -37,14 +37,18 @@ class AttachmentController extends Controller
 
         $record = $query->with(['attachments'])
             ->findOrFail($request->route('attachable_id'))
-            ->append(['title']);
+            ->append(['title']); // Used on page title
 
         // Render page
         return Inertia::render('global/pages/attachments/Index', [
-            'record' => $record,
+            // Refetched after deleting attachments
             'attachments' => $record->attachments,
-            'attachable_id' => $record->id,
-            'attachable_type' => $model,
+
+            // Never refetched again. But lazy load not used because 'attachments' depends on 'record'
+            'record' => $record,
+
+            // Lazy loads, never refetched again
+            'breadcrumbs' => $record->generateBreadcrumbs('MAD'),
         ]);
     }
 

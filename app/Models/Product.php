@@ -267,7 +267,7 @@ class Product extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
         }
 
         // Edit page
-        $breadcrumbs[] = ['title' => $this->title, 'link' => null];
+        $breadcrumbs[] = ['title' => $this->title, 'link' => route($lowercasedDepartment . '.products.edit', $this->id)];
 
         return $breadcrumbs;
     }

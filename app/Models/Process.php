@@ -459,7 +459,7 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
     /**
      * Scope the query to include basic relation for process status history pages.
      */
-    public function scopeWitRelationsForHistoryPage($query): Builder
+    public function scopeWithRelationsForHistoryPage($query): Builder
     {
         return $query->with([
             'statusHistory' => function ($historyQuery) {
@@ -511,7 +511,7 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
     // Implement method declared in HasTitleAttribute Interface
     public function getTitleAttribute(): string
     {
-        return __('Process') . ' #' . $this->id . ' / ' . $this->searchCountry->code;
+        return __('Process') . ' #' . $this->id . ' — ' . $this->searchCountry->code;
     }
 
     // Implement method declared in GeneratesBreadcrumbs Interface
@@ -530,7 +530,7 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
         }
 
         // Edit page
-        $breadcrumbs[] = ['title' => $this->title, 'link' => null];
+        $breadcrumbs[] = ['title' => $this->title, 'link' => route($lowercasedDepartment . '.processes.edit', $this->id)];
 
         return $breadcrumbs;
     }

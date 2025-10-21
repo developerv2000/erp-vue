@@ -26,9 +26,9 @@ return new class extends Migration
                 ->references('id')
                 ->on('process_statuses');
 
-            $table->timestamp('start_date');
-            $table->timestamp('end_date')->nullable();
-            $table->unsignedMediumInteger('duration_days')->nullable();
+            $table->timestamp('start_date'); // auto
+            $table->timestamp('end_date')->nullable(); // auto
+            $table->unsignedMediumInteger('duration_days')->nullable(); // auto
         });
     }
 

@@ -54,16 +54,17 @@ Route::middleware('auth', 'auth.session')->prefix('mad')->name('mad.')->group(fu
             ->middleware('can:mark-MAD-VPS-as-ready-for-order');
 
         // Status history
-        Route::prefix('/{process}/status-history')
+        Route::prefix('/status-history')
             ->controller(MADProcessStatusHistoryController::class)
             ->name('status-history.')
             ->middleware('can:edit-MAD-VPS-status-history')
             ->group(function () {
+                Route::get('/process/{process}', 'index')->name('index');
+
                 CRUDRouteGenerator::defineDefaultRoutesOnly([
-                    'index',
                     'edit',
                     'update',
-                    'destroy'
+                    'destroy',
                 ]);
             });
     });

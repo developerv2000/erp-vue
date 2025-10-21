@@ -42,6 +42,7 @@
     "pages.ASP": "ASP",
     "pages.Decision hub": "Decision hub",
     "pages.Misc": "Misc",
+    "pages.Status history": "Status history",
 
     "actions.Logout": "Logout",
     "actions.Add": "Add",
@@ -121,6 +122,9 @@
     "dates.Date of creation": "Date of creation",
     "dates.Update date": "Update date",
     "dates.Deletion date": "Deletion date",
+    "dates.Start date": "Start date",
+    "dates.End date": "End date",
+    "dates.Duration days": "Duration days",
 
     "filter.Filtered records": "Filtered records",
     "filter.Region": "Region",

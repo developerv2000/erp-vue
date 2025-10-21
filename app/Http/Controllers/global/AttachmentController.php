@@ -44,11 +44,9 @@ class AttachmentController extends Controller
             // Refetched after deleting attachments
             'attachments' => $record->attachments,
 
-            // Never refetched again. But lazy load not used because 'attachments' depends on 'record'
-            'record' => $record,
-
             // Lazy loads, never refetched again
-            'breadcrumbs' => $record->generateBreadcrumbs('MAD'),
+            'record' => fn() =>$record, // 'attachments' depends on 'record'
+            'breadcrumbs' => fn() => $record->generateBreadcrumbs('MAD'),
         ]);
     }
 

@@ -37,7 +37,7 @@ Route::middleware('auth', 'auth.session')->group(function () {
     });
 
     Route::prefix('comments')->controller(CommentController::class)->name('comments.')->group(function () {
-        Route::get('/view/{commentable_type}/{commentable_id}', 'index')->name('index');
+        Route::get('/view-model-comments/{commentable_type}/{commentable_id}', 'viewModelComments')->name('view-model-comments');
 
         CRUDRouteGenerator::defineDefaultRoutesOnly(
             ['store', 'update', 'destroy'],
@@ -45,6 +45,12 @@ Route::middleware('auth', 'auth.session')->group(function () {
             null,
             'can:edit-comments'
         );
+    });
+
+    Route::prefix('attachments')->controller(AttachmentController::class)->name('attachments.')->group(function () {
+        Route::get('/view-model-attachments/{attachable_type}/{attachable_id}', 'viewModelAttachments')->name('view-model-attachments');
+        Route::get('/show/{record}', 'show')->name('show');
+        Route::post('/destroy', 'destroy')->name('destroy');
     });
 
     Route::prefix('excel-storage')
@@ -58,12 +64,6 @@ Route::middleware('auth', 'auth.session')->group(function () {
             // Download a previously generated export file
             Route::post('/{model}/download/{filename}', 'download')->name('download');
         });
-
-    Route::prefix('attachments')->controller(AttachmentController::class)->name('attachments.')->group(function () {
-        Route::get('/view-model-attachments/{attachable_type}/{attachable_id}', 'viewModelAttachments')->name('view-model-attachments');
-        Route::get('/show/{record}', 'show')->name('show');
-        Route::post('/destroy', 'destroy')->name('destroy');
-    });
 });
 
 require __DIR__ . '/MAD.php';

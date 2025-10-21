@@ -110,14 +110,14 @@ class MADProcessController extends Controller
             'breadcrumbs' => $fetchedRecord->generateBreadcrumbs('MAD'),
 
             // Lazy loads, never refetched again
-            'countriesOrderedByProcessesCount' => Country::orderByProcessesCount()->get(),
-            'responsiblePeople' => ProcessResponsiblePerson::orderByName()->get(),
-            'defaultSelectedStatusIDs' => ProcessStatus::getDefaultSelectedIDValue(),
-            'countriesOrderedByName' => Country::orderByName()->get(),
-            'currencies' => Currency::orderByName()->get(),
-            'MAHs' => MarketingAuthorizationHolder::orderByName()->get(),
-            'defaultSelectedMAHID' => MarketingAuthorizationHolder::getDefaultSelectedIDValue(),
-            'defaultSelectedCurrencyID' => Currency::getDefaultIdValueForMADProcesses(),
+            'countriesOrderedByProcessesCount' => fn() => Country::orderByProcessesCount()->get(),
+            'responsiblePeople' => fn() => ProcessResponsiblePerson::orderByName()->get(),
+            'defaultSelectedStatusIDs' => fn() => ProcessStatus::getDefaultSelectedIDValue(),
+            'countriesOrderedByName' => fn() => Country::orderByName()->get(),
+            'currencies' => fn() => Currency::orderByName()->get(),
+            'MAHs' => fn() => MarketingAuthorizationHolder::orderByName()->get(),
+            'defaultSelectedMAHID' => fn() => MarketingAuthorizationHolder::getDefaultSelectedIDValue(),
+            'defaultSelectedCurrencyID' => fn() => Currency::getDefaultIdValueForMADProcesses(),
         ]);
     }
 

@@ -145,16 +145,16 @@ class MADProductController extends Controller
             'breadcrumbs' => $fetchedRecord->generateBreadcrumbs('MAD'),
 
             // Lazy loads, never refetched again
-            'manufacturers' => Manufacturer::getMinifiedRecordsWithName(),
-            'analystUsers' => User::getMADAnalystsMinified(),
-            'bdmUsers' => User::getCMDBDMsMinifed(),
-            'productClasses' => ProductClass::orderByName()->get(),
-            'productForms' => ProductForm::getMinifiedRecordsWithName(),
-            'shelfLifes' => ProductShelfLife::all(),
-            'zones' => Zone::orderByName()->get(),
-            'inns' => Inn::orderByName()->get(),
-            'countriesOrderedByName' => Country::orderByName()->get(),
-            'manufacturerCategories' => ManufacturerCategory::orderByName()->get(),
+            'manufacturers' => fn() => Manufacturer::getMinifiedRecordsWithName(),
+            'analystUsers' => fn() => User::getMADAnalystsMinified(),
+            'bdmUsers' => fn() => User::getCMDBDMsMinifed(),
+            'productClasses' => fn() => ProductClass::orderByName()->get(),
+            'productForms' => fn() => ProductForm::getMinifiedRecordsWithName(),
+            'shelfLifes' => fn() => ProductShelfLife::all(),
+            'zones' => fn() => Zone::orderByName()->get(),
+            'inns' => fn() => Inn::orderByName()->get(),
+            'countriesOrderedByName' => fn() => Country::orderByName()->get(),
+            'manufacturerCategories' => fn() => ManufacturerCategory::orderByName()->get(),
         ]);
     }
 

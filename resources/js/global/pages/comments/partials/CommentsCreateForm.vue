@@ -33,7 +33,7 @@ const initalValues = {
 };
 
 // VeeValidate form
-const { handleSubmit, errors, setErrors, resetForm, meta } = useForm({
+const { handleSubmit, setErrors, resetForm, meta } = useForm({
     validationSchema: schema,
     initialValues: initalValues,
 });
@@ -55,10 +55,9 @@ const submit = handleSubmit((values) => {
             } else {
                 router.reload({
                     only: ["comments"],
-                    onSuccess: () => {
-                        resetForm();
-                    },
                 });
+
+                resetForm();
             }
         })
         .catch((error) => {

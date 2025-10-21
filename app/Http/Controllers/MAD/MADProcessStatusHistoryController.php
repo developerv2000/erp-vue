@@ -16,39 +16,24 @@ class MADProcessStatusHistoryController extends Controller
     // Required for DestroysModelRecords trait
     public static $model = ProcessStatusHistory::class;
 
-    public function index($record)
+    public function index($process)
     {
-        $record = Process::withRelationsForHistoryPage()
-            ->findOrFail($record)
+        $process = Process::withRelationsForHistoryPage()
+            ->findOrFail($process)
             ->append(['title']); // Used on page title
 
         return Inertia::render('departments/MAD/pages/process-status-history/Index', [
-            // Refetched after deleting history records
-            'history' => $record->statusHistory,
-
-            // Never refetched again. But lazy load isn`t used because 'attachments' depends on 'record'
-            'record' => $record,
+            // Refetched after deleting history records of process
+            'historyRecords' => $process->statusHistory,
 
             // Lazy loads, never refetched again
-            'breadcrumbs' => $record->generateBreadcrumbs('MAD'),
+            'process' => fn() => $process, // 'historyRecords' depends on 'process'
+            'breadcrumbs' => fn() => $process->generateBreadcrumbs('MAD'),
         ]);
     }
 
     public function edit($record)
     {
-        $record = Process::withRelationsForHistoryPage()
-            ->findOrFail($record)
-            ->append(['title']); // Used on page title
 
-        return Inertia::render('departments/MAD/pages/process-status-history/Index', [
-            // Refetched after deleting history records
-            'history' => $record->statusHistory,
-
-            // Never refetched again. But lazy load isn`t used because 'attachments' depends on 'record'
-            'record' => $record,
-
-            // Lazy loads, never refetched again
-            'breadcrumbs' => $record->generateBreadcrumbs('MAD'),
-        ]);
     }
 }

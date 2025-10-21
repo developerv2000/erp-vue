@@ -15,7 +15,7 @@ const actionAfterSuccessDelete = () => {
     store.selected = [];
 
     router.reload({
-        only: ['history'],
+        only: ['historyRecords'],
     });
 }
 </script>
@@ -24,7 +24,7 @@ const actionAfterSuccessDelete = () => {
     <DefaultTableToolbar>
         <template #title>
             {{ t("filter.Filtered records") }} —
-            {{ page.props.history.length }}
+            {{ page.props.historyRecords.length }}
         </template>
 
         <template #actions>

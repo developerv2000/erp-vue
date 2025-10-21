@@ -1,10 +1,11 @@
 <script setup>
-import TableDefaultSkeleton from "@/core/components/table/misc/TableDefaultSkeleton.vue";
 import { usePage } from "@inertiajs/vue3";
 import { useI18n } from "vue-i18n";
-import ProcessStatusHistoryTableTop from "./ProcessStatusHistoryTableTop.vue";
 import { useDateFormat } from "@vueuse/core";
 import { useProcessStatusHistoryStore } from "@/departments/MAD/stores/processStatusHistoryTable";
+
+import ProcessStatusHistoryTableTop from "./ProcessStatusHistoryTableTop.vue";
+import TableDefaultSkeleton from "@/core/components/table/misc/TableDefaultSkeleton.vue";
 
 const { t } = useI18n();
 const page = usePage();
@@ -48,7 +49,7 @@ const headers = [
         class="main-table"
         :headers="headers"
         v-model="store.selected"
-        :items="page.props.history"
+        :items="page.props.historyRecords"
         items-per-page="-1"
         :sort-by="[
             {

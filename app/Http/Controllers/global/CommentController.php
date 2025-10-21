@@ -13,12 +13,12 @@ use Inertia\Inertia;
 
 class CommentController extends Controller
 {
-    use DestroysModelRecords;
+    use DestroysModelRecords; // AJAX request
 
     // used in multiple destroy trait
     public static $model = Comment::class;
 
-    public function index(Request $request)
+    public function viewModelComments(Request $request)
     {
         // Retrieve record with comments eagerly loaded and appended title
         $model = ModelHelper::addFullNamespaceToModelBasename(
@@ -33,21 +33,27 @@ class CommentController extends Controller
 
         $record = $query->with(['comments'])
             ->findOrFail($request->route('commentable_id'))
-            ->append(['title']);
+            ->append(['title']); // Used on page title
 
         // Load minified users of each comments
         Comment::loadMinifiedUsersOfRecords($record->comments);
 
         // Render page
         return Inertia::render('global/pages/comments/Index', [
-            'record' => $record,
+            // Refetched after storing/updating/deleting comments
             'comments' => $record->comments,
-            'commentable_id' => $record->id,
-            'commentable_type' => $model,
-            'deletedUserImage' => User::getImageUrlForDeletedUser(),
+
+            // Lazy loads, never refetched again
+            'record' => fn() => $record, // 'comments' depends on 'record'
+            'commentable_id' => fn() => $record->id,
+            'commentable_type' => fn() => $model,
+            'deletedUserImage' => fn() => User::getImageUrlForDeletedUser(),
         ]);
     }
 
+    /**
+     * Ajax request
+     */
     public function store(Request $request)
     {
         $model = $request->input('commentable_type');
@@ -59,10 +65,12 @@ class CommentController extends Controller
             $recordQuery->withTrashed();
         }
 
-        $record = $recordQuery->find($recordID);
+        $record = $recordQuery->findOrFail($recordID);
         $record->addComment($request->input('body'));
 
-        return redirect()->back();
+        return response()->json([
+            'success' => true,
+        ]);
     }
 
     /**

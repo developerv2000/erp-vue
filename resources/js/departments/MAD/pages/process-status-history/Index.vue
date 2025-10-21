@@ -12,7 +12,7 @@ const page = usePage();
 const { t } = useI18n();
 
 const title = computed(
-    () => t("pages.Status history") + " — " + page.props.record.title
+    () => t("pages.Status history") + " — " + page.props.process.title
 );
 
 const breadcrumbs = [

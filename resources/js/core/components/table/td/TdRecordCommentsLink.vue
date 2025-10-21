@@ -12,7 +12,7 @@ const { t } = useI18n();
 <template>
     <TdInertiaLink
         :link="
-            route('comments.index', {
+            route('comments.view-model-comments', {
                 commentable_type: record.base_model_class,
                 commentable_id: record.id,
             })

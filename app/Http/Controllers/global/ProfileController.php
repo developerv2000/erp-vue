@@ -16,12 +16,15 @@ class ProfileController extends Controller
     public function edit(Request $request)
     {
         return inertia('global/pages/profile/Edit', [
+            // Refetched after 'updatePersonalData' and 'updatePassword'
             'record' => $request->user(),
         ]);
     }
 
     /**
      * Update the user's profile information.
+     *
+     * Inertia post request
      */
     public function updatePersonalData(ProfilePersonalDataUpdateRequest $request): RedirectResponse
     {
@@ -32,6 +35,8 @@ class ProfileController extends Controller
 
     /**
      * Update the user`s password
+     *
+     * Inertia post request
      */
     public function updatePassword(ProfilePasswordUpdateRequest $request): RedirectResponse
     {

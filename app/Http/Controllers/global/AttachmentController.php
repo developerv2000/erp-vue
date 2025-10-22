@@ -4,10 +4,12 @@ namespace App\Http\Controllers\global;
 
 use App\Http\Controllers\Controller;
 use App\Models\Attachment;
+use App\Support\Helpers\ControllerHelper;
 use App\Support\Helpers\ModelHelper;
 use App\Support\Traits\Controller\DestroysModelRecords;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -44,8 +46,11 @@ class AttachmentController extends Controller
             // Refetched after deleting attachments
             'attachments' => $record->attachments,
 
-            // Lazy loads, never refetched again
-            'record' => fn() =>$record, // 'attachments' depends on 'record'
+            // Lazy loads. Refetched only on locale change
+            'allTableHeaders' => fn() => $this->getAllTableHeadersTranslated(),
+
+            // Lazy loads. Never refetched again
+            'record' => fn() => $record, // 'attachments' depends on 'record'
             'breadcrumbs' => fn() => $record->generateBreadcrumbs('MAD'),
         ]);
     }
@@ -81,5 +86,18 @@ class AttachmentController extends Controller
             default:
                 abort(404);
         }
+    }
+
+    private function getAllTableHeadersTranslated(): Collection
+    {
+        $headers = collect([
+            ['title' => "files.Name", 'key' => 'filename', 'sortable' => true],
+            ['title' => "files.Size", 'key' => 'file_size_in_mb', 'sortable' => true],
+            ['title' => "dates.Date of creation", 'key' => 'created_at', 'sortable' => true],
+        ]);
+
+        ControllerHelper::translateTableHeadersTitle($headers);
+
+        return $headers;
     }
 }

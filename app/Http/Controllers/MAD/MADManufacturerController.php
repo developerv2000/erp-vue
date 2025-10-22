@@ -37,10 +37,12 @@ class MADManufacturerController extends Controller
             // Refetched on smart filters change and filter form submit
             'smartFilterDependencies' => ManufacturersSmartFilter::getAllDependencies(),
 
-            // Lazy loads
+            // Lazy loads. Refetched only on headers update and locale change
+            'allTableHeaders' => $getAllTableHeaders,
+            'tableVisibleHeaders' => $getVisibleHeaders,
+
+            // Lazy loads. Never refetched again
             'simpleFilterDependencies' => fn() => ManufacturersSimpleFilter::getAllDependencies(),
-            'allTableHeaders' => $getAllTableHeaders, // Refetched only on headers update
-            'tableVisibleHeaders' => $getVisibleHeaders, // Refetched only on headers update
         ]);
     }
 
@@ -56,9 +58,11 @@ class MADManufacturerController extends Controller
             // Refetched on smart filters change and filter form submit
             'smartFilterDependencies' => ManufacturersSmartFilter::getAllDependencies(),
 
-            // Lazy loads, never refetched again
-            'simpleFilterDependencies' => fn() => ManufacturersSimpleFilter::getAllDependencies(),
+            // Lazy loads. Refetched only on locale change
             'tableVisibleHeaders' => $getVisibleHeaders,
+
+            // Lazy loads. Never refetched again
+            'simpleFilterDependencies' => fn() => ManufacturersSimpleFilter::getAllDependencies(),
         ]);
     }
 
@@ -106,7 +110,7 @@ class MADManufacturerController extends Controller
             'record' => $fetchedRecord,
             'breadcrumbs' => $fetchedRecord->generateBreadcrumbs('MAD'),
 
-            // Lazy loads, never refetched again
+            // Lazy loads. Never refetched again
             'categories' => fn() => ManufacturerCategory::orderByName()->get(),
             'productClasses' => fn() => ProductClass::orderByName()->get(),
             'analystUsers' => fn() => User::getMADAnalystsMinified(),

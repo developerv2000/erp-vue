@@ -38,10 +38,12 @@ class MADProcessController extends Controller
             // Refetched on smart filters change and filter form submit
             'smartFilterDependencies' => ProcessesSmartFilter::getAllDependencies(),
 
-            // Lazy loads
+            // Lazy loads. Refetched only on headers update and locale change
+            'allTableHeaders' => $getAllTableHeaders,
+            'tableVisibleHeaders' => $getVisibleHeaders,
+
+            // Lazy loads. Never refetched again
             'simpleFilterDependencies' => fn() => ProcessesSimpleFilter::getAllDependencies(),
-            'allTableHeaders' => $getAllTableHeaders, // Refetched only on headers update
-            'tableVisibleHeaders' => $getVisibleHeaders, // Refetched only on headers update
         ]);
     }
 
@@ -57,9 +59,11 @@ class MADProcessController extends Controller
             // Refetched on smart filters change and filter form submit
             'smartFilterDependencies' => ProcessesSmartFilter::getAllDependencies(),
 
-            // Lazy loads, never refetched again
-            'simpleFilterDependencies' => fn() => ProcessesSimpleFilter::getAllDependencies(),
+            // Lazy loads. Refetched only on locale change
             'tableVisibleHeaders' => $getVisibleHeaders,
+
+            // Lazy loads. Never refetched again
+            'simpleFilterDependencies' => fn() => ProcessesSimpleFilter::getAllDependencies(),
         ]);
     }
 
@@ -109,7 +113,7 @@ class MADProcessController extends Controller
             'record' => $fetchedRecord,
             'breadcrumbs' => $fetchedRecord->generateBreadcrumbs('MAD'),
 
-            // Lazy loads, never refetched again
+            // Lazy loads. Never refetched again
             'countriesOrderedByProcessesCount' => fn() => Country::orderByProcessesCount()->get(),
             'responsiblePeople' => fn() => ProcessResponsiblePerson::orderByName()->get(),
             'defaultSelectedStatusIDs' => fn() => ProcessStatus::getDefaultSelectedIDValue(),

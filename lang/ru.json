@@ -26,6 +26,7 @@
     "validations.max_date": "Дата должна быть до {max}.",
     "validations.min_items": "Выберите как минимум {min} элементов.",
     "validations.max_items": "Выберите не более {max} элементов.",
+    "validations.timestamp": "Значение должен быть в формате 'YYYY-MM-DD HH:mm:ss'.",
 
     "departments.Managment": "Руководство",
     "departments.MAD": "ОАП",

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Http\Requests\MAD\ProcessStatusHistoryUpdateRequest;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\ValidationException;
 
@@ -65,7 +66,7 @@ class ProcessStatusHistory extends Model
     protected static function booted(): void
     {
         static::updated(function ($record) {
-            // Recalculate 'days_past_since_last_activity' after updating processes status history.
+            // Recalculate related processes 'days_past_since_last_activity' after updating processes status history.
             $record->process->recalculateDaysPastSinceLastActivity();
         });
 
@@ -89,20 +90,14 @@ class ProcessStatusHistory extends Model
     */
 
     /**
-     * Update the model's attributes from the given request.
-     *
-     * @param \Illuminate\Http\Request $request The request object containing input data.
-     * @return void
+     * AJAX request
      */
-    public function updateFromRequest($request)
+    public function updateByMADFromRequest(ProcessStatusHistoryUpdateRequest $request): void
     {
-        // Update start_date from the request input
-        $this->start_date = $request->input('start_date');
+        $this->fill($request->safe()->all());
 
-        // 'status_id' and 'end_date' can`t be updated for active status history
+        // Recalculate duration days for non-active histories
         if (!$this->is_active_history) {
-            $this->status_id = $request->input('status_id');
-            $this->end_date = $request->input('end_date');
             $this->duration_days = (int) $this->start_date->diffInDays($this->end_date);
         }
 

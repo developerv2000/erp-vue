@@ -1,6 +1,5 @@
 <script setup>
 import { usePage } from "@inertiajs/vue3";
-import { useI18n } from "vue-i18n";
 import { useDateFormatter } from "@/core/composables/useDateFormatter";
 import { useProcessStatusHistoryStore } from "@/departments/MAD/stores/processStatusHistoryTable";
 
@@ -8,48 +7,9 @@ import ProcessStatusHistoryTableTop from "./ProcessStatusHistoryTableTop.vue";
 import TableDefaultSkeleton from "@/core/components/table/misc/TableDefaultSkeleton.vue";
 import { mdiPen } from "@mdi/js";
 
-const { t } = useI18n();
 const page = usePage();
 const store = useProcessStatusHistoryStore();
 const { formatDate } = useDateFormatter();
-
-const headers = [
-    {
-        title: t("Record"),
-        key: "edit",
-        sortable: false,
-    },
-
-    {
-        title: t("Status"),
-        key: "status_id",
-        sortable: true,
-    },
-
-    {
-        title: t("status.General"),
-        key: "general_status_name",
-        sortable: false,
-    },
-
-    {
-        title: t("dates.Start date"),
-        key: "start_date",
-        sortable: true,
-    },
-
-    {
-        title: t("dates.End date"),
-        key: "end_date",
-        sortable: true,
-    },
-
-    {
-        title: t("dates.Duration days"),
-        key: "duration_days",
-        sortable: true,
-    },
-];
 
 function edit(item) {
     store.activeRecord = { ...item };
@@ -60,7 +20,7 @@ function edit(item) {
 <template>
     <v-data-table
         class="main-table"
-        :headers="headers"
+        :headers="page.props.allTableHeaders"
         v-model="store.selected"
         :items="page.props.historyRecords"
         items-per-page="-1"

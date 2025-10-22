@@ -21,4 +21,18 @@ class ControllerHelper
             'sortable' => true,
         ]);
     }
+
+    /**
+     * Translates the given headers collection 'title' attribute.
+     *
+     * @param \Illuminate\Support\Collection $headers
+     * @return void
+     */
+    public static function translateTableHeadersTitle($headers)
+    {
+        $headers->transform(function ($header) {
+            $header['title'] = trans($header['title']);
+            return $header;
+        });
+    }
 }

@@ -6,6 +6,6 @@ export const useProcessStatusHistoryStore = defineStore('processStatusHistory', 
 
         // Edit form
         editDialog: false,
-        activeRecord: null,
+        activeRecord: undefined,
     }),
 });

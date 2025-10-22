@@ -26,6 +26,7 @@
     "validations.max_date": "Date must be before {max}.",
     "validations.min_items": "Select at least {min} items.",
     "validations.max_items": "Select no more than {max} items.",
+    "validations.timestamp": "Value must be in the format 'YYYY-MM-DD HH:mm:ss'.",
 
     "departments.Managment": "Managment",
     "departments.MAD": "MAD",

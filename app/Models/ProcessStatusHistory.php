@@ -47,6 +47,17 @@ class ProcessStatusHistory extends Model
 
     /*
     |--------------------------------------------------------------------------
+    | Additional attributes & appends
+    |--------------------------------------------------------------------------
+    */
+
+    public function getIsActiveHistoryAttribute(): bool
+    {
+        return $this->end_date ? false : true;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Events
     |--------------------------------------------------------------------------
     */
@@ -62,8 +73,8 @@ class ProcessStatusHistory extends Model
             // Active status history cannot be deleted from "mad.processes.status-history.destroy" route.
             // But it can be deleted from "mad.processes.destroy" route.
             $currentRouteName = request()->route()->getName();
-            
-            if ($record->isActiveStatusHistory() && $currentRouteName == 'mad.processes.status-history.destroy') {
+
+            if ($record->is_active_history && $currentRouteName == 'mad.processes.status-history.destroy') {
                 throw ValidationException::withMessages([
                     'process_status_history_deletion' => trans('validation.custom.process_status_history.is_active_history'),
                 ]);
@@ -89,7 +100,7 @@ class ProcessStatusHistory extends Model
         $this->start_date = $request->input('start_date');
 
         // 'status_id' and 'end_date' can`t be updated for active status history
-        if (!$this->isActiveStatusHistory()) {
+        if (!$this->is_active_history) {
             $this->status_id = $request->input('status_id');
             $this->end_date = $request->input('end_date');
             $this->duration_days = (int) $this->start_date->diffInDays($this->end_date);
@@ -117,13 +128,5 @@ class ProcessStatusHistory extends Model
             'end_date' => now(),
             'duration_days' => $this->start_date->diffInDays(now()),
         ]);
-    }
-
-    /**
-     * Determine if this status history is the active history of the associated process.
-     */
-    public function isActiveStatusHistory()
-    {
-        return $this->end_date ? false : true;
     }
 }

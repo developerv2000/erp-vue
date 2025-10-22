@@ -1,43 +1,31 @@
-import { useI18n } from 'vue-i18n';
-import { useTimeAgoIntl } from "@vueuse/core"
+import { useI18n } from 'vue-i18n'
+import { useTimeAgoIntl } from '@vueuse/core'
+import dayjs from 'dayjs'
+import 'dayjs/locale/en'
+import 'dayjs/locale/ru'
 
-/**
- * Format Laravel-style timestamps using native Intl.DateTimeFormat.
- */
 export function useDateFormatter() {
-    const { locale } = useI18n();
+    const { locale } = useI18n()
 
-    function formatDate(value, { withTime = true } = {}) {
-        if (!value) return '';
-
-        const date = new Date(value);
-
-        const options = {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric',
-            ...(withTime && {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: false,
-            }),
-        };
-
-        return new Intl.DateTimeFormat(locale.value || 'en', options).format(date);
+    /**
+     * Formats an absolute date with a given pattern.
+     * Example: formatDate('2025-10-17 09:00:00', 'DD MMM YYYY HH:mm:ss')
+     */
+    function formatDate(value, format = 'DD MMM YYYY') {
+        if (!value) return ''
+        return dayjs(value).locale(locale.value || 'en').format(format)
     }
 
-    return { formatDate };
-}
+    /**
+     * Returns a reactive "time ago" string.
+     * Example: timeAgo(new Date('2025-10-17T08:00:00'))
+     */
+    function timeAgo(date, options = {}) {
+        return useTimeAgoIntl(date, {
+            locale: locale.value || 'en',
+            ...options,
+        })
+    }
 
-/**
- * Wrapper for useTimeAgoIntl with locale loaded from store.
- */
-export function useTimeAgoFormatter(date, options = {}) {
-    const { locale } = useI18n();
-
-    return useTimeAgoIntl(date, {
-        locale: locale.value || "en",
-        ...options,
-    });
+    return { formatDate, timeAgo }
 }

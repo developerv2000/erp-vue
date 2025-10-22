@@ -7,6 +7,7 @@ import DefaultTableWrapper from "@/core/components/table/containers/DefaultTable
 import PageIntro from "@/core/layouts/PageIntro.vue";
 import InertiaBreadcrumbs from "@/core/components/inertia/InertiaBreadcrumbs.vue";
 import ProcessStatusHistoryTable from "./partials/ProcessStatusHistoryTable.vue";
+import ProcessStatusHistoryEditDialog from "./partials/ProcessStatusHistoryEditDialog.vue";
 
 const page = usePage();
 const { t } = useI18n();
@@ -37,5 +38,7 @@ const breadcrumbs = [
         <DefaultTableWrapper>
             <ProcessStatusHistoryTable />
         </DefaultTableWrapper>
+
+        <ProcessStatusHistoryEditDialog />
     </MainLayout>
 </template>

@@ -4,12 +4,11 @@ import { usePage } from "@inertiajs/vue3";
 import useQueryParams from "@/core/composables/useQueryParams";
 import { useMADProcessesTableStore } from "@/departments/MAD/stores/processesTable";
 import { useI18n } from "vue-i18n";
-import { useDateFormat } from "@vueuse/core";
+import { useDateFormatter } from "@/core/composables/useDateFormatter";
 import { formatPrice } from "@/core/scripts/utilities";
 import { DEFAULT_PER_PAGE_OPTIONS } from "@/core/scripts/constants";
 
 import ProcessesTableTop from "./ProcessesTableTop.vue";
-import InertiaLink from "@/core/components/inertia/InertiaLink.vue";
 import TableDefaultSkeleton from "@/core/components/table/misc/TableDefaultSkeleton.vue";
 import TdEditButton from "@/core/components/table/td/TdEditButton.vue";
 import TdDuplicateButton from "@/core/components/table/td/TdDuplicateButton.vue";
@@ -18,8 +17,6 @@ import TdAva from "@/core/components/table/td/TdAva.vue";
 import TdInertiaLink from "@/core/components/table/td/TdInertiaLink.vue";
 import TogglableThreeLinesLimitedText from "@/core/components/misc/TogglableThreeLinesLimitedText.vue";
 import TdRecordCommentsLink from "@/core/components/table/td/TdRecordCommentsLink.vue";
-import TdAttachmentsList from "@/core/components/table/td/TdAttachmentsList.vue";
-import TdRecordAttachmentsLink from "@/core/components/table/td/TdRecordAttachmentsLink.vue";
 import TableNavigateToPage from "@/core/components/table/misc/TableNavigateToPage.vue";
 import TdMediumWeightText from "@/core/components/table/td/TdMediumWeightText.vue";
 import TdProcessContractedInAsp from "@/core/components/table/td/MAD/processes/TdProcessContractedInAsp.vue";
@@ -32,6 +29,7 @@ const { t } = useI18n();
 const { get } = useQueryParams();
 const page = usePage();
 const store = useMADProcessesTableStore();
+const { formatDate } = useDateFormatter();
 
 onMounted(() => {
     // Init from inertia page if needed
@@ -95,7 +93,7 @@ function handleTableOptionsUpdate(options) {
 
         <!-- Item slots -->
         <template v-slot:item.deleted_at="{ item }">
-            {{ useDateFormat(item.deleted_at, "DD MMM YYYY") }}
+            {{ formatDate(item.deleted_at) }}
         </template>
 
         <template v-slot:item.edit="{ item }">
@@ -108,10 +106,9 @@ function handleTableOptionsUpdate(options) {
 
         <template v-slot:item.last_status_date="{ item }">
             {{
-                useDateFormat(
+                formatDate(
                     item.status_history[item.status_history.length - 1]
-                        .start_date,
-                    "DD MMM YYYY"
+                        .start_date
                 )
             }}
         </template>
@@ -214,9 +211,7 @@ function handleTableOptionsUpdate(options) {
         </template>
 
         <template v-slot:item.increased_price_date="{ item }">
-            <span v-if="item.increased_price_date">
-                {{ useDateFormat(item.increased_price_date, "DD MMM YYYY") }}
-            </span>
+            {{ formatDate(item.increased_price_date) }}
         </template>
 
         <template v-slot:item.product_class="{ item }">
@@ -238,14 +233,7 @@ function handleTableOptionsUpdate(options) {
         </template>
 
         <template v-slot:item.forecast_year_1_update_date="{ item }">
-            <span v-if="item.forecast_year_1_update_date">
-                {{
-                    useDateFormat(
-                        item.forecast_year_1_update_date,
-                        "DD MMM YYYY"
-                    )
-                }}
-            </span>
+            {{ formatDate(item.forecast_year_1_update_date) }}
         </template>
 
         <template v-slot:item.forecast_year_1="{ item }">
@@ -280,14 +268,7 @@ function handleTableOptionsUpdate(options) {
         </template>
 
         <template v-slot:item.responsible_person_update_date="{ item }">
-            <span v-if="item.responsible_person_update_date">
-                {{
-                    useDateFormat(
-                        item.responsible_person_update_date,
-                        "DD MMM YYYY"
-                    )
-                }}
-            </span>
+            {{ formatDate(item.responsible_person_update_date) }}
         </template>
 
         <template v-slot:item.days_past="{ item }">
@@ -295,11 +276,11 @@ function handleTableOptionsUpdate(options) {
         </template>
 
         <template v-slot:item.created_at="{ item }">
-            {{ useDateFormat(item.created_at, "DD MMM YYYY") }}
+            {{ formatDate(item.created_at) }}
         </template>
 
         <template v-slot:item.updated_at="{ item }">
-            {{ useDateFormat(item.updated_at, "DD MMM YYYY") }}
+            {{ formatDate(item.updated_at) }}
         </template>
 
         <template v-slot:item.comments_count="{ item }">
@@ -311,7 +292,7 @@ function handleTableOptionsUpdate(options) {
         </template>
 
         <template v-slot:item.last_comment_created_at="{ item }">
-            {{ useDateFormat(item.last_comment?.created_at, "DD MMM YYYY") }}
+            {{ formatDate(item.last_comment?.created_at) }}
         </template>
 
         <template v-slot:item.status_history="{ item }">

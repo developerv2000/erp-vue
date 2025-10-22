@@ -1,18 +1,20 @@
 <script setup>
+import { computed } from "vue";
 import { usePage } from "@inertiajs/vue3";
+import { useI18n } from "vue-i18n";
+import { useDateFormatter } from "@/core/composables/useDateFormatter";
+import { useCommentsStore } from "@/global/stores/comments";
+
 import DefaultSheet from "@/core/components/containers/DefaultSheet.vue";
 import DefaultTitle from "@/core/components/titles/DefaultTitle.vue";
-import { useI18n } from "vue-i18n";
-import { computed } from "vue";
-import { useTimeAgoFormatter } from "@/core/composables/useDateFormatter";
-import { mdiPencil, mdiDelete } from "@mdi/js";
-import { useCommentsStore } from "@/global/stores/comments";
 import CommentsEditDialog from "./CommentsEditDialog.vue";
 import CommentsDestroyDialog from "./CommentsDestroyDialog.vue";
+import { mdiPencil, mdiDelete } from "@mdi/js";
 
 const page = usePage();
 const { t } = useI18n();
 const store = useCommentsStore();
+const { timeAgo } = useDateFormatter();
 
 const title = computed(
     () => t("comments.All") + " — " + page.props.comments.length
@@ -38,7 +40,7 @@ const destroy = (comment) => {
             <v-card
                 v-for="comment in page.props.comments"
                 :key="comment.id"
-                :subtitle="useTimeAgoFormatter(comment.created_at).value"
+                :subtitle="timeAgo(comment.created_at).value"
                 elevation="1"
             >
                 <template #title>

@@ -1,7 +1,7 @@
 <script setup>
 import { usePage } from "@inertiajs/vue3";
 import { useI18n } from "vue-i18n";
-import { useDateFormat } from "@vueuse/core";
+import { useDateFormatter } from "@/core/composables/useDateFormatter";
 import { useAttachmentsStore } from "@/global/stores/attachments";
 
 import TableDefaultSkeleton from "@/core/components/table/misc/TableDefaultSkeleton.vue";
@@ -10,6 +10,7 @@ import AttachmentsTableTop from "./AttachmentsTableTop.vue";
 const { t } = useI18n();
 const page = usePage();
 const store = useAttachmentsStore();
+const { formatDate } = useDateFormatter();
 
 const headers = [
     {
@@ -67,7 +68,7 @@ const headers = [
         </template>
 
         <template v-slot:item.created_at="{ item }">
-            {{ useDateFormat(item.created_at, "DD MMM YYYY") }}
+            {{ formatDate(item.created_at) }}
         </template>
     </v-data-table>
 </template>

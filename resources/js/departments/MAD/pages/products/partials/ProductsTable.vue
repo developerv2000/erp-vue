@@ -4,7 +4,7 @@ import { usePage } from "@inertiajs/vue3";
 import useQueryParams from "@/core/composables/useQueryParams";
 import { useMADProductsTableStore } from "@/departments/MAD/stores/productsTable";
 import { useI18n } from "vue-i18n";
-import { useDateFormat } from "@vueuse/core";
+import { useDateFormatter } from "@/core/composables/useDateFormatter";
 import { formatPrice } from "@/core/scripts/utilities";
 import { DEFAULT_PER_PAGE_OPTIONS } from "@/core/scripts/constants";
 
@@ -28,6 +28,7 @@ const { t } = useI18n();
 const { get } = useQueryParams();
 const page = usePage();
 const store = useMADProductsTableStore();
+const { formatDate } = useDateFormatter();
 
 onMounted(() => {
     // Init from inertia page if needed
@@ -91,7 +92,7 @@ function handleTableOptionsUpdate(options) {
 
         <!-- Item slots -->
         <template v-slot:item.deleted_at="{ item }">
-            {{ useDateFormat(item.deleted_at, "DD MMM YYYY") }}
+            {{ formatDate(item.deleted_at) }}
         </template>
 
         <template v-slot:item.edit="{ item }">
@@ -209,7 +210,7 @@ function handleTableOptionsUpdate(options) {
         </template>
 
         <template v-slot:item.last_comment_created_at="{ item }">
-            {{ useDateFormat(item.last_comment?.created_at, "DD MMM YYYY") }}
+            {{ formatDate(item.last_comment?.created_at) }}
         </template>
 
         <template v-slot:item.manufacturer_bdm="{ item }">
@@ -221,11 +222,11 @@ function handleTableOptionsUpdate(options) {
         </template>
 
         <template v-slot:item.created_at="{ item }">
-            {{ useDateFormat(item.created_at, "DD MMM YYYY") }}
+            {{ formatDate(item.created_at) }}
         </template>
 
         <template v-slot:item.updated_at="{ item }">
-            {{ useDateFormat(item.updated_at, "DD MMM YYYY") }}
+            {{ formatDate(item.updated_at) }}
         </template>
 
         <template v-slot:item.matched_product_searches="{ item }">

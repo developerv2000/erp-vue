@@ -22,21 +22,21 @@ const defaultFilters = {
     created_at: null,
     updated_at: null,
 
-    // Singular autocompletes
+    // Singular id-based autocompletes
     manufacturer_category_id: null,
     manufacturer_analyst_user_id: null,
     manufacturer_bdm_user_id: null,
 
-    // Arrays
-    id: [],
-
     // Multiple autocompletes
+    id: [],
+    brand: [],
+
+    // Multiple id-based autocompletes
     inn_id: [],
     manufacturer_id: [],
     form_id: [],
     manufacturer_country_id: [],
     class_id: [],
-    brand: [],
     shelf_life_id: [],
     zones: [],
 }
@@ -79,10 +79,12 @@ export const useMADProductsTableStore = defineStore('MADProductsTable', {
             // Filters that don`t require normalization
             this.filters.dosage = query.dosage;
             this.filters.pack = query.pack;
+            this.filters.id = query.id;
+            this.filters.brand = query.brand;
 
             // Normalize filters
             normalizeSingleIDsFromQuery(this.filters, query, ['manufacturer_category_id', 'manufacturer_analyst_user_id', 'manufacturer_bdm_user_id']);
-            normalizeMultiIDsFromQuery(this.filters, query, ['id', 'inn_id', 'manufacturer_id', 'form_id', 'manufacturer_country_id', 'class_id', 'brand', 'shelf_life_id', 'zones']);
+            normalizeMultiIDsFromQuery(this.filters, query, ['inn_id', 'manufacturer_id', 'form_id', 'manufacturer_country_id', 'class_id', 'shelf_life_id', 'zones']);
             normalizeDateRangesFromQuery(this.filters, query, ['created_at', 'updated_at']);
 
             // Mark as initialized

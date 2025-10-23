@@ -14,19 +14,23 @@ const defaultPaginationOptions = {
 };
 
 const defaultFilters = {
+    // Boolean
+    active: null,
+    important: null,
+
     // Date ranges
     created_at: null,
     updated_at: null,
 
     // Singular autocompletes
+    region: null,
+
+    // Singular id-based autocompletes
     analyst_user_id: null,
     bdm_user_id: null,
-    region: null,
     category_id: null,
-    active: null,
-    important: null,
 
-    // Multiple autocompletes
+    // Multiple id-based autocompletes
     country_id: [],
     id: [],
     product_classes: [],

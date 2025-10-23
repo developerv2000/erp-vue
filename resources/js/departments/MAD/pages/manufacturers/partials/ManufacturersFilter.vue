@@ -53,8 +53,8 @@ const refreshSmartFiltersDebounced = debounce(refreshSmartFilters, 500);
             name="country_id[]"
             v-model="store.filters.country_id"
             :items="page.props.smartFilterDependencies.countriesOrderedByName"
-            multiple
             @update:modelValue="refreshSmartFiltersDebounced"
+            multiple
         />
 
         <FilterAutocomplete
@@ -62,8 +62,8 @@ const refreshSmartFiltersDebounced = debounce(refreshSmartFilters, 500);
             name="id[]"
             v-model="store.filters.id"
             :items="page.props.smartFilterDependencies.manufacturers"
-            multiple
             @update:modelValue="refreshSmartFiltersDebounced"
+            multiple
         />
 
         <FilterAutocomplete

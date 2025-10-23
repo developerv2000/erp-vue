@@ -160,9 +160,11 @@
     "statuses.8Р" : "8Р",
 
     "Deadline": "Дедлайн",
+    "deadline.Status": "Статус дедлайна",
     "deadline.Expired": "Просрочен",
-    "eadline.Not expired": "Непросрочен",
-    "eadline.No deadline": "Без дедлайна",
+    "deadline.Not expired": "Непросрочен",
+    "deadline.No deadline": "Без дедлайна",
+    "deadline.Order by deadline": "Сортировать по дедлайну",
 
     "Days": "Дней",
     "days.past": "Дней прошло",
@@ -240,6 +242,8 @@
     "fields.Responsible": "Ответственный",
     "fields.Responsible update date": "Дата обновления ответственных",
     "fields.Days have passed": "Дней прошло",
+    "fields.Contracted in ASP": "Контракт в СПГ",
+    "fields.Registered in ASP": "Зарегистрирован в СПГ",
 
     "AAAAAAAAAAAAAA": "AAAAAAAAAAAAAA"
 }

@@ -17,7 +17,7 @@ const { t } = useI18n();
                 </div>
             </v-card-item>
 
-            <v-card-text class="d-flex flex-column ga-4">
+            <v-card-text class="d-flex flex-column ga-4 pt-5">
                 <slot />
             </v-card-text>
 

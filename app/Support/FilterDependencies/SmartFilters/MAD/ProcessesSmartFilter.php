@@ -29,8 +29,8 @@ class ProcessesSmartFilter
 
         return [
             'manufacturer_id' => $request->input('manufacturer_id', []),
-            'inn_id' => $request->input('inn_id', []),
-            'form_id' => $request->input('form_id', []),
+            'product_inn_id' => $request->input('product_inn_id', []),
+            'product_form_id' => $request->input('product_form_id', []),
             'country_id' => $request->input('country_id', []),
             'status_id' => $request->input('status_id', []),
             'dosage' => $request->input('dosage'),
@@ -53,12 +53,12 @@ class ProcessesSmartFilter
 
             // Product
             $processesQuery->whereHas('product', function ($productsQuery) use ($requestData) {
-                if (!empty($requestData['inn_id'])) {
-                    $productsQuery->whereIn('products.inn_id', $requestData['inn_id']);
+                if (!empty($requestData['product_inn_id'])) {
+                    $productsQuery->whereIn('products.inn_id', $requestData['product_inn_id']);
                 }
 
-                if (!empty($requestData['form_id'])) {
-                    $productsQuery->whereIn('products.form_id', $requestData['form_id']);
+                if (!empty($requestData['product_form_id'])) {
+                    $productsQuery->whereIn('products.form_id', $requestData['product_form_id']);
                 }
 
                 if ($requestData['dosage']) {
@@ -82,8 +82,8 @@ class ProcessesSmartFilter
                 $productsQuery->whereIn('products.manufacturer_id', $requestData['manufacturer_id']);
             }
 
-            if (!empty($requestData['form_id'])) {
-                $productsQuery->whereIn('products.form_id', $requestData['form_id']);
+            if (!empty($requestData['product_form_id'])) {
+                $productsQuery->whereIn('products.form_id', $requestData['product_form_id']);
             }
 
             if ($requestData['dosage']) {
@@ -117,8 +117,8 @@ class ProcessesSmartFilter
                 $productsQuery->whereIn('products.manufacturer_id', $requestData['manufacturer_id']);
             }
 
-            if (!empty($requestData['inn_id'])) {
-                $productsQuery->whereIn('products.inn_id', $requestData['inn_id']);
+            if (!empty($requestData['product_inn_id'])) {
+                $productsQuery->whereIn('products.inn_id', $requestData['product_inn_id']);
             }
 
             if ($requestData['dosage']) {
@@ -158,12 +158,12 @@ class ProcessesSmartFilter
                     $productsQuery->whereIn('products.manufacturer_id', $requestData['manufacturer_id']);
                 }
 
-                if (!empty($requestData['inn_id'])) {
-                    $productsQuery->whereIn('products.inn_id', $requestData['inn_id']);
+                if (!empty($requestData['product_inn_id'])) {
+                    $productsQuery->whereIn('products.inn_id', $requestData['product_inn_id']);
                 }
 
-                if (!empty($requestData['form_id'])) {
-                    $productsQuery->whereIn('products.form_id', $requestData['form_id']);
+                if (!empty($requestData['product_form_id'])) {
+                    $productsQuery->whereIn('products.form_id', $requestData['product_form_id']);
                 }
 
                 if ($requestData['dosage']) {
@@ -193,12 +193,12 @@ class ProcessesSmartFilter
                     $productsQuery->whereIn('products.manufacturer_id', $requestData['manufacturer_id']);
                 }
 
-                if (!empty($requestData['inn_id'])) {
-                    $productsQuery->whereIn('products.inn_id', $requestData['inn_id']);
+                if (!empty($requestData['product_inn_id'])) {
+                    $productsQuery->whereIn('products.inn_id', $requestData['product_inn_id']);
                 }
 
-                if (!empty($requestData['form_id'])) {
-                    $productsQuery->whereIn('products.form_id', $requestData['form_id']);
+                if (!empty($requestData['product_form_id'])) {
+                    $productsQuery->whereIn('products.form_id', $requestData['product_form_id']);
                 }
 
                 if ($requestData['dosage']) {

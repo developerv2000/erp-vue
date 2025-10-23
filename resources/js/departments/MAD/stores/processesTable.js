@@ -15,31 +15,46 @@ const defaultPaginationOptions = {
 };
 
 const defaultFilters = {
+    // Boolean
+    order_by_days_past_since_last_activity: null,
+    contracted_in_asp: null,
+    registered_in_asp: null,
+
     // Text fields
-    dosage: null,
-    pack: null,
+    product_dosage: null,
+    product_pack: null,
+    trademark_en: null,
+    trademark_ru: null,
 
     // Date ranges
+    active_status_start_date_range: null,
     created_at: null,
     updated_at: null,
 
     // Singular autocompletes
-    manufacturer_category_id: null,
+    deadline_status: null,
+    manufacturer_region: null,
+
+    // Singular id-based autocompletes
     manufacturer_analyst_user_id: null,
     manufacturer_bdm_user_id: null,
-
-    // Arrays
-    id: [],
+    responsible_person_id: null,
+    manufacturer_category_id: null,
 
     // Multiple autocompletes
-    inn_id: [],
+    general_status_name_for_analysts: [],
+    product_brand: [],
+    id: [],
+
+    // Multiple id-based autocompletes
+    product_inn_id: [],
     manufacturer_id: [],
-    form_id: [],
+    product_form_id: [],
+    country_id: [],
+    status_id: [],
+    status_general_status_id: [],
     manufacturer_country_id: [],
-    class_id: [],
-    brand: [],
-    shelf_life_id: [],
-    zones: [],
+    product_class_id: [],
 }
 
 const API_URL = route('api.processes.get');
@@ -79,13 +94,27 @@ export const useMADProcessesTableStore = defineStore('MADProcessesTable', {
             this.navigate_to_page = this.pagination.page;
 
             // Filters that don`t require normalization
-            this.filters.dosage = query.dosage;
-            this.filters.pack = query.pack;
+            // Boolean
+            this.order_by_days_past_since_last_activity = query.order_by_days_past_since_last_activity;
+            this.contracted_in_asp = query.contracted_in_asp;
+            this.registered_in_asp = query.registered_in_asp;
+            // Text fields
+            this.product_dosage = query.product_dosage;
+            this.product_pack = query.product_pack;
+            this.trademark_en = query.trademark_en;
+            this.trademark_ru = query.trademark_ru;
+            // Singular autocompletes
+            this.deadline_status = query.deadline_status;
+            this.manufacturer_region = query.manufacturer_region;
+            // Multiple autocompletes
+            this.general_status_name_for_analysts = query.general_status_name_for_analysts;
+            this.product_brand = query.product_brand;
+            this.id = query.id;
 
             // Normalize filters
-            normalizeSingleIDsFromQuery(this.filters, query, ['manufacturer_category_id', 'manufacturer_analyst_user_id', 'manufacturer_bdm_user_id']);
-            normalizeMultiIDsFromQuery(this.filters, query, ['id', 'inn_id', 'manufacturer_id', 'form_id', 'manufacturer_country_id', 'class_id', 'brand', 'shelf_life_id', 'zones']);
-            normalizeDateRangesFromQuery(this.filters, query, ['created_at', 'updated_at']);
+            normalizeSingleIDsFromQuery(this.filters, query, ['manufacturer_analyst_user_id', 'manufacturer_bdm_user_id', 'responsible_person_id', 'manufacturer_category_id']);
+            normalizeMultiIDsFromQuery(this.filters, query, ['product_inn_id', 'manufacturer_id', 'product_form_id', 'country_id', 'status_id', 'status_general_status_id', 'manufacturer_country_id', 'product_class_id']);
+            normalizeDateRangesFromQuery(this.filters, query, ['active_status_start_date_range', 'created_at', 'updated_at']);
 
             // Mark as initialized
             this.initializedFromInertiaPage = true;

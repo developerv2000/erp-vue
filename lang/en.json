@@ -6,6 +6,7 @@
     "Record": "Record",
     "Multiple records": "Multiple records",
     "History": "History",
+    "Order by deadline": "Order by deadline",
 
     "validations.required": "This field is required.",
     "validations.invalid": "The value is invalid.",
@@ -160,9 +161,11 @@
     "statuses.8Р" : "8Р",
 
     "Deadline": "Deadline",
+    "deadline.Status": "Deadline status",
     "deadline.Expired": "Expired",
-    "eadline.Not expired": "Not expired",
-    "eadline.No deadline": "No deadline",
+    "deadline.Not expired": "Not expired",
+    "deadline.No deadline": "No deadline",
+    "deadline.Order by deadline": "Order by deadline",
 
     "Days": "Days",
     "days.past": "Days past",
@@ -240,6 +243,8 @@
     "fields.Responsible": "Responsible",
     "fields.Responsible update date": "Responsible update date",
     "fields.Days have passed": "Days have passed",
+    "fields.Contracted in ASP": "Contracted in ASP",
+    "fields.Registered in ASP": "Registered in ASP",
 
     "AAAAAAAAAAAAAA": "AAAAAAAAAAAAAA"
 }

@@ -1,9 +1,9 @@
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, computed } from "vue";
 import { usePage } from "@inertiajs/vue3";
 import { useI18n } from "vue-i18n";
 import { Form, useForm, useFieldArray } from "vee-validate";
-import { object, string, number, array } from "yup";
+import { object, string, number, array, date } from "yup";
 import { useVeeFormFields } from "@/core/composables/useVeeFormFields";
 import { useFormData } from "@/core/composables/useFormData";
 import { useGlobalStore } from "@/core/stores/global";
@@ -40,7 +40,53 @@ const resetFormOnSuccess = ref(false);
 const statusStage = ref(1);
 
 // Yup schema
-const schema = object({});
+const schema = computed(() => {
+    const base = {
+        // Product
+        product_id: number().required(),
+        product_form_id: number().required(),
+        product_shelf_life_id: number().required(),
+        product_class_id: number().required(),
+        product_moq: number().nullable(),
+
+        // Main
+        status_id: number().required(),
+        country_ids: array().required().min(1),
+        responsible_person_id: number().required(),
+        created_at: date().nullable(),
+    };
+
+    // 2ПО
+    if (statusStage.value >= 2) {
+        base.clinical_trial_country_ids = array();
+    }
+
+    // 3АЦ
+    if (statusStage.value >= 3) {
+        base.manufacturer_first_offered_price = number().required();
+        base.manufacturer_followed_offered_price = number().nullable();
+        base.currency_id = number().required();
+        base.our_first_offered_price = number().required();
+        base.our_followed_offered_price = number().nullable();
+
+        base.marketing_authorization_holder_id =
+            statusStage.value >= 5 ? number().required() : number().nullable();
+
+        base.trademark_en =
+            statusStage.value >= 5 ? string().required() : string().nullable();
+
+        base.trademark_ru =
+            statusStage.value >= 5 ? string().required() : string().nullable();
+    }
+
+    // 4СЦ
+    if (statusStage.value >= 4) {
+        base.agreed_price = number().required();
+        base.increased_price = number().nullable();
+    }
+
+    return object(base);
+});
 
 // Default form values
 const defaultFields = {
@@ -99,7 +145,10 @@ const { values } = useVeeFormFields(Object.keys(defaultFields));
 watch(
     () => values.status_id,
     (value) => {
-        if (!value) statusStage.value = 1;
+        if (!value) {
+            statusStage.value = 1;
+            return;
+        }
 
         statusStage.value = page.props.restrictedStatuses.find(
             (s) => s.id == value

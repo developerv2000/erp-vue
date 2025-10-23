@@ -41,11 +41,6 @@ const actionAfterSuccessDelete = () => {
                     :actionOnSuccess="actionAfterSuccessDelete"
                 />
 
-                <NewRecordButton
-                    v-if="!store.isTrashPage"
-                    :link="route('mad.processes.create')"
-                />
-
                 <RestoreSelectedButton
                     v-if="store.isTrashPage"
                     :restore-link="route('mad.processes.restore')"

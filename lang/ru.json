@@ -130,10 +130,13 @@
     "dates.Start date": "Дата начала",
     "dates.End date": "Дата окончания",
     "dates.Duration days": "Длительность дней",
+    "dates.Historical": "Историческая дата",
 
     "Similar records": "Схожие записи",
     "similar records.Not found": "Схожие записи не найдены.",
 
+    "Product": "Продукт",
+    "product.About": "О продукте",
     "Products": "Продукты",
     "products.Matched ATX": "Соответствующий ATX",
 

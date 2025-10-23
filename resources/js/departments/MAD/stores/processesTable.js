@@ -95,21 +95,22 @@ export const useMADProcessesTableStore = defineStore('MADProcessesTable', {
 
             // Filters that don`t require normalization
             // Boolean
-            this.order_by_days_past_since_last_activity = query.order_by_days_past_since_last_activity;
-            this.contracted_in_asp = query.contracted_in_asp;
-            this.registered_in_asp = query.registered_in_asp;
+            this.filters.order_by_days_past_since_last_activity = query.order_by_days_past_since_last_activity;
+            this.filters.contracted_in_asp = query.contracted_in_asp;
+            this.filters.registered_in_asp = query.registered_in_asp;
             // Text fields
-            this.product_dosage = query.product_dosage;
-            this.product_pack = query.product_pack;
-            this.trademark_en = query.trademark_en;
-            this.trademark_ru = query.trademark_ru;
+            this.filters.product_dosage = query.product_dosage;
+            this.filters.product_pack = query.product_pack;
+
+            this.filters.trademark_en = query.trademark_en;
+            this.filters.trademark_ru = query.trademark_ru;
             // Singular autocompletes
-            this.deadline_status = query.deadline_status;
-            this.manufacturer_region = query.manufacturer_region;
+            this.filters.deadline_status = query.deadline_status;
+            this.filters.manufacturer_region = query.manufacturer_region;
             // Multiple autocompletes
-            this.general_status_name_for_analysts = query.general_status_name_for_analysts;
-            this.product_brand = query.product_brand;
-            this.id = query.id;
+            this.filters.general_status_name_for_analysts = query.general_status_name_for_analysts;
+            this.filters.product_brand = query.product_brand;
+            this.filters.id = query.id;
 
             // Normalize filters
             normalizeSingleIDsFromQuery(this.filters, query, ['manufacturer_analyst_user_id', 'manufacturer_bdm_user_id', 'responsible_person_id', 'manufacturer_category_id']);
@@ -133,7 +134,7 @@ export const useMADProcessesTableStore = defineStore('MADProcessesTable', {
 
                 // Filters
                 ...this.filters,
-                ...normalizeDateRangesToQueryFormat(this.filters, ['created_at', 'updated_at']),
+                ...normalizeDateRangesToQueryFormat(this.filters, ['active_status_start_date_range', 'created_at', 'updated_at']),
             };
 
             // Remove default pagination params if same as default

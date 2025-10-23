@@ -6,7 +6,6 @@
     "Record": "Record",
     "Multiple records": "Multiple records",
     "History": "History",
-    "Order by deadline": "Order by deadline",
 
     "validations.required": "This field is required.",
     "validations.invalid": "The value is invalid.",
@@ -127,6 +126,7 @@
     "dates.Start date": "Start date",
     "dates.End date": "End date",
     "dates.Duration days": "Duration days",
+    "dates.Historical": "Historical date",
 
     "filter.Filtered records": "Filtered records",
     "filter.Region": "Region",
@@ -135,6 +135,8 @@
     "Similar records": "Similar records",
     "similar records.Not found": "Similar records not found.",
 
+    "Product": "Product",
+    "product.About": "About product",
     "Products": "Products",
     "products.Matched ATX": "Matched ATX",
 

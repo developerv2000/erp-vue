@@ -122,17 +122,19 @@ class Product extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
             'index_link_of_related_processes',
             'matched_product_searches',
         ]);
-    }
 
+        'http://qwer.test/mad/products?manufacturer_id%5B%5D=20&product_inn_id%5B%5D=6&product_form_id%5B%5D=9&dosage=56&pack=42%20ML&initialize_from_inertia_page=1';
+    }
     // Used in products.index/trash pages table
     public function getIndexLinkOfRelatedProcessesAttribute(): string
     {
-        return route('mad.products.index', [
+        return route('mad.processes.index', [
             'manufacturer_id[]' => $this->manufacturer_id,
-            'inn_id[]' => $this->inn_id,
-            'form_id[]' => $this->form_id,
-            'dosage' => $this->dosage,
-            'pack' => $this->pack,
+            'product_inn_id[]' => $this->inn_id,
+            'product_form_id[]' => $this->form_id,
+            'product_dosage' => $this->dosage,
+            'product_pack' => $this->pack,
+            'initialize_from_inertia_page' => true,
         ]);
     }
 

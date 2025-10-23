@@ -26,7 +26,7 @@ const refreshSmartFilters = () => {
             product_form_id: store.filters.product_form_id,
             country_id: store.filters.country_id,
             status_id: store.filters.status_id,
-            dosage: store.filters.dosage,
+            product_dosage: store.filters.product_dosage,
         },
         only: ["smartFilterDependencies"],
         preserveUrl: true,

@@ -112,7 +112,7 @@ function handleTableOptionsUpdate(options) {
 
             <TdInertiaLink
                 :link="
-                    route('mad.products.create', {
+                    route('mad.processes.create', {
                         product_id: item.id,
                     })
                 "

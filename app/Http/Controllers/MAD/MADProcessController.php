@@ -11,6 +11,10 @@ use App\Models\MarketingAuthorizationHolder;
 use App\Models\Process;
 use App\Models\ProcessResponsiblePerson;
 use App\Models\ProcessStatus;
+use App\Models\Product;
+use App\Models\ProductClass;
+use App\Models\ProductForm;
+use App\Models\ProductShelfLife;
 use App\Models\User;
 use App\Support\FilterDependencies\SimpleFilters\MAD\ProcessesSimpleFilter;
 use App\Support\FilterDependencies\SmartFilters\MAD\ProcessesSmartFilter;
@@ -67,18 +71,25 @@ class MADProcessController extends Controller
         ]);
     }
 
-    public function create()
+    public function create(Request $request)
     {
-        // No lazy loads required, because AJAX request is used on store
         return Inertia::render('departments/MAD/pages/processes/Create', [
-            'countriesOrderedByProcessesCount' => Country::orderByProcessesCount()->get(),
-            'responsiblePeople' => ProcessResponsiblePerson::orderByName()->get(),
-            'defaultSelectedStatusIDs' => ProcessStatus::getDefaultSelectedIDValue(),
-            'countriesOrderedByName' => Country::orderByName()->get(),
-            'currencies' => Currency::orderByName()->get(),
-            'MAHs' => MarketingAuthorizationHolder::orderByName()->get(),
-            'defaultSelectedMAHID' => MarketingAuthorizationHolder::getDefaultSelectedIDValue(),
-            'defaultSelectedCurrencyID' => Currency::getDefaultIdValueForMADProcesses(),
+            // Refetched after creating without redirect
+            'product' => Product::withBasicRelations()->findOrFail($request->input('product_id')),
+
+            // Lazy loads. Never refetched again
+            'restrictedStatuses' => fn() => ProcessStatus::getAllRestrictedByPermissions()->load('generalStatus'), // IMPORTANT
+            'productForms' => fn() => ProductForm::getMinifiedRecordsWithName(),
+            'shelfLifes' => fn() => ProductShelfLife::all(),
+            'productClasses' => fn() => ProductClass::orderByName()->get(),
+            'countriesOrderedByProcessesCount' => fn() => Country::orderByProcessesCount()->get(),
+            'responsiblePeople' => fn() => ProcessResponsiblePerson::orderByName()->get(),
+            'countriesOrderedByName' => fn() => Country::orderByName()->get(),
+            'currencies' => fn() => Currency::orderByName()->get(),
+            'MAHs' => fn() => MarketingAuthorizationHolder::orderByName()->get(),
+            'defaultSelectedStatusID' => fn() => ProcessStatus::getSelectedIDByDefault(),
+            'defaultSelectedMAHID' => fn() => MarketingAuthorizationHolder::getDefaultSelectedIDValue(),
+            'defaultSelectedCurrencyID' => fn() => Currency::getDefaultIdValueForMADProcesses(),
         ]);
     }
 

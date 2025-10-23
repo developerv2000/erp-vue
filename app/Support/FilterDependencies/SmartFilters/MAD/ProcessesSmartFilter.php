@@ -33,7 +33,7 @@ class ProcessesSmartFilter
             'product_form_id' => $request->input('product_form_id', []),
             'country_id' => $request->input('country_id', []),
             'status_id' => $request->input('status_id', []),
-            'dosage' => $request->input('dosage'),
+            'product_dosage' => $request->input('product_dosage'),
         ];
     }
 
@@ -61,8 +61,8 @@ class ProcessesSmartFilter
                     $productsQuery->whereIn('products.form_id', $requestData['product_form_id']);
                 }
 
-                if ($requestData['dosage']) {
-                    $productsQuery->where('products.dosage', $requestData['dosage']);
+                if ($requestData['product_dosage']) {
+                    $productsQuery->where('products.dosage', $requestData['product_dosage']);
                 }
             });
         });
@@ -86,8 +86,8 @@ class ProcessesSmartFilter
                 $productsQuery->whereIn('products.form_id', $requestData['product_form_id']);
             }
 
-            if ($requestData['dosage']) {
-                $productsQuery->where('products.dosage', $requestData['dosage']);
+            if ($requestData['product_dosage']) {
+                $productsQuery->where('products.dosage', $requestData['product_dosage']);
             }
 
             // Process
@@ -121,8 +121,8 @@ class ProcessesSmartFilter
                 $productsQuery->whereIn('products.inn_id', $requestData['product_inn_id']);
             }
 
-            if ($requestData['dosage']) {
-                $productsQuery->where('products.dosage', $requestData['dosage']);
+            if ($requestData['product_dosage']) {
+                $productsQuery->where('products.dosage', $requestData['product_dosage']);
             }
 
             // Process
@@ -166,8 +166,8 @@ class ProcessesSmartFilter
                     $productsQuery->whereIn('products.form_id', $requestData['product_form_id']);
                 }
 
-                if ($requestData['dosage']) {
-                    $productsQuery->where('products.dosage', $requestData['dosage']);
+                if ($requestData['product_dosage']) {
+                    $productsQuery->where('products.dosage', $requestData['product_dosage']);
                 }
             });
         });
@@ -201,8 +201,8 @@ class ProcessesSmartFilter
                     $productsQuery->whereIn('products.form_id', $requestData['product_form_id']);
                 }
 
-                if ($requestData['dosage']) {
-                    $productsQuery->where('products.dosage', $requestData['dosage']);
+                if ($requestData['product_dosage']) {
+                    $productsQuery->where('products.dosage', $requestData['product_dosage']);
                 }
             });
         });

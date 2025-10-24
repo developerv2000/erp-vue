@@ -16,6 +16,11 @@ export default function useAuth() {
         return hasRole("Global administrator")
     }
 
+    const isAnyAdministrator = () => {
+        return hasRole("Global administrator")
+            || hasRole("MAD administrator")
+    }
+
     const getDenyingPermission = (permissionName) => {
         return permissionName.replace(/^can-/, "can-not-")
     }
@@ -91,6 +96,7 @@ export default function useAuth() {
         isLoggedIn,
         hasRole,
         isGlobalAdministrator,
+        isAnyAdministrator,
         can,
         canAny,
         owns,

@@ -1,43 +1,40 @@
 <script setup>
-import { ref, watch, computed } from "vue";
-import { router, usePage } from "@inertiajs/vue3";
+import { ref, computed, watch } from "vue";
+import { usePage, router } from "@inertiajs/vue3";
 import { useI18n } from "vue-i18n";
-import { Form, useForm, useFieldArray } from "vee-validate";
-import { object, string, number, array, date } from "yup";
+import { Form, useForm } from "vee-validate";
+import { object, string, number, array } from "yup";
 import { useVeeFormFields } from "@/core/composables/useVeeFormFields";
 import { useFormData } from "@/core/composables/useFormData";
 import { useMessagesStore } from "@/core/stores/messages";
-import axios from "axios";
+import useAuth from "@/core/composables/useAuth";
 
 import DefaultSheet from "@/core/components/containers/DefaultSheet.vue";
 import DefaultTitle from "@/core/components/titles/DefaultTitle.vue";
-import AboutProduct from "../../products/partials/AboutProduct.vue";
-import ProcessesEditProductBlock from "./ProcessesEditProductBlock.vue";
 import DefaultTextField from "@/core/components/form/inputs/DefaultTextField.vue";
 import DefaultAutocomplete from "@/core/components/form/inputs/DefaultAutocomplete.vue";
 import DefaultWysiwyg from "@/core/components/form/inputs/DefaultWysiwyg.vue";
-import DefaultDateInput from "@/core/components/form/inputs/DefaultDateInput.vue";
 import DefaultNumberInput from "@/core/components/form/inputs/DefaultNumberInput.vue";
 import FormActionsContainer from "@/core/components/form/containers/FormActionsContainer.vue";
 import FormResetButton from "@/core/components/form/buttons/FormResetButton.vue";
-import FormStoreAndRedirectBack from "@/core/components/form/buttons/FormStoreAndRedirectBack.vue";
-import FormStoreAndReset from "@/core/components/form/buttons/FormStoreAndReset.vue";
-import FormStoreWithoutReseting from "@/core/components/form/buttons/FormStoreWithoutReseting.vue";
-import ProcessesCreateCountriesBlock from "./ProcessesCreateCountriesBlock.vue";
-import { removeDateTimezonesForQuery } from "@/core/scripts/queryHelper";
+import FormUpdateAndRedirectBack from "@/core/components/form/buttons/FormUpdateAndRedirectBack.vue";
+import FormUpdateWithourRedirect from "@/core/components/form/buttons/FormUpdateWithourRedirect.vue";
+import AboutProduct from "../../products/partials/AboutProduct.vue";
+import ProcessesEditProductBlock from "./ProcessesEditProductBlock.vue";
 
 // Dependencies
 const { t } = useI18n();
 const { objectToFormData } = useFormData();
 const page = usePage();
 const messages = useMessagesStore();
+const { isAnyAdministrator } = useAuth();
 
+const record = computed(() => page.props.record);
 const loading = ref(false);
 const redirectBack = ref(false);
-const resetFormOnSuccess = ref(false);
 
 // Depends on 'status_id' field and updated using watch()
-const statusStage = ref(1);
+const statusStage = ref(record.value.status.general_status.stage);
 
 // Yup schema
 const schema = computed(() => {
@@ -51,33 +48,34 @@ const schema = computed(() => {
 
         // Main
         status_id: number().required(),
-        country_ids: array().required().min(1),
+        country_id: number().required(),
         responsible_person_id: number().required(),
-        created_at: date().nullable(),
-
-        // Dynamic countries with forecasts
-        countries: array().of(
-            object({
-                country_id: number().required(),
-                forecast_year_1: number().required(),
-                forecast_year_2: number().required(),
-                forecast_year_3: number().required(),
-            })
-        ),
     };
 
     // 2ПО
     if (statusStage.value >= 2) {
+        base.forecast_year_1 = number().required();
+        base.forecast_year_2 = number().required();
+        base.forecast_year_3 = number().required();
         base.clinical_trial_country_ids = array();
     }
 
     // 3АЦ
     if (statusStage.value >= 3) {
         base.manufacturer_first_offered_price = number().required();
-        base.manufacturer_followed_offered_price = number().nullable();
+
+        base.manufacturer_followed_offered_price = record.value
+            .manufacturer_followed_offered_price
+            ? number().required()
+            : number().nullable();
+
         base.currency_id = number().required();
         base.our_first_offered_price = number().required();
-        base.our_followed_offered_price = number().nullable();
+
+        base.our_followed_offered_price = record.value
+            .our_followed_offered_price
+            ? number().required()
+            : number().nullable();
 
         base.marketing_authorization_holder_id =
             statusStage.value >= 5 ? number().required() : number().nullable();
@@ -98,66 +96,81 @@ const schema = computed(() => {
     return object(base);
 });
 
-// Default form values
-const defaultFields = computed(() => {
-    return {
-        // Product
-        product_id: page.props.product.id,
-        product_form_id: page.props.product.form_id,
-        product_dosage: page.props.product.dosage,
-        product_pack: page.props.product.pack,
-        product_shelf_life_id: page.props.product.shelf_life_id,
-        product_class_id: page.props.product.class_id,
-        product_moq: page.props.product.moq,
+// Backend-driven values (reactive to record)
+const baseInitialValues = computed(() => ({
+    // Product
+    product_id: record.value.product_id,
+    product_form_id: record.value.product.form_id,
+    product_dosage: record.value.product.dosage,
+    product_pack: record.value.product.pack,
+    product_shelf_life_id: record.value.product.shelf_life_id,
+    product_class_id: record.value.product.class_id,
+    product_moq: record.value.product.moq,
 
-        // Main
-        status_id: page.props.defaultSelectedStatusID,
-        country_ids: [],
-        responsible_person_id: null,
-        created_at: null,
-        countries: [], // dynamic array
-        comment: null,
+    // Main
+    status_id: record.value.status_id,
+    country_id: record.value.country_id,
+    responsible_person_id: record.value.responsible_person_id,
+    comment: null,
 
-        // 2ПО
-        down_payment_1: null,
-        down_payment_2: null,
-        down_payment_condition: null,
-        dossier_status: null,
-        clinical_trial_year: null,
-        clinical_trial_country_ids: [],
-        clinical_trial_ich_country: null,
+    // 2ПО
+    forecast_year_1: record.value.forecast_year_1,
+    forecast_year_2: record.value.forecast_year_2,
+    forecast_year_3: record.value.forecast_year_3,
+    down_payment_1: record.value.down_payment_1,
+    down_payment_2: record.value.down_payment_2,
+    down_payment_condition: record.value.down_payment_condition,
+    dossier_status: record.value.dossier_status,
+    clinical_trial_year: record.value.clinical_trial_year,
+    clinical_trial_country_ids: record.value.clinical_trial_countries.map(
+        (c) => c.id
+    ),
+    clinical_trial_ich_country: record.value.clinical_trial_ich_country,
 
-        // 3АЦ
-        manufacturer_first_offered_price: null,
-        manufacturer_followed_offered_price: null,
-        currency_id: page.props.defaultSelectedCurrencyID,
-        our_first_offered_price: null,
-        our_followed_offered_price: null,
-        marketing_authorization_holder_id: page.props.defaultSelectedMAHID,
-        trademark_en: null,
-        trademark_ru: null,
+    // 3АЦ
+    manufacturer_first_offered_price:
+        record.value.manufacturer_first_offered_price,
 
-        // 4СЦ
-        agreed_price: null,
-        increased_price: null,
-    };
-});
+    manufacturer_followed_offered_price:
+        record.value.manufacturer_followed_offered_price,
+
+    currency_id:
+        record.value.currency_id ?? page.props.defaultSelectedCurrencyID,
+
+    our_first_offered_price: record.value.our_first_offered_price,
+    our_followed_offered_price: record.value.our_followed_offered_price,
+
+    marketing_authorization_holder_id:
+        record.value.marketing_authorization_holder_id ??
+        page.props.defaultSelectedMAHID,
+
+    trademark_en: record.value.trademark_en,
+    trademark_ru: record.value.trademark_ru,
+
+    // 4СЦ
+    agreed_price: record.value.agreed_price,
+    increased_price: record.value.increased_price,
+}));
+
+// Always-reset values
+const extraResetValues = {
+    comment: null,
+};
+
+// Merged initial values
+const mergedInitialValues = computed(() => ({
+    ...baseInitialValues.value,
+    ...extraResetValues,
+}));
 
 // VeeValidate form
-const { errors, handleSubmit, resetForm, setErrors, meta } = useForm({
+const { handleSubmit, errors, setErrors, resetForm, meta } = useForm({
     validationSchema: schema,
-    initialValues: { ...defaultFields.value },
+    initialValues: mergedInitialValues.value,
 });
 
 // Get form values as ref
-const { values } = useVeeFormFields(Object.keys(defaultFields.value));
-
-// Get form dynamic 'countries' array
-const {
-    fields: countriesFields,
-    push: pushCountry,
-    remove: removeCountry,
-} = useFieldArray("countries");
+const { values } = useVeeFormFields(Object.keys(mergedInitialValues.value));
 
 // Watch 'status_id' field and update 'statusStage' accordingly
 watch(
@@ -174,51 +187,23 @@ watch(
     }
 );
 
-// Watch "country_ids" and sync the 'countries' field array
-watch(
-    () => values.country_ids,
-    (ids = []) => {
-        // Push missing countries
-        for (const id of ids) {
-            const exists = countriesFields.value.some(
-                (field) => field.value.country_id === id
-            );
-            if (!exists) {
-                pushCountry({
-                    country_id: id,
-                    forecast_year_1: null,
-                    forecast_year_2: null,
-                    forecast_year_3: null,
-                });
-            }
-        }
-
-        // Remove countries that were unselected
-        for (let i = countriesFields.value.length - 1; i >= 0; i--) {
-            const countryId = countriesFields.value[i].value.country_id;
-            if (!ids.includes(countryId)) {
-                removeCountry(i);
-            }
-        }
-    },
-    { deep: true, immediate: true } // sync immediately and track nested changes
-);
-
 // Submit handler
 const submit = handleSubmit((values) => {
-    loading.value = true;
-    removeDateTimezonesForQuery(values, ["created_at"]);
     const formData = objectToFormData(values);
+    loading.value = true;
 
     axios
-        .post(route("mad.processes.store"), formData)
+        .post(
+            route("mad.processes.update", { record: record.value.id }),
+            formData
+        )
         .then(() => {
-            messages.addCreatedSuccessfullyMessage();
+            messages.addUpdatedSuccessfullyMessage();
 
             if (redirectBack.value) {
                 window.history.back();
             } else {
-                reloadUpdatedDataAndResetForm();
+                reloadRequiredDataAndResetForm();
             }
         })
         .catch((error) => {
@@ -234,15 +219,13 @@ const submit = handleSubmit((values) => {
         });
 });
 
-const reloadUpdatedDataAndResetForm = () => {
+const reloadRequiredDataAndResetForm = () => {
     router.reload({
-        only: ["product"],
+        only: ["record", "breadcrumbs"],
         onSuccess: () => {
-            if (resetFormOnSuccess.value) {
-                resetForm({
-                    values: defaultFields.value,
-                });
-            }
+            resetForm({
+                values: mergedInitialValues.value,
+            });
         },
     });
 };
@@ -250,7 +233,7 @@ const reloadUpdatedDataAndResetForm = () => {
 
 <template>
     <Form class="d-flex flex-column ga-6 pb-8" enctype="multipart/form-data">
-        <AboutProduct :product="page.props.product" />
+        <AboutProduct :product="record.product" />
         <ProcessesEditProductBlock :values="values" :errors="errors" />
 
         <!-- Main -->
@@ -259,23 +242,31 @@ const reloadUpdatedDataAndResetForm = () => {
 
             <v-row>
                 <v-col cols="4">
+                    <!-- Requires permission  -->
                     <DefaultAutocomplete
                         :label="t('fields.Status')"
                         :items="page.props.restrictedStatuses"
                         v-model="values.status_id"
                         :error-messages="errors.status_id"
+                        :disabled="
+                            !record.current_status_can_be_edited_for_auth_user
+                        "
                         required
                     />
                 </v-col>
 
                 <v-col cols="4">
+                    <!-- Only admins can edit 'country_id' after stage 1 -->
                     <DefaultAutocomplete
                         :label="t('fields.Search country')"
                         item-title="code"
                         :items="page.props.countriesOrderedByProcessesCount"
-                        v-model="values.country_ids"
-                        :error-messages="errors.country_ids"
-                        multiple
+                        v-model="values.country_id"
+                        :error-messages="errors.country_id"
+                        :disabled="
+                            record.status.general_status.stage > 1 &&
+                            !isAnyAdministrator()
+                        "
                         required
                     />
                 </v-col>
@@ -289,29 +280,48 @@ const reloadUpdatedDataAndResetForm = () => {
                         required
                     />
                 </v-col>
-
-                <v-col cols="4">
-                    <DefaultDateInput
-                        :label="t('dates.Historical')"
-                        v-model="values.created_at"
-                        :error-messages="errors.created_at"
-                    />
-                </v-col>
             </v-row>
         </DefaultSheet>
 
-        <!-- Dynamic countries with forecasts -->
+        <!-- 2ПО -->
         <v-slide-y-transition>
-            <ProcessesCreateCountriesBlock
-                v-if="values.country_ids.length"
-                :fields="countriesFields"
-                :errors="errors"
-                :push="pushCountry"
-                :remove="removeCountry"
-            />
+            <DefaultSheet v-if="statusStage >= 2">
+                <DefaultTitle>{{ t("fields.Forecasts") }}</DefaultTitle>
+
+                <v-row>
+                    <v-col>
+                        <DefaultNumberInput
+                            v-model="values.forecast_year_1"
+                            :label="t('fields.Forecast 1 year')"
+                            :error-messages="errors.forecast_year_1"
+                            :min="0"
+                            required
+                        />
+                    </v-col>
+
+                    <v-col>
+                        <DefaultNumberInput
+                            v-model="values.forecast_year_2"
+                            :label="t('fields.Forecast 2 year')"
+                            :error-messages="errors.forecast_year_2"
+                            :min="0"
+                            required
+                        />
+                    </v-col>
+
+                    <v-col>
+                        <DefaultNumberInput
+                            v-model="values.forecast_year_3"
+                            :label="t('fields.Forecast 3 year')"
+                            :error-messages="errors.forecast_year_3"
+                            :min="0"
+                            required
+                        />
+                    </v-col>
+                </v-row>
+            </DefaultSheet>
         </v-slide-y-transition>
 
-        <!-- 2ПО -->
         <v-slide-y-transition>
             <DefaultSheet v-if="statusStage >= 2">
                 <DefaultTitle>2ПО</DefaultTitle>
@@ -385,6 +395,7 @@ const reloadUpdatedDataAndResetForm = () => {
 
                 <v-row>
                     <v-col cols="4">
+                        <!-- Readonly when 'manufacturer_followed_offered_price' is filled -->
                         <DefaultNumberInput
                             :label="t('fields.Manufacturer price 1')"
                             v-model="values.manufacturer_first_offered_price"
@@ -394,11 +405,16 @@ const reloadUpdatedDataAndResetForm = () => {
                             :min="0"
                             :precision="2"
                             :step="0.01"
+                            :disabled="
+                                record.manufacturer_followed_offered_price !=
+                                null
+                            "
                             required
                         />
                     </v-col>
 
                     <v-col cols="4">
+                        <!-- Required when its was already filled -->
                         <DefaultNumberInput
                             :label="t('fields.Manufacturer price 2')"
                             v-model="values.manufacturer_followed_offered_price"
@@ -408,7 +424,10 @@ const reloadUpdatedDataAndResetForm = () => {
                             :min="0"
                             :precision="2"
                             :step="0.01"
-                            required
+                            :required="
+                                record.manufacturer_followed_offered_price !=
+                                null
+                            "
                         />
                     </v-col>
 
@@ -423,6 +442,7 @@ const reloadUpdatedDataAndResetForm = () => {
                     </v-col>
 
                     <v-col cols="4">
+                        <!-- Readonly when 'our_followed_offered_price' is filled -->
                         <DefaultNumberInput
                             :label="t('fields.Our price 1')"
                             v-model="values.our_first_offered_price"
@@ -430,11 +450,15 @@ const reloadUpdatedDataAndResetForm = () => {
                             :min="0"
                             :precision="2"
                             :step="0.01"
+                            :disabled="
+                                record.our_followed_offered_price != null
+                            "
                             required
                         />
                     </v-col>
 
                     <v-col cols="4">
+                        <!-- Required when its was already filled -->
                         <DefaultNumberInput
                             :label="t('fields.Our price 2')"
                             v-model="values.our_followed_offered_price"
@@ -442,6 +466,9 @@ const reloadUpdatedDataAndResetForm = () => {
                             :min="0"
                             :precision="2"
                             :step="0.01"
+                            :required="
+                                record.our_followed_offered_price != null
+                            "
                         />
                     </v-col>
 
@@ -516,23 +543,30 @@ const reloadUpdatedDataAndResetForm = () => {
         <!-- Comment -->
         <DefaultSheet>
             <v-row>
-                <v-col cols="12">
+                <v-col>
                     <DefaultWysiwyg
                         v-model="values.comment"
-                        :label="t('Comment')"
+                        :label="t('comments.New')"
+                        :error-messages="errors.comment"
                         folder="comments"
+                    />
+                </v-col>
+
+                <v-col v-if="record.last_comment">
+                    <DefaultWysiwyg
+                        v-model="record.last_comment.body"
+                        :label="t('comments.Last')"
+                        disabled
                     />
                 </v-col>
             </v-row>
         </DefaultSheet>
 
-        <!-- Actions -->
         <FormActionsContainer>
-            <FormResetButton @click="resetForm()" :loading="loading" />
+            <FormResetButton @click="resetForm" :loading="loading" />
 
-            <FormStoreAndRedirectBack
+            <FormUpdateAndRedirectBack
                 @click="
-                    resetFormOnSuccess = true;
                     redirectBack = true;
                     submit();
                 "
@@ -540,19 +574,8 @@ const reloadUpdatedDataAndResetForm = () => {
                 :disabled="!meta.valid"
             />
 
-            <FormStoreAndReset
+            <FormUpdateWithourRedirect
                 @click="
-                    resetFormOnSuccess = true;
-                    redirectBack = false;
-                    submit();
-                "
-                :loading="loading"
-                :disabled="!meta.valid"
-            />
-
-            <FormStoreWithoutReseting
-                @click="
-                    resetFormOnSuccess = false;
                     redirectBack = false;
                     submit();
                 "

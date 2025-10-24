@@ -101,7 +101,7 @@ function handleTableOptionsUpdate(options) {
         </template>
 
         <template v-slot:item.duplicate="{ item }">
-            <TdDuplicateButton :link="route('mad.processes.edit', item.id)" />
+            <TdDuplicateButton :link="route('mad.processes.duplicate', item.id)" />
         </template>
 
         <template v-slot:item.last_status_date="{ item }">

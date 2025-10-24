@@ -72,6 +72,13 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
     protected function casts(): array
     {
         return [
+            'manufacturer_first_offered_price' => 'float',
+            'manufacturer_followed_offered_price' => 'float',
+            'our_first_offered_price' => 'float',
+            'our_followed_offered_price' => 'float',
+            'agreed_price' => 'float',
+            'increased_price' => 'float',
+
             'forecast_year_1_update_date' => 'date',
             'increased_price_date' => 'date',
             'responsible_person_update_date' => 'date',
@@ -276,6 +283,17 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
     public function getIsReadyForOrderAttribute(): bool
     {
         return $this->readiness_for_order_date ? true : false;
+    }
+
+    /**
+     * Check wether current status of process can be edited by authenticated user or not.
+     *
+     * Used in processes.edit page.
+     */
+    public function getCurrentStatusCanBeEditedForAuthUserAttribute(): bool
+    {
+        return Gate::allows('upgrade-MAD-VPS-status-after-contract-stage')
+            || !$this->status->generalStatus->requires_permission;
     }
 
     /*
@@ -1297,17 +1315,6 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
         if ($this->product->manufacturer->analyst_user_id != $userID) {
             Gate::authorize('edit-MAD-VPS-of-all-analysts');
         }
-    }
-
-    /**
-     * Check wether current status of process can be edited by authenticated user or not.
-     *
-     * Used in processes.edit page.
-     */
-    public function currentStatusCanBeEditedForAuthtUser()
-    {
-        return Gate::allows('upgrade-MAD-VPS-status-after-contract-stage')
-            || !$this->status->generalStatus->requires_permission;
     }
 
     /**

@@ -94,6 +94,36 @@ class MADProcessController extends Controller
     }
 
     /**
+     * Route model binding is not used, because trashed records can also be duplicated
+     *
+     * AJAX "mad.processes.store" route is also used for duplication, almost the same as creation!
+     */
+    public function duplicate(Request $request, $record)
+    {
+        // Secure route
+        $fetchedRecord = Process::withBasicRelations()->findOrFail($record);
+        $fetchedRecord->ensureAuthUserHasAccessToProcess($request);
+
+        return Inertia::render('departments/MAD/pages/processes/Duplicate', [
+            // Never refetched again
+            'record' => $fetchedRecord,
+
+            // Lazy loads. Never refetched again
+            'restrictedStatuses' => fn() => ProcessStatus::getAllRestrictedByPermissions()->load('generalStatus'), // IMPORTANT
+            'productForms' => fn() => ProductForm::getMinifiedRecordsWithName(),
+            'shelfLifes' => fn() => ProductShelfLife::all(),
+            'productClasses' => fn() => ProductClass::orderByName()->get(),
+            'countriesOrderedByProcessesCount' => fn() => Country::orderByProcessesCount()->get(),
+            'responsiblePeople' => fn() => ProcessResponsiblePerson::orderByName()->get(),
+            'countriesOrderedByName' => fn() => Country::orderByName()->get(),
+            'currencies' => fn() => Currency::orderByName()->get(),
+            'MAHs' => fn() => MarketingAuthorizationHolder::orderByName()->get(),
+            'defaultSelectedMAHID' => fn() => MarketingAuthorizationHolder::getDefaultSelectedIDValue(),
+            'defaultSelectedCurrencyID' => fn() => Currency::getDefaultIdValueForMADProcesses(),
+        ]);
+    }
+
+    /**
      * AJAX request
      */
     public function store(ProcessStoreRequest $request)
@@ -120,7 +150,10 @@ class MADProcessController extends Controller
             ->findOrFail($record);
 
         $fetchedRecord->appendBasicAttributes();
-        $fetchedRecord->append('title'); // Used on generating breadcrumbs
+        $fetchedRecord->append([
+            'title', // Used on generating breadcrumbs
+            'current_status_can_be_edited_for_auth_user' // Used on "status_id" field
+        ]);
 
         return Inertia::render('departments/MAD/pages/processes/Edit', [
             // Refetched after record update
@@ -128,9 +161,12 @@ class MADProcessController extends Controller
             'breadcrumbs' => $fetchedRecord->generateBreadcrumbs('MAD'),
 
             // Lazy loads. Never refetched again
+            'restrictedStatuses' => fn() => ProcessStatus::getAllRestrictedByPermissions()->load('generalStatus'), // IMPORTANT
+            'productForms' => fn() => ProductForm::getMinifiedRecordsWithName(),
+            'shelfLifes' => fn() => ProductShelfLife::all(),
+            'productClasses' => fn() => ProductClass::orderByName()->get(),
             'countriesOrderedByProcessesCount' => fn() => Country::orderByProcessesCount()->get(),
             'responsiblePeople' => fn() => ProcessResponsiblePerson::orderByName()->get(),
-            'defaultSelectedStatusIDs' => fn() => ProcessStatus::getDefaultSelectedIDValue(),
             'countriesOrderedByName' => fn() => Country::orderByName()->get(),
             'currencies' => fn() => Currency::orderByName()->get(),
             'MAHs' => fn() => MarketingAuthorizationHolder::orderByName()->get(),

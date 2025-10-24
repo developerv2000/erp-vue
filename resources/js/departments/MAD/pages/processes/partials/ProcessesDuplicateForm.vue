@@ -1,6 +1,6 @@
 <script setup>
 import { ref, watch, computed } from "vue";
-import { router, usePage } from "@inertiajs/vue3";
+import { usePage } from "@inertiajs/vue3";
 import { useI18n } from "vue-i18n";
 import { Form, useForm, useFieldArray } from "vee-validate";
 import { object, string, number, array, date } from "yup";
@@ -20,11 +20,9 @@ import DefaultDateInput from "@/core/components/form/inputs/DefaultDateInput.vue
 import DefaultNumberInput from "@/core/components/form/inputs/DefaultNumberInput.vue";
 import FormActionsContainer from "@/core/components/form/containers/FormActionsContainer.vue";
 import FormResetButton from "@/core/components/form/buttons/FormResetButton.vue";
-import FormStoreAndRedirectBack from "@/core/components/form/buttons/FormStoreAndRedirectBack.vue";
-import FormStoreAndReset from "@/core/components/form/buttons/FormStoreAndReset.vue";
-import FormStoreWithoutReseting from "@/core/components/form/buttons/FormStoreWithoutReseting.vue";
 import ProcessesCreateCountriesBlock from "./ProcessesCreateCountriesBlock.vue";
 import { removeDateTimezonesForQuery } from "@/core/scripts/queryHelper";
+import FormDuplicateAndRedirectBack from "@/core/components/form/buttons/FormDuplicateAndRedirectBack.vue";
 
 // Dependencies
 const { t } = useI18n();
@@ -33,11 +31,10 @@ const page = usePage();
 const messages = useMessagesStore();
 
 const loading = ref(false);
-const redirectBack = ref(false);
-const resetFormOnSuccess = ref(false);
+const record = page.props.record;
 
 // Depends on 'status_id' field and updated using watch()
-const statusStage = ref(1);
+const statusStage = ref(record.status.general_status.stage);
 
 // Yup schema
 const schema = computed(() => {
@@ -102,44 +99,55 @@ const schema = computed(() => {
 const defaultFields = computed(() => {
     return {
         // Product
-        product_id: page.props.product.id,
-        product_form_id: page.props.product.form_id,
-        product_dosage: page.props.product.dosage,
-        product_pack: page.props.product.pack,
-        product_shelf_life_id: page.props.product.shelf_life_id,
-        product_class_id: page.props.product.class_id,
-        product_moq: page.props.product.moq,
+        product_id: record.product_id,
+        product_form_id: record.product.form_id,
+        product_dosage: record.product.dosage,
+        product_pack: record.product.pack,
+        product_shelf_life_id: record.product.shelf_life_id,
+        product_class_id: record.product.class_id,
+        product_moq: record.product.moq,
 
         // Main
-        status_id: page.props.defaultSelectedStatusID,
+        status_id: record.status_id,
         country_ids: [],
-        responsible_person_id: null,
+        responsible_person_id: record.responsible_person_id,
         created_at: null,
         countries: [], // dynamic array
         comment: null,
 
         // 2ПО
-        down_payment_1: null,
-        down_payment_2: null,
-        down_payment_condition: null,
-        dossier_status: null,
-        clinical_trial_year: null,
-        clinical_trial_country_ids: [],
-        clinical_trial_ich_country: null,
+        down_payment_1: record.down_payment_1,
+        down_payment_2: record.down_payment_2,
+        down_payment_condition: record.down_payment_condition,
+        dossier_status: record.dossier_status,
+        clinical_trial_year: record.clinical_trial_year,
+        clinical_trial_country_ids: record.clinical_trial_countries.map(
+            (c) => c.id
+        ),
+        clinical_trial_ich_country: record.clinical_trial_ich_country,
 
         // 3АЦ
-        manufacturer_first_offered_price: null,
-        manufacturer_followed_offered_price: null,
-        currency_id: page.props.defaultSelectedCurrencyID,
-        our_first_offered_price: null,
-        our_followed_offered_price: null,
-        marketing_authorization_holder_id: page.props.defaultSelectedMAHID,
-        trademark_en: null,
-        trademark_ru: null,
+        manufacturer_first_offered_price:
+            record.manufacturer_first_offered_price,
+
+        manufacturer_followed_offered_price:
+            record.manufacturer_followed_offered_price,
+
+        currency_id: record.currency_id ?? page.props.defaultSelectedCurrencyID,
+
+        our_first_offered_price: record.our_first_offered_price,
+        our_followed_offered_price: record.our_followed_offered_price,
+
+        marketing_authorization_holder_id:
+            record.marketing_authorization_holder_id ??
+            page.props.defaultSelectedMAHID,
+
+        trademark_en: record.trademark_en,
+        trademark_ru: record.trademark_ru,
 
         // 4СЦ
-        agreed_price: null,
-        increased_price: null,
+        agreed_price: record.agreed_price,
+        increased_price: record.increased_price,
     };
 });
 
@@ -214,12 +222,7 @@ const submit = handleSubmit((values) => {
         .post(route("mad.processes.store"), formData)
         .then(() => {
             messages.addCreatedSuccessfullyMessage();
-
-            if (redirectBack.value) {
-                window.history.back();
-            } else {
-                reloadUpdatedDataAndResetForm();
-            }
+            window.history.back();
         })
         .catch((error) => {
             if (error.response?.status === 422) {
@@ -233,24 +236,11 @@ const submit = handleSubmit((values) => {
             loading.value = false;
         });
 });
-
-const reloadUpdatedDataAndResetForm = () => {
-    router.reload({
-        only: ["product"],
-        onSuccess: () => {
-            if (resetFormOnSuccess.value) {
-                resetForm({
-                    values: defaultFields.value,
-                });
-            }
-        },
-    });
-};
 </script>
 
 <template>
     <Form class="d-flex flex-column ga-6 pb-8" enctype="multipart/form-data">
-        <AboutProduct :product="page.props.product" />
+        <AboutProduct :product="record.product" />
         <ProcessesEditProductBlock :values="values" :errors="errors" />
 
         <!-- Main -->
@@ -530,32 +520,8 @@ const reloadUpdatedDataAndResetForm = () => {
         <FormActionsContainer>
             <FormResetButton @click="resetForm()" :loading="loading" />
 
-            <FormStoreAndRedirectBack
-                @click="
-                    resetFormOnSuccess = true;
-                    redirectBack = true;
-                    submit();
-                "
-                :loading="loading"
-                :disabled="!meta.valid"
-            />
-
-            <FormStoreAndReset
-                @click="
-                    resetFormOnSuccess = true;
-                    redirectBack = false;
-                    submit();
-                "
-                :loading="loading"
-                :disabled="!meta.valid"
-            />
-
-            <FormStoreWithoutReseting
-                @click="
-                    resetFormOnSuccess = false;
-                    redirectBack = false;
-                    submit();
-                "
+            <FormDuplicateAndRedirectBack
+                @click="submit()"
                 :loading="loading"
                 :disabled="!meta.valid"
             />

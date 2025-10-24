@@ -40,6 +40,9 @@ Route::middleware('auth', 'auth.session')->prefix('mad')->name('mad.')->group(fu
             'can:edit-MAD-VPS'
         );
 
+        // Duplication
+        Route::get('/duplicate/{record}', 'duplicate')->name('duplicate')->middleware('can:edit-MAD-VPS');
+
         // Ajax requests on checkbox toggles
         Route::post('/update-contracted-in-asp-value', 'updateContractedInAspValue')
             ->name('update-contracted-in-asp-value')

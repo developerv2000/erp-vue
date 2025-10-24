@@ -101,6 +101,9 @@ class MADProcessController extends Controller
         // Store multiple records
         Process::storeMultipleRecordsByMADFromRequest($request);
 
+        // Sync related product updates
+        Product::findOrFail($request->input('product_id'))->updateOnRelatedProcessCreateOrEdit($request);
+
         // Return success response
         return response()->json([
             'success' => true,

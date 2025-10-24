@@ -249,12 +249,7 @@ function handleTableOptionsUpdate(options) {
         </template>
 
         <template v-slot:item.clinical_trial_countries_name="{ item }">
-            <span
-                v-for="country in item.clinical_trial_countries"
-                :key="country.name"
-            >
-                {{ country.name }}
-            </span>
+            {{ item.clinical_trial_countries.map((obj) => obj.name).join(" ") }}
         </template>
 
         <template v-slot:item.product_zones_name="{ item }">

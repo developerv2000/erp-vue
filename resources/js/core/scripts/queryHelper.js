@@ -97,6 +97,51 @@ export function normalizeDateRangesToQueryFormat(filtersObj, attributes) {
     return query;
 }
 
+/**
+ * Normalize a date to 'YYYY-MM-DD' (remove timezone and time).
+ *
+ * @param {Date|string|null} date - The date to normalize.
+ * @returns {string|null} - The normalized date string or null.
+ */
+export function removeTimezoneFromDate(date) {
+    if (!date) return null;
+
+    // If it's already a proper string like "2025-10-01"
+    if (typeof date === 'string') {
+        const match = date.match(/^\d{4}-\d{2}-\d{2}/);
+        return match ? match[0] : null;
+    }
+
+    // Handle Date objects
+    if (date instanceof Date && !isNaN(date)) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    return null;
+}
+
+/**
+ * Remove timezones from all specified date attributes in an object
+ * (for example, before sending query data to the backend).
+ *
+ * @param {Record<string, any>} obj - The object containing date fields.
+ * @param {string[]} attributes - List of attribute names to normalize.
+ */
+export function removeDateTimezonesForQuery(obj, attributes = []) {
+    if (!obj || typeof obj !== 'object') return;
+
+    for (const attr of attributes) {
+        if (!Object.prototype.hasOwnProperty.call(obj, attr)) continue;
+        const value = obj[attr];
+        if (value !== null && value !== undefined) {
+            obj[attr] = removeTimezoneFromDate(value);
+        }
+    }
+}
+
 // Clean query parameters removing empty values/arrays
 export function cleanQueryParams(obj) {
     return Object.fromEntries(

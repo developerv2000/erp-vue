@@ -39,7 +39,7 @@ const normalizeInputDebounced = debounce((value, field, key) => {
         <DefaultTitle>{{ t("Multiple records") }}</DefaultTitle>
 
         <div v-if="fields.length" class="mb-5">
-            <v-slide-y-transition group tag="div">
+            <v-slide-y-transition tag="div" group>
                 <v-row v-for="(field, index) in fields" :key="field.key">
                     <v-col>
                         <DefaultTextField

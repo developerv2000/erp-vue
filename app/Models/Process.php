@@ -311,7 +311,6 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
             $record->trademark_en = mb_strtoupper($record->trademark_en ?: '');
             $record->trademark_ru = mb_strtoupper($record->trademark_ru ?: '');
 
-            $record->syncRelatedProductUpdates();
             $record->handleForecastUpdateDate();
             $record->handleIncreasedPriceDate();
         });
@@ -993,30 +992,24 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
      *
      * AJAX request.
      *
-     * This method processes an array of country IDs from the request,
+     * This method processes an array of countries from the request,
      * merges specific forecast year data for each country, and creates
      * model instances with the combined data. It also attaches related
      * clinical trial countries and responsible people, and stores comments.
      */
     public static function storeMultipleRecordsByMADFromRequest(ProcessStoreRequest $request): void
     {
-        $countryIDs = $request->input('country_ids');
+        $countries = $request->input('countries');
 
-        foreach ($countryIDs as $countryID) {
-            $country = Country::find($countryID);
+        foreach ($countries as $country) {
+            // Merge 'country_id' and 'forecasts 1-3' into the request array
+            $mergedData = $request->merge([...$country])->all();
 
-            // Merge additional forecast data for the specific country into the request array
-            $mergedData = $request->merge([
-                'country_id' => $countryID,
-                'forecast_year_1' => $request->input('forecast_year_1_of_' . $country->code),
-                'forecast_year_2' => $request->input('forecast_year_2_of_' . $country->code),
-                'forecast_year_3' => $request->input('forecast_year_3_of_' . $country->code),
-            ])->all();
-
+            // Create a new instance of the model
             $record = self::create($mergedData);
 
             // BelongsToMany relations
-            $record->clinicalTrialCountries()->attach($request->input('clinicalTrialCountries'));
+            $record->clinicalTrialCountries()->attach($request->input('clinical_trial_country_ids'));
 
             // HasMany relations
             $record->storeCommentFromRequest($request);
@@ -1031,7 +1024,7 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
         $this->update($request->all());
 
         // BelongsToMany relations
-        $this->clinicalTrialCountries()->sync($request->input('clinicalTrialCountries'));
+        $this->clinicalTrialCountries()->sync($request->input('clinical_trial_country_ids'));
 
         // HasMany relations
         $this->storeCommentFromRequest($request);
@@ -1274,35 +1267,6 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
     | Misc
     |--------------------------------------------------------------------------
     */
-
-    /**
-     * Synchronize related product attributes of the process,
-     *
-     * Used during the saving event of the model.
-     */
-    private function syncRelatedProductUpdates()
-    {
-        $product = $this->product;
-
-        // Global attributes
-        $product->fill(request()->only([
-            'form_id',
-            'dosage',
-            'pack',
-            'shelf_life_id',
-            'class_id',
-        ]));
-
-        // MOQ is available from stage 2
-        if (request()->has('moq')) {
-            $product->moq = request()->input('moq');
-        }
-
-        // Save only if any field is updated
-        if ($product->isDirty()) {
-            $product->save();
-        }
-    }
 
     /**
      * Notify users if status has been updated to contact stage.

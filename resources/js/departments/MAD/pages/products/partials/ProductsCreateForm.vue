@@ -92,7 +92,7 @@ const { errors, handleSubmit, resetForm, setErrors, meta } = useForm({
 // Get form values as ref
 const { values } = useVeeFormFields(Object.keys(defaultFields));
 
-// Get form dynamic 'products' array value
+// Get form dynamic 'products' array
 const {
     fields: productsFields,
     push: pushProduct,

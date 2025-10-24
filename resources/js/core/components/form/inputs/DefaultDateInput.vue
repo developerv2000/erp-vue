@@ -39,6 +39,7 @@ const inputAttrs = useAttrs();
             autocomplete="off"
             hide-details="auto"
             v-bind="inputAttrs"
+            clearable
         />
     </StandardLabeledGroup>
 </template>

@@ -568,6 +568,25 @@ class Product extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
     }
 
     /**
+     * Update self attributes on related process 'create' or 'edit'
+     */
+    public function updateOnRelatedProcessCreateOrEdit($request)
+    {
+        // Global attributes
+        $this->form_id = $request->input('product_form_id');
+        $this->dosage = $request->input('product_dosage');
+        $this->pack = $request->input('product_pack');
+        $this->shelf_life_id = $request->input('product_shelf_life_id');
+        $this->class_id = $request->input('product_class_id');
+        $this->moq = $request->input('product_moq');
+
+        // Save only if any field is updated
+        if ($this->isDirty()) {
+            $this->save();
+        }
+    }
+
+    /**
      * Get similar records based on the provided request data.
      *
      * Used for AJAX requests to retrieve similar records, on the products create form.

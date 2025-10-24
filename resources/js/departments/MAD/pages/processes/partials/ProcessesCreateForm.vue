@@ -1,6 +1,6 @@
 <script setup>
 import { ref, watch, computed } from "vue";
-import { usePage } from "@inertiajs/vue3";
+import { router, usePage } from "@inertiajs/vue3";
 import { useI18n } from "vue-i18n";
 import { Form, useForm, useFieldArray } from "vee-validate";
 import { object, string, number, array, date } from "yup";
@@ -24,6 +24,8 @@ import FormResetButton from "@/core/components/form/buttons/FormResetButton.vue"
 import FormStoreAndRedirectBack from "@/core/components/form/buttons/FormStoreAndRedirectBack.vue";
 import FormStoreAndReset from "@/core/components/form/buttons/FormStoreAndReset.vue";
 import FormStoreWithoutReseting from "@/core/components/form/buttons/FormStoreWithoutReseting.vue";
+import ProcessesCreateCountriesBlock from "./ProcessesCreateCountriesBlock.vue";
+import { removeDateTimezonesForQuery } from "@/core/scripts/queryHelper";
 
 // Dependencies
 const { t } = useI18n();
@@ -54,6 +56,16 @@ const schema = computed(() => {
         country_ids: array().required().min(1),
         responsible_person_id: number().required(),
         created_at: date().nullable(),
+
+        // Dynamic countries with forecasts
+        countries: array().of(
+            object({
+                country_id: number().required(),
+                forecast_year_1: number().required(),
+                forecast_year_2: number().required(),
+                forecast_year_3: number().required(),
+            })
+        ),
     };
 
     // 2ПО
@@ -89,57 +101,65 @@ const schema = computed(() => {
 });
 
 // Default form values
-const defaultFields = {
-    // Product
-    product_id: page.props.product.id,
-    product_form_id: page.props.product.form_id,
-    product_dosage: page.props.product.dosage,
-    product_pack: page.props.product.pack,
-    product_shelf_life_id: page.props.product.shelf_life_id,
-    product_class_id: page.props.product.class_id,
-    product_moq: page.props.product.moq,
+const defaultFields = computed(() => {
+    return {
+        // Product
+        product_id: page.props.product.id,
+        product_form_id: page.props.product.form_id,
+        product_dosage: page.props.product.dosage,
+        product_pack: page.props.product.pack,
+        product_shelf_life_id: page.props.product.shelf_life_id,
+        product_class_id: page.props.product.class_id,
+        product_moq: page.props.product.moq,
 
-    // Main
-    status_id: page.props.defaultSelectedStatusID,
-    country_ids: [],
-    responsible_person_id: null,
-    created_at: null,
+        // Main
+        status_id: page.props.defaultSelectedStatusID,
+        country_ids: [],
+        responsible_person_id: null,
+        created_at: null,
+        countries: [], // dynamic array
+        comment: null,
 
-    // 2ПО
-    down_payment_1: null,
-    down_payment_2: null,
-    down_payment_condition: null,
-    dossier_status: null,
-    clinical_trial_year: null,
-    clinical_trial_country_ids: [],
-    clinical_trial_ich_country: null,
+        // 2ПО
+        down_payment_1: null,
+        down_payment_2: null,
+        down_payment_condition: null,
+        dossier_status: null,
+        clinical_trial_year: null,
+        clinical_trial_country_ids: [],
+        clinical_trial_ich_country: null,
 
-    // 3АЦ
-    manufacturer_first_offered_price: null,
-    manufacturer_followed_offered_price: null,
-    currency_id: page.props.defaultSelectedCurrencyID,
-    our_first_offered_price: null,
-    our_followed_offered_price: null,
-    marketing_authorization_holder_id: page.props.defaultSelectedMAHID,
-    trademark_en: null,
-    trademark_ru: null,
+        // 3АЦ
+        manufacturer_first_offered_price: null,
+        manufacturer_followed_offered_price: null,
+        currency_id: page.props.defaultSelectedCurrencyID,
+        our_first_offered_price: null,
+        our_followed_offered_price: null,
+        marketing_authorization_holder_id: page.props.defaultSelectedMAHID,
+        trademark_en: null,
+        trademark_ru: null,
 
-    // 4СЦ
-    agreed_price: null,
-    increased_price: null,
-
-    // comment
-    comment: null,
-};
+        // 4СЦ
+        agreed_price: null,
+        increased_price: null,
+    };
+});
 
 // VeeValidate form
 const { errors, handleSubmit, resetForm, setErrors, meta } = useForm({
     validationSchema: schema,
-    initialValues: { ...defaultFields },
+    initialValues: { ...defaultFields.value },
 });
 
 // Get form values as ref
-const { values } = useVeeFormFields(Object.keys(defaultFields));
+const { values } = useVeeFormFields(Object.keys(defaultFields.value));
+
+// Get form dynamic 'countries' array
+const {
+    fields: countriesFields,
+    push: pushCountry,
+    remove: removeCountry,
+} = useFieldArray("countries");
 
 // Watch 'status_id' field and update 'statusStage' accordingly
 watch(
@@ -156,9 +176,40 @@ watch(
     }
 );
 
+// Watch "country_ids" and sync the 'countries' field array
+watch(
+    () => values.country_ids,
+    (ids = []) => {
+        // Push missing countries
+        for (const id of ids) {
+            const exists = countriesFields.value.some(
+                (field) => field.value.country_id === id
+            );
+            if (!exists) {
+                pushCountry({
+                    country_id: id,
+                    forecast_year_1: null,
+                    forecast_year_2: null,
+                    forecast_year_3: null,
+                });
+            }
+        }
+
+        // Remove countries that were unselected
+        for (let i = countriesFields.value.length - 1; i >= 0; i--) {
+            const countryId = countriesFields.value[i].value.country_id;
+            if (!ids.includes(countryId)) {
+                removeCountry(i);
+            }
+        }
+    },
+    { deep: true, immediate: true } // sync immediately and track nested changes
+);
+
 // Submit handler
 const submit = handleSubmit((values) => {
     loading.value = true;
+    removeDateTimezonesForQuery(values, ["created_at"]);
     const formData = objectToFormData(values);
 
     axios
@@ -166,12 +217,10 @@ const submit = handleSubmit((values) => {
         .then(() => {
             messages.addCreatedSuccessfullyMessage();
 
-            if (resetFormOnSuccess.value) {
-                resetForm();
-            }
-
             if (redirectBack.value) {
                 window.history.back();
+            } else {
+                reloadUpdatedDataAndResetForm();
             }
         })
         .catch((error) => {
@@ -186,6 +235,19 @@ const submit = handleSubmit((values) => {
             loading.value = false;
         });
 });
+
+const reloadUpdatedDataAndResetForm = () => {
+    router.reload({
+        only: ["product"],
+        onSuccess: () => {
+            if (resetFormOnSuccess.value) {
+                resetForm({
+                    values: defaultFields.value,
+                });
+            }
+        },
+    });
+};
 </script>
 
 <template>
@@ -211,6 +273,7 @@ const submit = handleSubmit((values) => {
                 <v-col cols="4">
                     <DefaultAutocomplete
                         :label="t('fields.Search country')"
+                        item-title="code"
                         :items="page.props.countriesOrderedByProcessesCount"
                         v-model="values.country_ids"
                         :error-messages="errors.country_ids"
@@ -239,198 +302,215 @@ const submit = handleSubmit((values) => {
             </v-row>
         </DefaultSheet>
 
+        <!-- Dynamic countries with forecasts -->
+        <v-slide-y-transition>
+            <ProcessesCreateCountriesBlock
+                v-if="values.country_ids.length"
+                :fields="countriesFields"
+                :errors="errors"
+                :push="pushCountry"
+                :remove="removeCountry"
+            />
+        </v-slide-y-transition>
+
         <!-- 2ПО -->
-        <DefaultSheet v-if="statusStage >= 2">
-            <DefaultTitle>2ПО</DefaultTitle>
+        <v-slide-y-transition>
+            <DefaultSheet v-if="statusStage >= 2">
+                <DefaultTitle>2ПО</DefaultTitle>
 
-            <v-row>
-                <v-col cols="4">
-                    <DefaultTextField
-                        :label="t('fields.Down payment 1')"
-                        v-model="values.down_payment_1"
-                        :error-messages="errors.down_payment_1"
-                    />
-                </v-col>
+                <v-row>
+                    <v-col cols="4">
+                        <DefaultTextField
+                            :label="t('fields.Down payment 1')"
+                            v-model="values.down_payment_1"
+                            :error-messages="errors.down_payment_1"
+                        />
+                    </v-col>
 
-                <v-col cols="4">
-                    <DefaultTextField
-                        :label="t('fields.Down payment 2')"
-                        v-model="values.down_payment_2"
-                        :error-messages="errors.down_payment_2"
-                    />
-                </v-col>
+                    <v-col cols="4">
+                        <DefaultTextField
+                            :label="t('fields.Down payment 2')"
+                            v-model="values.down_payment_2"
+                            :error-messages="errors.down_payment_2"
+                        />
+                    </v-col>
 
-                <v-col cols="4">
-                    <DefaultTextField
-                        :label="t('fields.Down payment condition')"
-                        v-model="values.down_payment_condition"
-                        :error-messages="errors.down_payment_condition"
-                    />
-                </v-col>
+                    <v-col cols="4">
+                        <DefaultTextField
+                            :label="t('fields.Down payment condition')"
+                            v-model="values.down_payment_condition"
+                            :error-messages="errors.down_payment_condition"
+                        />
+                    </v-col>
 
-                <v-col cols="4">
-                    <DefaultTextField
-                        :label="t('fields.Dossier status')"
-                        v-model="values.dossier_status"
-                        :error-messages="errors.dossier_status"
-                    />
-                </v-col>
+                    <v-col cols="4">
+                        <DefaultTextField
+                            :label="t('fields.Dossier status')"
+                            v-model="values.dossier_status"
+                            :error-messages="errors.dossier_status"
+                        />
+                    </v-col>
 
-                <v-col cols="4">
-                    <DefaultTextField
-                        :label="t('fields.Year Cr/Be')"
-                        v-model="values.clinical_trial_year"
-                        :error-messages="errors.clinical_trial_year"
-                    />
-                </v-col>
+                    <v-col cols="4">
+                        <DefaultTextField
+                            :label="t('fields.Year Cr/Be')"
+                            v-model="values.clinical_trial_year"
+                            :error-messages="errors.clinical_trial_year"
+                        />
+                    </v-col>
 
-                <v-col cols="4">
-                    <DefaultAutocomplete
-                        :label="t('fields.Countries Cr/Be')"
-                        :items="page.props.countriesOrderedByName"
-                        v-model="values.clinical_trial_country_ids"
-                        :error-messages="errors.clinical_trial_country_ids"
-                        multiple
-                    />
-                </v-col>
+                    <v-col cols="4">
+                        <DefaultAutocomplete
+                            :label="t('fields.Countries Cr/Be')"
+                            :items="page.props.countriesOrderedByName"
+                            v-model="values.clinical_trial_country_ids"
+                            :error-messages="errors.clinical_trial_country_ids"
+                            multiple
+                        />
+                    </v-col>
 
-                <v-col cols="4">
-                    <DefaultTextField
-                        :label="t('fields.Country ich')"
-                        v-model="values.clinical_trial_ich_country"
-                        :error-messages="errors.clinical_trial_ich_country"
-                    />
-                </v-col>
-            </v-row>
-        </DefaultSheet>
+                    <v-col cols="4">
+                        <DefaultTextField
+                            :label="t('fields.Country ich')"
+                            v-model="values.clinical_trial_ich_country"
+                            :error-messages="errors.clinical_trial_ich_country"
+                        />
+                    </v-col>
+                </v-row>
+            </DefaultSheet>
+        </v-slide-y-transition>
 
         <!-- 3АЦ -->
-        <DefaultSheet v-if="statusStage >= 3">
-            <DefaultTitle>3АЦ</DefaultTitle>
+        <v-slide-y-transition>
+            <DefaultSheet v-if="statusStage >= 3">
+                <DefaultTitle>3АЦ</DefaultTitle>
 
-            <v-row>
-                <v-col cols="4">
-                    <DefaultNumberInput
-                        :label="t('fields.Manufacturer price 1')"
-                        v-model="values.manufacturer_first_offered_price"
-                        :error-messages="
-                            errors.manufacturer_first_offered_price
-                        "
-                        :min="0"
-                        :precision="2"
-                        :step="0.01"
-                        required
-                    />
-                </v-col>
+                <v-row>
+                    <v-col cols="4">
+                        <DefaultNumberInput
+                            :label="t('fields.Manufacturer price 1')"
+                            v-model="values.manufacturer_first_offered_price"
+                            :error-messages="
+                                errors.manufacturer_first_offered_price
+                            "
+                            :min="0"
+                            :precision="2"
+                            :step="0.01"
+                            required
+                        />
+                    </v-col>
 
-                <v-col cols="4">
-                    <DefaultNumberInput
-                        :label="t('fields.Manufacturer price 2')"
-                        v-model="values.manufacturer_followed_offered_price"
-                        :error-messages="
-                            errors.manufacturer_followed_offered_price
-                        "
-                        :min="0"
-                        :precision="2"
-                        :step="0.01"
-                        required
-                    />
-                </v-col>
+                    <v-col cols="4">
+                        <DefaultNumberInput
+                            :label="t('fields.Manufacturer price 2')"
+                            v-model="values.manufacturer_followed_offered_price"
+                            :error-messages="
+                                errors.manufacturer_followed_offered_price
+                            "
+                            :min="0"
+                            :precision="2"
+                            :step="0.01"
+                            required
+                        />
+                    </v-col>
 
-                <v-col cols="4">
-                    <DefaultAutocomplete
-                        :label="t('fields.Currency')"
-                        :items="page.props.currencies"
-                        v-model="values.currency_id"
-                        :error-messages="errors.currency_id"
-                        required
-                    />
-                </v-col>
+                    <v-col cols="4">
+                        <DefaultAutocomplete
+                            :label="t('fields.Currency')"
+                            :items="page.props.currencies"
+                            v-model="values.currency_id"
+                            :error-messages="errors.currency_id"
+                            required
+                        />
+                    </v-col>
 
-                <v-col cols="4">
-                    <DefaultNumberInput
-                        :label="t('fields.Our price 1')"
-                        v-model="values.our_first_offered_price"
-                        :error-messages="errors.our_first_offered_price"
-                        :min="0"
-                        :precision="2"
-                        :step="0.01"
-                        required
-                    />
-                </v-col>
+                    <v-col cols="4">
+                        <DefaultNumberInput
+                            :label="t('fields.Our price 1')"
+                            v-model="values.our_first_offered_price"
+                            :error-messages="errors.our_first_offered_price"
+                            :min="0"
+                            :precision="2"
+                            :step="0.01"
+                            required
+                        />
+                    </v-col>
 
-                <v-col cols="4">
-                    <DefaultNumberInput
-                        :label="t('fields.Our price 2')"
-                        v-model="values.our_followed_offered_price"
-                        :error-messages="errors.our_followed_offered_price"
-                        :min="0"
-                        :precision="2"
-                        :step="0.01"
-                    />
-                </v-col>
+                    <v-col cols="4">
+                        <DefaultNumberInput
+                            :label="t('fields.Our price 2')"
+                            v-model="values.our_followed_offered_price"
+                            :error-messages="errors.our_followed_offered_price"
+                            :min="0"
+                            :precision="2"
+                            :step="0.01"
+                        />
+                    </v-col>
 
-                <v-col cols="4">
-                    <DefaultAutocomplete
-                        :label="t('fields.MAH')"
-                        :items="page.props.MAHs"
-                        v-model="values.marketing_authorization_holder_id"
-                        :error-messages="
-                            errors.marketing_authorization_holder_id
-                        "
-                        :required="statusStage >= 5"
-                    />
-                </v-col>
+                    <v-col cols="4">
+                        <DefaultAutocomplete
+                            :label="t('fields.MAH')"
+                            :items="page.props.MAHs"
+                            v-model="values.marketing_authorization_holder_id"
+                            :error-messages="
+                                errors.marketing_authorization_holder_id
+                            "
+                            :required="statusStage >= 5"
+                        />
+                    </v-col>
 
-                <v-col cols="4">
-                    <DefaultTextField
-                        :label="t('fields.TM Eng')"
-                        v-model="values.trademark_en"
-                        :error-messages="errors.trademark_en"
-                        :required="statusStage >= 5"
-                    />
-                </v-col>
+                    <v-col cols="4">
+                        <DefaultTextField
+                            :label="t('fields.TM Eng')"
+                            v-model="values.trademark_en"
+                            :error-messages="errors.trademark_en"
+                            :required="statusStage >= 5"
+                        />
+                    </v-col>
 
-                <v-col cols="4">
-                    <DefaultTextField
-                        :label="t('fields.TM Rus')"
-                        v-model="values.trademark_ru"
-                        :error-messages="errors.trademark_ru"
-                        :required="statusStage >= 5"
-                    />
-                </v-col>
-            </v-row>
-        </DefaultSheet>
+                    <v-col cols="4">
+                        <DefaultTextField
+                            :label="t('fields.TM Rus')"
+                            v-model="values.trademark_ru"
+                            :error-messages="errors.trademark_ru"
+                            :required="statusStage >= 5"
+                        />
+                    </v-col>
+                </v-row>
+            </DefaultSheet>
+        </v-slide-y-transition>
 
         <!-- 4СЦ -->
-        <DefaultSheet v-if="statusStage >= 4">
-            <DefaultTitle>4СЦ</DefaultTitle>
+        <v-slide-y-transition>
+            <DefaultSheet v-if="statusStage >= 4">
+                <DefaultTitle>4СЦ</DefaultTitle>
 
-            <v-row>
-                <v-col cols="4">
-                    <DefaultNumberInput
-                        :label="t('fields.Agreed price')"
-                        v-model="values.agreed_price"
-                        :error-messages="errors.agreed_price"
-                        :min="0"
-                        :precision="2"
-                        :step="0.01"
-                        required
-                    />
-                </v-col>
+                <v-row>
+                    <v-col cols="4">
+                        <DefaultNumberInput
+                            :label="t('fields.Agreed price')"
+                            v-model="values.agreed_price"
+                            :error-messages="errors.agreed_price"
+                            :min="0"
+                            :precision="2"
+                            :step="0.01"
+                            required
+                        />
+                    </v-col>
 
-                <v-col cols="4">
-                    <DefaultNumberInput
-                        :label="t('fields.Increased price')"
-                        v-model="values.increased_price"
-                        :error-messages="errors.increased_price"
-                        :min="0"
-                        :precision="2"
-                        :step="0.01"
-                    />
-                </v-col>
-            </v-row>
-        </DefaultSheet>
+                    <v-col cols="4">
+                        <DefaultNumberInput
+                            :label="t('fields.Increased price')"
+                            v-model="values.increased_price"
+                            :error-messages="errors.increased_price"
+                            :min="0"
+                            :precision="2"
+                            :step="0.01"
+                        />
+                    </v-col>
+                </v-row>
+            </DefaultSheet>
+        </v-slide-y-transition>
 
         <!-- Comment -->
         <DefaultSheet>

@@ -161,7 +161,13 @@ class MADProcessController extends Controller
             'breadcrumbs' => $fetchedRecord->generateBreadcrumbs('MAD'),
 
             // Lazy loads. Never refetched again
-            'restrictedStatuses' => fn() => ProcessStatus::getAllRestrictedByPermissions()->load('generalStatus'), // IMPORTANT
+            'restrictedStatuses' => fn() => ProcessStatus::getAllRestrictedByPermissions() // IMPORTANT
+                ->load('generalStatus')
+                ->append('is_stopped_status'),
+
+            // Used to display status name, when current status name misses in "restrictedStatuses"
+            'allStatuses' => fn() => ProcessStatus::all(),
+
             'productForms' => fn() => ProductForm::getMinifiedRecordsWithName(),
             'shelfLifes' => fn() => ProductShelfLife::all(),
             'productClasses' => fn() => ProductClass::orderByName()->get(),
@@ -182,9 +188,14 @@ class MADProcessController extends Controller
      */
     public function update(ProcessUpdateRequest $request, $record)
     {
+        // Update record
         $fetchedRecord = Process::withTrashed()->findOrFail($record);
         $fetchedRecord->updateByMADFromRequest($request);
 
+        // Sync related product updates
+        Product::findOrFail($request->input('product_id'))->updateOnRelatedProcessCreateOrEdit($request);
+
+        // Return success response
         return response()->json([
             'success' => true,
         ]);

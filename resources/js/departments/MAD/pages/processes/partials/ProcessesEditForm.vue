@@ -32,6 +32,7 @@ const { isAnyAdministrator } = useAuth();
 const record = computed(() => page.props.record);
 const loading = ref(false);
 const redirectBack = ref(false);
+const statusChangedToStopped = ref(false);
 
 // Depends on 'status_id' field and updated using watch()
 const statusStage = ref(record.value.status.general_status.stage);
@@ -50,6 +51,9 @@ const schema = computed(() => {
         status_id: number().required(),
         country_id: number().required(),
         responsible_person_id: number().required(),
+        comment: statusChangedToStopped.value
+            ? string().required()
+            : string().nullable(),
     };
 
     // 2ПО
@@ -111,7 +115,6 @@ const baseInitialValues = computed(() => ({
     status_id: record.value.status_id,
     country_id: record.value.country_id,
     responsible_person_id: record.value.responsible_person_id,
-    comment: null,
 
     // 2ПО
     forecast_year_1: record.value.forecast_year_1,
@@ -172,18 +175,32 @@ const { handleSubmit, errors, setErrors, resetForm, meta } = useForm({
 // Get form values as ref
 const { values } = useVeeFormFields(Object.keys(mergedInitialValues.value));
 
-// Watch 'status_id' field and update 'statusStage' accordingly
+// Watch 'status_id' field and update 'statusStage' accordingly.
+// Also set 'comment' field as required, when status changes to "stopped".
 watch(
     () => values.status_id,
     (value) => {
+        // Reset to defaults if no value
         if (!value) {
             statusStage.value = 1;
+            statusChangedToStopped.value = false;
             return;
         }
 
-        statusStage.value = page.props.restrictedStatuses.find(
+        // Get new status
+        const newStatus = page.props.restrictedStatuses.find(
             (s) => s.id == value
-        ).general_status.stage;
+        );
+
+        // Update status stage
+        statusStage.value = newStatus.general_status.stage;
+
+        // Update 'comment' field
+        statusChangedToStopped.value =
+            newStatus.id != record.value.status_id &&
+            newStatus.is_stopped_status
+                ? true
+                : false;
     }
 );
 
@@ -245,7 +262,11 @@ const reloadRequiredDataAndResetForm = () => {
                     <!-- Requires permission  -->
                     <DefaultAutocomplete
                         :label="t('fields.Status')"
-                        :items="page.props.restrictedStatuses"
+                        :items="
+                            record.current_status_can_be_edited_for_auth_user
+                                ? page.props.restrictedStatuses
+                                : page.props.allStatuses
+                        "
                         v-model="values.status_id"
                         :error-messages="errors.status_id"
                         :disabled="
@@ -546,9 +567,14 @@ const reloadRequiredDataAndResetForm = () => {
                 <v-col>
                     <DefaultWysiwyg
                         v-model="values.comment"
-                        :label="t('comments.New')"
+                        :label="
+                            statusChangedToStopped
+                                ? t('statuses.Reason for stop')
+                                : t('comments.New')
+                        "
                         :error-messages="errors.comment"
                         folder="comments"
+                        :required="statusChangedToStopped"
                     />
                 </v-col>
 

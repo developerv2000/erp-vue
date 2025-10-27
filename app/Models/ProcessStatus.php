@@ -64,6 +64,22 @@ class ProcessStatus extends Model
 
     /*
     |--------------------------------------------------------------------------
+    | Additional attributes & appends
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Used in below situations:
+     * 1. In mad.processes.edit to set "comment" as required, when status changes to "stopped".
+     * 2. When recalculating "days_past_since_last_activity" attribute of process.
+     */
+    public function getIsStoppedStatusAttribute()
+    {
+        return in_array($this->id, self::STOPED_IDS);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Misc
     |--------------------------------------------------------------------------
     */
@@ -92,16 +108,6 @@ class ProcessStatus extends Model
     public static function getSelectedIDByDefault()
     {
         return self::where('name', 'Вб')->value('id');
-    }
-
-    /**
-     * Check if status is stoped.
-     *
-     * Used in processes.edit & handling processes 'order_priority' attribute.
-     */
-    public function isStopedStatus()
-    {
-        return in_array($this->id, self::STOPED_IDS);
     }
 
     /**

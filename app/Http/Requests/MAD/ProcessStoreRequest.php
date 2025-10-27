@@ -9,8 +9,8 @@ class ProcessStoreRequest extends FormRequest
 {
     public function prepareForValidation()
     {
-        $status = ProcessStatus::find($this->input('status_id'));
-        $stage = optional($status->generalStatus)->stage ?? 1;
+        $status = ProcessStatus::findOrFail($this->input('status_id'));
+        $stage = $status->generalStatus->stage;
 
         // Base fields available for ALL stages
         $baseFields = [

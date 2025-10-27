@@ -1218,7 +1218,7 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
         }
 
         // If the record's status is "stopped", set priority to -1 and exit.
-        if ($this->status->isStopedStatus()) {
+        if ($this->status->is_stopped_status) {
             $this->days_past_since_last_activity = -1;
             $this->timestamps = false;
             $this->saveQuietly();

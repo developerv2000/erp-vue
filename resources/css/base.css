@@ -97,6 +97,7 @@ body.theme--dark #nprogress .peg {
 
 .main-table .three-lines-limited-text img {
     max-width: 40px;
+    height: auto;
 }
 /* ------------ /end Main table ------------ */
 

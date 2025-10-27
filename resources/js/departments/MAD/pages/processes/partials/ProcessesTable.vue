@@ -101,7 +101,9 @@ function handleTableOptionsUpdate(options) {
         </template>
 
         <template v-slot:item.duplicate="{ item }">
-            <TdDuplicateButton :link="route('mad.processes.duplicate', item.id)" />
+            <TdDuplicateButton
+                :link="route('mad.processes.duplicate', item.id)"
+            />
         </template>
 
         <template v-slot:item.last_status_date="{ item }">
@@ -177,7 +179,7 @@ function handleTableOptionsUpdate(options) {
         </template>
 
         <template v-slot:item.product_inn_name="{ item }">
-            {{ item.product.inn.name }}
+            <TogglableThreeLinesLimitedText :text="item.product.inn.name" />
         </template>
 
         <template v-slot:item.product_form_name="{ item }">
@@ -185,7 +187,7 @@ function handleTableOptionsUpdate(options) {
         </template>
 
         <template v-slot:item.product_dosage="{ item }">
-            {{ item.product.dosage }}
+            <TogglableThreeLinesLimitedText :text="item.product.dosage" />
         </template>
 
         <template v-slot:item.product_pack="{ item }">
@@ -221,7 +223,10 @@ function handleTableOptionsUpdate(options) {
         </template>
 
         <template v-slot:item.product_atx_name="{ item }">
-            {{ item.product.atx?.name }}
+            <TogglableThreeLinesLimitedText
+                v-if="item.product.atx"
+                :text="item.product.atx.name"
+            />
         </template>
 
         <template v-slot:item.product_atx_short_name="{ item }">

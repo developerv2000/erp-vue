@@ -1456,7 +1456,7 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
             $columns,
             ['title' => 'ID', 'key' => 'id', 'width' => 62, 'sortable' => true, 'visible' => 1, 'order' => $order++],
             ['title' => 'status.Date', 'key' => 'last_status_date', 'width' => 100, 'sortable' => false, 'visible' => 1, 'order' => $order++],
-            ['title' => 'Deadline', 'key' => 'deadline_status', 'width' => 118, 'sortable' => false, 'visible' => 1, 'order' => $order++],
+            ['title' => 'Deadline', 'key' => 'deadline_status', 'width' => 132, 'sortable' => false, 'visible' => 1, 'order' => $order++],
         );
 
         if (Gate::forUser($user)->allows(Permission::extractAbilityName(Permission::CAN_CONTROL_MAD_ASP_PROCESSES))) {

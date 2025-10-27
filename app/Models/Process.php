@@ -1512,7 +1512,7 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
             ['title' => 'fields.TM Eng', 'key' => 'trademark_en', 'width' => 110, 'sortable' => true],
             ['title' => 'fields.TM Rus', 'key' => 'trademark_ru', 'width' => 110, 'sortable' => true],
 
-            ['title' => 'fields.Date of forecast', 'key' => 'forecast_year_1_update_date', 'width' => 96, 'sortable' => true],
+            ['title' => 'fields.Date of forecast', 'key' => 'forecast_year_1_update_date', 'width' => 100, 'sortable' => true],
             ['title' => 'fields.Forecast 1 year', 'key' => 'forecast_year_1', 'width' => 130, 'sortable' => true],
             ['title' => 'fields.Forecast 2 year', 'key' => 'forecast_year_2', 'width' => 130, 'sortable' => true],
             ['title' => 'fields.Forecast 3 year', 'key' => 'forecast_year_3', 'width' => 130, 'sortable' => true],

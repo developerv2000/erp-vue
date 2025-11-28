@@ -530,10 +530,10 @@ const reloadUpdatedDataAndResetForm = () => {
         <FormActionsContainer>
             <FormResetButton @click="resetForm()" :loading="loading" />
 
-            <FormStoreAndRedirectBack
+            <FormStoreWithoutReseting
                 @click="
-                    resetFormOnSuccess = true;
-                    redirectBack = true;
+                    resetFormOnSuccess = false;
+                    redirectBack = false;
                     submit();
                 "
                 :loading="loading"
@@ -550,10 +550,10 @@ const reloadUpdatedDataAndResetForm = () => {
                 :disabled="!meta.valid"
             />
 
-            <FormStoreWithoutReseting
+            <FormStoreAndRedirectBack
                 @click="
-                    resetFormOnSuccess = false;
-                    redirectBack = false;
+                    resetFormOnSuccess = true;
+                    redirectBack = true;
                     submit();
                 "
                 :loading="loading"

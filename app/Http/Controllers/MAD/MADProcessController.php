@@ -207,8 +207,7 @@ class MADProcessController extends Controller
     public function updateContractedInAspValue(Request $request)
     {
         $record = Process::withTrashed()
-            ->withBasicRelations()
-            ->withBasicRelationCounts()
+            ->with('status.generalStatus') // Required for 'is_ready_for_asp_contract' attribute
             ->findOrFail($request->input('id'));
 
         // Return error if record isn`t ready for ASP contract
@@ -221,8 +220,16 @@ class MADProcessController extends Controller
             'contracted_in_asp' => $request->input('new_value'),
         ]);
 
-        // Append basic attributes and return record
+        // Refetch record because relations lost after update() call
+        $record = Process::withTrashed()
+            ->withBasicRelations()
+            ->withBasicRelationCounts()
+            ->find($request->input('id'));
+
+        // Append basic attributes with 'general_statuses_with_periods' and return record
         $record->appendBasicAttributes();
+        $record->addGeneralStatusPeriods();
+
         return $record;
     }
 
@@ -232,8 +239,7 @@ class MADProcessController extends Controller
     public function updateRegisteredInAspValue(Request $request)
     {
         $record = Process::withTrashed()
-            ->withBasicRelations()
-            ->withBasicRelationCounts()
+            ->with('status.generalStatus') // Required for 'is_ready_for_asp_registration' attribute
             ->findOrFail($request->input('id'));
 
         // Return error if record isn`t ready for ASP registration
@@ -246,8 +252,16 @@ class MADProcessController extends Controller
             'registered_in_asp' => $request->input('new_value'),
         ]);
 
-        // Append basic attributes and return record
+        // Refetch record because relations lost after update() call
+        $record = Process::withTrashed()
+            ->withBasicRelations()
+            ->withBasicRelationCounts()
+            ->find($request->input('id'));
+
+        // Append basic attributes with 'general_statuses_with_periods' and return record
         $record->appendBasicAttributes();
+        $record->addGeneralStatusPeriods();
+
         return $record;
     }
 
@@ -257,8 +271,7 @@ class MADProcessController extends Controller
     public function updateReadyForOrderValue(Request $request)
     {
         $record = Process::withTrashed()
-            ->withBasicRelations()
-            ->withBasicRelationCounts()
+            ->with('status.generalStatus') // Required for 'can_be_marked_as_ready_for_order' attribute
             ->findOrFail($request->input('id'));
 
         // Return error if record isn`t ready for ASP contract
@@ -273,8 +286,16 @@ class MADProcessController extends Controller
             'readiness_for_order_date' => $isReady ? now() : null,
         ]);
 
-        // Append basic attributes and return record
+        // Refetch record because relations lost after update() call
+        $record = Process::withTrashed()
+            ->withBasicRelations()
+            ->withBasicRelationCounts()
+            ->find($request->input('id'));
+
+        // Append basic attributes with 'general_statuses_with_periods' and return record
         $record->appendBasicAttributes();
+        $record->addGeneralStatusPeriods();
+
         return $record;
     }
 }

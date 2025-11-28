@@ -1,0 +1,1 @@
+import{_ as o}from"./_plugin-vue_export-helper-DlAUqK2U.js";import{a1 as s,o as t,a2 as r}from"./app-BN27vI2s.js";const n={},a={class:"d-flex justify-end w-100 ga-4"};function c(e,_){return t(),s("div",a,[r(e.$slots,"default")])}const d=o(n,[["render",c]]);export{d as F};

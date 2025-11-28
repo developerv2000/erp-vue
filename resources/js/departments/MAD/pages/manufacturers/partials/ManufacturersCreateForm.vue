@@ -51,7 +51,9 @@ const defaultFields = {
     name: "",
     category_id: null,
     productClasses: [],
-    analyst_user_id: isCurrentUserInArray(page.props.analystUsers) ? page.props.auth.user.id : null,
+    analyst_user_id: isCurrentUserInArray(page.props.analystUsers)
+        ? page.props.auth.user.id
+        : null,
     bdm_user_id: null,
     country_id: null,
     zones: page.props.defaultSelectedZoneIDs ?? [],
@@ -274,10 +276,10 @@ const submit = handleSubmit((values) => {
         <FormActionsContainer>
             <FormResetButton @click="resetForm" :loading="loading" />
 
-            <FormStoreAndRedirectBack
+            <FormStoreWithoutReseting
                 @click="
-                    resetFormOnSuccess = true;
-                    redirectBack = true;
+                    resetFormOnSuccess = false;
+                    redirectBack = false;
                     submit();
                 "
                 :loading="loading"
@@ -294,10 +296,10 @@ const submit = handleSubmit((values) => {
                 :disabled="!meta.valid"
             />
 
-            <FormStoreWithoutReseting
+            <FormStoreAndRedirectBack
                 @click="
-                    resetFormOnSuccess = false;
-                    redirectBack = false;
+                    resetFormOnSuccess = true;
+                    redirectBack = true;
                     submit();
                 "
                 :loading="loading"

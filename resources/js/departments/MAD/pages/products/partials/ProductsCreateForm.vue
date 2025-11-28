@@ -52,7 +52,8 @@ const schema = object({
     products: array().of(
         object({
             dosage: string().required(),
-            pack: string().required(),
+            pack: string().nullable(),
+            moq: number().nullable(),
         })
     ),
 });
@@ -80,7 +81,12 @@ const defaultFields = {
     atx_short_name: null,
 
     // Dynamic products
-    products: [],
+    products: [
+        {
+            dosage: null,
+            pack: null,
+        },
+    ],
 };
 
 // VeeValidate form
@@ -387,10 +393,10 @@ const updateMatchedATX = () => {
                 :loading="loading"
             />
 
-            <FormStoreAndRedirectBack
+            <FormStoreWithoutReseting
                 @click="
-                    resetFormOnSuccess = true;
-                    redirectBack = true;
+                    resetFormOnSuccess = false;
+                    redirectBack = false;
                     submit();
                 "
                 :loading="loading"
@@ -407,10 +413,10 @@ const updateMatchedATX = () => {
                 :disabled="!meta.valid"
             />
 
-            <FormStoreWithoutReseting
+            <FormStoreAndRedirectBack
                 @click="
-                    resetFormOnSuccess = false;
-                    redirectBack = false;
+                    resetFormOnSuccess = true;
+                    redirectBack = true;
                     submit();
                 "
                 :loading="loading"

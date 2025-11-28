@@ -22,7 +22,7 @@ class ProcessUpdateRequest extends FormRequest
             'product_class_id',
             'product_moq',
             'status_id',
-            'country_ids',
+            'country_id',
             'responsible_person_id',
             'comment',
         ];

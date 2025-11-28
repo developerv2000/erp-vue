@@ -238,26 +238,42 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
             ?: $this->manufacturer_first_offered_price;
 
         return $finalPrice
-            ? Currency::convertPriceToUSD($finalPrice, $this->currency)
+            ? round(Currency::convertPriceToUSD($finalPrice, $this->currency), 2)
             : null;
     }
 
     /**
      * Get the percentage increase of the price.
      *
-     * @return float|null The percentage increase, rounded to two decimal places, or null if calculation is not possible.
+     * The calculation compares the increased price to the original/base price
+     * (using followed_offered_price if available, otherwise our_first_offered_price).
+     *
+     * @return float|null
      */
     public function getIncreasedPricePercentageAttribute()
     {
-        // Retrieve the increased price and agreed price
+        // Final increased price
         $increasedPrice = $this->increased_price;
-        $agreedPrice = $this->agreed_price;
 
-        // Calculate the percentage increase if both values are available
-        return ($increasedPrice && $agreedPrice)
-            ? round(GeneralHelper::calculatePercentageOfTotal($agreedPrice, $increasedPrice), 2)
-            : null;
+        // Choose the correct base price: priority -> followed → first offered
+        $basePrice = $this->followed_offered_price ?: $this->our_first_offered_price;
+
+        // Validation: cannot calculate without both prices or if base is zero
+        if (!$increasedPrice || !$basePrice || $basePrice == 0) {
+            return null;
+        }
+
+        // Calculate how much the new price is in % of the base price
+        // Example: if increased price = 120 and base = 100 → 120% of base
+        $percentOfBase = GeneralHelper::calculatePercentageOfTotal($basePrice, $increasedPrice);
+
+        // Convert to “increase percentage” (e.g. 120% → 20%)
+        $increasePercentage = $percentOfBase - 100;
+
+        // Truncate to 2 decimals (NO rounding)
+        return floor($increasePercentage * 100) / 100;
     }
+
 
     /**
      * CHeck whether process can be added to ASP (СПГ) as contracted
@@ -1373,11 +1389,6 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
     /**
      * Add general statuses with periods for a collection of records.
      *
-     * This method processes a collection of records and adds general status periods
-     * based on the status history of each record. It clones the general statuses to
-     * avoid modifying the original collection, calculates the start and end dates,
-     * duration days, and duration days ratio for each general status.
-     *
      * @param \Illuminate\Database\Eloquent\Collection $records The collection of records to process.
      *
      * @return void
@@ -1393,46 +1404,66 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
                 return clone $item;
             });
 
-            foreach ($clonedGeneralStatuses as $generalStatus) {
-                // Filter status histories related to the current general status
-                $histories = $record->statusHistory->filter(function ($history) use ($generalStatus) {
-                    return $history->status->general_status_id === $generalStatus->id;
-                });
-
-                // Skip if no histories found
-                if ($histories->isEmpty()) continue;
-
-                // Sort histories by ID to find the first and last history
-                $firstHistory = $histories->sortBy('id')->first();
-                $lastHistory = $histories->sortByDesc('id')->first();
-
-                // Set the start_date of the general status
-                $generalStatus->start_date = $firstHistory->start_date;
-
-                // Set the end_date of the general status
-                $generalStatus->end_date = $lastHistory->end_date ?: now();
-
-                // Calculate duration_days for not closed status history
-                // Process current status last history must not be closed logically
-                $lastHistory->duration_days = $lastHistory->duration_days ?? round($lastHistory->start_date->diffInDays(now(), true));
-
-                // Then calculate the total duration_days
-                $generalStatus->duration_days = $histories->sum('duration_days');
-            }
-
-            // Calculate the highest duration_days among all general statuses
-            $highestPeriod = $clonedGeneralStatuses->max('duration_days') ?: 1;
-
-            // Calculate duration_days_ratio for each general status
-            foreach ($clonedGeneralStatuses as $generalStatus) {
-                $generalStatus->duration_days_ratio = $generalStatus->duration_days
-                    ? round($generalStatus->duration_days * 100 / $highestPeriod)
-                    : 0;
-            }
-
-            // Assign the cloned general statuses to the record
-            $record->general_statuses_with_periods = $clonedGeneralStatuses;
+            // Add general statuses with periods
+            $record->addGeneralStatusPeriods($clonedGeneralStatuses);
         }
+    }
+
+    /**
+     * Add general statuses with periods for record.
+     *
+     * This method processes a collection of records and adds general status periods
+     * based on the status history of each record. It clones the general statuses to
+     * avoid modifying the original collection, calculates the start and end dates,
+     * duration days, and duration days ratio for each general status.
+     *
+     * @return void
+     */
+    public function addGeneralStatusPeriods($generalStatuses = null): void
+    {
+        if (!$generalStatuses) {
+            $generalStatuses = ProcessGeneralStatus::all();
+        }
+
+        foreach ($generalStatuses as $generalStatus) {
+            // Filter status histories related to the current general status
+            $histories = $this->statusHistory->filter(function ($history) use ($generalStatus) {
+                return $history->status->general_status_id === $generalStatus->id;
+            });
+
+            // Skip if no histories found
+            if ($histories->isEmpty()) continue;
+
+            // Sort histories by ID to find the first and last history
+            $firstHistory = $histories->sortBy('id')->first();
+            $lastHistory = $histories->sortByDesc('id')->first();
+
+            // Set the start_date of the general status
+            $generalStatus->start_date = $firstHistory->start_date;
+
+            // Set the end_date of the general status
+            $generalStatus->end_date = $lastHistory->end_date ?: now();
+
+            // Calculate duration_days for not closed status history
+            // Process current status last history must not be closed logically
+            $lastHistory->duration_days = $lastHistory->duration_days ?? round($lastHistory->start_date->diffInDays(now(), true));
+
+            // Then calculate the total duration_days
+            $generalStatus->duration_days = $histories->sum('duration_days');
+        }
+
+        // Calculate the highest duration_days among all general statuses
+        $highestPeriod = $generalStatuses->max('duration_days') ?: 1;
+
+        // Calculate duration_days_ratio for each general status
+        foreach ($generalStatuses as $generalStatus) {
+            $generalStatus->duration_days_ratio = $generalStatus->duration_days
+                ? round($generalStatus->duration_days * 100 / $highestPeriod)
+                : 0;
+        }
+
+        // Assign general statuses to the record
+        $this->general_statuses_with_periods = $generalStatuses;
     }
 
     public static function getMADTableHeadersForUser($user): array|null

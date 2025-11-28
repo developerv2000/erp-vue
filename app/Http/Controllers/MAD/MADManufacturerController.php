@@ -9,6 +9,7 @@ use App\Models\Country;
 use App\Models\Manufacturer;
 use App\Models\ManufacturerBlacklist;
 use App\Models\ManufacturerCategory;
+use App\Models\Permission;
 use App\Models\ProductClass;
 use App\Models\User;
 use App\Models\Zone;

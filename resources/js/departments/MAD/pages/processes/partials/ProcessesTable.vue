@@ -206,6 +206,10 @@ function handleTableOptionsUpdate(options) {
             {{ item.currency?.name }}
         </template>
 
+        <template v-slot:item.manufacturer_offered_price_in_usd="{ item }">
+            {{ item.manufacturer_offered_price_in_usd }}
+        </template>
+
         <template v-slot:item.increased_price_percentage="{ item }">
             <span v-if="item.increased_price_percentage">
                 {{ item.increased_price_percentage }} %

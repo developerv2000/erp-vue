@@ -65,7 +65,6 @@ const normalizeInputDebounced = debounce((value, field, key) => {
                                 (val) =>
                                     normalizeInputDebounced(val, field, 'pack')
                             "
-                            required
                         />
                     </v-col>
 

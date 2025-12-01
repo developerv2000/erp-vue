@@ -2,14 +2,17 @@
 
 namespace App\Models;
 
+use App\Support\Traits\Model\AddsDefaultQueryParamsToRequest;
 use App\Support\Traits\Model\FindsRecordByName;
 use App\Support\Traits\Model\ScopesOrderingByName;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class Department extends Model
 {
     use FindsRecordByName;
     use ScopesOrderingByName;
+    use AddsDefaultQueryParamsToRequest;
 
     /*
     |--------------------------------------------------------------------------
@@ -19,8 +22,8 @@ class Department extends Model
 
     // Querying
     const DEFAULT_ORDER_BY = 'name';
-    const DEFAULT_ORDER_TYPE = 'asc';
-    const DEFAULT_PAGINATION_LIMIT = 50;
+    const DEFAULT_ORDER_DIRECTION = 'asc';
+    const DEFAULT_PER_PAGE = 50;
 
     // Departments
     const MGMT_NAME = 'Руководство'; // Managment
@@ -77,5 +80,26 @@ class Department extends Model
     public function roles()
     {
         return $this->hasMany(Role::class);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Scopes
+    |--------------------------------------------------------------------------
+    */
+
+    public function scopeWithBasicRelations($query): Builder
+    {
+        return $query->with([
+            'roles',
+            'permissions',
+        ]);
+    }
+
+    public function scopeWithBasicRelationCounts($query): Builder
+    {
+        return $query->withCount([
+            'users',
+        ]);
     }
 }

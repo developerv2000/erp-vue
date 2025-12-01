@@ -2,6 +2,7 @@
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 import InertiaLinkedListItem from "@/core/components/inertia/InertiaLinkedListItem.vue";
+import useAuth from "@/core/composables/useAuth";
 
 import {
     mdiViewList,
@@ -11,11 +12,11 @@ import {
     mdiAccountGroup,
     mdiFinance,
     mdiChartArc,
-    mdiTextSearch,
     mdiApps,
 } from "@mdi/js";
 
 const { t } = useI18n();
+const { can } = useAuth();
 
 const listItems = computed(() => [
     {
@@ -23,6 +24,7 @@ const listItems = computed(() => [
         routeName: "mad.manufacturers.index",
         routeParams: null,
         activeOnRoutes: "mad.manufacturers.*",
+        permission: "view-MAD-EPP",
         prependIcon: mdiViewList,
     },
 
@@ -39,6 +41,7 @@ const listItems = computed(() => [
         routeName: "mad.products.index",
         routeParams: null,
         activeOnRoutes: "mad.products.*",
+        permission: "view-MAD-IVP",
         prependIcon: mdiPill,
     },
 
@@ -47,6 +50,7 @@ const listItems = computed(() => [
         routeName: "mad.processes.index",
         routeParams: null,
         activeOnRoutes: "mad.processes.*",
+        permission: "view-MAD-VPS",
         prependIcon: mdiLayers,
     },
 
@@ -75,14 +79,6 @@ const listItems = computed(() => [
     // },
 
     // {
-    //     title: t("pages.Decision hub"),
-    //     routeName: "mad.decision-hub.index",
-    //     routeParams: null,
-    //     activeOnRoutes: "mad.decision-hub.*",
-    //     prependIcon: mdiTextSearch,
-    // },
-
-    // {
     //     title: t("pages.Misc"),
     //     routeName: "misc-models.department-models",
     //     routeParams: { department: "MAD" },
@@ -96,13 +92,14 @@ const listItems = computed(() => [
     <v-list density="compact" color="primary">
         <v-list-subheader>{{ $t("departments.MAD") }}</v-list-subheader>
 
-        <InertiaLinkedListItem
-            v-for="(item, index) in listItems"
-            :key="index"
-            :title="item.title"
-            :prepend-icon="item.prependIcon"
-            :link="route(item.routeName, item.routeParams)"
-            :active="route().current(item.activeOnRoutes, item.routeParams)"
-        />
+        <template v-for="(item, index) in listItems" :key="index">
+            <InertiaLinkedListItem
+                v-if="!item.permission || can(item.permission)"
+                :title="item.title"
+                :prepend-icon="item.prependIcon"
+                :link="route(item.routeName, item.routeParams)"
+                :active="route().current(item.activeOnRoutes, item.routeParams)"
+            />
+        </template>
     </v-list>
 </template>

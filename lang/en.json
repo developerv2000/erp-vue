@@ -28,8 +28,12 @@
     "validations.max_items": "Select no more than {max} items.",
     "validations.timestamp": "Value must be in the format 'YYYY-MM-DD HH:mm:ss'.",
 
-    "departments.Managment": "Managment",
+    "Administration": "Administration",
     "departments.MAD": "MAD",
+
+    "Departments": "Departments",
+    "Roles": "Roles",
+    "Permissions": "Permissions",
 
     "pages.Main": "Main",
     "pages.Trash": "Trash",
@@ -41,9 +45,12 @@
     "pages.Meetings": "Meetings",
     "pages.KPI": "KPI",
     "pages.ASP": "ASP",
-    "pages.Decision hub": "Decision hub",
     "pages.Misc": "Misc",
     "pages.Status history": "Status history",
+    "pages.Departments": "Departments",
+    "pages.Roles": "Roles",
+    "pages.Permissions": "Permissions",
+    "pages.Users": "Users",
 
     "actions.Logout": "Logout",
     "actions.Add": "Add",
@@ -120,6 +127,7 @@
     "comments.Date": "Comments date",
     "comments.All": "All comments",
 
+    "Users": "Users",
     "users.Deleted user": "Deleted user",
 
     "dates.Date of creation": "Date of creation",
@@ -182,6 +190,7 @@
     "fields.Current password": "Current password",
     "fields.New password": "New password",
 
+    "fields.Abbreviation": "Abbreviation",
     "fields.Text": "Текст",
     "fields.Analyst": "Analyst",
     "fields.BDM": "BDM",

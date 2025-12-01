@@ -28,8 +28,12 @@
     "validations.max_items": "Выберите не более {max} элементов.",
     "validations.timestamp": "Значение должен быть в формате 'YYYY-MM-DD HH:mm:ss'.",
 
-    "departments.Managment": "Руководство",
+    "Administration": "Администрация",
     "departments.MAD": "ОАП",
+
+    "Departments": "Отделы",
+    "Roles": "Роли",
+    "Permissions": "Разрешения",
 
     "pages.Main": "Главная",
     "pages.Trash": "Корзина",
@@ -41,9 +45,12 @@
     "pages.Meetings": "Встречи",
     "pages.KPI": "КПЭ",
     "pages.ASP": "СПГ",
-    "pages.Decision hub": "Decision hub",
     "pages.Misc": "Разное",
     "pages.Status history": "История статусов",
+    "pages.Departments": "Отделы",
+    "pages.Roles": "Роли",
+    "pages.Permissions": "Разрешения",
+    "pages.Users": "Пользователи",
 
     "actions.Logout": "Выйти",
     "actions.Create": "Создать",
@@ -124,6 +131,7 @@
     "comments.Date": "Дата коммент.",
     "comments.All": "Все комментарии",
 
+    "Users": "Пользователи",
     "users.Deleted user": "Удалённый пользователь",
 
     "dates.Date of creation": "Дата создания",
@@ -182,6 +190,7 @@
     "fields.Current password": "Текущий пароль",
     "fields.New password": "Новый пароль",
 
+    "fields.Abbreviation": "Аббревиатура",
     "fields.Text": "Текст",
     "fields.Analyst": "Аналитик",
     "fields.BDM": "БДМ",

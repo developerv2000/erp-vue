@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\global\AttachmentController;
-use App\Http\Controllers\global\AuthenticationController;
 use App\Http\Controllers\global\CommentController;
 use App\Http\Controllers\global\ExcelStorageController;
 use App\Http\Controllers\global\MainController;
@@ -11,11 +10,7 @@ use App\Support\Generators\CRUDRouteGenerator;
 use Illuminate\Support\Facades\Route;
 
 // Authentication routes
-Route::controller(AuthenticationController::class)->group(function () {
-    Route::get('login', 'loginShow')->middleware('guest')->name('login.show');
-    Route::post('login', 'login')->middleware('guest')->name('login');
-    Route::post('logout', 'logout')->middleware('auth')->name('logout');
-});
+require __DIR__ . '/auth.php';
 
 // Global routes
 Route::middleware('auth', 'auth.session')->group(function () {
@@ -66,4 +61,5 @@ Route::middleware('auth', 'auth.session')->group(function () {
         });
 });
 
+require __DIR__ . '/administration.php';
 require __DIR__ . '/MAD.php';

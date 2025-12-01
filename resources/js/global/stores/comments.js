@@ -10,4 +10,14 @@ export const useCommentsStore = defineStore('comments', {
             body: null
         },
     }),
+
+    actions: {
+        resetState() {
+            this.editDialog = false;
+            this.destroyDialog = false;
+
+            this.activeRecord.id = null;
+            this.activeRecord.body = null;
+        },
+    },
 });

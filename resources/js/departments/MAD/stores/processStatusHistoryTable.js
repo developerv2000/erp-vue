@@ -8,4 +8,12 @@ export const useProcessStatusHistoryStore = defineStore('processStatusHistory', 
         editDialog: false,
         activeRecord: undefined,
     }),
+
+    actions: {
+        resetState() {
+            this.selected = [];
+            this.editDialog = false;
+            this.activeRecord = undefined;
+        },
+    }
 });

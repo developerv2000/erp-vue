@@ -40,8 +40,15 @@ class ProfileController extends Controller
      */
     public function updatePassword(ProfilePasswordUpdateRequest $request): RedirectResponse
     {
-        $request->user()->updateProfilePassword($request);
+        // Update password
+        auth()->user()->updateProfilePassword($request);
 
-        return redirect()->back();
+        // Logout user after password change
+        auth()->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        // Redirect to login page
+        return redirect()->route('login', ['logged_out' => true]);
     }
 }

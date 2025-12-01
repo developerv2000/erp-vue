@@ -4,4 +4,10 @@ export const useAttachmentsStore = defineStore('attachments', {
     state: () => ({
         selected: [],
     }),
+
+    actions: {
+        resetState() {
+            this.selected = [];
+        },
+    },
 });

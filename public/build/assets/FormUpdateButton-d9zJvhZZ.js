@@ -1,1 +1,0 @@
-import{h as a,a as o,o as s,w as r,g as n,t as p,u as t}from"./app-BN27vI2s.js";import{_ as c}from"./DefaultButton-bK-sfj_8.js";import{x as i}from"./mdi-B8JOKl2S.js";const x={__name:"FormUpdateButton",setup(_){const{t:e}=a();return(m,u)=>(s(),o(c,{"prepend-icon":t(i),type:"submit"},{default:r(()=>[n(p(t(e)("actions.Update")),1)]),_:1},8,["prepend-icon"]))}};export{x as _};

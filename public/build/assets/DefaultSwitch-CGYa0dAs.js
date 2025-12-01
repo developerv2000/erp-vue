@@ -1,1 +1,0 @@
-import{_ as e}from"./_plugin-vue_export-helper-DlAUqK2U.js";import{V as r}from"./VSwitch-CiLd8Xz7.js";import{a as t,o}from"./app-BN27vI2s.js";const a={};function c(s,f){return o(),t(r,{"hide-details":"","true-value":1,"false-value":0})}const l=e(a,[["render",c]]);export{l as D};

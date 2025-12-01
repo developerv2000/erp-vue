@@ -1,15 +1,20 @@
 <script setup>
 import GuestLayout from "@/core/layouts/GuestLayout.vue";
-import { ref } from "vue";
+
+import { onMounted, ref } from "vue";
 import { Head } from "@inertiajs/vue3";
 import { router } from "@inertiajs/vue3";
 import { Form, useForm, useField } from "vee-validate";
+import { useGlobalStore } from "@/core/stores/global";
+import useQueryParams from "@/core/composables/useQueryParams";
 import * as yup from "yup";
 
 import DefaultTextField from "@/core/components/form/inputs/DefaultTextField.vue";
 import { mdiEye, mdiEyeOff } from "@mdi/js";
 
 const showPassword = ref(false);
+const globalStore = useGlobalStore();
+const { get } = useQueryParams();
 
 // Yup schema
 const schema = yup.object({
@@ -42,6 +47,13 @@ const submit = handleSubmit((values) => {
             resetForm();
         },
     });
+});
+
+// Reset all stores after logout
+onMounted(() => {
+    if (get("logged_out")) {
+        globalStore.resetAllStores();
+    }
 });
 </script>
 

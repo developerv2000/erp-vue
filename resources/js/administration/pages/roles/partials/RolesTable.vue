@@ -35,22 +35,22 @@ const { t } = useI18n();
         </template>
 
         <!-- Loading slot -->
-        <template v-slot:loading>
+        <template #loading>
             <TableDefaultSkeleton />
         </template>
 
         <!-- Item slots -->
-        <template v-slot:item.department_id="{ item }">
+        <template #item.department_id="{ item }">
             {{ item.department?.abbreviation }}
         </template>
 
-        <template v-slot:item.global="{ item }">
+        <template #item.global="{ item }">
             <TdMediumWeightText v-if="item.global" class="text-orange">
                 {{ t("properties.Global") }}
             </TdMediumWeightText>
         </template>
 
-        <template v-slot:item.users_count="{ item }">
+        <template #item.users_count="{ item }">
             <TdInertiaLink
                 :link="
                     route('administration.users.index', {
@@ -62,7 +62,7 @@ const { t } = useI18n();
             </TdInertiaLink>
         </template>
 
-        <template v-slot:item.permissons_name="{ item }">
+        <template #item.permissons_name="{ item }">
             <div class="d-flex flex-wrap ga-1">
                 <TdInertiaLink
                     v-for="permission in item.permissions"

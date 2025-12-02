@@ -2,20 +2,25 @@
 
 namespace App\Models;
 
+use App\Support\Helpers\ModelHelper;
 use App\Support\Helpers\QueryFilterHelper;
+use App\Support\Traits\Model\AddsDefaultQueryParamsToRequest;
 use App\Support\Traits\Model\FindsRecordByName;
 use App\Support\Traits\Model\ScopesOrderingByName;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 
 class Permission extends Model
 {
     use FindsRecordByName;
     use ScopesOrderingByName;
+    use AddsDefaultQueryParamsToRequest;
 
     // Querying
     const DEFAULT_ORDER_BY = 'name';
-    const DEFAULT_ORDER_TYPE = 'asc';
-    const DEFAULT_PAGINATION_LIMIT = 50;
+    const DEFAULT_ORDER_DIRECTION = 'asc';
+    const DEFAULT_PER_PAGE = 50;
 
     /*
     |--------------------------------------------------------------------------
@@ -144,6 +149,67 @@ class Permission extends Model
         return $query->withCount([
             'users',
         ]);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Filtering
+    |--------------------------------------------------------------------------
+    */
+
+    public static function filterQueryForRequest($query, $request): Builder
+    {
+        return QueryFilterHelper::applyFilters($query, $request, self::getFilterConfig());
+    }
+
+    private static function getFilterConfig(): array
+    {
+        return [
+            'whereIn' => ['id', 'department_id'],
+            'whereEqual' => ['global'],
+
+            'belongsToManyRelation' => [
+                [
+                    'inputName' => 'roles',
+                    'relationName' => 'roles',
+                    'relationTable' => 'roles',
+                ],
+            ],
+        ];
+    }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Queries
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Build and execute a model query based on request parameters.
+     *
+     * Steps:
+     *  - Apply default relations & counts
+     *  - Normalize query params (pagination, sorting, etc.)
+     *  - Apply filters
+     *  - Finalize query with sorting & pagination
+     *
+     * @param $action  ('paginate', 'get' or 'query')
+     * @return mixed
+     */
+    public static function queryRecordsFromRequest(Request $request, string $action = 'paginate')
+    {
+        $query = self::withBasicRelations()->withBasicRelationCounts();
+
+        // Normalize request parameters
+        self::addDefaultQueryParamsToRequest($request);
+
+        // Apply filters
+        self::filterQueryForRequest($query, $request);
+
+        // Finalize (sorting & pagination)
+        $records = ModelHelper::finalizeQueryForRequest($query, $request, $action);
+
+        return $records;
     }
 
     /*

@@ -139,7 +139,7 @@ class Role extends Model
      * @param $action  ('paginate', 'get' or 'query')
      * @return mixed
      */
-    public static function queryRecordsFromRequest(Request $request, string $action = 'paginate', bool $appendAttributes = false)
+    public static function queryRecordsFromRequest(Request $request, string $action = 'paginate')
     {
         $query = self::withBasicRelations()->withBasicRelationCounts();
 

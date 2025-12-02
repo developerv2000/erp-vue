@@ -27,7 +27,7 @@ onMounted(() => {
     normalizeNumbersFromQuery(filters.value, query, ["global"]);
     normalizeMultiIDsFromQuery(filters.value, query, [
         "id",
-        "permissions",
+        "roles",
         "department_id",
     ]);
 });
@@ -70,15 +70,15 @@ const resetFilter = () => {
             :label="t('fields.Name')"
             name="id[]"
             v-model="filters.id"
-            :items="page.props.simpleFilterDependencies.roles"
+            :items="page.props.simpleFilterDependencies.permissions"
             multiple
         />
 
         <FilterAutocomplete
-            :label="t('Permissions')"
-            name="permissions"
-            v-model="filters.permissions"
-            :items="page.props.simpleFilterDependencies.permissions"
+            :label="t('Roles')"
+            name="roles"
+            v-model="filters.roles"
+            :items="page.props.simpleFilterDependencies.roles"
             multiple
         />
 

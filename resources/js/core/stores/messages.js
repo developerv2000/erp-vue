@@ -73,6 +73,20 @@ export const useMessagesStore = defineStore('messages', {
             });
         },
         // Filter
+        addFilteredSuccessfullyMessage() {
+            this.add({
+                text: i18n.global.t('messages.Filtered successfully'),
+                color: 'success',
+                timeout: 1200
+            });
+        },
+        addFilteringFailedMessage() {
+            this.add({
+                text: i18n.global.t('messages.Filtering failed'),
+                color: 'error',
+                timeout: 1200
+            });
+        },
         addSmartFiltersUpdatedSuccessfullyMessage() {
             this.add({
                 text: i18n.global.t('messages.Smart filters updated successfully'),
@@ -83,6 +97,20 @@ export const useMessagesStore = defineStore('messages', {
         addSmartFiltersUpdateFailedMessage() {
             this.add({
                 text: i18n.global.t('messages.Smart filters update failed'),
+                color: 'error',
+                timeout: 1200
+            });
+        },
+        addFilterResetSuccessfullyMessage() {
+            this.add({
+                text: i18n.global.t('messages.Filter reset successfully'),
+                color: 'success',
+                timeout: 1200
+            });
+        },
+        addFilterResetFailedMessage() {
+            this.add({
+                text: i18n.global.t('messages.Filter reset failed'),
                 color: 'error',
                 timeout: 1200
             });

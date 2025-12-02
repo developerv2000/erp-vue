@@ -1,16 +1,19 @@
 <script setup>
 import { usePage } from "@inertiajs/vue3";
+import { useI18n } from "vue-i18n";
 
-import DepartmentsTableTop from "./DepartmentsTableTop.vue";
+import PermissionsTableTop from "./PermissionsTableTop.vue";
 import TableDefaultSkeleton from "@/core/components/table/misc/TableDefaultSkeleton.vue";
 import TdInertiaLink from "@/core/components/table/td/TdInertiaLink.vue";
+import TdMediumWeightText from "@/core/components/table/td/TdMediumWeightText.vue";
 
 const page = usePage();
+const { t } = useI18n();
 </script>
 
 <template>
     <v-data-table
-        class="main-table"
+        class="main-table main-table--limited-height main-table--without-footer main-table--with-filter"
         :headers="page.props.allTableHeaders"
         :items="page.props.records"
         items-per-page="-1"
@@ -28,7 +31,7 @@ const page = usePage();
     >
         <!-- Top slot -->
         <template #top>
-            <DepartmentsTableTop />
+            <PermissionsTableTop />
         </template>
 
         <!-- Loading slot -->
@@ -37,24 +40,21 @@ const page = usePage();
         </template>
 
         <!-- Item slots -->
-        <template #item.roles_name="{ item }">
-            <template v-for="role in item.roles" :key="role.id">
-                <TdInertiaLink
-                    :link="
-                        route('administration.roles.index', { 'id[]': role.id })
-                    "
-                >
-                    {{ role.name }}
-                </TdInertiaLink>
-                <br />
-            </template>
+        <template #item.department_id="{ item }">
+            {{ item.department?.abbreviation }}
+        </template>
+
+        <template #item.global="{ item }">
+            <TdMediumWeightText v-if="item.global" class="text-orange">
+                {{ t("properties.Global") }}
+            </TdMediumWeightText>
         </template>
 
         <template #item.users_count="{ item }">
             <TdInertiaLink
                 :link="
                     route('administration.users.index', {
-                        'department_id[]': item.id,
+                        'permissions[]': item.id,
                     })
                 "
             >
@@ -62,21 +62,20 @@ const page = usePage();
             </TdInertiaLink>
         </template>
 
-        <template #item.permissons_name="{ item }">
-            <div class="d-flex flex-wrap ga-1">
+        <template #item.roles_name="{ item }">
+            <template v-for="role in item.roles" :key="role.id">
                 <TdInertiaLink
-                    v-for="permission in item.permissions"
-                    :key="permission.id"
-                    class="mr-3"
                     :link="
-                        route('administration.permissions.index', {
-                            'id[]': permission.id,
+                        route('administration.roles.index', {
+                            'id[]': role.id,
                         })
                     "
                 >
-                    {{ permission.name }}
+                    {{ role.name }}
                 </TdInertiaLink>
-            </div>
+                <br />
+            </template>
         </template>
     </v-data-table>
 </template>
+

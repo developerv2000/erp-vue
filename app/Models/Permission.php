@@ -91,7 +91,7 @@ class Permission extends Model
     // VPS
     const CAN_VIEW_MAD_VPS_OF_ALL_ANALYSTS_NAME = 'can-view-MAD-VPS-of-all-analysts';
     const CAN_EDIT_MAD_VPS_OF_ALL_ANALYSTS_NAME = 'can-edit-MAD-VPS-of-all-analysts';
-    const CAN_EDIT_MAD_VPS_STATUS_HISTORY_NAME = 'can edit-MAD-VPS-status-history';
+    const CAN_EDIT_MAD_VPS_STATUS_HISTORY_NAME = 'can-edit-MAD-VPS-status-history';
     const CAN_UPGRADE_MAD_VPS_STATUS_AFTER_CONTRACT_STAGE_NAME = 'can-upgrade-MAD-VPS-status-after-contract-stage';
     const CAN_RECEIVE_NOTIFICATION_ON_MAD_VPS_CONTRACT = 'can-receive-notification-on-MAD-VPS-contract';
     const CAN_MARK_MAD_VPS_AS_READY_FOR_ORDER = 'can-mark-MAD-VPS-as-ready-for-order';

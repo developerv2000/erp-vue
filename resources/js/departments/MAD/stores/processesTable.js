@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { router } from '@inertiajs/vue3'
 import axios from 'axios';
-import { cleanQueryParams, normalizeDateRangesFromQuery, normalizeDateRangesToQueryFormat, normalizeMultiIDsFromQuery, normalizeSingleIDsFromQuery } from '@/core/scripts/queryHelper';
+import { cleanQueryParams, normalizeNumbersFromQuery, normalizeDateRangesFromQuery, normalizeDateRangesToQueryFormat, normalizeMultiIDsFromQuery, normalizeSingleIDsFromQuery } from '@/core/scripts/queryHelper';
 import { createRecordActions } from '@/core/stores/helpers/createRecordActions';
 
 const defaultPaginationOptions = {
@@ -93,15 +93,10 @@ export const useMADProcessesTableStore = defineStore('MADProcessesTable', {
             this.pagination.order_direction = query.order_direction ?? defaultPaginationOptions.order_direction;
             this.navigate_to_page = this.pagination.page;
 
-            // Filters that don`t require normalization
-            // Boolean
-            this.filters.order_by_days_past_since_last_activity = query.order_by_days_past_since_last_activity;
-            this.filters.contracted_in_asp = query.contracted_in_asp;
-            this.filters.registered_in_asp = query.registered_in_asp;
+            // Filters that don`t require normalization:
             // Text fields
             this.filters.product_dosage = query.product_dosage;
             this.filters.product_pack = query.product_pack;
-
             this.filters.trademark_en = query.trademark_en;
             this.filters.trademark_ru = query.trademark_ru;
             // Singular autocompletes
@@ -113,6 +108,7 @@ export const useMADProcessesTableStore = defineStore('MADProcessesTable', {
             this.filters.id = query.id;
 
             // Normalize filters
+            normalizeNumbersFromQuery(this.filters, query, ['order_by_days_past_since_last_activity', 'contracted_in_asp', 'registered_in_asp']);
             normalizeSingleIDsFromQuery(this.filters, query, ['manufacturer_analyst_user_id', 'manufacturer_bdm_user_id', 'responsible_person_id', 'manufacturer_category_id']);
             normalizeMultiIDsFromQuery(this.filters, query, ['product_inn_id', 'manufacturer_id', 'product_form_id', 'country_id', 'status_id', 'status_general_status_id', 'manufacturer_country_id', 'product_class_id']);
             normalizeDateRangesFromQuery(this.filters, query, ['active_status_start_date_range', 'created_at', 'updated_at']);

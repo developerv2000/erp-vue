@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { router } from '@inertiajs/vue3'
 import axios from 'axios';
-import { cleanQueryParams, normalizeDateRangesFromQuery, normalizeDateRangesToQueryFormat, normalizeMultiIDsFromQuery, normalizeSingleIDsFromQuery } from '@/core/scripts/queryHelper';
+import { cleanQueryParams, normalizeNumbersFromQuery, normalizeDateRangesFromQuery, normalizeDateRangesToQueryFormat, normalizeMultiIDsFromQuery, normalizeSingleIDsFromQuery } from '@/core/scripts/queryHelper';
 
 const defaultPaginationOptions = {
     page: 1,
@@ -80,6 +80,7 @@ export const useMADManufacturersTableStore = defineStore('MADManufacturersTable'
             this.filters.important = query.important;
 
             // Normalize filters
+            normalizeNumbersFromQuery(this.filters, query, ['active', 'important']);
             normalizeSingleIDsFromQuery(this.filters, query, ['analyst_user_id', 'bdm_user_id', 'category_id']);
             normalizeMultiIDsFromQuery(this.filters, query, ['country_id', 'id', 'product_classes', 'zones', 'process_country_id', 'blacklists']);
             normalizeDateRangesFromQuery(this.filters, query, ['created_at', 'updated_at']);

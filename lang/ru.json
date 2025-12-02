@@ -31,6 +31,7 @@
     "Administration": "Администрация",
     "departments.MAD": "ОАП",
 
+    "Department": "Отдел",
     "Departments": "Отделы",
     "Roles": "Роли",
     "Permissions": "Разрешения",
@@ -123,6 +124,7 @@
     "properties.Important": "Важный",
     "properties.Active": "Активный",
     "properties.Stopped": "Остановлен",
+    "properties.Global": "Глобальный",
 
     "Comment": "Комментарий",
     "Comments": "Комментарии",
@@ -183,6 +185,9 @@
     "Days": "Дней",
     "days.past": "Дней прошло",
 
+    "fields.Abbreviation": "Аббревиатура",
+    "fields.Description": "Описание",
+
     "fields.Email": "Электронная почта",
     "fields.Password": "Пароль",
     "fields.Name": "Имя",
@@ -190,7 +195,6 @@
     "fields.Current password": "Текущий пароль",
     "fields.New password": "Новый пароль",
 
-    "fields.Abbreviation": "Аббревиатура",
     "fields.Text": "Текст",
     "fields.Analyst": "Аналитик",
     "fields.BDM": "БДМ",

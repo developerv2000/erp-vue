@@ -18,3 +18,4 @@ function handleFullscreenChange() {
         <slot />
     </div>
 </template>
+

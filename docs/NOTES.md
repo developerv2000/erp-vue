@@ -14,4 +14,5 @@
 
 ## Misc
 - Permissions fully updated. Reattach users direct permission manually
-- Fix uploading attachments for muptiple "products" create.
+- Fix uploading attachments for muptiple "products" create
+- Fix moving to the top FilterBooleanAutocomplete when selected "false" value

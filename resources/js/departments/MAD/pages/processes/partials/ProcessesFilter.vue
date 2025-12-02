@@ -236,6 +236,6 @@ const refreshSmartFiltersDebounced = debounce(refreshSmartFilters, 500);
             v-model="store.filters.registered_in_asp"
         />
 
-        <FilterDefaultInputs :store="store" :exclude="['id']" />
+        <FilterDefaultInputs :store="store" />
     </StoreBindedFilter>
 </template>

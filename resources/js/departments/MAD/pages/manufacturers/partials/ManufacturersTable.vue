@@ -78,7 +78,7 @@ function handleTableOptionsUpdate(options) {
         </template>
 
         <!-- Loading slot -->
-        <template v-slot:loading>
+        <template #loading>
             <TableDefaultSkeleton />
         </template>
 
@@ -88,27 +88,27 @@ function handleTableOptionsUpdate(options) {
         </template>
 
         <!-- Item slots -->
-        <template v-slot:item.deleted_at="{ item }">
+        <template #item.deleted_at="{ item }">
             {{ formatDate(item.deleted_at) }}
         </template>
 
-        <template v-slot:item.edit="{ item }">
+        <template #item.edit="{ item }">
             <TdEditButton :link="route('mad.manufacturers.edit', item.id)" />
         </template>
 
-        <template v-slot:item.bdm_user_id="{ item }">
+        <template #item.bdm_user_id="{ item }">
             <TdAva :user="item.bdm" />
         </template>
 
-        <template v-slot:item.analyst_user_id="{ item }">
+        <template #item.analyst_user_id="{ item }">
             <TdAva :user="item.analyst" />
         </template>
 
-        <template v-slot:item.country_id="{ item }">
+        <template #item.country_id="{ item }">
             {{ item.country.name }}
         </template>
 
-        <template v-slot:item.products_count="{ item }">
+        <template #item.products_count="{ item }">
             <TdInertiaLink
                 :link="
                     route('mad.products.index', {
@@ -122,15 +122,15 @@ function handleTableOptionsUpdate(options) {
             </TdInertiaLink>
         </template>
 
-        <template v-slot:item.name="{ item }">
+        <template #item.name="{ item }">
             {{ item.name }}
         </template>
 
-        <template v-slot:item.category_id="{ item }">
+        <template #item.category_id="{ item }">
             <TdManufacturerCategory :name="item.category.name" />
         </template>
 
-        <template v-slot:item.active="{ item }">
+        <template #item.active="{ item }">
             <TdMediumWeightText
                 :class="{
                     'text-green': item.active,
@@ -145,65 +145,65 @@ function handleTableOptionsUpdate(options) {
             </TdMediumWeightText>
         </template>
 
-        <template v-slot:item.important="{ item }">
+        <template #item.important="{ item }">
             <TdMediumWeightText v-if="item.important" class="text-red">
                 {{ t("properties.Important") }}
             </TdMediumWeightText>
         </template>
 
-        <template v-slot:item.product_classes_name="{ item }">
+        <template #item.product_classes_name="{ item }">
             <span>{{
                 item.product_classes.map((obj) => obj.name).join(" ")
             }}</span>
         </template>
 
-        <template v-slot:item.zones_name="{ item }">
+        <template #item.zones_name="{ item }">
             <span>{{ item.zones.map((obj) => obj.name).join(" ") }}</span>
         </template>
 
-        <template v-slot:item.blacklists_name="{ item }">
+        <template #item.blacklists_name="{ item }">
             <span>{{ item.blacklists.map((obj) => obj.name).join(" ") }}</span>
         </template>
 
-        <template v-slot:item.presences_name="{ item }">
+        <template #item.presences_name="{ item }">
             <span>{{ item.presences.map((obj) => obj.name).join(" ") }}</span>
         </template>
 
-        <template v-slot:item.website="{ item }">
+        <template #item.website="{ item }">
             <TdLink :link="item.website" target="_blank">
                 <TogglableThreeLinesLimitedText :text="item.website" />
             </TdLink>
         </template>
 
-        <template v-slot:item.about="{ item }">
+        <template #item.about="{ item }">
             <TogglableThreeLinesLimitedText :text="item.about" />
         </template>
 
-        <template v-slot:item.relationship="{ item }">
+        <template #item.relationship="{ item }">
             <TogglableThreeLinesLimitedText :text="item.relationship" />
         </template>
 
-        <template v-slot:item.comments_count="{ item }">
+        <template #item.comments_count="{ item }">
             <TdRecordCommentsLink :record="item" />
         </template>
 
-        <template v-slot:item.last_comment_body="{ item }">
+        <template #item.last_comment_body="{ item }">
             <TogglableThreeLinesLimitedText :text="item.last_comment?.body" />
         </template>
 
-        <template v-slot:item.last_comment_created_at="{ item }">
+        <template #item.last_comment_created_at="{ item }">
             {{ formatDate(item.last_comment?.created_at) }}
         </template>
 
-        <template v-slot:item.created_at="{ item }">
+        <template #item.created_at="{ item }">
             {{ formatDate(item.created_at) }}
         </template>
 
-        <template v-slot:item.updated_at="{ item }">
+        <template #item.updated_at="{ item }">
             {{ formatDate(item.updated_at) }}
         </template>
 
-        <template v-slot:item.meetings_count="{ item }">
+        <template #item.meetings_count="{ item }">
             <TdInertiaLink
                 :link="
                     route('mad.manufacturers.index', {
@@ -216,7 +216,7 @@ function handleTableOptionsUpdate(options) {
             </TdInertiaLink>
         </template>
 
-        <template v-slot:item.attachments_count="{ item }">
+        <template #item.attachments_count="{ item }">
             <TdRecordAttachmentsLink :record="item" />
             <TdAttachmentsList :attachments="item.attachments" />
         </template>

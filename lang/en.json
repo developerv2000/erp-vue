@@ -119,6 +119,7 @@
     "properties.Important": "Important",
     "properties.Active": "Active",
     "properties.Stopped": "Stopped",
+    "properties.Global": "Global",
 
     "Comment": "Comment",
     "Comments": "Comments",
@@ -183,6 +184,9 @@
     "Days": "Days",
     "days.past": "Days past",
 
+    "fields.Abbreviation": "Abbreviation",
+    "fields.Description": "Description",
+
     "fields.Email": "Email",
     "fields.Password": "Password",
     "fields.Name": "Name",
@@ -190,7 +194,6 @@
     "fields.Current password": "Current password",
     "fields.New password": "New password",
 
-    "fields.Abbreviation": "Abbreviation",
     "fields.Text": "Текст",
     "fields.Analyst": "Analyst",
     "fields.BDM": "BDM",

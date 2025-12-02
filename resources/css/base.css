@@ -5,8 +5,11 @@
     --default-toolbar-height: 56px;
     --main-table-footer-height: 62px;
 
-    --main-table-wrapper-max-height: calc(100vh - var(--app-bar-height) - var(--main-box-padding-top) - var(--default-toolbar-height) - var(--main-table-footer-height));
-    --main-table-wrapper-fullscreened-max-height: calc(100vh - var(--default-toolbar-height) - var(--main-table-footer-height));
+    --main-table-wrapper-with-footer-max-height: calc(100vh - var(--app-bar-height) - var(--main-box-padding-top) - var(--default-toolbar-height) - var(--main-table-footer-height));
+    --main-table-wrapper-with-footer-fullscreened-max-height: calc(100vh - var(--default-toolbar-height) - var(--main-table-footer-height));
+
+    --main-table-wrapper-without-footer-max-height: calc(100vh - var(--app-bar-height) - var(--main-box-padding-top) - var(--default-toolbar-height));
+    --main-table-wrapper-without-footer-fullscreened-max-height: calc(100vh - var(--default-toolbar-height));
 
     --main-filter-width: 200px;
     --main-filter-max-height: calc(100vh - var(--app-bar-height) - var(--main-box-padding-top));
@@ -20,6 +23,7 @@
 body.theme--light #nprogress .bar {
     background: #1867c0 !important;
 }
+
 body.theme--dark #nprogress .bar {
     background: #FF9800 !important;
 }
@@ -28,9 +32,11 @@ body.theme--dark #nprogress .bar {
 body.theme--light #nprogress .peg {
     box-shadow: 0 0 10px #1867c0, 0 0 5px #1867c0 !important;
 }
+
 body.theme--dark #nprogress .peg {
     box-shadow: 0 0 10px #FF9800, 0 0 5px #FF9800 !important;
 }
+
 /* ------------ /end Inertia progress bar ------------ */
 
 
@@ -59,19 +65,32 @@ body.theme--dark #nprogress .peg {
 
 
 /* ------------ Main table ------------ */
+/* Limit max-width when there is a filter */
 .main-table.main-table--with-filter {
     /* 100% - .default-table-wrapper:gap - .main-filter:width */
     max-width: calc(100% - 24px - var(--main-filter-width));
 }
 
+/* Limit max-height when there is a footer */
 .main-table--limited-height .v-table__wrapper {
-    max-height: var(--main-table-wrapper-max-height);
+    max-height: var(--main-table-wrapper-with-footer-max-height);
     overflow: auto;
 }
 
-/* Fullscreen mode */
+/* Limit max-height when there is no footer */
+.main-table--limited-height.main-table--without-footer .v-table__wrapper {
+    max-height: var(--main-table-wrapper-without-footer-max-height);
+    overflow: auto;
+}
+
+/* Fullscreen mode with footer */
 .default-table-wrapper.fullscreen .main-table .v-table__wrapper {
-    max-height: var(--main-table-wrapper-fullscreened-max-height);
+    max-height: var(--main-table-wrapper-with-footer-fullscreened-max-height);
+}
+
+/* Fullscreen mode without footer */
+.default-table-wrapper.fullscreen .main-table.main-table--without-footer .v-table__wrapper {
+    max-height: var(--main-table-wrapper-without-footer-fullscreened-max-height);
 }
 
 .main-table table {
@@ -99,6 +118,7 @@ body.theme--dark #nprogress .peg {
     max-width: 40px;
     height: auto;
 }
+
 /* ------------ /end Main table ------------ */
 
 
@@ -109,13 +129,13 @@ body.theme--dark #nprogress .peg {
 }
 
 /* Set max-height for v-card to enable position sticky for apply button */
-.main-filter > .v-card {
+.main-filter>.v-card {
     max-height: var(--main-filter-max-height);
     overflow-y: auto;
 }
 
 /* Fullscreen mode */
-.default-table-wrapper.fullscreen .main-filter > .v-card {
+.default-table-wrapper.fullscreen .main-filter>.v-card {
     max-height: var(--main-filter-fullscreened-max-height);
 }
 
@@ -127,4 +147,5 @@ body.theme--dark #nprogress .peg {
 .main-filter .v-card-text {
     padding-top: 18px;
 }
+
 /* ------------ /end Main filter ------------ */

@@ -81,7 +81,7 @@ function handleTableOptionsUpdate(options) {
         </template>
 
         <!-- Loading slot -->
-        <template v-slot:loading>
+        <template #loading>
             <TableDefaultSkeleton />
         </template>
 
@@ -91,15 +91,15 @@ function handleTableOptionsUpdate(options) {
         </template>
 
         <!-- Item slots -->
-        <template v-slot:item.deleted_at="{ item }">
+        <template #item.deleted_at="{ item }">
             {{ formatDate(item.deleted_at) }}
         </template>
 
-        <template v-slot:item.edit="{ item }">
+        <template #item.edit="{ item }">
             <TdEditButton :link="route('mad.products.edit', item.id)" />
         </template>
 
-        <template v-slot:item.processes_count="{ item }">
+        <template #item.processes_count="{ item }">
             <InertiaLink
                 class="d-flex ga-2 mb-2 text-high-emphasis"
                 :link="item.index_link_of_related_processes"
@@ -121,72 +121,72 @@ function handleTableOptionsUpdate(options) {
             </TdInertiaLink>
         </template>
 
-        <template v-slot:item.manufacturer_category_name="{ item }">
+        <template #item.manufacturer_category_name="{ item }">
             <TdManufacturerCategory :name="item.manufacturer.category.name" />
         </template>
 
-        <template v-slot:item.manufacturer_country_name="{ item }">
+        <template #item.manufacturer_country_name="{ item }">
             {{ item.manufacturer.country.name }}
         </template>
 
-        <template v-slot:item.manufacturer_id="{ item }">
+        <template #item.manufacturer_id="{ item }">
             {{ item.manufacturer.name }}
         </template>
 
-        <template v-slot:item.inn_id="{ item }">
+        <template #item.inn_id="{ item }">
             <TogglableThreeLinesLimitedText :text="item.inn.name" />
         </template>
 
-        <template v-slot:item.form_id="{ item }">
+        <template #item.form_id="{ item }">
             {{ item.form.name }}
         </template>
 
-        <template v-slot:item.form_parent_name="{ item }">
+        <template #item.form_parent_name="{ item }">
             {{ item.form.parent_name }}
         </template>
 
-        <template v-slot:item.dosage="{ item }">
+        <template #item.dosage="{ item }">
             <TogglableThreeLinesLimitedText :text="item.dosage" />
         </template>
 
-        <template v-slot:item.moq="{ item }">
+        <template #item.moq="{ item }">
             {{ formatPrice(item.moq) }}
         </template>
 
-        <template v-slot:item.shelf_life_id="{ item }">
+        <template #item.shelf_life_id="{ item }">
             {{ item.shelf_life.name }}
         </template>
 
-        <template v-slot:item.class_id="{ item }">
+        <template #item.class_id="{ item }">
             <TdMediumWeightText class="text-green">
                 {{ item.class.name }}
             </TdMediumWeightText>
         </template>
 
-        <template v-slot:item.atx_id="{ item }">
+        <template #item.atx_id="{ item }">
             <TogglableThreeLinesLimitedText
                 v-if="item.atx"
                 :text="item.atx.name"
             />
         </template>
 
-        <template v-slot:item.atx_short_name="{ item }">
+        <template #item.atx_short_name="{ item }">
             {{ item.atx?.short_name }}
         </template>
 
-        <template v-slot:item.dossier="{ item }">
+        <template #item.dossier="{ item }">
             <TogglableThreeLinesLimitedText :text="item.dossier" />
         </template>
 
-        <template v-slot:item.zones_name="{ item }">
+        <template #item.zones_name="{ item }">
             <span>{{ item.zones.map((obj) => obj.name).join(" ") }}</span>
         </template>
 
-        <template v-slot:item.bioequivalence="{ item }">
+        <template #item.bioequivalence="{ item }">
             <TogglableThreeLinesLimitedText :text="item.bioequivalence" />
         </template>
 
-        <template v-slot:item.registered_in_eu="{ item }">
+        <template #item.registered_in_eu="{ item }">
             <TdMediumWeightText
                 v-if="item.registered_in_eu"
                 class="text-pink-darken-3"
@@ -195,41 +195,41 @@ function handleTableOptionsUpdate(options) {
             </TdMediumWeightText>
         </template>
 
-        <template v-slot:item.sold_in_eu="{ item }">
+        <template #item.sold_in_eu="{ item }">
             <TdMediumWeightText v-if="item.sold_in_eu" class="text-indigo">
                 For sale
             </TdMediumWeightText>
         </template>
 
-        <template v-slot:item.comments_count="{ item }">
+        <template #item.comments_count="{ item }">
             <TdRecordCommentsLink :record="item" />
         </template>
 
-        <template v-slot:item.last_comment_body="{ item }">
+        <template #item.last_comment_body="{ item }">
             <TogglableThreeLinesLimitedText :text="item.last_comment?.body" />
         </template>
 
-        <template v-slot:item.last_comment_created_at="{ item }">
+        <template #item.last_comment_created_at="{ item }">
             {{ formatDate(item.last_comment?.created_at) }}
         </template>
 
-        <template v-slot:item.manufacturer_bdm="{ item }">
+        <template #item.manufacturer_bdm="{ item }">
             <TdAva :user="item.manufacturer.bdm" />
         </template>
 
-        <template v-slot:item.manufacturer_analyst="{ item }">
+        <template #item.manufacturer_analyst="{ item }">
             <TdAva :user="item.manufacturer.analyst" />
         </template>
 
-        <template v-slot:item.created_at="{ item }">
+        <template #item.created_at="{ item }">
             {{ formatDate(item.created_at) }}
         </template>
 
-        <template v-slot:item.updated_at="{ item }">
+        <template #item.updated_at="{ item }">
             {{ formatDate(item.updated_at) }}
         </template>
 
-        <template v-slot:item.matched_product_searches="{ item }">
+        <template #item.matched_product_searches="{ item }">
             <TdInertiaLink
                 v-for="search in item.matched_product_searches"
                 :key="search.id"
@@ -239,7 +239,7 @@ function handleTableOptionsUpdate(options) {
             </TdInertiaLink>
         </template>
 
-        <template v-slot:item.attachments_count="{ item }">
+        <template #item.attachments_count="{ item }">
             <TdRecordAttachmentsLink :record="item" />
             <TdAttachmentsList :attachments="item.attachments" />
         </template>

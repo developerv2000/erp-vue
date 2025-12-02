@@ -36,16 +36,16 @@ const { formatDate } = useDateFormatter();
         </template>
 
         <!-- Loading slot -->
-        <template v-slot:loading>
+        <template #loading>
             <TableDefaultSkeleton />
         </template>
 
         <!-- Item slots -->
-        <template v-slot:item.file_size_in_mb="{ item }">
+        <template #item.file_size_in_mb="{ item }">
             {{ item.file_size_in_mb }} mb
         </template>
 
-        <template v-slot:item.created_at="{ item }">
+        <template #item.created_at="{ item }">
             {{ formatDate(item.created_at) }}
         </template>
     </v-data-table>

@@ -1,3 +1,19 @@
+// Number normalization
+export function normalizeNumber(input) {
+    if (input === undefined || input === null || input === "") return null;
+    const parsed = Number(input);
+    return isNaN(parsed) ? null : parsed;
+}
+
+/**
+ * Initialize multiple numbers from query
+ */
+export function normalizeNumbersFromQuery(targetObj, query, attributes) {
+    attributes.forEach((attr) => {
+        targetObj[attr] = normalizeNumber(query?.[attr]);
+    });
+}
+
 // Single ID normalization
 export function normalizeSingleID(input) {
     if (input === undefined || input === null || input === "") return null;

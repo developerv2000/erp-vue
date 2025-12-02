@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use App\Support\Helpers\ModelHelper;
 use App\Support\Traits\Model\AddsDefaultQueryParamsToRequest;
 use App\Support\Traits\Model\FindsRecordByName;
 use App\Support\Traits\Model\ScopesOrderingByName;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 
 class Department extends Model
 {
@@ -101,5 +103,35 @@ class Department extends Model
         return $query->withCount([
             'users',
         ]);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Queries
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Build and execute a model query based on request parameters.
+     *
+     * Steps:
+     *  - Apply default relations & counts
+     *  - Normalize query params (pagination, sorting, etc.)
+     *  - Finalize query with sorting & pagination
+     *
+     * @param $action  ('paginate', 'get' or 'query')
+     * @return mixed
+     */
+    public static function queryRecordsFromRequest(Request $request, string $action = 'get')
+    {
+        $query = self::withBasicRelations()->withBasicRelationCounts();
+
+        // Normalize request parameters
+        self::addDefaultQueryParamsToRequest($request);
+
+        // Finalize (sorting & pagination)
+        $records = ModelHelper::finalizeQueryForRequest($query, $request, $action);
+
+        return $records;
     }
 }

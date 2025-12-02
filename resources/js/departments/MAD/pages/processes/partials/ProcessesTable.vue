@@ -82,7 +82,7 @@ function handleTableOptionsUpdate(options) {
         </template>
 
         <!-- Loading slot -->
-        <template v-slot:loading>
+        <template #loading>
             <TableDefaultSkeleton />
         </template>
 
@@ -92,21 +92,21 @@ function handleTableOptionsUpdate(options) {
         </template>
 
         <!-- Item slots -->
-        <template v-slot:item.deleted_at="{ item }">
+        <template #item.deleted_at="{ item }">
             {{ formatDate(item.deleted_at) }}
         </template>
 
-        <template v-slot:item.edit="{ item }">
+        <template #item.edit="{ item }">
             <TdEditButton :link="route('mad.processes.edit', item.id)" />
         </template>
 
-        <template v-slot:item.duplicate="{ item }">
+        <template #item.duplicate="{ item }">
             <TdDuplicateButton
                 :link="route('mad.processes.duplicate', item.id)"
             />
         </template>
 
-        <template v-slot:item.last_status_date="{ item }">
+        <template #item.last_status_date="{ item }">
             {{
                 formatDate(
                     item.status_history[item.status_history.length - 1]
@@ -115,191 +115,191 @@ function handleTableOptionsUpdate(options) {
             }}
         </template>
 
-        <template v-slot:item.deadline_status="{ item }">
+        <template #item.deadline_status="{ item }">
             <TdProcessDeadlineStatus :record="item" />
         </template>
 
-        <template v-slot:item.contracted_in_asp="{ item }">
+        <template #item.contracted_in_asp="{ item }">
             <TdProcessContractedInAsp
                 v-if="item.is_ready_for_asp_contract"
                 :record="item"
             />
         </template>
 
-        <template v-slot:item.registered_in_asp="{ item }">
+        <template #item.registered_in_asp="{ item }">
             <TdProcessRegisteredInAsp
                 v-if="item.is_ready_for_asp_registration"
                 :record="item"
             />
         </template>
 
-        <template v-slot:item.readiness_for_order_date="{ item }">
+        <template #item.readiness_for_order_date="{ item }">
             <TdProcessReadinessForOder
                 v-if="item.can_be_marked_as_ready_for_order"
                 :record="item"
             />
         </template>
 
-        <template v-slot:item.status_id="{ item }">
+        <template #item.status_id="{ item }">
             {{ item.status.name }}
         </template>
 
-        <template v-slot:item.general_status_name_for_analysts="{ item }">
+        <template #item.general_status_name_for_analysts="{ item }">
             {{ item.status.general_status.name_for_analysts }}
         </template>
 
-        <template v-slot:item.general_status_name="{ item }">
+        <template #item.general_status_name="{ item }">
             {{ item.status.general_status.name }}
         </template>
 
-        <template v-slot:item.manufacturer_bdm="{ item }">
+        <template #item.manufacturer_bdm="{ item }">
             <TdAva :user="item.product.manufacturer.bdm" />
         </template>
 
-        <template v-slot:item.manufacturer_analyst="{ item }">
+        <template #item.manufacturer_analyst="{ item }">
             <TdAva :user="item.product.manufacturer.analyst" />
         </template>
 
-        <template v-slot:item.country_id="{ item }">
+        <template #item.country_id="{ item }">
             {{ item.search_country.code }}
         </template>
 
-        <template v-slot:item.manufacturer_category_name="{ item }">
+        <template #item.manufacturer_category_name="{ item }">
             <TdManufacturerCategory
                 :name="item.product.manufacturer.category.name"
             />
         </template>
 
-        <template v-slot:item.manufacturer_country_name="{ item }">
+        <template #item.manufacturer_country_name="{ item }">
             {{ item.product.manufacturer.country.name }}
         </template>
 
-        <template v-slot:item.product_manufacturer_name="{ item }">
+        <template #item.product_manufacturer_name="{ item }">
             {{ item.product.manufacturer.name }}
         </template>
 
-        <template v-slot:item.product_inn_name="{ item }">
+        <template #item.product_inn_name="{ item }">
             <TogglableThreeLinesLimitedText :text="item.product.inn.name" />
         </template>
 
-        <template v-slot:item.product_form_name="{ item }">
+        <template #item.product_form_name="{ item }">
             {{ item.product.form.name }}
         </template>
 
-        <template v-slot:item.product_dosage="{ item }">
+        <template #item.product_dosage="{ item }">
             <TogglableThreeLinesLimitedText :text="item.product.dosage" />
         </template>
 
-        <template v-slot:item.product_pack="{ item }">
+        <template #item.product_pack="{ item }">
             {{ item.product.pack }}
         </template>
 
-        <template v-slot:item.product_moq="{ item }">
+        <template #item.product_moq="{ item }">
             {{ formatPrice(item.product.moq) }}
         </template>
 
-        <template v-slot:item.product_shelf_life="{ item }">
+        <template #item.product_shelf_life="{ item }">
             {{ item.product.shelf_life.name }}
         </template>
 
-        <template v-slot:item.currency_id="{ item }">
+        <template #item.currency_id="{ item }">
             {{ item.currency?.name }}
         </template>
 
-        <template v-slot:item.manufacturer_offered_price_in_usd="{ item }">
+        <template #item.manufacturer_offered_price_in_usd="{ item }">
             {{ item.manufacturer_offered_price_in_usd }}
         </template>
 
-        <template v-slot:item.increased_price_percentage="{ item }">
+        <template #item.increased_price_percentage="{ item }">
             <span v-if="item.increased_price_percentage">
                 {{ item.increased_price_percentage }} %
             </span>
         </template>
 
-        <template v-slot:item.increased_price_date="{ item }">
+        <template #item.increased_price_date="{ item }">
             {{ formatDate(item.increased_price_date) }}
         </template>
 
-        <template v-slot:item.product_class="{ item }">
+        <template #item.product_class="{ item }">
             <TdMediumWeightText class="text-green">
                 {{ item.product.class.name }}
             </TdMediumWeightText>
         </template>
 
-        <template v-slot:item.product_atx_name="{ item }">
+        <template #item.product_atx_name="{ item }">
             <TogglableThreeLinesLimitedText
                 v-if="item.product.atx"
                 :text="item.product.atx.name"
             />
         </template>
 
-        <template v-slot:item.product_atx_short_name="{ item }">
+        <template #item.product_atx_short_name="{ item }">
             {{ item.product.atx?.short_name }}
         </template>
 
-        <template v-slot:item.marketing_authorization_holder_id="{ item }">
+        <template #item.marketing_authorization_holder_id="{ item }">
             {{ item.mah?.name }}
         </template>
 
-        <template v-slot:item.forecast_year_1_update_date="{ item }">
+        <template #item.forecast_year_1_update_date="{ item }">
             {{ formatDate(item.forecast_year_1_update_date) }}
         </template>
 
-        <template v-slot:item.forecast_year_1="{ item }">
+        <template #item.forecast_year_1="{ item }">
             {{ formatPrice(item.forecast_year_1) }}
         </template>
 
-        <template v-slot:item.forecast_year_2="{ item }">
+        <template #item.forecast_year_2="{ item }">
             {{ formatPrice(item.forecast_year_2) }}
         </template>
 
-        <template v-slot:item.forecast_year_3="{ item }">
+        <template #item.forecast_year_3="{ item }">
             {{ formatPrice(item.forecast_year_3) }}
         </template>
 
-        <template v-slot:item.clinical_trial_countries_name="{ item }">
+        <template #item.clinical_trial_countries_name="{ item }">
             {{ item.clinical_trial_countries.map((obj) => obj.name).join(" ") }}
         </template>
 
-        <template v-slot:item.product_zones_name="{ item }">
+        <template #item.product_zones_name="{ item }">
             <span>{{
                 item.product.zones.map((obj) => obj.name).join(" ")
             }}</span>
         </template>
 
-        <template v-slot:item.responsible_person_id="{ item }">
+        <template #item.responsible_person_id="{ item }">
             {{ item.responsible_person.name }}
         </template>
 
-        <template v-slot:item.responsible_person_update_date="{ item }">
+        <template #item.responsible_person_update_date="{ item }">
             {{ formatDate(item.responsible_person_update_date) }}
         </template>
 
-        <template v-slot:item.days_past="{ item }">
+        <template #item.days_past="{ item }">
             {{ item.days_past }}
         </template>
 
-        <template v-slot:item.created_at="{ item }">
+        <template #item.created_at="{ item }">
             {{ formatDate(item.created_at) }}
         </template>
 
-        <template v-slot:item.updated_at="{ item }">
+        <template #item.updated_at="{ item }">
             {{ formatDate(item.updated_at) }}
         </template>
 
-        <template v-slot:item.comments_count="{ item }">
+        <template #item.comments_count="{ item }">
             <TdRecordCommentsLink :record="item" />
         </template>
 
-        <template v-slot:item.last_comment_body="{ item }">
+        <template #item.last_comment_body="{ item }">
             <TogglableThreeLinesLimitedText :text="item.last_comment?.body" />
         </template>
 
-        <template v-slot:item.last_comment_created_at="{ item }">
+        <template #item.last_comment_created_at="{ item }">
             {{ formatDate(item.last_comment?.created_at) }}
         </template>
 
-        <template v-slot:item.status_history="{ item }">
+        <template #item.status_history="{ item }">
             <TdInertiaLink
                 :link="route('mad.processes.status-history.index', item.id)"
             >
@@ -307,43 +307,43 @@ function handleTableOptionsUpdate(options) {
             </TdInertiaLink>
         </template>
 
-        <template v-slot:item.general_status_periods_1="{ item }">
+        <template #item.general_status_periods_1="{ item }">
             <TdProcessGeneralStatusPeriod :record="item" :array-key="0" />
         </template>
 
-        <template v-slot:item.general_status_periods_2="{ item }">
+        <template #item.general_status_periods_2="{ item }">
             <TdProcessGeneralStatusPeriod :record="item" :array-key="1" />
         </template>
 
-        <template v-slot:item.general_status_periods_3="{ item }">
+        <template #item.general_status_periods_3="{ item }">
             <TdProcessGeneralStatusPeriod :record="item" :array-key="2" />
         </template>
 
-        <template v-slot:item.general_status_periods_4="{ item }">
+        <template #item.general_status_periods_4="{ item }">
             <TdProcessGeneralStatusPeriod :record="item" :array-key="3" />
         </template>
 
-        <template v-slot:item.general_status_periods_5="{ item }">
+        <template #item.general_status_periods_5="{ item }">
             <TdProcessGeneralStatusPeriod :record="item" :array-key="4" />
         </template>
 
-        <template v-slot:item.general_status_periods_6="{ item }">
+        <template #item.general_status_periods_6="{ item }">
             <TdProcessGeneralStatusPeriod :record="item" :array-key="5" />
         </template>
 
-        <template v-slot:item.general_status_periods_7="{ item }">
+        <template #item.general_status_periods_7="{ item }">
             <TdProcessGeneralStatusPeriod :record="item" :array-key="6" />
         </template>
 
-        <template v-slot:item.general_status_periods_8="{ item }">
+        <template #item.general_status_periods_8="{ item }">
             <TdProcessGeneralStatusPeriod :record="item" :array-key="7" />
         </template>
 
-        <template v-slot:item.general_status_periods_9="{ item }">
+        <template #item.general_status_periods_9="{ item }">
             <TdProcessGeneralStatusPeriod :record="item" :array-key="8" />
         </template>
 
-        <template v-slot:item.general_status_periods_10="{ item }">
+        <template #item.general_status_periods_10="{ item }">
             <TdProcessGeneralStatusPeriod :record="item" :array-key="9" />
         </template>
     </v-data-table-server>

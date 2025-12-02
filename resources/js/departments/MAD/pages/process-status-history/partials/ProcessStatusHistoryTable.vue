@@ -42,12 +42,12 @@ function edit(item) {
         </template>
 
         <!-- Loading slot -->
-        <template v-slot:loading>
+        <template #loading>
             <TableDefaultSkeleton />
         </template>
 
         <!-- Item slots -->
-        <template v-slot:item.edit="{ item }">
+        <template #item.edit="{ item }">
             <v-btn
                 color="amber"
                 variant="tonal"
@@ -57,19 +57,19 @@ function edit(item) {
             />
         </template>
 
-        <template v-slot:item.status_id="{ item }">
+        <template #item.status_id="{ item }">
             {{ item.status.name }}
         </template>
 
-        <template v-slot:item.general_status_name="{ item }">
+        <template #item.general_status_name="{ item }">
             {{ item.status.general_status.name }}
         </template>
 
-        <template v-slot:item.start_date="{ item }">
+        <template #item.start_date="{ item }">
             {{ formatDate(item.start_date, "DD MMM YYYY HH:mm:ss") }}
         </template>
 
-        <template v-slot:item.end_date="{ item }">
+        <template #item.end_date="{ item }">
             <span v-if="item.end_date">
                 {{ formatDate(item.end_date, "DD MMM YYYY HH:mm:ss") }}
             </span>

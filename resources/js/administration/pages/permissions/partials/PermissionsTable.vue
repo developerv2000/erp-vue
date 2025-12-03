@@ -55,6 +55,7 @@ const { t } = useI18n();
                 :link="
                     route('administration.users.index', {
                         'permissions[]': item.id,
+                        initialize_from_inertia_page: true,
                     })
                 "
             >

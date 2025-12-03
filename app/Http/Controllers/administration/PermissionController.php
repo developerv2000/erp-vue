@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\administration;
 
 use App\Http\Controllers\Controller;
+use App\Models\Department;
 use App\Models\Permission;
-use App\Support\FilterDependencies\SimpleFilters\administration\PermissionsSimpleFilter;
+use App\Models\Role;
 use App\Support\Helpers\ControllerHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -21,22 +22,31 @@ class PermissionController extends Controller
             'records' => fn() => Permission::queryRecordsFromRequest($request, 'get'),
 
             // Never refetched again
-            'simpleFilterDependencies' => fn() => PermissionsSimpleFilter::getAllDependencies(),
+            'filterDependencies' => fn() => $this->getFilterDependencies(),
         ]);
     }
 
     private function getAllTableHeadersTranslated(): Collection
     {
         $headers = collect([
-            ['title' => "fields.Name", 'key' => 'name', 'width' => 280, 'sortable' => true,],
-            ['title' => "Department", 'key' => 'department_id', 'width' => 120, 'sortable' => true,],
-            ['title' => "properties.Global", 'key' => 'global', 'width' => 120, 'sortable' => true,],
-            ['title' => "Users", 'key' => 'users_count', 'width' => 132, 'sortable' => true,],
-            ['title' => "Roles", 'key' => 'roles_name', 'width' => 220, 'sortable' => false,],
+            ['title' => "fields.Name", 'key' => 'name', 'width' => 280, 'sortable' => true],
+            ['title' => "Department", 'key' => 'department_id', 'width' => 120, 'sortable' => true],
+            ['title' => "properties.Global", 'key' => 'global', 'width' => 120, 'sortable' => true],
+            ['title' => "Users", 'key' => 'users_count', 'width' => 132, 'sortable' => true],
+            ['title' => "Roles", 'key' => 'roles_name', 'width' => 220, 'sortable' => false],
         ]);
 
         ControllerHelper::translateTableHeadersTitle($headers);
 
         return $headers;
+    }
+
+    private function getFilterDependencies(): array
+    {
+        return [
+            'roles' => Role::orderByName()->get(),
+            'permissions' => Permission::orderByName()->get(),
+            'departments' => Department::orderByName()->get(),
+        ];
     }
 }

@@ -6,48 +6,37 @@ import { cleanQueryParams, normalizeNumbersFromQuery, normalizeDateRangesFromQue
 const defaultPaginationOptions = {
     page: 1,
     per_page: 50,
-    order_by: 'updated_at',
-    order_direction: 'desc',
+    order_by: 'name',
+    order_direction: 'asc',
     total_records: 0,
     last_page: 1,
     navigate_to_page: 1, // Prepended navigation
 };
 
 const defaultFilters = {
-    // Boolean
-    active: null,
-    important: null,
+    // Text fields
+    email: null,
 
     // Date ranges
     created_at: null,
     updated_at: null,
 
-    // Singular autocompletes
-    region: null,
-
-    // Singular id-based autocompletes
-    analyst_user_id: null,
-    bdm_user_id: null,
-    category_id: null,
-
     // Multiple id-based autocompletes
-    country_id: [],
     id: [],
-    product_classes: [],
-    zones: [],
-    process_country_id: [],
-    blacklists: [],
+    department_id: [],
+    roles: [],
+    permissions: [],
+    responsible_countries: [],
 }
 
-const API_URL = route('api.manufacturers.get');
+const API_URL = route('api.users.get');
 
-export const useMADManufacturersTableStore = defineStore('MADManufacturersTable', {
+export const useAdministrationUsersTableStore = defineStore('AdministrationUsersTable', {
     state: () => ({
         records: [],
         loading: false,
         initializedFromInertiaPage: false,
         selected: [],
-        isTrashPage: false,
 
         pagination: {
             ...defaultPaginationOptions
@@ -59,10 +48,6 @@ export const useMADManufacturersTableStore = defineStore('MADManufacturersTable'
     }),
 
     actions: {
-        detectCurrentPage() {
-            this.isTrashPage = route().current('*.trash'); // Used to differ index/trash pages
-        },
-
         initFromInertiaPage(page) {
             this.records = [];
             const query = page.props.query;
@@ -75,12 +60,10 @@ export const useMADManufacturersTableStore = defineStore('MADManufacturersTable'
             this.navigate_to_page = this.pagination.page;
 
             // Filters that don`t require normalization
-            this.filters.region = query.region;
+            this.filters.email = query.email;
 
             // Normalize filters
-            normalizeNumbersFromQuery(this.filters, query, ['active', 'important']);
-            normalizeSingleIDsFromQuery(this.filters, query, ['analyst_user_id', 'bdm_user_id', 'category_id']);
-            normalizeMultiIDsFromQuery(this.filters, query, ['country_id', 'id', 'product_classes', 'zones', 'process_country_id', 'blacklists']);
+            normalizeMultiIDsFromQuery(this.filters, query, ['id', 'department_id', 'roles', 'permissions', 'responsible_countries']);
             normalizeDateRangesFromQuery(this.filters, query, ['created_at', 'updated_at']);
 
             // Mark as initialized
@@ -89,9 +72,6 @@ export const useMADManufacturersTableStore = defineStore('MADManufacturersTable'
 
         toQuery() {
             const rawQuery = {
-                // Only trashed
-                only_trashed: this.isTrashPage ? true : null, // null -> remove from query
-
                 // Pagination
                 page: this.pagination.page,
                 per_page: this.pagination.per_page,
@@ -155,7 +135,7 @@ export const useMADManufacturersTableStore = defineStore('MADManufacturersTable'
 
         updateUrlAfterFetch() {
             router.get(route(route().current()), this.toQuery(), {
-                only: ['smartFilterDependencies', 'query'], // Also update query to trigger active filters class update
+                only: ['query'], // Update query to trigger active filters class update
                 replace: true,
                 preserveState: true,
                 preserveScroll: true,
@@ -183,7 +163,7 @@ export const useMADManufacturersTableStore = defineStore('MADManufacturersTable'
 
         resetUrl() {
             router.get(route(route().current()), {}, {
-                only: ['smartFilterDependencies'],
+                only: [],
                 replace: true,
                 preserveState: true,
                 preserveScroll: true,

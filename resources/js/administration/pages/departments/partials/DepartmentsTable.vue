@@ -55,6 +55,7 @@ const page = usePage();
                 :link="
                     route('administration.users.index', {
                         'department_id[]': item.id,
+                        initialize_from_inertia_page: true,
                     })
                 "
             >
@@ -62,7 +63,7 @@ const page = usePage();
             </TdInertiaLink>
         </template>
 
-        <template #item.permissons_name="{ item }">
+        <template #item.permissions_name="{ item }">
             <div class="d-flex flex-wrap ga-1">
                 <TdInertiaLink
                     v-for="permission in item.permissions"

@@ -9,7 +9,7 @@ const { t } = useI18n();
 </script>
 
 <template>
-    <MainLayout :title="t('pages.Roles')" :display-title-at-header="true">
+    <MainLayout :title="t('pages.Permissions')" :display-title-at-header="true">
         <DefaultTableWrapper>
             <PermissionsTable />
             <PermissionsFilter />

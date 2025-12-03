@@ -70,7 +70,7 @@ const resetFilter = () => {
             :label="t('fields.Name')"
             name="id[]"
             v-model="filters.id"
-            :items="page.props.simpleFilterDependencies.roles"
+            :items="page.props.filterDependencies.roles"
             multiple
         />
 
@@ -78,7 +78,7 @@ const resetFilter = () => {
             :label="t('Permissions')"
             name="permissions"
             v-model="filters.permissions"
-            :items="page.props.simpleFilterDependencies.permissions"
+            :items="page.props.filterDependencies.permissions"
             multiple
         />
 
@@ -86,7 +86,7 @@ const resetFilter = () => {
             :label="t('Departments')"
             name="department_id"
             v-model="filters.department_id"
-            :items="page.props.simpleFilterDependencies.departments"
+            :items="page.props.filterDependencies.departments"
             item-title="abbreviation"
             multiple
         />

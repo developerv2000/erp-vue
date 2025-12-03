@@ -25,11 +25,11 @@ class DepartmentController extends Controller
     private function getAllTableHeadersTranslated(): Collection
     {
         $headers = collect([
-            ['title' => "fields.Name", 'key' => 'name', 'width' => 220, 'sortable' => true,],
-            ['title' => "fields.Abbreviation", 'key' => 'abbreviation', 'width' => 132, 'sortable' => true,],
-            ['title' => "Roles", 'key' => 'roles_name', 'width' => 160, 'sortable' => false,],
-            ['title' => "Users", 'key' => 'users_count', 'width' => 132, 'sortable' => true,],
-            ['title' => "Permissions", 'key' => 'permissons_name', 'width' => 940, 'sortable' => false,],
+            ['title' => "fields.Name", 'key' => 'name', 'width' => 220, 'sortable' => true],
+            ['title' => "fields.Abbreviation", 'key' => 'abbreviation', 'width' => 132, 'sortable' => true],
+            ['title' => "Roles", 'key' => 'roles_name', 'width' => 160, 'sortable' => false],
+            ['title' => "Users", 'key' => 'users_count', 'width' => 132, 'sortable' => true],
+            ['title' => "Permissions", 'key' => 'permissions_name', 'width' => 940, 'sortable' => false],
         ]);
 
         ControllerHelper::translateTableHeadersTitle($headers);

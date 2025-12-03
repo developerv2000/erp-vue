@@ -4,8 +4,10 @@
     "No": "Нет",
     "Attachments": "Вложения",
     "Record": "Запись",
+    "Records": "Записи",
     "Multiple records": "Множество записей",
     "History": "История",
+    "Manufacturers": "Производители",
 
     "validations.required": "Это поле обязательно.",
     "validations.invalid": "Недопустимое значение.",

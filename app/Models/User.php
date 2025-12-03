@@ -3,12 +3,19 @@
 namespace App\Models;
 
 use App\Support\Helpers\FileHelper;
+use App\Support\Helpers\ModelHelper;
+use App\Support\Helpers\QueryFilterHelper;
+use App\Support\Traits\Model\AddsDefaultQueryParamsToRequest;
 use App\Support\Traits\Model\UploadsFile;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Http\Request;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\ValidationException;
 use InvalidArgumentException;
 
 class User extends Authenticatable
@@ -17,12 +24,18 @@ class User extends Authenticatable
     use HasFactory;
     use Notifiable;
     use UploadsFile;
+    use AddsDefaultQueryParamsToRequest;
 
     /*
     |--------------------------------------------------------------------------
     | Constants
     |--------------------------------------------------------------------------
     */
+
+    // Query
+    const DEFAULT_ORDER_BY = 'name';
+    const DEFAULT_ORDER_DIRECTION = 'asc';
+    const DEFAULT_PER_PAGE = 50;
 
     // Photo
     const PHOTO_PATH = 'images/users';
@@ -121,18 +134,51 @@ class User extends Authenticatable
         return $this->hasMany(Manufacturer::class, 'analyst_user_id');
     }
 
+    public function manufacturersAsBdm()
+    {
+        return $this->hasMany(Manufacturer::class, 'bdm_user_id');
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
     /*
     |--------------------------------------------------------------------------
-    | Additional attributes
+    | Additional attributes & appends
     |--------------------------------------------------------------------------
     */
+
+    public static function appendRecordsBasicAttributes($records): void
+    {
+        foreach ($records as $record) {
+            $record->appendBasicAttributes();
+        }
+    }
+
+    // 'photo_url' is always appended automatically
+    public function appendBasicAttributes(): void
+    {
+        $this->append([
+            'usage_count',
+        ]);
+    }
+
+    // Ensure that all related model counts are loaded.
+    public function getUsageCountAttribute(): int
+    {
+        return $this->manufacturers_as_analyst_count
+            + $this->manufacturers_as_bdm_count;
+        // + $this->product_searches_count;
+    }
 
     public function getPhotoUrlAttribute(): string
     {
         return url('storage/' . self::PHOTO_PATH . '/' . $this->photo);
     }
 
-    public function getPhotoPathAttribute()
+    public function getPhotoPathAttribute(): string
     {
         return storage_path('app/public/' . self::PHOTO_PATH . '/' . $this->photo);
     }
@@ -148,7 +194,7 @@ class User extends Authenticatable
      *
      * Used by EnsureUserRelationsAreLoaded middleware.
      */
-    public function loadBasicAuthRelations()
+    public function loadBasicAuthRelations(): void
     {
         $this->loadMissing([
             'roles' => function ($rolesQuery) {
@@ -161,18 +207,68 @@ class User extends Authenticatable
 
     /*
     |--------------------------------------------------------------------------
+    | Events
+    |--------------------------------------------------------------------------
+    */
+
+    protected static function booted(): void
+    {
+        static::deleting(function ($record) {
+            // Load counts which are required for 'usage_count' attribute
+            $record->loadCount(
+                'manufacturersAsAnalyst',
+                'manufacturersAsBdm',
+                // 'productSearches'
+            );
+
+            // Throw error if user is in use
+            if ($record->usage_count > 0) {
+                throw ValidationException::withMessages([
+                    'user_deletion' => trans('validation.custom.users.user_is_in_use', ['name' => $record->name]),
+                ]);
+            }
+
+            // Delete related models but keep 'comments'
+            $record->roles()->detach();
+            $record->permissions()->detach();
+            $record->responsibleCountries()->detach();
+        });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Scopes
     |--------------------------------------------------------------------------
     */
 
-    public function scopeOnlyCMDBDMs($query)
+    public function scopeOnlyCMDBDMs($query): Builder
     {
         return $query->whereRelation('roles', 'name', Role::CMD_BDM_NAME);
     }
 
-    public function scopeOnlyMADAnalysts($query)
+    public function scopeOnlyMADAnalysts($query): Builder
     {
         return $query->whereRelation('roles', 'name', Role::MAD_ANALYST_NAME);
+    }
+
+    public function scopeWithBasicRelations($query): Builder
+    {
+        return $query->with([
+            'department',
+            'roles',
+            'permissions',
+            'responsibleCountries',
+        ]);
+    }
+
+    public function scopeWithBasicRelationCounts($query): Builder
+    {
+        return $query->withCount([
+            'manufacturersAsAnalyst',
+            'manufacturersAsBdm',
+            // 'productSearches'
+            'comments',
+        ]);
     }
 
     /**
@@ -180,7 +276,7 @@ class User extends Authenticatable
      *
      * Roles with permissions must be loaded, because of using gates.
      */
-    public function scopeWithBasicRelationsToNotify($query)
+    public function scopeWithBasicRelationsToNotify($query): Builder
     {
         return $query->with([
             'roles' => function ($rolesQuery) {
@@ -196,14 +292,55 @@ class User extends Authenticatable
     |--------------------------------------------------------------------------
     */
 
-    public static function getCMDBDMsMinifed()
+    /**
+     * Build and execute a model query based on request parameters.
+     *
+     * Steps:
+     *  - Apply default relations & counts
+     *  - Normalize query params (pagination, sorting, etc.)
+     *  - Apply filters
+     *  - Finalize query with sorting & pagination
+     *  - Append basic attributes (if requested and unless returning raw query)
+     *
+     * @param $action  ('paginate', 'get' or 'query')
+     * @return mixed
+     */
+    public static function queryRecordsFromRequest(Request $request, string $action = 'paginate', bool $appendAttributes = false)
+    {
+        $query = self::withBasicRelations()->withBasicRelationCounts();
+
+        // Normalize request parameters
+        self::addDefaultQueryParamsToRequest($request);
+
+        // Apply filters
+        self::filterQueryForRequest($query, $request);
+
+        // Finalize (sorting & pagination)
+        $records = ModelHelper::finalizeQueryForRequest($query, $request, $action);
+
+        // Append attributes unless raw query is requested
+        if ($appendAttributes && $action !== 'query') {
+            self::appendRecordsBasicAttributes($records);
+        }
+
+        return $records;
+    }
+
+    public static function getCMDBDMsMinifed(): Collection
     {
         return self::onlyCMDBDMs()->select('id', 'name')->get();
     }
 
-    public static function getMADAnalystsMinified()
+    public static function getMADAnalystsMinified(): Collection
     {
         return self::onlyMADAnalysts()->select('id', 'name')->get();
+    }
+
+    public static function getAllMinified(): Collection
+    {
+        return self::select('id', 'name')
+            ->orderBy('name', 'asc')
+            ->get();
     }
 
     /*
@@ -212,28 +349,28 @@ class User extends Authenticatable
     |--------------------------------------------------------------------------
     */
 
-    public function hasRole($role)
+    public function hasRole($role): bool
     {
         return $this->roles->contains('name', $role);
     }
 
-    public function isInactive()
+    public function isInactive(): bool
     {
         return $this->hasRole(Role::INACTIVE_NAME);
     }
 
-    public function isGlobalAdministrator()
+    public function isGlobalAdministrator(): bool
     {
         return $this->hasRole(Role::GLOBAL_ADMINISTRATOR_NAME);
     }
 
-    public function isAnyAdministrator()
+    public function isAnyAdministrator(): bool
     {
         return $this->isGlobalAdministrator()
             || $this->isMADAdministrator();
     }
 
-    public function isMADAdministrator()
+    public function isMADAdministrator(): bool
     {
         return $this->hasRole(Role::MAD_ADMINISTRATOR_NAME);
     }
@@ -290,6 +427,47 @@ class User extends Authenticatable
 
     /*
     |--------------------------------------------------------------------------
+    | Filtering
+    |--------------------------------------------------------------------------
+    */
+
+    public static function filterQueryForRequest($query, $request): Builder
+    {
+        return QueryFilterHelper::applyFilters($query, $request, self::getFilterConfig());
+    }
+
+    private static function getFilterConfig(): array
+    {
+        return [
+            'whereEqual' => ['analyst_user_id', 'bdm_user_id', 'category_id', 'active', 'important'],
+            'whereIn' => ['id', 'department_id'],
+            'like' => ['email'],
+            'dateRange' => ['created_at', 'updated_at'],
+
+            'belongsToManyRelation' => [
+                [
+                    'inputName' => 'permissions',
+                    'relationName' => 'permissions',
+                    'relationTable' => 'permissions',
+                ],
+
+                [
+                    'inputName' => 'roles',
+                    'relationName' => 'roles',
+                    'relationTable' => 'roles',
+                ],
+
+                [
+                    'inputName' => 'responsible_countries',
+                    'relationName' => 'responsibleCountries',
+                    'relationTable' => 'countries',
+                ],
+            ],
+        ];
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Settings: Main helpers
     |--------------------------------------------------------------------------
     */
@@ -342,7 +520,7 @@ class User extends Authenticatable
     /**
      * Used via artisan command line.
      */
-    public static function resetSettingsOfAllUsers()
+    public static function resetSettingsOfAllUsers(): void
     {
         self::all()->each(function ($user) {
             $user->resetSettings();
@@ -422,7 +600,7 @@ class User extends Authenticatable
     |--------------------------------------------------------------------------
     */
 
-    public function resetMADTableHeaders($settings)
+    public function resetMADTableHeaders($settings): void
     {
         $this->refresh();
         $settings = $this->settings;
@@ -481,16 +659,91 @@ class User extends Authenticatable
 
     /*
     |--------------------------------------------------------------------------
+    | Store & Update by admin
+    |--------------------------------------------------------------------------
+    */
+
+    public static function storeByAdminFromRequest($request): void
+    {
+        $record = self::create($request->validated());
+
+        // BelongsToMany relations
+        $record->roles()->attach($request->input('roles'));
+        $record->permissions()->attach($request->input('permissions'));
+        $record->responsibleCountries()->attach($request->input('responsible_countries'));
+
+        // Reset all settings of the user
+        $record->resetSettings();
+
+        // Upload user's photo
+        $record->uploadPhoto();
+    }
+
+    /**
+     * Update by admin.
+     *
+     * Logouts updated user from all devices for security.
+     */
+    public function updateByAdminFromRequest($request): void
+    {
+        // Update the user's profile
+        $this->update($request->validated());
+
+        // BelongsToMany relations
+        $this->roles()->sync($request->input('roles'));
+        $this->permissions()->sync($request->input('permissions'));
+        $this->responsibleCountries()->sync($request->input('responsibleCountries'));
+
+        // Reset settings
+        $this->resetSettings();
+
+        // Manually logout user from all devices
+        if (Auth::user()->id != $this->id) {
+            $this->logoutFromAllSessions();
+        }
+
+        // Upload user's photo if provided
+        if ($request->hasFile('photo')) {
+            $this->uploadPhoto();
+        }
+    }
+
+    /**
+     * Update users password by admin.
+     *
+     * Laravel automatically logouts user from other devices, while user is updating his own password.
+     * Thats why manually logout user from all devices, if not own password is being updated.
+     */
+    public function updatePassword($request): void
+    {
+        // Update the user's password with the new hashed password
+        $this->update([
+            'password' => bcrypt($request->password),
+        ]);
+
+        // Manually logout from all devices
+        if (Auth::user()->id != $this->id) {
+            $this->logoutFromAllSessions();
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Misc
     |--------------------------------------------------------------------------
     */
+
+    public static function getStoragePhotoFolderPath(): string
+    {
+        return storage_path('app/public/' . self::PHOTO_PATH);
+    }
 
     public static function getImageUrlForDeletedUser(): string
     {
         return url('storage/' . self::PHOTO_PATH . '/' . self::DELETED_USER_PHOTO);
     }
 
-    public static function notifyUsersBasedOnPermission($notification, $permission)
+    public static function notifyUsersBasedOnPermission($notification, $permission): void
     {
         self::withBasicRelationsToNotify()->each(function ($user) use ($notification, $permission) {
             if (Gate::forUser($user)->allows($permission)) {
@@ -501,20 +754,37 @@ class User extends Authenticatable
 
     public function uploadPhoto(): void
     {
-        $this->uploadFile('photo', storage_path('app/public/' . self::PHOTO_PATH), $this->name);
+        $this->uploadFile('photo', self::getStoragePhotoFolderPath(), $this->name);
         FileHelper::resizeImage($this->photo_path, self::PHOTO_WIDTH, self::PHOTO_HEIGHT);
+    }
+
+    /**
+     * Logout user manually from all devices, by clearing sessions and remember_token.
+     *
+     * Laravel automatically logouts user from other devices, while user is updating his own password.
+     * Used only when updating user by admin!
+     */
+    private function logoutFromAllSessions(): void
+    {
+        // Delete all sessions for the current user
+        DB::table('sessions')->where('user_id', $this->id)->delete();
+
+        // Delete users remember_token.
+        $this->refresh();
+        $this->remember_token = null;
+        $this->save();
     }
 
     /**
      * Detect users home page, based on permissions.
      */
-    public function detectHomeRouteName()
+    public function detectHomeRouteName(): string
     {
         $homepageRoutes = [
             // MAD
             'mad.manufacturers.index' => 'view-MAD-EPP',
-            'mad.products.index' => 'view-IVP-EPP',
-            'mad.processes.index' => 'view-VPS-EPP',
+            'mad.products.index' => 'view-MAD-IVP',
+            'mad.processes.index' => 'view-MAD-VPS',
         ];
 
         foreach ($homepageRoutes as $routeName => $gate) {

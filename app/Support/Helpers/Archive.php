@@ -13,7 +13,7 @@ use App\Models\Product;
  */
 class Archive
 {
-    public static function validateProductAtxes()
+    public static function validateProductAtxes(): void
     {
         Product::chunk(500, function ($products) {
             foreach ($products as $product) {

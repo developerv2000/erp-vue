@@ -192,6 +192,10 @@ return [
         'meetings' => [
             'unique' => 'Meeting for such a year, with a current manufacturer already exists.',
         ],
+
+        'users' => [
+            'user_is_in_use' => 'User :name is use, please replace it with another user and retry again.',
+        ],
     ],
 
     /*

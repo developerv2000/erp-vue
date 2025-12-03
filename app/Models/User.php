@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 use InvalidArgumentException;
@@ -692,7 +693,7 @@ class User extends Authenticatable
         // BelongsToMany relations
         $this->roles()->sync($request->input('roles'));
         $this->permissions()->sync($request->input('permissions'));
-        $this->responsibleCountries()->sync($request->input('responsibleCountries'));
+        $this->responsibleCountries()->sync($request->input('responsible_countries'));
 
         // Reset settings
         $this->resetSettings();
@@ -714,7 +715,7 @@ class User extends Authenticatable
      * Laravel automatically logouts user from other devices, while user is updating his own password.
      * Thats why manually logout user from all devices, if not own password is being updated.
      */
-    public function updatePassword($request): void
+    public function updatePasswordByAdmin($request): void
     {
         // Update the user's password with the new hashed password
         $this->update([

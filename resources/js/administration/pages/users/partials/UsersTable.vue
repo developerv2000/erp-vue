@@ -84,6 +84,10 @@ function handleTableOptionsUpdate(options) {
         </template>
 
         <!-- Item slots -->
+        <template #item.edit="{ item }">
+            <TdEditButton :link="route('administration.users.edit', item.id)" />
+        </template>
+
         <template #item.photo="{ item }">
             <v-avatar :image="item.photo_url" size="x-large" />
         </template>

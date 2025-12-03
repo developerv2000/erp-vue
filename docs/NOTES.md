@@ -19,3 +19,4 @@
 - User model, fix 'productSearches relation/count' after adding 'ProductSearch'
 - Remove redundant SimpleFilters
 - Add :return typos for controller functions
+- FIx profile edit form (make it like MAD CRUD forms)

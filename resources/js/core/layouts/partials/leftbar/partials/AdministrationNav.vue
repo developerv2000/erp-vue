@@ -43,7 +43,7 @@ const listItems = computed(() => [
         title: t("pages.Users"),
         routeName: "administration.users.index",
         routeParams: null,
-        activeOnRoutes: "administration.users.index",
+        activeOnRoutes: "administration.users.*",
         prependIcon: mdiAccountCircle,
     },
 ]);

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\administration;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\administration\UserStoreRequest;
 use App\Http\Requests\administration\UserUpdateRequest;
+use App\Http\Requests\Koko\UserPasswordUpdateRequest;
 use App\Models\Country;
 use App\Models\Department;
 use App\Models\Permission;
@@ -37,7 +38,7 @@ class UserController extends Controller
     public function create()
     {
         // No lazy loads required, because AJAX request is used on store
-        return Inertia::render('administration/pages/v/Index', [
+        return Inertia::render('administration/pages/users/Create', [
             'permissions' => Permission::orderByName()->get(),
             'roles' => Role::orderByName()->get(),
             'departments' => Department::orderByName()->get(),
@@ -59,9 +60,15 @@ class UserController extends Controller
 
     public function edit(User $record)
     {
+        $record->load([
+            'roles',
+            'permissions',
+            'responsibleCountries'
+        ]);
+
         $record->appendBasicAttributes();
 
-        return Inertia::render('departments/MAD/pages/manufacturers/Edit', [
+        return Inertia::render('administration/pages/users/Edit', [
             // Refetched after record update
             'record' => $record,
 
@@ -85,9 +92,22 @@ class UserController extends Controller
         ]);
     }
 
+    /**
+     * AJAX request
+     */
+    public function updatePassword(UserPasswordUpdateRequest $request, User $record)
+    {
+        $record->updatePasswordByAdmin($request);
+
+        return response()->json([
+            'success' => true,
+        ]);
+    }
+
     private function getAllTableHeadersTranslated(): Collection
     {
         $headers = collect([
+            ['title' => 'Record', 'key' => 'edit', 'width' => 60, 'sortable' => false],
             ['title' => "fields.Photo", 'key' => 'photo', 'width' => 74, 'sortable' => false],
             ['title' => "fields.Name", 'key' => 'name', 'width' => 180, 'sortable' => true],
             ['title' => "fields.Email", 'key' => 'email', 'width' => 180, 'sortable' => true],

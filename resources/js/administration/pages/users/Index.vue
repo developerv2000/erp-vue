@@ -9,7 +9,7 @@ const { t } = useI18n();
 </script>
 
 <template>
-    <MainLayout :title="t('pages.EPP')" :display-title-at-header="true">
+    <MainLayout :title="t('pages.Users')" :display-title-at-header="true">
         <DefaultTableWrapper>
             <UsersTable />
             <UsersFilter />

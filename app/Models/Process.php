@@ -1289,7 +1289,7 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
      */
     public static function recalculateAllDaysPastSinceLastActivity(): void
     {
-        self::withTrashed()->with(['activeStatusHistory', 'lastComment'])->chunk(500, function ($records) {
+        self::withTrashed()->with(['activeStatusHistory', 'lastComment'])->chunk(1000, function ($records) {
             foreach ($records as $record) {
                 $record->recalculateDaysPastSinceLastActivity();
             }

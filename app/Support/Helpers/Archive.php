@@ -15,7 +15,7 @@ class Archive
 {
     public static function validateProductAtxes(): void
     {
-        Product::chunk(500, function ($products) {
+        Product::chunk(1000, function ($products) {
             foreach ($products as $product) {
                 $atx = Atx::where('inn_id', $product->inn_id)
                     ->where('form_id', $product->form_id)

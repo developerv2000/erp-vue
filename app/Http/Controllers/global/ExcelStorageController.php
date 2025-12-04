@@ -62,7 +62,7 @@ class ExcelStorageController extends Controller
     {
         $row = 2;
 
-        $query->chunk(800, function ($recordsChunk) use (&$sheet, &$row, $modelClass) {
+        $query->chunk(1000, function ($recordsChunk) use (&$sheet, &$row, $modelClass) {
             if (in_array(PreparesFetchedRecordsForExport::class, class_implements($modelClass))) {
                 $modelClass::prepareFetchedRecordsForExport($recordsChunk);
             }

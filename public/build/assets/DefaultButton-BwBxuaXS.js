@@ -1,0 +1,1 @@
+import{ab as a,c as r,o,w as n,e as c,m as _,_ as l,b as e,I as u}from"./app-DFGAykv1.js";const i={class:"text-none"},h={__name:"DefaultButton",setup(p){const t=a();return(s,d)=>(o(),r(u,l({color:"primary",variant:"flat",height:e(t).size?"":"40",rounded:"lg"},e(t)),{default:n(()=>[c("span",i,[_(s.$slots,"default")])]),_:3},16,["height"]))}};export{h as _};

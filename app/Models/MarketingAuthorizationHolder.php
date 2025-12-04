@@ -13,14 +13,6 @@ class MarketingAuthorizationHolder extends Model
 
     /*
     |--------------------------------------------------------------------------
-    | Constants
-    |--------------------------------------------------------------------------
-    */
-
-    const UNDER_DISCUSSION_SHORT_NAME = 'Обс.'; // used in MAD ASP show page
-
-    /*
-    |--------------------------------------------------------------------------
     | Properties
     |--------------------------------------------------------------------------
     */
@@ -52,14 +44,6 @@ class MarketingAuthorizationHolder extends Model
 
     public static function getDefaultSelectedIDValue()
     {
-        return self::where('name', 'Обсуждается')->value('id');
-    }
-
-    /**
-     * Used on MAD ASP show page.
-     */
-    public static function getUnderDiscussionNamedRecord()
-    {
-        return self::where('name', 'Обсуждается')->first();
+        return self::where('name', 'TBC')->value('id');
     }
 }

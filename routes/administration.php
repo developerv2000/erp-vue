@@ -19,5 +19,6 @@ Route::prefix('administration')->name('administration.')->middleware('auth', 'au
         );
 
         Route::post('/update-password/{record}', 'updatePassword')->name('update-password');
+        Route::post('/transfer-records/{record}', 'transferRecords')->name('transfer-records');
     });
 });

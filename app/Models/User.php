@@ -712,20 +712,38 @@ class User extends Authenticatable
     /**
      * Update users password by admin.
      *
-     * Laravel automatically logouts user from other devices, while user is updating his own password.
+     * Laravel automatically logouts user from all devices, while user is updating his own password.
      * Thats why manually logout user from all devices, if not own password is being updated.
      */
     public function updatePasswordByAdmin($request): void
     {
         // Update the user's password with the new hashed password
         $this->update([
-            'password' => bcrypt($request->password),
+            'password' => bcrypt($request->new_password),
         ]);
 
         // Manually logout from all devices
         if (Auth::user()->id != $this->id) {
             $this->logoutFromAllSessions();
         }
+    }
+
+    /**
+     * Transfer records (like manufacturersAsAnalyst) except comments to another user by admin.
+     */
+    public function transferRecordsByAdmin($request): void
+    {
+        $toUserId = $request->input('to_user_id');
+
+        // manufacturersAsAnalyst
+        $this->manufacturersAsAnalyst()->update([
+            'analyst_user_id' => $toUserId,
+        ]);
+
+        // manufacturersAsBdm
+        $this->manufacturersAsBdm()->update([
+            'bdm_user_id' => $toUserId,
+        ]);
     }
 
     /*

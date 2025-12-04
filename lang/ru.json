@@ -86,6 +86,8 @@
 
     "forms.Personal data": "Персональные данные",
     "forms.Password update": "Обновить пароль",
+    "forms.Transfer records": "Передать записи",
+    "forms.Transfer records description": "Передать все записи пользователя другому пользователю, кроме комментарий. Комментарии не будут удалены.",
 
     "filter.Filtered records": "Отфильтрованных записей",
     "filter.Region": "Регион",
@@ -139,6 +141,7 @@
     "comments.Date": "Дата коммент.",
     "comments.All": "Все комментарии",
 
+    "User": "Пользователь",
     "Users": "Пользователи",
     "users.Deleted user": "Удалённый пользователь",
 

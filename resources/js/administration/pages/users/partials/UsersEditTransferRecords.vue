@@ -3,16 +3,15 @@ import { ref, computed } from "vue";
 import { usePage, router } from "@inertiajs/vue3";
 import { useI18n } from "vue-i18n";
 import { Form, useForm, useField } from "vee-validate";
-import { object, string } from "yup";
+import { number, object, string } from "yup";
 import { useFormData } from "@/core/composables/useFormData";
 import { useMessagesStore } from "@/core/stores/messages";
 
 import DefaultSheet from "@/core/components/containers/DefaultSheet.vue";
 import DefaultTitle from "@/core/components/titles/DefaultTitle.vue";
-import DefaultTextField from "@/core/components/form/inputs/DefaultTextField.vue";
+import DefaultAutocomplete from "@/core/components/form/inputs/DefaultAutocomplete.vue";
 import FormActionsContainer from "@/core/components/form/containers/FormActionsContainer.vue";
 import FormResetButton from "@/core/components/form/buttons/FormResetButton.vue";
-import { mdiEye, mdiEyeOff } from "@mdi/js";
 import FormUpdateWithourRedirect from "@/core/components/form/buttons/FormUpdateWithourRedirect.vue";
 import FormUpdateAndRedirectBack from "@/core/components/form/buttons/FormUpdateAndRedirectBack.vue";
 
@@ -24,11 +23,10 @@ const messages = useMessagesStore();
 const record = computed(() => page.props.record);
 const loading = ref(false);
 const redirectBack = ref(false);
-const showNewPassword = ref(false);
 
 // Yup schema
 const schema = object({
-    new_password: string().required().min(4),
+    to_user_id: number().required(),
 });
 
 // VeeValidate form
@@ -38,8 +36,8 @@ const { handleSubmit, setErrors, resetForm, meta } = useForm({
 });
 
 // Register form fields
-const { value: newPassword, errorMessage: newPasswordError } =
-    useField("new_password");
+const { value: toUserId, errorMessage: toUserIdError } =
+    useField("to_user_id");
 
 // Submit handler
 const submit = handleSubmit((values) => {
@@ -48,24 +46,15 @@ const submit = handleSubmit((values) => {
 
     axios
         .post(
-            route("administration.users.update-password", {
+            route("administration.users.transfer-records", {
                 record: record.value.id,
             }),
             formData
         )
-        .then((response) => {
+        .then(() => {
             messages.addUpdatedSuccessfullyMessage();
 
-            // Redirect to login page, if own password was updated
-            if (response.data.redirectToLoginPage) {
-                router.visit(route("login"), {
-                    data: {
-                        logged_out: true,
-                    },
-                });
-            }
-
-            if (redirectBack.value && !response.data.redirectToLoginPage) {
+            if (redirectBack.value) {
                 window.history.back();
             } else {
                 resetForm({
@@ -88,22 +77,23 @@ const submit = handleSubmit((values) => {
 </script>
 
 <template>
-    <Form class="d-flex flex-column ga-6 mt-8">
+    <Form class="d-flex flex-column ga-6 mt-8 pb-8">
         <DefaultSheet>
-            <DefaultTitle>{{ t("forms.Password update") }}</DefaultTitle>
+            <DefaultTitle :margin-bottom="2">{{
+                t("forms.Transfer records")
+            }}</DefaultTitle>
+
+            <p class="text-body-2 mb-4">
+                {{ t("forms.Transfer records description") }}
+            </p>
 
             <v-row>
                 <v-col cols="4">
-                    <DefaultTextField
-                        :label="t('fields.New password')"
-                        :type="showNewPassword ? 'text' : 'password'"
-                        v-model="newPassword"
-                        :error-messages="newPasswordError"
-                        autocomplete="new-password"
-                        :append-inner-icon="
-                            showNewPassword ? mdiEyeOff : mdiEye
-                        "
-                        @click:append-inner="showNewPassword = !showNewPassword"
+                    <DefaultAutocomplete
+                        :label="t('User')"
+                        :items="page.props.users"
+                        v-model="toUserId"
+                        :error-messages="toUserIdError"
                         required
                     />
                 </v-col>

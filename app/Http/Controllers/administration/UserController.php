@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\administration;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\administration\UserPasswordUpdateRequest;
 use App\Http\Requests\administration\UserStoreRequest;
+use App\Http\Requests\administration\UserTransferRecordsRequest;
 use App\Http\Requests\administration\UserUpdateRequest;
-use App\Http\Requests\Koko\UserPasswordUpdateRequest;
 use App\Models\Country;
 use App\Models\Department;
 use App\Models\Permission;
@@ -77,6 +78,7 @@ class UserController extends Controller
             'roles' => fn() => Role::orderByName()->get(),
             'departments' => fn() => Department::orderByName()->get(),
             'countriesOrderedByProcessesCount' => fn() => Country::orderByProcessesCount()->get(),
+            'users' => fn() => User::getAllMinified(),
         ]);
     }
 
@@ -98,6 +100,20 @@ class UserController extends Controller
     public function updatePassword(UserPasswordUpdateRequest $request, User $record)
     {
         $record->updatePasswordByAdmin($request);
+        $redirectToLoginPage = $record->id == auth()->user()->id; // Redirect to login page if own password was updated
+
+        return response()->json([
+            'success' => true,
+            'redirectToLoginPage' => $redirectToLoginPage,
+        ]);
+    }
+
+    /**
+     * AJAX request
+     */
+    public function transferRecords(UserTransferRecordsRequest $request, User $record)
+    {
+        $record->transferRecordsByAdmin($request);
 
         return response()->json([
             'success' => true,

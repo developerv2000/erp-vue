@@ -27,7 +27,7 @@ const schema = yup.object({
 });
 
 // VeeValidate form
-const { handleSubmit, setErrors, resetForm } = useForm({
+const { handleSubmit, setErrors, resetForm, meta } = useForm({
     validationSchema: schema,
 });
 
@@ -47,6 +47,7 @@ const submit = handleSubmit((values) => {
         },
         onError: (errors) => {
             setErrors(errors);
+            messages.addFixErrorsMessage();
         },
         onSuccess: () => {
             resetForm();
@@ -60,10 +61,10 @@ const submit = handleSubmit((values) => {
 </script>
 
 <template>
-    <DefaultSheet class="mt-8">
-        <DefaultTitle>{{ t("forms.Password update") }}</DefaultTitle>
+    <Form>
+        <DefaultSheet class="mt-8">
+            <DefaultTitle>{{ t("forms.Password update") }}</DefaultTitle>
 
-        <Form @submit="submit">
             <v-row>
                 <v-col>
                     <DefaultTextField
@@ -97,11 +98,16 @@ const submit = handleSubmit((values) => {
                     />
                 </v-col>
             </v-row>
+        </DefaultSheet>
 
-            <FormActionsContainer class="mt-5">
-                <FormUpdateButton :loading="loading" />
-                <FormResetButton />
-            </FormActionsContainer>
-        </Form>
-    </DefaultSheet>
+        <FormActionsContainer class="mt-5">
+            <FormResetButton @click="resetForm" :loading="loading" />
+
+            <FormUpdateButton
+                @click="submit"
+                :loading="loading"
+                :disabled="!meta.valid"
+            />
+        </FormActionsContainer>
+    </Form>
 </template>

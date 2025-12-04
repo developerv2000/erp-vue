@@ -84,6 +84,8 @@
 
     "forms.Personal data": "Personal data",
     "forms.Password update": "Password update",
+    "forms.Transfer records": "Transfer records",
+    "forms.Transfer records description": "Transfer all records of the user to another user, except comments. Comments will not be deleted.",
 
     "messages.Success": "Success!",
     "messages.Submition failed": "Something went wrong, please try again later!",
@@ -133,6 +135,7 @@
     "comments.Date": "Comments date",
     "comments.All": "All comments",
 
+    "User": "User",
     "Users": "Users",
     "users.Deleted user": "Deleted user",
 

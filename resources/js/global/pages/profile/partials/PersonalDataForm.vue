@@ -30,7 +30,7 @@ const schema = yup.object({
 });
 
 // VeeValidate form
-const { handleSubmit, setErrors, resetForm, setFieldValue } = useForm({
+const { handleSubmit, setErrors, resetForm, setFieldValue, meta } = useForm({
     validationSchema: schema,
     initialValues: computed(() => ({
         name: user.value.name,
@@ -55,6 +55,7 @@ const submit = handleSubmit((values) => {
         },
         onError: (errors) => {
             setErrors(errors);
+            messages.addFixErrorsMessage();
         },
         onSuccess: () => {
             setFieldValue("photo", null);
@@ -68,10 +69,10 @@ const submit = handleSubmit((values) => {
 </script>
 
 <template>
-    <DefaultSheet>
-        <DefaultTitle>{{ t("forms.Personal data") }}</DefaultTitle>
+    <Form enctype="multipart/form-data">
+        <DefaultSheet>
+            <DefaultTitle>{{ t("forms.Personal data") }}</DefaultTitle>
 
-        <Form @submit="submit" enctype="multipart/form-data">
             <v-row>
                 <v-col>
                     <DefaultTextField
@@ -101,11 +102,16 @@ const submit = handleSubmit((values) => {
                     />
                 </v-col>
             </v-row>
+        </DefaultSheet>
 
-            <FormActionsContainer class="mt-5">
-                <FormUpdateButton :loading="loading" />
-                <FormResetButton @click="resetForm" />
-            </FormActionsContainer>
-        </Form>
-    </DefaultSheet>
+        <FormActionsContainer class="mt-5">
+            <FormResetButton @click="resetForm" :loading="loading" />
+
+            <FormUpdateButton
+                @click="submit"
+                :loading="loading"
+                :disabled="!meta.valid"
+            />
+        </FormActionsContainer>
+    </Form>
 </template>

@@ -206,7 +206,10 @@ function handleTableOptionsUpdate(options) {
         </template>
 
         <template #item.last_comment_body="{ item }">
-            <TogglableThreeLinesLimitedText :text="item.last_comment?.body" />
+            <TogglableThreeLinesLimitedText
+                class="main-table__last-comment"
+                :text="item.last_comment?.body"
+            />
         </template>
 
         <template #item.last_comment_created_at="{ item }">

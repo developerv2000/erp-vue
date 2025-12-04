@@ -114,9 +114,16 @@ body.theme--dark #nprogress .peg {
     justify-items: flex-start;
 }
 
-.main-table .three-lines-limited-text img {
+.main-table__last-comment img {
     max-width: 40px;
     height: auto;
+}
+
+.main-table__last-comment table th {
+    padding: 0 !important;
+    white-space: normal;
+    text-align: left;
+    font-weight: normal;
 }
 
 /* ------------ /end Main table ------------ */

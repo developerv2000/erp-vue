@@ -1,0 +1,1 @@
+import{f as l,o as r,m as t,aU as n}from"./app-DBI2YLZw.js";const p={__name:"DefaultTableWrapper",setup(s){function a(){const e=document.querySelector(".default-table-wrapper");n(e)}return(e,o)=>(r(),l("div",{class:"default-table-wrapper d-flex ga-6 align-start",onFullscreenchange:a},[t(e.$slots,"default")],32))}};export{p as _};

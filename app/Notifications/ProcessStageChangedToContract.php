@@ -39,6 +39,7 @@ class ProcessStageChangedToContract extends Notification
     public function toArray(object $notifiable): array
     {
         return [
+            'type' => class_basename(static::class),
             'process_id' => $this->process->id,
             'status_name' => $this->status_name,
         ];

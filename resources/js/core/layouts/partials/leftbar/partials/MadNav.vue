@@ -16,7 +16,7 @@ import {
 } from "@mdi/js";
 
 const { t } = useI18n();
-const { can } = useAuth();
+const { can, canAny } = useAuth();
 
 const listItems = computed(() => [
     {
@@ -89,7 +89,11 @@ const listItems = computed(() => [
 </script>
 
 <template>
-    <v-list density="compact" color="primary">
+    <v-list
+        v-if="canAny(['view-MAD-EPP', 'view-MAD-IVP', 'view-MAD-VPS'])"
+        density="compact"
+        color="primary"
+    >
         <v-list-subheader>{{ $t("departments.MAD") }}</v-list-subheader>
 
         <template v-for="(item, index) in listItems" :key="index">

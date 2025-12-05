@@ -38,6 +38,10 @@ class User extends Authenticatable
     const DEFAULT_ORDER_DIRECTION = 'asc';
     const DEFAULT_PER_PAGE = 50;
 
+    const DEFAULT_NOTIFICATIONS_ORDER_BY = 'created_at';
+    const DEFAULT_NOTIFICATIONS_ORDER_DIRECTION = 'desc';
+    const DEFAULT_NOTIFICATIONS_PER_PAGE = 50;
+
     // Photo
     const PHOTO_PATH = 'images/users';
     const PHOTO_WIDTH = 400;
@@ -327,6 +331,33 @@ class User extends Authenticatable
         return $records;
     }
 
+    /**
+     * Build and execute a notifications query based on request parameters.
+     *
+     * @param $action  ('paginate', 'get' or 'query')
+     * @return mixed
+     */
+    public function queryNotificationsFromRequest(Request $request, string $action = 'paginate')
+    {
+        $query = $this->notifications();;
+
+        // Normalize request parameters
+        self::addDefaultQueryParamsToRequest(
+            $request,
+            'DEFAULT_NOTIFICATIONS_ORDER_BY',
+            'DEFAULT_NOTIFICATIONS_ORDER_DIRECTION',
+            'DEFAULT_NOTIFICATIONS_PER_PAGE',
+        );
+
+        // Apply filters
+        self::filterNotificationsQueryForRequest($query, $request);
+
+        // Finalize (sorting & pagination)
+        $records = ModelHelper::finalizeQueryForRequest($query, $request, $action);
+
+        return $records;
+    }
+
     public static function getCMDBDMsMinifed(): Collection
     {
         return self::onlyCMDBDMs()->select('id', 'name')->get();
@@ -465,6 +496,22 @@ class User extends Authenticatable
                 ],
             ],
         ];
+    }
+
+    public static function filterNotificationsQueryForRequest($query, $request)
+    {
+        // Apply unread filter
+        if ($request->filled('unread')) {
+            $unread = $request->input('unread');
+
+            $query->when($unread == true, function ($conditionalQuery) {
+                return $conditionalQuery->whereNull('read_at');
+            })->when($unread == false, function ($conditionalQuery) {
+                return $conditionalQuery->whereNotNull('read_at');
+            });
+        }
+
+        return $query;
     }
 
     /*

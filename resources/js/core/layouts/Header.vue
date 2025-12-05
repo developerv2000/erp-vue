@@ -3,6 +3,7 @@ import ThemeToggler from "./partials/header/ThemeToggler.vue";
 import LocalesMenu from "./partials/header/LocalesMenu.vue";
 import ProfileMenu from "./partials/header/ProfileMenu.vue";
 import LeftbarToggler from "./partials/header/LeftbarToggler.vue";
+import NotificationsLink from "./partials/header/NotificationsLink.vue";
 import { mdiBellOutline } from "@mdi/js";
 
 defineProps({
@@ -27,7 +28,7 @@ defineProps({
         </v-app-bar-title>
 
         <template #append>
-            <v-btn :icon="mdiBellOutline" />
+            <NotificationsLink />
             <ThemeToggler />
             <LocalesMenu />
             <ProfileMenu />

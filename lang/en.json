@@ -70,6 +70,7 @@
     "actions.Fullscreen": "Fullscreen",
     "actions.Filter": "Filter",
     "actions.Apply": "Apply",
+    "actions.Check": "Check",
     "actions.Go to page": "Go to page",
     "actions.Store": "Store",
     "actions.Store and redirect back": "Store and redirect back",
@@ -118,11 +119,16 @@
     "modals.Delete record": "Delete record",
     "modals.Delete record question": "Are you sure you want to delete this record",
 
+    "notifications.Mark selected as read": "Mark as read",
+    "notifications.Process stage updated to contract": "Status of process #{process_id} has been updated to {status_name}.",
+
     "files.Generating": "Generating file",
     "files.Download started": "Download started",
     "files.Name": "Filename",
     "files.Size": "File size",
 
+    "properties.New": "New",
+    "properties.Read": "Read",
     "properties.Important": "Important",
     "properties.Active": "Active",
     "properties.Stopped": "Stopped",
@@ -139,6 +145,7 @@
     "Users": "Users",
     "users.Deleted user": "Deleted user",
 
+    "Date": "Date",
     "dates.Date of creation": "Date of creation",
     "dates.Update date": "Update date",
     "dates.Deletion date": "Deletion date",

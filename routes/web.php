@@ -4,6 +4,7 @@ use App\Http\Controllers\global\AttachmentController;
 use App\Http\Controllers\global\CommentController;
 use App\Http\Controllers\global\ExcelStorageController;
 use App\Http\Controllers\global\MainController;
+use App\Http\Controllers\global\NotificationController;
 use App\Http\Controllers\global\ProfileController;
 use App\Http\Controllers\global\SettingController;
 use App\Support\Generators\CRUDRouteGenerator;
@@ -23,6 +24,13 @@ Route::middleware('auth', 'auth.session')->group(function () {
 
         Route::post('table-headers/{key}', 'updateTableHeaders')->name('table-headers.update'); // AJAX request
         Route::post('table-headers/{key}/reset', 'resetTableHeaders')->name('table-headers.reset'); // AJAX request
+    });
+
+    Route::prefix('notifications')->controller(NotificationController::class)->name('notifications.')->group(function () {
+        Route::get('/', 'index')->name('index');
+
+        Route::post('/mark-as-read', 'markAsRead')->name('mark-as-read'); // AJAX request
+        Route::post('/destroy', 'destroy')->name('destroy'); // AJAX request
     });
 
     Route::controller(ProfileController::class)->prefix('profile')->name('profile.')->group(function () {

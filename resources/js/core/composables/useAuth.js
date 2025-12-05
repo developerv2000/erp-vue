@@ -91,6 +91,11 @@ export default function useAuth() {
         return array.some((item) => item.id === user.value.id)
     }
 
+    const canReceiveNotifications = () => {
+        if (!user.value) return false;
+        return canAny(['receive-notification-on-MAD-VPS-contract']);
+    }
+
     return {
         user,
         isLoggedIn,
@@ -101,5 +106,6 @@ export default function useAuth() {
         canAny,
         owns,
         isCurrentUserInArray,
+        canReceiveNotifications,
     }
 }

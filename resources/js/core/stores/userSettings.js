@@ -8,6 +8,7 @@ export const useUserSettingsStore = defineStore("userSettings", {
         theme: "light",
         locale: "en",
         isLeftbarCollapsed: false, // Controls <v-navigation-drawer rail />
+        initialized: false,
     }),
 
     getters: {
@@ -17,6 +18,12 @@ export const useUserSettingsStore = defineStore("userSettings", {
 
     actions: {
         initFromInertiaPage(page) {
+            // Return if already initialized
+            if (this.initialized) return
+
+            // Mark as initialized
+            this.initialized = true
+
             // Theme
             const theme = page.props.auth.user?.settings.theme ?? this.theme
             this.setTheme(theme)

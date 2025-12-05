@@ -44,7 +44,7 @@ export default defineConfig({
             '@': fileURLToPath(new URL('./resources/js', import.meta.url)),
 
             // Shortcut for importing from `lang/`
-            '@lang': fileURLToPath(new URL('./lang', import.meta.url))
+            '@lang': fileURLToPath(new URL('./lang', import.meta.url)),
         },
     },
 

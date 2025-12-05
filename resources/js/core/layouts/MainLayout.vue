@@ -1,6 +1,7 @@
 <script setup>
 import { Head } from "@inertiajs/vue3";
 import { usePage } from "@inertiajs/vue3";
+import { useGlobalStore } from "../stores/global";
 import { useUserSettingsStore } from "@/core/stores/userSettings";
 
 import Leftbar from "./Leftbar.vue";
@@ -21,9 +22,13 @@ defineProps({
 
 const page = usePage();
 const userSettings = useUserSettingsStore();
+const globalStore = useGlobalStore();
 
-// Initialize user settings from inertia page
+// Initialize user settings from inertia page (only once)
 userSettings.initFromInertiaPage(page);
+
+// Initialize global store, check for unread notifications etc. (only once)
+globalStore.initFromInertiaPage(page);
 </script>
 
 <template>

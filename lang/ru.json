@@ -72,6 +72,7 @@
     "actions.Fullscreen": "Полноэкранный",
     "actions.Filter": "Фильтр",
     "actions.Apply": "Применять",
+    "actions.Check": "Проверить",
     "actions.Go to page": "Перейти на страницу",
     "actions.Store": "Сохранить",
     "actions.Store and redirect back": "Сохранить и вернуться",
@@ -124,11 +125,16 @@
     "modals.Delete record": "Удалить запись",
     "modals.Delete record question": "Вы уверены, что хотите удалить эту запись",
 
+    "notifications.Mark selected as read": "Пометить как прочитанное",
+    "notifications.Process stage updated to contract": "Статус процесса #{process_id} был изменён на {status_name}.",
+
     "files.Generating": "Генерация файла",
     "files.Download started": "Загрузка началась",
     "files.Name": "Имя файла",
     "files.Size": "Размер файла",
 
+    "properties.New": "Новый",
+    "properties.Read": "Прочитанно",
     "properties.Important": "Важный",
     "properties.Active": "Активный",
     "properties.Stopped": "Остановлен",
@@ -145,6 +151,7 @@
     "Users": "Пользователи",
     "users.Deleted user": "Удалённый пользователь",
 
+    "Date": "Дата",
     "dates.Date of creation": "Дата создания",
     "dates.Update date": "Дата обновления",
     "dates.Deletion date": "Дата удаления",

@@ -10,7 +10,7 @@ const defaultPaginationOptions = {
     order_direction: 'asc',
     total_records: 0,
     last_page: 1,
-    navigate_to_page: 1, // Prepended navigation
+    navigate_to_page: 1, // Prepended navigation on footer of the table
 };
 
 const defaultFilters = {

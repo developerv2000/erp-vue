@@ -327,7 +327,7 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
 
         static::created(function ($record) {
             $record->addStatusHistoryForCurrentStatus($record->created_at);
-            $record->recalculateDaysPastSinceLastActivity(); // Must be executed only AFTER creating status_history!
+            $record->recalculateDaysPastSinceLastActivity(true); // Must be executed only AFTER creating status_history!
         });
 
         static::updating(function ($record) {
@@ -338,7 +338,7 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
 
         static::updated(function ($record) {
             // Recalculate 'days_past_since_last_activity' after updating event, because records status maybe be updated.
-            $record->recalculateDaysPastSinceLastActivity();
+            $record->recalculateDaysPastSinceLastActivity(true);
         });
 
         static::saving(function ($record) {
@@ -1291,7 +1291,7 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
     {
         self::withTrashed()->with(['activeStatusHistory', 'lastComment'])->chunk(1000, function ($records) {
             foreach ($records as $record) {
-                $record->recalculateDaysPastSinceLastActivity();
+                $record->recalculateDaysPastSinceLastActivity(false); // false => don`t refresh records
             }
         });
     }

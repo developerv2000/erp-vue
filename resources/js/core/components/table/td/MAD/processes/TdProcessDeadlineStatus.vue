@@ -14,7 +14,7 @@ const color = computed(() => {
         case "Stopped":
             return "grey-lighten-3";
         case "No deadline":
-            return "light-green-accent-1";
+            return "light-green-lighten-1";
         case "Not expired":
             return "orange-lighten-3";
         case "Expired":

@@ -59,9 +59,9 @@ const schema = computed(() => {
         countries: array().of(
             object({
                 country_id: number().required(),
-                forecast_year_1: number().required(),
-                forecast_year_2: number().required(),
-                forecast_year_3: number().required(),
+                forecast_year_1:  statusStage.value >= 2 ? number().required() : number().nullable(),
+                forecast_year_2: statusStage.value >= 2 ? number().required() : number().nullable(),
+                forecast_year_3: statusStage.value >= 2 ? number().required() : number().nullable(),
             })
         ),
     };
@@ -308,6 +308,7 @@ const reloadUpdatedDataAndResetForm = () => {
                 :errors="errors"
                 :push="pushCountry"
                 :remove="removeCountry"
+                :statusStage="statusStage"
             />
         </v-slide-y-transition>
 

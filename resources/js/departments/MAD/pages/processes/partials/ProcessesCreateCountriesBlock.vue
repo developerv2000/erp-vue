@@ -9,6 +9,7 @@ import DefaultNumberInput from "@/core/components/form/inputs/DefaultNumberInput
 defineProps({
     fields: { type: Array, required: true },
     errors: { type: Object, required: true },
+    statusStage: { required: true },
 });
 
 // Access i18n and inertia page
@@ -42,7 +43,7 @@ const getCountryCodeByID = (id) => {
                                 errors[`countries.${index}.forecast_year_1`]
                             "
                             :min="0"
-                            required
+                            :required="statusStage >= 2"
                         />
                     </v-col>
 
@@ -57,7 +58,7 @@ const getCountryCodeByID = (id) => {
                                 errors[`countries.${index}.forecast_year_2`]
                             "
                             :min="0"
-                            required
+                            :required="statusStage >= 2"
                         />
                     </v-col>
 
@@ -72,7 +73,7 @@ const getCountryCodeByID = (id) => {
                                 errors[`countries.${index}.forecast_year_3`]
                             "
                             :min="0"
-                            required
+                            :required="statusStage >= 2"
                         />
                     </v-col>
                 </v-row>

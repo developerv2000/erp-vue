@@ -33,7 +33,7 @@ export const useGlobalStore = defineStore("global", {
                 // Check for unread notifications each 2 minutes
                 this._interval = setInterval(() => {
                     this.checkForUnreadNotifications()
-                }, 60 * 1000);
+                }, 120 * 1000);
             }
         },
 
@@ -79,6 +79,9 @@ export const useGlobalStore = defineStore("global", {
             stores.forEach((store) => {
                 store.resetState();
             });
+
+            // Reset self
+            this.resetState();
         },
 
         resetState() {

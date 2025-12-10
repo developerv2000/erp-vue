@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Http\Requests\MAD\ProductStoreRequest;
 use App\Http\Requests\MAD\ProductUpdateRequest;
+use App\Support\Contracts\Model\ExportsProductSelection;
 use App\Support\Contracts\Model\ExportsRecordsAsExcel;
 use App\Support\Contracts\Model\GeneratesBreadcrumbs;
 use App\Support\Contracts\Model\HasTitleAttribute;
@@ -23,7 +24,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
-class Product extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, ExportsRecordsAsExcel
+class Product extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, ExportsRecordsAsExcel, ExportsProductSelection
 {
     /** @use HasFactory<\Database\Factories\ProductFactory> */
     use HasFactory;
@@ -122,8 +123,6 @@ class Product extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
             'index_link_of_related_processes',
             'matched_product_searches',
         ]);
-
-        'http://qwer.test/mad/products?manufacturer_id%5B%5D=20&product_inn_id%5B%5D=6&product_form_id%5B%5D=9&dosage=56&pack=42%20ML&initialize_from_inertia_page=1';
     }
     // Used in products.index/trash pages table
     public function getIndexLinkOfRelatedProcessesAttribute(): string
@@ -328,6 +327,44 @@ class Product extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
             $this->updated_at,
             $this->matched_product_searches->count(),
         ];
+    }
+
+    //  Implement method declared in ExportsProductSelection Interface.
+    public function scopeWithRelationsForProductSelection($query)
+    {
+        // Select only required fields
+        return $query
+            ->with([
+                'inn',
+                'form',
+                'shelfLife',
+            ])
+            ->select([
+                'products.id',
+                'inn_id',
+                'form_id',
+                'shelf_life_id',
+                'dosage',
+                'pack',
+                'moq',
+            ]);
+    }
+
+    // Implement method declared in ExportsProductSelection Interface
+    public static function queryRecordsForProductSelection(Request $request): Builder
+    {
+        $query = self::withRelationsForProductSelection();
+
+        // Normalize request parameters
+        self::addDefaultQueryParamsToRequest($request);
+
+        // Apply filters
+        self::filterQueryForRequest($query, $request);
+
+        // Finalize (sorting)
+        ModelHelper::finalizeQueryForRequest($query, $request, 'query');
+
+        return $query;
     }
 
     /*

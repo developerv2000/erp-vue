@@ -20,3 +20,4 @@
 - Remove redundant SimpleFilters
 - Add :return typos for controller functions
 - FIx profile edit form (make it like MAD CRUD forms)
+- Refactor Products 'getMatchedProductSearchesAttribute()'

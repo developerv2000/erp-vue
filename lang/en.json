@@ -64,6 +64,7 @@
     "actions.Permanent delete": "Permanent delete",
     "actions.Restore": "Restore",
     "actions.Export": "Export",
+    "actions.PS": "PS",
     "actions.More": "More",
     "actions.Cancel": "Cancel",
     "actions.Columns": "Columns",

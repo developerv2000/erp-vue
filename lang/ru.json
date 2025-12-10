@@ -66,6 +66,7 @@
     "actions.Permanent delete": "Удалить навсегда",
     "actions.Restore": "Востановить",
     "actions.Export": "Экспорт",
+    "actions.PS": "ВП",
     "actions.More": "Ещё",
     "actions.Cancel": "Отмена",
     "actions.Columns": "Столбцы",

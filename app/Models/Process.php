@@ -6,6 +6,7 @@ use App\Http\Requests\MAD\ProcessDuplicateRequest;
 use App\Http\Requests\MAD\ProcessStoreRequest;
 use App\Http\Requests\MAD\ProcessUpdateRequest;
 use App\Notifications\ProcessStageChangedToContract;
+use App\Support\Contracts\Model\ExportsProductSelection;
 use App\Support\Contracts\Model\ExportsRecordsAsExcel;
 use App\Support\Contracts\Model\GeneratesBreadcrumbs;
 use App\Support\Contracts\Model\HasTitleAttribute;
@@ -26,7 +27,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
-class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, ExportsRecordsAsExcel, PreparesFetchedRecordsForExport
+class Process extends Model implements
+    HasTitleAttribute,
+    GeneratesBreadcrumbs,
+    ExportsRecordsAsExcel,
+    PreparesFetchedRecordsForExport,
+    ExportsProductSelection
 {
     /** @use HasFactory<\Database\Factories\ProcessFactory> */
     use HasFactory;
@@ -568,7 +574,11 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
         return $breadcrumbs;
     }
 
-    // Implement method declared in ExportsRecordsAsExcel Interface
+    /**
+     * Implement method declared in ExportsRecordsAsExcel Interface
+     *
+     * Removes 'ordering by table joins' for performance.
+     */
     public static function queryRecordsForExportFromRequest(Request $request): Builder
     {
         $query = self::withBasicRelations()
@@ -578,13 +588,17 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
         // Normalize request parameters
         self::addDefaultQueryParamsToRequest($request);
 
+        // Remove 'ordering by table joins' for perfomance
+        self::removeOrderingByTableJoinsFromRequest($query, $request);
+
         // Apply filters
         self::filterQueryForRequest($query, $request);
 
         // Merge 'order_by_days_past_since_last_activity' into request if missing
         self::ensureOrderByActivityFlag($request);
 
-        // Add ordering by 'days_past_since_last_activity' before default ordering
+        // Add ordering by 'days_past_since_last_activity' before
+        // default ordering via ModelHelper::finalizeQueryForRequest
         self::orderQueryByActivityIfRequested($query, $request);
 
         // Finalize (sorting)
@@ -669,6 +683,59 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
         ];
     }
 
+    // Implement method declared in ExportsProductSelection Interface
+    public function scopeWithRelationsForProductSelection($query)
+    {
+        return $query->with([
+            'product' => function ($productQuery) {
+                $productQuery->withRelationsForProductSelection();
+            },
+            'status',
+            'currency',
+            'searchCountry',
+        ])
+            ->select(
+                'processes.id',
+                'product_id',
+                'country_id',
+                'status_id',
+                'currency_id',
+                'agreed_price',
+                'manufacturer_first_offered_price',
+                'our_first_offered_price',
+                'forecast_year_1',
+                'forecast_year_2',
+                'forecast_year_3',
+            );
+    }
+
+    // Implement method declared in ExportsRecordsAsExcel Interface
+    public static function queryRecordsForProductSelection(Request $request): Builder
+    {
+        $query = self::withRelationsForProductSelection();
+
+        // Normalize request parameters
+        self::addDefaultQueryParamsToRequest($request);
+
+        // Remove 'ordering by table joins' for perfomance
+        self::removeOrderingByTableJoinsFromRequest($query, $request);
+
+        // Apply filters
+        self::filterQueryForRequest($query, $request);
+
+        // Merge 'order_by_days_past_since_last_activity' into request if missing
+        self::ensureOrderByActivityFlag($request);
+
+        // Add ordering by 'days_past_since_last_activity' before
+        // default ordering via ModelHelper::finalizeQueryForRequest
+        self::orderQueryByActivityIfRequested($query, $request);
+
+        // Finalize (sorting)
+        ModelHelper::finalizeQueryForRequest($query, $request, 'query');
+
+        return $query;
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Queries
@@ -701,13 +768,17 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
         // Normalize request parameters
         self::addDefaultQueryParamsToRequest($request);
 
+        // Add table joins for query ordering
+        self::addTableJoinsForQueryOrdering($query, $request);
+
         // Apply filters
         self::filterQueryForRequest($query, $request);
 
         // Merge 'order_by_days_past_since_last_activity' into request if missing
         self::ensureOrderByActivityFlag($request);
 
-        // Add ordering by 'days_past_since_last_activity' before default ordering
+        // Add ordering by 'days_past_since_last_activity' before
+        // default ordering via ModelHelper::finalizeQueryForRequest
         self::orderQueryByActivityIfRequested($query, $request);
 
         // Finalize (sorting & pagination)
@@ -1307,7 +1378,7 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
      *
      * Used during the updating event of the model.
      */
-    private function notifyUsersOnContractStage()
+    private function notifyUsersOnContractStage(): void
     {
         if ($this->isDirty('status_id')) {
             $status = ProcessStatus::find($this->status_id);
@@ -1335,30 +1406,46 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
 
     /**
      * Used on processes.index/trash pages for query ordering.
+     *
+     * Important:
+     * Don`t forget to update 'removeOrderingByTableJoinsFromRequest()'
+     * when adding/removing table joins.
      */
-    public static function addJoinsForQueryOrdering($query, $request)
+    private static function addTableJoinsForQueryOrdering($query, $request): void
     {
-        if ($request->input('order_by') == 'product_manufacturer_name') {
-            $query->withProductsManufacturerNameAttribute();
-        }
+        $orderBy = $request->input('order_by');
 
-        if ($request->input('order_by') == 'product_inn_name') {
-            $query->withProductsInnNameAttribute();
-        }
+        match ($orderBy) {
+            'product_manufacturer_name' => $query->withProductsManufacturerNameAttribute(),
+            'product_inn_name'          => $query->withProductsInnNameAttribute(),
+            'product_form_name'         => $query->withProductsFormNameAttribute(),
+            'product_dosage'            => $query->withProductsDosageAttribute(),
+            default                     => null,
+        };
+    }
 
-        if ($request->input('order_by') == 'product_form_name') {
-            $query->withProductsFormNameAttribute();
-        }
+    /**
+     * Remove 'ordering by table joins' from request
+     * when exporting records or product selection for performance.
+     */
+    private static function removeOrderingByTableJoinsFromRequest($request): void
+    {
+        $orderBy = $request->input('order_by');
 
-        if ($request->input('order_by') == 'product_dosage') {
-            $query->withProductsDosageAttribute();
-        }
+        $joinFields = [
+            'product_manufacturer_name',
+            'product_inn_name',
+            'product_form_name',
+            'product_dosage',
+        ];
 
-        return $query;
+        if (in_array($orderBy, $joinFields)) {
+            $request->merge(['order_by' => 'id']);
+        }
     }
 
     // Used on filters.
-    public static function pluckAllEnTrademarks()
+    public static function pluckAllEnTrademarks(): Collection
     {
         return self::select('trademark_en')
             ->distinct()
@@ -1367,7 +1454,7 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
     }
 
     // Used on filters.
-    public static function pluckAllRuTrademarks()
+    public static function pluckAllRuTrademarks(): Collection
     {
         return self::select('trademark_ru')
             ->distinct()
@@ -1376,7 +1463,7 @@ class Process extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
     }
 
     // Used on filters.
-    public static function getDeadlineStatusOptions()
+    public static function getDeadlineStatusOptions(): array
     {
         return [
             self::DEADLINE_STOPPED_STATUS_NAME,

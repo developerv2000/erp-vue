@@ -12,6 +12,7 @@ import ColumnsListItem from "@/core/components/table/toolbar/more-action-items/C
 import FullscreenListItem from "@/core/components/table/toolbar/more-action-items/FullscreenListItem.vue";
 import TrashListItem from "@/core/components/table/toolbar/more-action-items/TrashListItem.vue";
 import ExportButton from "@/core/components/table/toolbar/actions/ExportButton.vue";
+import ExportProductSelectionButton from "@/core/components/table/toolbar/actions/ExportProductSelectionButton.vue";
 
 const store = useMADProcessesTableStore();
 const { t } = useI18n();
@@ -55,11 +56,12 @@ const actionAfterSuccessDelete = () => {
             </template>
 
             <!-- Export -->
-            <ExportButton
+            <template
                 v-if="can('export-records-as-excel') && !store.isTrashPage"
-                model="Process"
-                :store="store"
-            />
+            >
+                <ExportButton model="Process" :store="store" />
+                <ExportProductSelectionButton model="Process" :store="store" />
+            </template>
         </template>
 
         <template #moreActions>

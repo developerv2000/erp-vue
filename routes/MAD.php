@@ -4,10 +4,24 @@ use App\Http\Controllers\MAD\MADManufacturerController;
 use App\Http\Controllers\MAD\MADProcessController;
 use App\Http\Controllers\MAD\MADProcessStatusHistoryController;
 use App\Http\Controllers\MAD\MADProductController;
+use App\Http\Controllers\MAD\MADProductSelectionController;
 use App\Support\Generators\CRUDRouteGenerator;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('mad')->name('mad.')->middleware('auth', 'auth.session')->group(function () {
+    // VP - Product selection
+    Route::prefix('product-selection')
+        ->controller(MADProductSelectionController::class)
+        ->middleware('can:export-records-as-excel')
+        ->name('product-selection.')
+        ->group(function () {
+            // Generate and store an export file for a given model
+            Route::post('/{model}/generate', 'generate')->name('generate');
+
+            // Download a previously generated export file
+            Route::post('/{model}/download/{filename}', 'download')->name('download');
+        });
+
     // EPP
     Route::prefix('/manufacturers')->controller(MADManufacturerController::class)->name('manufacturers.')->group(function () {
         CRUDRouteGenerator::defineDefaultRoutesOnly(

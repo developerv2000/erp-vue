@@ -33,7 +33,7 @@ function generateFile() {
 
     axios
         .post(
-            route("product-selection.generate", { model: props.model }),
+            route("mad.product-selection.generate", { model: props.model }),
             props.store.toQuery()
         )
         .then(async (response) => {
@@ -49,7 +49,7 @@ async function startDownload(filename) {
 
     axios
         .post(
-            route("product-selection.download", {
+            route("mad.product-selection.download", {
                 model: props.model,
                 filename,
             }),

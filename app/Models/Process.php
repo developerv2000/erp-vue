@@ -589,7 +589,7 @@ class Process extends Model implements
         self::addDefaultQueryParamsToRequest($request);
 
         // Remove 'ordering by table joins' for perfomance
-        self::removeOrderingByTableJoinsFromRequest($query, $request);
+        self::removeOrderingByTableJoinsFromRequest($request);
 
         // Apply filters
         self::filterQueryForRequest($query, $request);
@@ -718,7 +718,7 @@ class Process extends Model implements
         self::addDefaultQueryParamsToRequest($request);
 
         // Remove 'ordering by table joins' for perfomance
-        self::removeOrderingByTableJoinsFromRequest($query, $request);
+        self::removeOrderingByTableJoinsFromRequest($request);
 
         // Apply filters
         self::filterQueryForRequest($query, $request);

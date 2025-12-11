@@ -7,8 +7,9 @@ use App\Support\Helpers\FileHelper;
 use App\Support\Helpers\ModelHelper;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Color;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 
 class MADProductSelectionService
 {
@@ -42,7 +43,7 @@ class MADProductSelectionService
 
     const FIRST_DEFAULT_COUNTRY_COLUMN_SUBTITLE_LETTER = 'L';
     const LAST_DEFAULT_COUNTRY_COLUMN_SUBTITLE_LETTER = 'Z';
-    const COLUMNS_COUNT_FROM_LAST_COUNTRY_TO_FIRST_FORECAST = 7;
+    const COLUMNS_COUNT_AFTER_LAST_COUNTRY_TO_FIRST_FORECAST = 6;
     const LAST_DEFAULT_FORECAST_COLUMN_SUBTITLE_LETTER = 'BY';
 
     protected string $model;
@@ -107,35 +108,29 @@ class MADProductSelectionService
 
     protected function buildSpreadsheet()
     {
-        $sheet = $this->getActiveSheetFromTemplate();
+        $templatePath = storage_path(self::EXCEL_TEMPLATE_FILE_PATH);
+        $spreadsheet = IOFactory::load($templatePath);
+        $activeSheet = $spreadsheet->getActiveSheet();
 
         // Collect all records with required appends
         $records = $this->collectRecords();
 
         // Insert 'additional country subtitles' into sheet
-        $countries = $this->resolveCountries($records, $sheet);
+        $countries = $this->resolveCountries($records, $activeSheet);
 
         // Insert 'additional country forecast titles and subtitles' into sheet
-        $this->insertAdditionalForecastTitlesIntoSheet($sheet, $countries['additional']);
+        $this->insertAdditionalForecastTitlesIntoSheet($activeSheet, $countries['additional']);
 
         // Insert records into sheet
-        $this->insertRecordsIntoSheet($sheet, $records, $countries);
+        $this->insertRecordsIntoSheet($activeSheet, $records, $countries);
 
         // Return sheet
-        return $sheet;
-    }
-
-    protected function getActiveSheetFromTemplate()
-    {
-        $templatePath = storage_path(self::EXCEL_TEMPLATE_FILE_PATH);
-        $spreadsheet = IOFactory::load($templatePath);
-
-        return $spreadsheet->getActiveSheet();
+        return $spreadsheet;
     }
 
     protected function collectRecords()
     {
-        $query = $this->modelClass::queryRecordsForProductSelection();
+        $query = $this->modelClass::queryRecordsForProductSelection(request());
 
         // Collect all records by chunks
         $records = collect();
@@ -148,6 +143,8 @@ class MADProductSelectionService
         if ($this->model == 'Product') {
             $this->appendActiveProductSearches($records);
         }
+
+        return $records;
     }
 
     /**
@@ -189,13 +186,13 @@ class MADProductSelectionService
         $additionalCountries = $uniqueCountries->diff(self::DEFAULT_COUNTRIES);
 
         // 3. Return additional countries
-        return $additionalCountries;
+        return $additionalCountries->toArray();
     }
 
     /**
      * Requires refactoring!
      */
-    protected function insertAdditionalCountrySubtitlesIntoSheet(Worksheet $sheet, $additionalCountries)
+    protected function insertAdditionalCountrySubtitlesIntoSheet($sheet, $additionalCountries)
     {
         // Exit if no additional countries
         if (count($additionalCountries) == 0) {
@@ -203,7 +200,7 @@ class MADProductSelectionService
         }
 
         // insert 'additional country subtitles' after 'last default country subtitle'
-        $startColIndex = Coordinate::columnIndexFromString(self::LAST_DEFAULT_COUNTRY_COLUMN_SUBTITLE_LETTER) + 1;
+        $startColIndex = Coordinate::columnIndexFromString(self::LAST_DEFAULT_COUNTRY_COLUMN_SUBTITLE_LETTER);
 
         foreach ($additionalCountries as $country) {
             // Insert new country column
@@ -211,7 +208,7 @@ class MADProductSelectionService
             $nextColLetter = Coordinate::stringFromColumnIndex($nextColIndex);
             $sheet->insertNewColumnBefore($nextColLetter);
 
-            $insertedCellCoordinates = [$nextColLetter, self::SUBTITLES_ROW];
+            $insertedCellCoordinates = [$nextColIndex, self::SUBTITLES_ROW];
             $sheet->setCellValue($insertedCellCoordinates, $country);
 
             // Update cell styles
@@ -226,8 +223,36 @@ class MADProductSelectionService
 
     protected function highlightAdditionalInsertedCell($cellStyle)
     {
-        $cellStyle->getFill()->getStartColor()->setARGB('00FFFF');
-        $cellStyle->getFont()->setColor(new Color(Color::COLOR_BLACK));
+        // Background fill
+        $cellStyle->getFill()
+            ->setFillType(Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FF00FFFF');
+
+        // Font color + bold
+        $cellStyle->getFont()
+            ->setColor(new Color(Color::COLOR_BLACK))
+            ->setBold(true);
+
+        // Alignment (horizontal + vertical)
+        $cellStyle->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER)
+            ->setVertical(Alignment::VERTICAL_CENTER);
+    }
+
+    protected function highlightMatchedCountryCell($cellStyle)
+    {
+        $cellStyle->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        $cellStyle->getFill()
+            ->setFillType(Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FF92D050');
+    }
+
+    protected function resetCellBackgroundColor($cellStyle)
+    {
+        $cellStyle->getFill()
+            ->setFillType(Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FFFFFFFF');
     }
 
     protected function insertAdditionalForecastTitlesIntoSheet($sheet, $additionalCountries)
@@ -251,12 +276,24 @@ class MADProductSelectionService
             $sheet->mergeCells($mergeRange);
 
             // Set country title
-            $sheet->setCellValue([$firstColIndex, self::TITLES_ROW], "Forecast " . $country);
+            $sheet->setCellValue([$firstColIndex, self::TITLES_ROW], "FORECAST " . $country);
+
+            // Highlight inserted title
+            $cellStyle = $sheet->getCell([$firstColIndex, self::TITLES_ROW])->getStyle();
+            $this->highlightAdditionalInsertedCell($cellStyle);
 
             // 2. Set forecast subtitles
-            $sheet->setCellValue([$firstColIndex + 1, self::SUBTITLES_ROW], "YEAR 1");
-            $sheet->setCellValue([$firstColIndex + 2, self::SUBTITLES_ROW], "YEAR 2");
-            $sheet->setCellValue([$firstColIndex + 3, self::SUBTITLES_ROW], "YEAR 3");
+            $sheet->setCellValue([$firstColIndex, self::SUBTITLES_ROW], "YEAR 1");
+            $sheet->setCellValue([$firstColIndex + 1, self::SUBTITLES_ROW], "YEAR 2");
+            $sheet->setCellValue([$firstColIndex + 2, self::SUBTITLES_ROW], "YEAR 3");
+
+            // Highlight inserted subtitles
+            $cellStyle = $sheet->getCell([$firstColIndex, self::SUBTITLES_ROW])->getStyle();
+            $this->highlightAdditionalInsertedCell($cellStyle);
+            $cellStyle = $sheet->getCell([$firstColIndex + 1, self::SUBTITLES_ROW])->getStyle();
+            $this->highlightAdditionalInsertedCell($cellStyle);
+            $cellStyle = $sheet->getCell([$firstColIndex + 2, self::SUBTITLES_ROW])->getStyle();
+            $this->highlightAdditionalInsertedCell($cellStyle);
 
             // Move to next 3-column block
             $startColIndex += 3;
@@ -323,7 +360,61 @@ class MADProductSelectionService
         });
     }
 
-    protected function insertProductRecordsIntoSheet($sheet, $records, $countries) {}
+    protected function insertProductRecordsIntoSheet($sheet, $records, $countries)
+    {
+        $row = self::START_INSERTING_RECORDS_FROM_ROW;
+        $recordsCounter = 1;
+
+        foreach ($records as $record) {
+            // Begin from 'A' column
+            $columnIndex = 1;
+
+            // 1. Insert record counter
+            $sheet->setCellValue([$columnIndex++, $row], $recordsCounter);
+
+            // 2. Insert Inn, form, dosage, pack, MOQ and shelf life
+            $sheet->setCellValue([$columnIndex++, $row], $record->inn->name);
+            $sheet->setCellValue([$columnIndex++, $row], $record->form->name);
+            $sheet->setCellValue([$columnIndex++, $row], $record->dosage);
+            $sheet->setCellValue([$columnIndex++, $row], $record->pack);
+            $sheet->setCellValue([$columnIndex++, $row], $record->moq);
+            $sheet->setCellValue([$columnIndex++, $row], $record->shelfLife->name);
+
+            // 3. Insert active product matches for countries
+
+            // Values reset for each records row
+            $firstCountryColumnIndex = Coordinate::columnIndexFromString(self::FIRST_DEFAULT_COUNTRY_COLUMN_SUBTITLE_LETTER);
+            $loopColumnIndex = $firstCountryColumnIndex; // Increment after each country loop, used only inside countries loop
+
+            // Loop through all countries
+            foreach ($countries['all'] as $country) {
+                $cellIndex = [$loopColumnIndex, $row];
+                $cellStyle = $sheet->getCell($cellIndex)->getStyle();
+
+                if ($record->active_product_searches->contains('country.code', $country)) {
+                    $sheet->setCellValue($cellIndex, 1);
+                    $this->highlightMatchedCountryCell($cellStyle);
+                } else {
+                    // Reset cell background color because new inserted rows/columns copy previous row styles
+                    $this->resetCellBackgroundColor($cellStyle);
+                }
+
+                $loopColumnIndex++; // Move to the next country column
+            }
+
+            // Move to the next row
+            $row++;
+            $recordsCounter++;
+
+            // Insert new rows to escape rewriting notes placed after record rows
+            $sheet->insertNewRowBefore($row, 1);
+        }
+
+        // Remove last inserted redundant row, because it is empty and copies previous row styles
+        if ($records->isNotEmpty()) {
+            $sheet->removeRow($row);
+        }
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -331,5 +422,94 @@ class MADProductSelectionService
     |--------------------------------------------------------------------------
     */
 
-    protected function insertProcessRecordsIntoSheet($sheet, $records, $countries) {}
+    protected function insertProcessRecordsIntoSheet($sheet, $records, $countries)
+    {
+        $row = self::START_INSERTING_RECORDS_FROM_ROW;
+        $recordsCounter = 1;
+        $allCountriesCount = count($countries['all']); // Used in getFirstForecastColumnIndexForCountry()
+
+        // loop only through unique records by 'product_id'
+        $uniqueRecords = $records->unique('product_id');
+
+        foreach ($uniqueRecords as $record) {
+            // Begin from 'A' column
+            $columnIndex = 1;
+
+            // 1. Insert record counter
+            $sheet->setCellValue([$columnIndex++, $row], $recordsCounter);
+
+            // 2. Insert Inn, form, dosage, pack, MOQ, shelf life, 'manufacturer_first_offered_price',
+            // 'our_first_offered_price', 'agreed_price' and currency
+            $sheet->setCellValue([$columnIndex++, $row], $record->product->inn->name);
+            $sheet->setCellValue([$columnIndex++, $row], $record->product->form->name);
+            $sheet->setCellValue([$columnIndex++, $row], $record->product->dosage);
+            $sheet->setCellValue([$columnIndex++, $row], $record->product->pack);
+            $sheet->setCellValue([$columnIndex++, $row], $record->product->moq);
+            $sheet->setCellValue([$columnIndex++, $row], $record->product->shelfLife->name);
+            $sheet->setCellValue([$columnIndex++, $row], $record->manufacturer_first_offered_price);
+            $sheet->setCellValue([$columnIndex++, $row], $record->our_first_offered_price);
+            $sheet->setCellValue([$columnIndex++, $row], $record->agreed_price);
+            $sheet->setCellValue([$columnIndex++, $row], $record->currency?->name);
+
+            // 3. Insert searchCountry matches
+
+            // Values reset for each records row
+            $firstCountryColumnIndex = Coordinate::columnIndexFromString(self::FIRST_DEFAULT_COUNTRY_COLUMN_SUBTITLE_LETTER);
+            $loopColumnIndex = $firstCountryColumnIndex; // Increment after each country loop, used only inside countries loop
+            $countriesLoopIndex = 0; // Used on calculating forecast column indexes
+
+            // Loop through all countries
+            foreach ($countries['all'] as $country) {
+                $countriesLoopIndex++;
+                $columnIndex = $loopColumnIndex;
+                $cellIndex = [$columnIndex, $row];
+                $cellStyle = $sheet->getCell($cellIndex)->getStyle();
+
+                // Search for matches
+                $matched = $records
+                    ->where('product_id', $record->product_id)
+                    ->where('searchCountry.code', $country)
+                    ->first();
+
+                if ($matched) {
+                    // 4. Insert status if matched
+                    $sheet->setCellValue($cellIndex, $matched->status->name);
+                    $this->highlightMatchedCountryCell($cellStyle);
+
+                    // 5. Insert year 1, 2, 3 forecasts
+                    // Detect forecast column start index
+                    $firstForecastColumnIndex = $this->getFirstForecastColumnIndexForCountry($countriesLoopIndex, $allCountriesCount);
+
+                    $sheet->setCellValue([$firstForecastColumnIndex, $row], $matched->forecast_year_1);
+                    $sheet->setCellValue([$firstForecastColumnIndex + 1, $row], $matched->forecast_year_2);
+                    $sheet->setCellValue([$firstForecastColumnIndex + 2, $row], $matched->forecast_year_3);
+                } else {
+                    // Reset cell background color because new inserted rows/columns copy previous row styles
+                    $this->resetCellBackgroundColor($cellStyle);
+                }
+
+                $loopColumnIndex++; // Move to the next country column
+            }
+
+            // Move to the next row
+            $row++;
+            $recordsCounter++;
+
+            // Insert new rows to escape rewriting notes placed after record rows
+            $sheet->insertNewRowBefore($row, 1);
+        }
+
+        // Remove last inserted redundant row, because it is empty and copies previous row styles
+        if ($records->isNotEmpty()) {
+            $sheet->removeRow($row);
+        }
+    }
+
+    protected function getFirstForecastColumnIndexForCountry($countryIndex, $allCountriesCount)
+    {
+        return Coordinate::columnIndexFromString(self::FIRST_DEFAULT_COUNTRY_COLUMN_SUBTITLE_LETTER)
+            + $allCountriesCount
+            + self::COLUMNS_COUNT_AFTER_LAST_COUNTRY_TO_FIRST_FORECAST
+            + (($countryIndex - 1) * 3); // Each country has 3 forecast columns
+    }
 }

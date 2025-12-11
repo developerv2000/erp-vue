@@ -22,7 +22,6 @@ use App\Support\Helpers\ControllerHelper;
 use App\Support\Traits\Controller\DestroysModelRecords;
 use App\Support\Traits\Controller\RestoresModelRecords;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
 class MADProcessController extends Controller

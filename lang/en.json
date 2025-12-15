@@ -155,6 +155,10 @@
     "dates.Duration days": "Duration days",
     "dates.Historical": "Historical date",
 
+    "Year": "Year",
+    "Month": "Month",
+    "Months": "Months",
+
     "filter.Filtered records": "Filtered records",
     "filter.Region": "Region",
     "filter.Has VPS for country": "Has VPS for country",
@@ -278,6 +282,7 @@
     "fields.Days have passed": "Days have passed",
     "fields.Contracted in ASP": "Contracted in ASP",
     "fields.Registered in ASP": "Registered in ASP",
+    "fields.Extensive version": "Extensive version",
 
     "AAAAAAAAAAAAAA": "AAAAAAAAAAAAAA"
 }

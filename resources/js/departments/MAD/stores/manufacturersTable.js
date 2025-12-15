@@ -167,19 +167,19 @@ export const useMADManufacturersTableStore = defineStore('MADManufacturersTable'
             this.fetchRecords({ updateUrl: true });
         },
 
-        resetState() {
-            this.records = [];
-            this.loading = false;
-            this.selected = [];
+            resetState() {
+                this.records = [];
+                this.loading = false;
+                this.selected = [];
 
-            this.pagination = {
-                ...defaultPaginationOptions
-            };
+                this.pagination = {
+                    ...defaultPaginationOptions
+                };
 
-            this.filters = {
-                ...defaultFilters
-            };
-        },
+                this.filters = {
+                    ...defaultFilters
+                };
+            },
 
         resetUrl() {
             router.get(route(route().current()), {}, {
@@ -188,6 +188,17 @@ export const useMADManufacturersTableStore = defineStore('MADManufacturersTable'
                 preserveState: true,
                 preserveScroll: true,
             });
+        },
+
+        applyFilter() {
+            this.pagination.page = 1;
+            this.fetchRecords();
+        },
+
+        resetFilter() {
+            this.resetState();
+            this.resetUrl();
+            this.fetchRecords();
         },
     }
 })

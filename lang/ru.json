@@ -161,6 +161,10 @@
     "dates.Duration days": "Длительность дней",
     "dates.Historical": "Историческая дата",
 
+    "Year": "Год",
+    "Month": "Месяц",
+    "Months": "Месяцы",
+
     "Similar records": "Схожие записи",
     "similar records.Not found": "Схожие записи не найдены.",
 
@@ -280,6 +284,8 @@
     "fields.Days have passed": "Дней прошло",
     "fields.Contracted in ASP": "Контракт в СПГ",
     "fields.Registered in ASP": "Зарегистрирован в СПГ",
+
+    "fields.Extensive version": "Расширенная версия",
 
     "AAAAAAAAAAAAAA": "AAAAAAAAAAAAAA"
 }

@@ -62,13 +62,14 @@ const listItems = computed(() => [
     //     prependIcon: mdiAccountGroup,
     // },
 
-    // {
-    //     title: t("pages.KPI"),
-    //     routeName: "mad.kpi.index",
-    //     routeParams: null,
-    //     activeOnRoutes: "mad.kpi.index",
-    //     prependIcon: mdiFinance,
-    // },
+    {
+        title: t("pages.KPI"),
+        routeName: "mad.kpi.index",
+        routeParams: null,
+        activeOnRoutes: "mad.kpi.index",
+        permission: "view-MAD-KPI",
+        prependIcon: mdiFinance,
+    },
 
     // {
     //     title: t("pages.ASP"),

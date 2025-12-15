@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\MAD;
 
 use App\Http\Controllers\Controller;
-use App\Support\Services\MAD\MADProductSelectionService;
+use App\Http\Controllers\MAD\Services\MADProductSelectionService;
 use Illuminate\Http\Request;
 
 class MADProductSelectionController extends Controller

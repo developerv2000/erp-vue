@@ -32,6 +32,9 @@ import './vee-validate-config'
 // Initialize Pinia once (outside of the app creation)
 const pinia = createPinia()
 
+// Register echarts component
+import VChart from './echarts'
+
 // App name from `.env` (or fallback)
 const appName = import.meta.env.VITE_APP_NAME || 'ERP'
 
@@ -55,7 +58,8 @@ createInertiaApp({
             .use(vuetify)          // Vuetify UI plugin
             .use(vuetifyProTipTap) // Vuetify Pro TipTap (WYSIWYG)
             .use(pinia)            // Global Pinia store
-            .use(i18n)             // i18n translations
+            .use(i18n)             // i18n
+            .component('VChart', VChart)
             .mount(el)             // Mount to the DOM
     },
 

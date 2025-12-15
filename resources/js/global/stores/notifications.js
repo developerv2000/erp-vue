@@ -153,5 +153,16 @@ export const useNotificationsTableStore = defineStore('NotificationsTable', {
                 preserveScroll: true,
             });
         },
+
+        applyFilter() {
+            this.pagination.page = 1;
+            this.fetchRecords();
+        },
+
+        resetFilter() {
+            this.resetState();
+            this.resetUrl();
+            this.fetchRecords();
+        },
     }
 })

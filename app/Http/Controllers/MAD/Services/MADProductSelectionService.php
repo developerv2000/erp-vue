@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Support\Services\MAD;
+namespace App\Http\Controllers\MAD\Services;
 
 use App\Models\ProductSearchStatus;
 use App\Support\Helpers\FileHelper;
@@ -8,7 +8,6 @@ use App\Support\Helpers\ModelHelper;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
-use PhpOffice\PhpSpreadsheet\Style\Color;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 
 class MADProductSelectionService

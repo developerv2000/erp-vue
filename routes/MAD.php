@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\MAD\MADKPIController;
 use App\Http\Controllers\MAD\MADManufacturerController;
 use App\Http\Controllers\MAD\MADProcessController;
 use App\Http\Controllers\MAD\MADProcessStatusHistoryController;
@@ -84,5 +85,10 @@ Route::prefix('mad')->name('mad.')->middleware('auth', 'auth.session')->group(fu
                     'destroy',
                 ]);
             });
+    });
+
+    // KPI
+    Route::prefix('/kpi')->controller(MADKPIController::class)->name('kpi.')->group(function () {
+        Route::get('/', 'index')->name('index')->middleware('can:view-MAD-KPI');
     });
 });

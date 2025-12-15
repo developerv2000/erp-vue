@@ -49,6 +49,58 @@ class GeneralHelper
 
     /*
     |--------------------------------------------------------------------------
+    | Months
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Collect all calendar months
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public static function collectCalendarMonths()
+    {
+        return collect([
+            collect(['name' => 'January', 'id' => 1]),
+            collect(['name' => 'February', 'id' => 2]),
+            collect(['name' => 'March', 'id' => 3]),
+            collect(['name' => 'April', 'id' => 4]),
+            collect(['name' => 'May', 'id' => 5]),
+            collect(['name' => 'June', 'id' => 6]),
+            collect(['name' => 'July', 'id' => 7]),
+            collect(['name' => 'August', 'id' => 8]),
+            collect(['name' => 'September', 'id' => 9]),
+            collect(['name' => 'October', 'id' => 10]),
+            collect(['name' => 'November', 'id' => 11]),
+            collect(['name' => 'December', 'id' => 12]),
+        ]);
+    }
+
+    /**
+     * Collect all calendar months translated
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public static function collectCalendarMonthsTranslated()
+    {
+        $months = self::collectCalendarMonths();
+        self::translateMonthNames($months);
+
+        return $months;
+    }
+
+    /**
+     * Translate month names
+     */
+    public static function translateMonthNames($months): void
+    {
+        $months->each(function ($month) {
+            $month['name'] = trans($month['name']);
+        });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Percentage calculations
     |--------------------------------------------------------------------------
     */

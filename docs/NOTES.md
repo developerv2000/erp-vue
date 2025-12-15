@@ -17,7 +17,7 @@
 - Fix uploading attachments for muptiple "products" create
 - Fix moving to the top FilterBooleanAutocomplete when selected "false" value
 - User model, fix 'productSearches relation/count' after adding 'ProductSearch'
-- Remove redundant SimpleFilters
+- Remove redundant MAD SimpleFilters
 - Add :return typos for controller functions
 - FIx profile edit form (make it like MAD CRUD forms)
 - Refactor Products 'getMatchedProductSearchesAttribute()'

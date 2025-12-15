@@ -87,8 +87,8 @@ class Permission extends Model
     const CAN_VIEW_MAD_KVPP_MATCHING_PROCESSES_NAME = 'can-view-MAD-KVPP-matching-processes';
 
     // KPI
-    const CAN_VIEW_KPI_EXTENDED_VERSION_NAME = 'can-view-MAD-extended-KPI-version';
     const CAN_VIEW_KPI_OF_ALL_ANALYSTS = 'can-view-MAD-KPI-of-all-analysts';
+    const CAN_VIEW_KPI_EXTENDED_VERSION_NAME = 'can-view-MAD-extended-KPI-version';
 
     // ASP
     const CAN_CONTROL_MAD_ASP_PROCESSES = 'can-control-MAD-ASP-processes';

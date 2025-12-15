@@ -2,6 +2,7 @@
 import { usePage } from "@inertiajs/vue3";
 import { useI18n } from "vue-i18n";
 import { useMADKPIStore } from "@/departments/MAD/stores/kpi";
+import useAuth from "@/core/composables/useAuth";
 
 import StoreBindedFilter from "@/core/components/filters/StoreBindedFilter.vue";
 import FilterTextField from "@/core/components/filters/inputs/FilterTextField.vue";
@@ -11,6 +12,7 @@ import FilterBooleanAutocomplete from "@/core/components/filters/inputs/FilterBo
 const { t } = useI18n();
 const page = usePage();
 const store = useMADKPIStore();
+const { can } = useAuth();
 </script>
 
 <template>
@@ -31,6 +33,7 @@ const store = useMADKPIStore();
         />
 
         <FilterAutocomplete
+            v-if="can('view-MAD-KPI-of-all-analysts')"
             :label="t('fields.Analyst')"
             name="manufacturer_analyst_user_id"
             v-model="store.filters.manufacturer_analyst_user_id"
@@ -63,9 +66,10 @@ const store = useMADKPIStore();
         />
 
         <FilterBooleanAutocomplete
+            v-if="can('view-MAD-extended-KPI-version')"
             :label="t('fields.Extensive version')"
-            name="extensive_version"
-            v-model="store.filters.extensive_version"
+            name="extended_version"
+            v-model="store.filters.extended_version"
         />
     </StoreBindedFilter>
 </template>

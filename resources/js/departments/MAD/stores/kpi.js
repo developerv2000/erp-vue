@@ -1,13 +1,13 @@
 import { defineStore } from 'pinia'
 import { router } from '@inertiajs/vue3';
-import { cleanQueryParams, normalizeNumbersFromQuery, normalizeMultiIDsFromQuery, normalizeSingleIDsFromQuery } from '@/core/scripts/queryHelper';
+import { cleanQueryParams, normalizeMultiIDsFromQuery, normalizeSingleIDsFromQuery } from '@/core/scripts/queryHelper';
 
 const defaultFilters = {
     // Integers
     year: null,
 
     // Boolean
-    extensive_version: null,
+    extended_version: null,
 
     // Singular autocompletes
     manufacturer_region: null,
@@ -42,7 +42,7 @@ export const useMADKPIStore = defineStore('MADKPI', {
 
             // Normalize filters
             this.filters.year = Number(page.props.kpiData.year);
-            normalizeNumbersFromQuery(this.filters, query, ['extensive_version']);
+            this.filters.extended_version = Number(page.props.kpiData.entendedVersion);
             normalizeSingleIDsFromQuery(this.filters, query, ['manufacturer_analyst_user_id', 'manufacturer_bdm_user_id']);
             normalizeMultiIDsFromQuery(this.filters, query, ['months', 'country_id']);
 

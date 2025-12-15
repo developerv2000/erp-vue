@@ -91,7 +91,7 @@ const listItems = computed(() => [
 
 <template>
     <v-list
-        v-if="canAny(['view-MAD-EPP', 'view-MAD-IVP', 'view-MAD-VPS'])"
+        v-if="canAny(['view-MAD-EPP', 'view-MAD-IVP', 'view-MAD-VPS', 'view-MAD-KPI'])"
         density="compact"
         color="primary"
     >

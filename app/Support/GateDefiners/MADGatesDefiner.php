@@ -21,13 +21,18 @@ class MADGatesDefiner
             // VPS
             Permission::CAN_VIEW_MAD_VPS_NAME,
             Permission::CAN_EDIT_MAD_VPS_NAME,
-            
+
             Permission::CAN_VIEW_MAD_VPS_OF_ALL_ANALYSTS_NAME,
             Permission::CAN_EDIT_MAD_VPS_OF_ALL_ANALYSTS_NAME,
             Permission::CAN_EDIT_MAD_VPS_STATUS_HISTORY_NAME,
             Permission::CAN_UPGRADE_MAD_VPS_STATUS_AFTER_CONTRACT_STAGE_NAME,
             Permission::CAN_RECEIVE_NOTIFICATION_ON_MAD_VPS_CONTRACT,
             Permission::CAN_MARK_MAD_VPS_AS_READY_FOR_ORDER,
+
+            // KPI
+            Permission::CAN_VIEW_MAD_KPI_NAME,
+            Permission::CAN_VIEW_KPI_OF_ALL_ANALYSTS,
+            Permission::CAN_VIEW_KPI_EXTENDED_VERSION_NAME,
         ];
 
         GatesDefiner::definePermissionBasedGates($permission);

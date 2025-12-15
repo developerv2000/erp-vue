@@ -6,6 +6,8 @@ import { useMADProductsTableStore } from "@/departments/MAD/stores/productsTable
 import { useAttachmentsStore } from "@/global/stores/attachments";
 import { useCommentsStore } from "@/global/stores/comments";
 import { useMADManufacturersTableStore } from "@/departments/MAD/stores/manufacturersTable";
+import { useAdministrationUsersTableStore } from "@/administration/stores/usersTable";
+import { useMADKPIStore } from "@/departments/MAD/stores/kpi";
 import useAuth from "../composables/useAuth";
 import axios from "axios";
 
@@ -52,23 +54,38 @@ export const useGlobalStore = defineStore("global", {
                 });
         },
         getAllResetableStores() {
-            // Fetch all resetable Pinia stores
+            // Fetch all resetable Pinia stores:
+
+            // Global
             const notificationsTableStore = useNotificationsTableStore();
             const attachmentsStore = useAttachmentsStore();
             const commentsStore = useCommentsStore();
+
+            // Administration
+            const usersTableStore = useAdministrationUsersTableStore();
+
+            // MAD
             const manufacturersTableStore = useMADManufacturersTableStore();
+            const productsTableStore = useMADProductsTableStore();
             const processesTableStore = useMADProcessesTableStore();
             const processStatusHistoryStore = useProcessStatusHistoryStore();
-            const productsTableStore = useMADProductsTableStore();
+            const kpiStore = useMADKPIStore();
 
             return [
+                // Global
                 notificationsTableStore,
                 attachmentsStore,
                 commentsStore,
+
+                // Administration
+                usersTableStore,
+
+                // MAD
                 manufacturersTableStore,
+                productsTableStore,
                 processesTableStore,
                 processStatusHistoryStore,
-                productsTableStore,
+                kpiStore,
             ];
         },
 

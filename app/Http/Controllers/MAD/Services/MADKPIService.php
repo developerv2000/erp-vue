@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\MAD\Services;
 
 use App\Models\Country;
+use App\Models\Manufacturer;
 use App\Models\Process;
 use App\Models\ProcessGeneralStatus;
 use App\Support\Helpers\GeneralHelper;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
 class MADKPIService
@@ -35,9 +37,20 @@ class MADKPIService
     public function getKPI()
     {
         $this->resolveDependencies();
+
+        // General statuses
         $this->calculateAllGeneralStatusProcessCounts();
         $this->addAllGeneralStatusProcessCountLinks();
+
+        // Months
         $this->addSumOfAllProcessesCountsForMonths();
+        $this->addActiveManufacturersCountsForMonths();
+        $this->addActiveManufacturersLinksForMonths();
+
+        // Countries
+        $this->addProcessCountsForGeneralStatusesOfCountries();
+        $this->addYearProcessesCountsForCountries();
+        $this->addKPILinksForCountries();
 
         return [
             'entendedVersion' => $this->entendedVersion,
@@ -93,8 +106,13 @@ class MADKPIService
     protected function resolveCountries()
     {
         $this->countries = Country::orderByProcessesCount()
+            // Get only requested countries when 'country_id' is filled
             ->when($this->request->filled('country_id'), function ($query) {
                 return $query->whereIn('id', $this->request->input('country_id'));
+            })
+            // Else get only countries with processes when 'country_id' is not filled
+            ->when(!$this->request->filled('country_id'), function ($query) {
+                return $query->whereHas('processes');
             })
             ->get();
     }
@@ -120,7 +138,7 @@ class MADKPIService
 
     /*
     |--------------------------------------------------------------------------
-    | General status process counts calculations
+    | Process counts of general statuses
     |--------------------------------------------------------------------------
     */
 
@@ -128,7 +146,7 @@ class MADKPIService
     {
         $this->addCurrentProcessCountsForGeneralStatusMonths();
         $this->addMaximumProcessCountsForGeneralStatusMonths();
-        $this->addSumOfMonthlyProcessesForGeneralStatuses();
+        $this->addYearProcessesCountForGeneralStatuses();
     }
 
     /**
@@ -168,7 +186,7 @@ class MADKPIService
                 $count = Process::filterQueryForRequest($query, $request, applyPermissionsFilter: false)
                     ->count();
 
-                // Update the current processes count of the month for the status
+                // Set the current processes count of the month for the status
                 $statusMonths = $status->months;
                 $statusMonths[$month['id']]['current_processes_count'] = $count;
                 $status->months = $statusMonths;
@@ -207,7 +225,7 @@ class MADKPIService
                 $count = Process::filterQueryForRequest($query, $request, applyPermissionsFilter: false)
                     ->count();
 
-                // Update the maximum processes count of the month for the status
+                // Set the maximum processes count of the month for the status
                 $statusMonths = $status->months;
                 $statusMonths[$month['id']]['maximum_processes_count'] = $count;
                 $status->months = $statusMonths;
@@ -216,9 +234,9 @@ class MADKPIService
     }
 
     /**
-     * Add 'year_current_processes' and 'year_maximum_processes' for each general status.
+     * Add 'year_current_processes_count' and 'year_maximum_processes_count' for each general status.
      */
-    protected function addSumOfMonthlyProcessesForGeneralStatuses()
+    protected function addYearProcessesCountForGeneralStatuses()
     {
         foreach ($this->generalStatuses as $status) {
             $sumOfCurrentProcesses = 0;
@@ -229,14 +247,14 @@ class MADKPIService
                 $sumOfMaximumProcesses += $month['maximum_processes_count'];
             }
 
-            $status['year_current_processes'] = $sumOfCurrentProcesses;
-            $status['year_maximum_processes'] = $sumOfMaximumProcesses;
+            $status['year_current_processes_count'] = $sumOfCurrentProcesses;
+            $status['year_maximum_processes_count'] = $sumOfMaximumProcesses;
         }
     }
 
     /*
     |--------------------------------------------------------------------------
-    | General status process counts links
+    | Process counts links of general statuses
     |--------------------------------------------------------------------------
     */
 
@@ -246,6 +264,9 @@ class MADKPIService
         $this->addMaximumProcessCountLinksForGeneralStatusMonths();
     }
 
+    /**
+     * Add 'current_processes_link' for each month of general statuses.
+     */
     protected function addCurrentProcessCountLinksForGeneralStatusMonths()
     {
         // Get required filter query parameters from request
@@ -271,13 +292,14 @@ class MADKPIService
 
                     // Default query
                 } else {
+                    $queryParams['initialize_from_inertia_page'] = true; // Reset pinia store filters
                     $queryParams['general_status_id[]'] = $status->id;
                     $queryParams['active_status_start_date_range'] = $this->generateMonthRangeForSpecificMonth($month);
                 }
 
                 $link = route('mad.processes.index', $queryParams);
 
-                // Update the current processes link of the month for the status
+                // Set the current processes link of the month for the status
                 $statusMonths = $status->months;
                 $statusMonths[$month['id']]['current_processes_link'] = $link;
                 $status->months = $statusMonths;
@@ -285,6 +307,9 @@ class MADKPIService
         }
     }
 
+    /**
+     * Add 'maximum_processes_link' for each month of general statuses.
+     */
     protected function addMaximumProcessCountLinksForGeneralStatusMonths()
     {
         // Get required filter query parameters from request
@@ -292,33 +317,31 @@ class MADKPIService
 
         foreach ($this->generalStatuses as $status) {
             foreach ($this->months as $month) {
-                $queryParams = $filterQueryParams;
-
                 // Special query for stage 5(Kk)
                 if ($status->stage == 5) {
                     $queryParams = [
-                        ...$queryParams,
+                        ...$filterQueryParams,
                         ...$this->getContractedOnSpecificMonthParams($month),
                     ];
 
                     // Special query for stage 7(НПР)
                 } else if ($status->stage == 7) {
                     $queryParams = [
-                        ...$queryParams,
+                        ...$filterQueryParams,
                         ...$this->getRegisteredOnSpecificMonthParams($month),
                     ];
 
                     // Default query
                 } else {
                     $queryParams = [
-                        ...$queryParams,
+                        ...$filterQueryParams,
                         ...$this->getHasGeneralStatusHistoryForSpecificMonthParams($month, $status),
                     ];
                 }
 
                 $link = route('mad.processes.index', $queryParams);
 
-                // Update the current processes link of the month for the status
+                // Set the current processes link of the month for the status
                 $statusMonths = $status->months;
                 $statusMonths[$month['id']]['maximum_processes_link'] = $link;
                 $status->months = $statusMonths;
@@ -328,12 +351,12 @@ class MADKPIService
 
     /*
     |--------------------------------------------------------------------------
-    | Months
+    | Month calculations and links
     |--------------------------------------------------------------------------
     */
 
     /**
-     * Add 'sum_of_all_current_process' and 'sum_of_all_maximum_process' for each month.
+     * Add 'sum_of_all_current_process_count' and 'sum_of_all_maximum_process_count' for each month.
      */
     protected function addSumOfAllProcessesCountsForMonths()
     {
@@ -346,8 +369,145 @@ class MADKPIService
                 $sumOfMaximumProcesses += $status->months[$month['id']]['maximum_processes_count'];
             }
 
-            $month['sum_of_all_current_process'] = $sumOfCurrentProcesses;
-            $month['sum_of_all_maximum_process'] = $sumOfMaximumProcesses;
+            $month['sum_of_all_current_process_count'] = $sumOfCurrentProcesses;
+            $month['sum_of_all_maximum_process_count'] = $sumOfMaximumProcesses;
+        }
+    }
+
+    /**
+     * Add 'active_manufacturers_count' for each month.
+     */
+    protected function addActiveManufacturersCountsForMonths()
+    {
+        foreach ($this->months as $month) {
+            $query = Manufacturer::query();
+            $request = $this->request->duplicate();
+
+            // Validate 'country_id' of request, which represents
+            // 'country_id' of Process, not Manufacturer
+            if ($request->has('country_id')) {
+                $request->merge([
+                    'process_country_id' => $request->country_id,
+                    'country_id' => null,
+                ]);
+            }
+
+            // Merge required params to request
+            $request->merge($this->getHasActiveProcessesForSpecificMonthParams($month));
+
+            // Apply base filters
+            $query = Manufacturer::filterQueryForRequest($query, $request);
+
+            // Set active manufacturers count for month
+            $month['active_manufacturers_count'] = $query->count();;
+        }
+    }
+
+    /**
+     * Add 'active_manufacturers_link' for each month
+     */
+    protected function addActiveManufacturersLinksForMonths()
+    {
+        // Get vaidated filter query parameters from request
+        $filterQueryParams = [
+            'analyst_user_id' => $this->request->manufacturer_analyst_user_id,
+            'bdm_user_id' => $this->request->manufacturer_bdm_user_id,
+            'region' => $this->request->manufacturer_region,
+        ];
+
+        foreach ($this->months as $month) {
+            $queryParams = [
+                ...$filterQueryParams,
+                ...$this->getHasActiveProcessesForSpecificMonthParams($month),
+            ];
+
+            // Generate and assign link for month
+            $link = route('mad.manufacturers.index', $queryParams);
+            $month['active_manufacturers_link'] = $link;
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Countries calculations and links
+    |--------------------------------------------------------------------------
+    */
+
+    protected function addProcessCountsForGeneralStatusesOfCountries()
+    {
+        // Pluck month ids for filtering
+        $monthIDs = $this->months->pluck('id')->toArray();
+
+        foreach ($this->countries as $country) {
+            $country->statuses = [];
+
+            // Calculate processes count for each general statuses
+            foreach ($this->generalStatuses as $status) {
+                $query = Process::query();
+                $request = $this->request->duplicate();
+
+                // Filter 'country_id'
+                $query->where('country_id', $country->id);
+
+                // Special query for stage 5(Kk)
+                if ($status->stage == 5) {
+                    $request->merge($this->getContractedOnSpecificMonthsParams($monthIDs));
+                    // Special query for stage 7(НПР)
+                } elseif ($status->stage == 7) {
+                    $request->merge($this->getRegisteredOnSpecificMonthsParams($monthIDs));
+                    // Default query
+                } else {
+                    $query->whereHas('activeStatusHistory', function ($historyQuery) use ($status, $monthIDs) {
+                        $historyQuery->whereYear('start_date', $this->year)
+                            ->whereIn(DB::raw('MONTH(start_date)'), $monthIDs)
+                            ->whereHas('status.generalStatus', fn($statusesQuery) => $statusesQuery->where('id', $status->id));
+                    });
+                }
+
+                // Apply base filters
+                Process::filterQueryForRequest($query, $request, applyPermissionsFilter: false);
+
+                // Set processes count for general status of country
+                $statuses = $country->statuses;
+                $statuses[$status->name]['processes_count'] = $query->count();
+                $country->statuses = $statuses;
+            }
+        }
+    }
+
+    /**
+     * Add 'year_processes_count' for each country
+     */
+    protected function addYearProcessesCountsForCountries()
+    {
+        foreach ($this->countries as $country) {
+            $sum = 0;
+
+            foreach ($country->statuses as $status) {
+                $sum += $status['processes_count'];
+            }
+
+            $country->year_processes_count = $sum;
+        }
+    }
+
+    /**
+     * Add 'kpi_link' for each country
+     *
+     * Used on 'map' type chart, when clicking specific country!
+     */
+    protected function addKPILinksForCountries()
+    {
+        // Get required filter query parameters from request
+        $filterQueryParams = $this->request->except(['country_id']);
+
+        foreach ($this->countries as $country) {
+            $queryParams = $filterQueryParams;
+            $queryParams['country_id'] = [$country->id];
+            $queryParams['initialize_from_inertia_page'] = true; // Reset pinia store filters
+
+            $link = route('mad.kpi.index', $queryParams);
+            $country['kpi_link'] = $link;
         }
     }
 
@@ -372,6 +532,7 @@ class MADKPIService
             'contracted_on_specific_month' => true,
             'contracted_on_year' => $this->year,
             'contracted_on_month' => $month['id'],
+            'initialize_from_inertia_page' => true, // Reset pinia store filters
         ];
     }
 
@@ -390,6 +551,7 @@ class MADKPIService
             'registered_on_specific_month' => true,
             'registered_on_year' => $this->year,
             'registered_on_month' => $month['id'],
+            'initialize_from_inertia_page' => true, // Reset pinia store filters
         ];
     }
 
@@ -409,6 +571,7 @@ class MADKPIService
             'has_general_status_for_year' => $this->year,
             'has_general_status_for_month' => $month['id'],
             'has_general_status_id' => $status->id,
+            'initialize_from_inertia_page' => true, // Reset pinia store filters
         ];
     }
 
@@ -429,6 +592,25 @@ class MADKPIService
     }
 
     /**
+     * Used in below cases:
+     *
+     * 1. When calculating 'active_manufacturers_count' of months,
+     * by merging parameters into request.
+     *
+     * 2. When generating 'active_manufacturers_link' of months,
+     * by merging parameters into links query.
+     */
+    protected function getHasActiveProcessesForSpecificMonthParams($month): array
+    {
+        return [
+            'has_active_processes_for_specific_month' => true,
+            'has_active_processes_for_year' => $this->year,
+            'has_active_processes_for_month' => $month['id'],
+            'initialize_from_inertia_page' => true, // Reset pinia store filters
+        ];
+    }
+
+    /**
      * Generate month range in format of given_month_d/m/y - next_month_d/m/y for month.
      *
      * Used only when generating 'current_processes_link' for months of general statuses
@@ -440,5 +622,31 @@ class MADKPIService
         $nextMonthStart = $monthStart->copy()->addMonth()->startOfMonth();
 
         return $monthStart->format('d/m/Y') . ' - ' . $nextMonthStart->format('d/m/Y');
+    }
+
+    /**
+     * Used only when calculating 'processes_count' of general statuses of countries,
+     * when general status is 5(Кк), by merging parameters into request.
+     */
+    protected function getContractedOnSpecificMonthsParams(array $monthIDs): array
+    {
+        return [
+            'contracted_on_specific_months' => true,
+            'contracted_on_year' => $this->year,
+            'contracted_on_months' => $monthIDs,
+        ];
+    }
+
+    /**
+     * Used only when calculating 'processes_count' of general statuses of countries,
+     * when general status is 7(НПР), by merging parameters into request.
+     */
+    protected function getRegisteredOnSpecificMonthsParams(array $monthIDs): array
+    {
+        return [
+            'registered_on_specific_months' => true,
+            'registered_on_year' => $this->year,
+            'registered_on_months' => $monthIDs,
+        ];
     }
 }

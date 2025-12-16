@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
 class Process extends Model implements
@@ -900,7 +901,7 @@ class Process extends Model implements
                 $historyQuery
                     ->whereYear('start_date', $request->input('contracted_on_year'))
                     ->whereMonth('start_date', $request->input('contracted_on_month'))
-                    ->where('status_id', ProcessStatus::CONTACTED_RECORD_ID);
+                    ->where('status_id', ProcessStatus::CONTRACTED_RECORD_ID);
             });
         }
 
@@ -909,7 +910,7 @@ class Process extends Model implements
                 $historyQuery
                     ->whereYear('start_date', $request->input('contracted_on_year'))
                     ->whereIn(DB::raw('MONTH(start_date)'), $request->input('contracted_on_months'))
-                    ->where('status_id', ProcessStatus::CONTACTED_RECORD_ID);
+                    ->where('status_id', ProcessStatus::CONTRACTED_RECORD_ID);
             });
         }
 

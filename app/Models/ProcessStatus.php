@@ -13,7 +13,7 @@ class ProcessStatus extends Model
     |--------------------------------------------------------------------------
     */
 
-    const CONTACTED_RECORD_ID = 11;
+    const CONTRACTED_RECORD_ID = 11;
     const REGISTERED_RECORD_ID = 16;
 
     const MAX_PROCESS_ACTIVITY_DELAY_DAYS  = 15;

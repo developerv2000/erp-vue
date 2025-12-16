@@ -6,6 +6,8 @@ import { computed, onMounted } from "vue";
 import { useI18n } from "vue-i18n";
 import useQueryParams from "@/core/composables/useQueryParams";
 import KPIFilter from "./partials/KPIFilter.vue";
+import CurrentProcessesPie from "./partials/charts/CurrentProcessesPie.vue";
+import MaximumProcessesPie from "./partials/charts/MaximumProcessesPie.vue";
 
 const page = usePage();
 const { t } = useI18n();
@@ -23,12 +25,22 @@ onMounted(() => {
         store.initFromInertiaPage(page);
     }
 });
+
+const chartsWrapperStyles = {
+    maxWidth: "calc(100% - var(--main-filter-width))",
+};
 </script>
 
 <template>
     <MainLayout :title="title" :display-title-at-header="true">
         <div class="d-flex ga-6 align-start">
-            <div class="d-flex flex-column flex-grow-1 ga-6"></div>
+            <div class="d-flex flex-column flex-grow-1 ga-6" :style="chartsWrapperStyles">
+                <!-- Pies -->
+                <div class="d-flex ga-6">
+                    <CurrentProcessesPie />
+                    <MaximumProcessesPie />
+                </div>
+            </div>
 
             <KPIFilter />
         </div>

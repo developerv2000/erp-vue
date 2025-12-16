@@ -12,7 +12,7 @@ window.axios.defaults.withCredentials = true;
 await window.axios.get('/sanctum/csrf-cookie');
 
 // IMPORTANT: Do NOT enable withXSRFToken when using Sanctum
-// axios.defaults.withXSRFToken = true; 
+// axios.defaults.withXSRFToken = true;
 
 // -----------------------------
 // CSRF Auto-refresh Interceptor

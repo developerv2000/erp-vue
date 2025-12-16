@@ -206,6 +206,9 @@
     "Days": "Дней",
     "days.past": "Дней прошло",
 
+    "charts.MAD KPI current processes count": "Ключевые показатели по тщательной обработке продуктов по месяцам",
+    "charts.MAD KPI maximum processes count": "Ключевые показатели по количеству выполненных работ на каждом этапе по месяцам",
+
     "fields.Abbreviation": "Аббревиатура",
     "fields.Description": "Описание",
 

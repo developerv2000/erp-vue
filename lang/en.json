@@ -204,6 +204,9 @@
     "Days": "Days",
     "days.past": "Days past",
 
+    "charts.MAD KPI current processes count": "Key performance indicators for thorough food processing by month",
+    "charts.MAD KPI maximum processes count": "Key performance indicators for the amount of work completed at each stage by month",
+
     "fields.Abbreviation": "Abbreviation",
     "fields.Description": "Description",
 

@@ -14,6 +14,9 @@ export const useUserSettingsStore = defineStore("userSettings", {
     getters: {
         appBackgroundClass: (state) =>
             state.theme === "light" ? "bg-grey-lighten-4" : "bg-black",
+
+        echartsTheme: (state) =>
+            state.theme === "light" ? "default" : "dark",
     },
 
     actions: {

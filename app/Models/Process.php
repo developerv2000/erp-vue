@@ -999,7 +999,13 @@ class Process extends Model implements
     {
         return [
             'whereEqual' => ['contracted_in_asp', 'registered_in_asp', 'responsible_person_id'],
-            'whereIn' => ['id', 'country_id', 'status_id', 'marketing_authorization_holder_id'],
+            'whereIn' => ['id', 'status_id', 'marketing_authorization_holder_id'],
+            'whereInAmbigious' => [
+                [
+                    'inputName' => 'country_id',
+                    'tableName' => 'processes',
+                ]
+            ],
             'like' => ['trademark_en', 'trademark_ru'],
             'dateRange' => ['created_at', 'updated_at'],
 

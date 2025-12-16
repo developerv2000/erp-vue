@@ -20,6 +20,7 @@ class QueryFilterHelper
     {
         $query = self::filterWhereEqual($request, $query, $config['whereEqual'] ?? []);
         $query = self::filterWhereIn($request, $query, $config['whereIn'] ?? []);
+        $query = self::filterWhereInAmbigious($request, $query, $config['whereInAmbigious'] ?? []);
         $query = self::filterDate($request, $query, $config['date'] ?? []);
         $query = self::filterLike($request, $query, $config['like'] ?? []);
         $query = self::filterDateRange($request, $query, $config['dateRange'] ?? []);
@@ -54,6 +55,16 @@ class QueryFilterHelper
         foreach ($attributes as $attribute) {
             if ($request->filled($attribute)) {
                 $query->whereIn($attribute, $request->input($attribute));
+            }
+        }
+        return $query;
+    }
+
+    public static function filterWhereInAmbigious(Request $request, Builder $query, array $filters): Builder
+    {
+        foreach ($filters as $filter) {
+            if ($request->filled($filter['inputName'])) {
+                $query->whereIn($filter['tableName'] . '.' . $filter['inputName'], $request->input($filter['inputName']));
             }
         }
         return $query;

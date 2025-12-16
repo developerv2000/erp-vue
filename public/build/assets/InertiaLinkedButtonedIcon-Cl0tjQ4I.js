@@ -1,0 +1,1 @@
+import{c as r,o as s,aA as c,B as a,j as p}from"./app-zlqHbSzm.js";const k={__name:"InertiaLinkedButtonedIcon",props:{icon:String,link:{type:String,required:!0}},setup(t){const n=t,e=()=>{p.visit(n.link)},i=o=>{o.button===1&&window.open(n.link,"_blank")};return(o,u)=>(s(),r(a,{icon:n.icon,onClick:c(e,["prevent","stop"]),onMousedown:i},null,8,["icon"]))}};export{k as _};

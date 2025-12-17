@@ -380,18 +380,12 @@ class MADKPIService
      */
     protected function addActiveManufacturersCountsForMonths()
     {
+        // Validate request params
+        $validatedRequest = $this->getValidatedRequestForManufacturerIndexPage();
+
         foreach ($this->months as $month) {
             $query = Manufacturer::query();
-            $request = $this->request->duplicate();
-
-            // Validate 'country_id' of request, which represents
-            // 'country_id' of Process, not Manufacturer
-            if ($request->has('country_id')) {
-                $request->merge([
-                    'process_country_id' => $request->country_id,
-                    'country_id' => null,
-                ]);
-            }
+            $request = $validatedRequest->duplicate();
 
             // Merge required params to request
             $request->merge($this->getHasActiveProcessesForSpecificMonthParams($month));
@@ -654,5 +648,48 @@ class MADKPIService
             'registered_on_year' => $this->year,
             'registered_on_months' => $monthIDs,
         ];
+    }
+
+    protected function getValidatedRequestForManufacturerIndexPage()
+    {
+        $request = $this->request->duplicate();
+
+        // 1. Validate'country_id' of request, which represents
+        // 'country_id' of Process, not Manufacturer
+        if ($request->has('country_id')) {
+            $request->merge([
+                'process_country_id' => $request->country_id,
+                'country_id' => null,
+            ]);
+        }
+
+        // 2. Validate 'manufacturer_region' of request, which represents
+        // 'region' of Manufacturer
+        if ($request->has('manufacturer_region')) {
+            $request->merge([
+                'region' => $request->manufacturer_region,
+                'manufacturer_region' => null,
+            ]);
+        }
+
+        // 3. Validate 'manufacturer_bdm_user_id' of request, which represents
+        // 'bdm_user_id' of Manufacturer
+        if ($request->has('manufacturer_bdm_user_id')) {
+            $request->merge([
+                'bdm_user_id' => $request->manufacturer_bdm_user_id,
+                'manufacturer_bdm_user_id' => null,
+            ]);
+        }
+
+        // 4. Validate 'manufacturer_analyst_user_id' of request, which represents
+        // 'analyst_user_id' of Manufacturer
+        if ($request->has('manufacturer_analyst_user_id')) {
+            $request->merge([
+                'analyst_user_id' => $request->manufacturer_analyst_user_id,
+                'manufacturer_analyst_user_id' => null,
+            ]);
+        }
+
+        return $request;
     }
 }

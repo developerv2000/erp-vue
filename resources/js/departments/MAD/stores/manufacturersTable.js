@@ -14,6 +14,11 @@ const defaultPaginationOptions = {
 };
 
 const defaultFilters = {
+    // Readonly
+    has_active_processes_for_specific_month: null, // Number
+    has_active_processes_for_year: null,
+    has_active_processes_for_month: null,
+
     // Boolean
     active: null,
     important: null,
@@ -73,6 +78,11 @@ export const useMADManufacturersTableStore = defineStore('MADManufacturersTable'
             this.pagination.order_by = query.order_by ?? defaultPaginationOptions.order_by;
             this.pagination.order_direction = query.order_direction ?? defaultPaginationOptions.order_direction;
             this.navigate_to_page = this.pagination.page;
+
+            // Readonly
+            this.filters.has_active_processes_for_specific_month = query.has_active_processes_for_specific_month ? Number(query.has_active_processes_for_specific_month) : null;
+            this.filters.has_active_processes_for_year = query.has_active_processes_for_year;
+            this.filters.has_active_processes_for_month = query.has_active_processes_for_month;
 
             // Filters that don`t require normalization
             this.filters.region = query.region;
@@ -167,19 +177,19 @@ export const useMADManufacturersTableStore = defineStore('MADManufacturersTable'
             this.fetchRecords({ updateUrl: true });
         },
 
-            resetState() {
-                this.records = [];
-                this.loading = false;
-                this.selected = [];
+        resetState() {
+            this.records = [];
+            this.loading = false;
+            this.selected = [];
 
-                this.pagination = {
-                    ...defaultPaginationOptions
-                };
+            this.pagination = {
+                ...defaultPaginationOptions
+            };
 
-                this.filters = {
-                    ...defaultFilters
-                };
-            },
+            this.filters = {
+                ...defaultFilters
+            };
+        },
 
         resetUrl() {
             router.get(route(route().current()), {}, {

@@ -25,7 +25,10 @@ const series = computed(() => {
         type: "bar",
         showBackground: true,
         data: months.value.map((month) => month.active_manufacturers_count),
-        label: graphBarSeriesDefaultLabelOptions,
+        label: {
+            ...graphBarSeriesDefaultLabelOptions,
+            rotate: 0,
+        },
     };
 });
 
@@ -39,14 +42,14 @@ const option = computed(() => {
         grid: {
             ...graphDefaultGridOptions,
             bottom: 40,
-            top: 120,
+            top: 88,
         },
         toolbox: graphDefaultToolboxOptions,
         tooltip: graphDefaultTooltipOptions,
         xAxis: [
             {
                 type: "category",
-                data: months.value.map((month) => month.name),
+                data: months.value.map((month) => t(month.name)),
                 axisPointer: graphDefaultXAxisPointerOptions,
             },
         ],

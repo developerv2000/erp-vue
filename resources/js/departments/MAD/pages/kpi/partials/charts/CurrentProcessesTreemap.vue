@@ -16,6 +16,7 @@ const { t } = useI18n();
 const store = useMADKPIStore();
 const userSettings = useUserSettingsStore();
 const countries = computed(() => page.props.kpiData.countries);
+console.log(countries);
 
 const series = computed(() => {
     return {
@@ -38,7 +39,9 @@ const option = computed(() => {
         toolbox: treemapDefaultToolboxOptions,
         tooltip: {
             formatter: ({ name, value, data }) =>
-                `<strong>${name}</strong><br>${t("calculations.Sum")}: ${value}<br>` +
+                `<strong>${name}</strong><br>${t(
+                    "calculations.Sum"
+                )}: ${value}<br>` +
                 Object.entries(data.statuses)
                     .map(([key, val]) => `${key}: ${val.processes_count}`)
                     .join("<br>"),
@@ -46,15 +49,24 @@ const option = computed(() => {
         series: [series.value],
     };
 });
+
+const handleContextMenu = (params) => {
+    if (!params.data) return;
+    
+    // Prevent default right-click menu
+    params?.event?.event?.preventDefault();
+    if (params.data?.kpi_link) window.open(params.data.kpi_link, "_blank");
+};
 </script>
 
 <template>
-    <v-sheet height="580px">
+    <v-sheet height="600px">
         <VChart
             :option="option"
             :loading="store.loading"
             :theme="userSettings.echartsTheme"
             :key="userSettings.echartsTheme"
+            @contextmenu="handleContextMenu"
             autoresize
         />
     </v-sheet>

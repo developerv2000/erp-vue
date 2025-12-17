@@ -1,0 +1,1 @@
+import{_ as t}from"./_plugin-vue_export-helper-DlAUqK2U.js";import{f as o,o as s,aM as r}from"./app-DQwAq2sA.js";const n={},c={class:"font-weight-medium"};function a(e,_){return s(),o("span",c,[r(e.$slots,"default")])}const m=t(n,[["render",a]]);export{m as T};

@@ -94,6 +94,10 @@
     "filter.Filtered records": "Отфильтрованных записей",
     "filter.Region": "Регион",
     "filter.Has VPS for country": "Имеет ВПЦ для страны",
+    "Special filter": "Особый фильтр",
+    "Special filter.Contract on specific month": "Контракт на конкретный месяц",
+    "Special filter.Registration on specific month": "Регистрация на конкретный месяц",
+    "Special filter.Was active on specific month": "Был активен на конкретный месяц",
 
     "messages.Success": "Успешно!",
     "messages.Submition failed": "Что-то пошло не так. Пожалуйста, попробуйте позже!",

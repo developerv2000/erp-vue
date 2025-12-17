@@ -9,6 +9,7 @@ import StoreBindedFilter from "@/core/components/filters/StoreBindedFilter.vue";
 import FilterAutocomplete from "@/core/components/filters/inputs/FilterAutocomplete.vue";
 import FilterBooleanAutocomplete from "@/core/components/filters/inputs/FilterBooleanAutocomplete.vue";
 import FilterDefaultInputs from "@/core/components/filters/inputs/FilterDefaultInputs.vue";
+import FilterTextField from "@/core/components/filters/inputs/FilterTextField.vue";
 
 const { t } = useI18n();
 const page = usePage();
@@ -40,6 +41,13 @@ const refreshSmartFiltersDebounced = debounce(refreshSmartFilters, 500);
 
 <template>
     <StoreBindedFilter :store="store">
+        <FilterTextField
+            v-if="store.filters.has_active_processes_for_specific_month"
+            :label="t('Special filter')"
+            :value="t('Special filter.Was active on specific month')"
+            readonly
+        />
+
         <FilterAutocomplete
             :label="'* ' + t('fields.Analyst')"
             name="analyst_user_id"

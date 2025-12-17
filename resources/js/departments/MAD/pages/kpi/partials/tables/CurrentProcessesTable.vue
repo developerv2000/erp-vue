@@ -9,6 +9,12 @@ const { t } = useI18n();
 
 const months = computed(() => page.props.kpiData.months);
 const generalStatuses = computed(() => page.props.kpiData.generalStatuses);
+
+const handleLinksClick = (event) => {
+    if (event.target.dataset.isLink === "true") {
+        window.open(event.target.dataset.link, "_blank");
+    }
+};
 </script>
 
 <template>
@@ -32,13 +38,19 @@ const generalStatuses = computed(() => page.props.kpiData.generalStatuses);
                 </tr>
             </thead>
 
-            <tbody>
+            <tbody @click="handleLinksClick">
                 <!-- General status rows -->
                 <tr v-for="status in generalStatuses" :key="status.id">
                     <td>{{ status.name }}</td>
 
                     <td v-for="month in status.months" :key="month.id">
-                        {{ month.current_processes_count }}
+                        <span
+                            class="cursor-pointer"
+                            :data-is-link="true"
+                            :data-link="month.current_processes_link"
+                        >
+                            {{ month.current_processes_count }}
+                        </span>
                     </td>
 
                     <td>{{ status.year_current_processes_count }}</td>

@@ -63,7 +63,7 @@ const option = computed(() => {
         xAxis: [
             {
                 type: "category",
-                data: months.value.map((month) => month.name),
+                data: months.value.map((month) => t(month.name)),
                 axisPointer: graphDefaultXAxisPointerOptions,
             },
         ],

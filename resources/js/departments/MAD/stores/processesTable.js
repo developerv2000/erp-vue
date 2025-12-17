@@ -15,6 +15,18 @@ const defaultPaginationOptions = {
 };
 
 const defaultFilters = {
+    // Readonly filters
+    contracted_on_specific_month: null, // Number
+    contracted_on_year: null,
+    contracted_on_month: null,
+    registered_on_specific_month: null, // Number
+    registered_on_year: null,
+    registered_on_month: null,
+    has_general_status_history: null, // Number
+    has_general_status_for_year: null,
+    has_general_status_for_month: null,
+    has_general_status_id: null,
+
     // Boolean
     order_by_days_past_since_last_activity: null,
     contracted_in_asp: null,
@@ -93,6 +105,18 @@ export const useMADProcessesTableStore = defineStore('MADProcessesTable', {
             this.pagination.order_direction = query.order_direction ?? defaultPaginationOptions.order_direction;
             this.navigate_to_page = this.pagination.page;
 
+            // Readonly
+            this.filters.contracted_on_specific_month = query.contracted_on_specific_month ? Number(query.contracted_on_specific_month) : null;
+            this.filters.contracted_on_year = query.contracted_on_year;
+            this.filters.contracted_on_month = query.contracted_on_month;
+            this.filters.registered_on_specific_month = query.registered_on_specific_month ? Number(query.registered_on_specific_month) : null;
+            this.filters.registered_on_year = query.registered_on_year;
+            this.filters.registered_on_month = query.registered_on_month;
+            this.filters.has_general_status_history = query.has_general_status_history ? Number(query.has_general_status_history) : null;
+            this.filters.has_general_status_for_year = query.has_general_status_for_year;
+            this.filters.has_general_status_for_month = query.has_general_status_for_month;
+            this.filters.has_general_status_id = query.has_general_status_id;
+            
             // Filters that don`t require normalization:
             // Text fields
             this.filters.product_dosage = query.product_dosage;

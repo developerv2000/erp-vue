@@ -178,6 +178,10 @@
     "filter.Filtered records": "Filtered records",
     "filter.Region": "Region",
     "filter.Has VPS for country": "Has VPS for country",
+    "Special filter": "Special filter",
+    "Special filter.Contract on specific month": "Contract on specific month",
+    "Special filter.Registration on specific month": "Registration on specific month",
+    "Special filter.Was active on specific month": "Was active on specific month",
 
     "Similar records": "Similar records",
     "similar records.Not found": "Similar records not found.",

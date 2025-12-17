@@ -294,7 +294,7 @@ class MADKPIService
                     // Default query
                 } else {
                     $queryParams['initialize_from_inertia_page'] = true; // Reset pinia store filters
-                    $queryParams['general_status_id[]'] = $status->id;
+                    $queryParams['status_general_status_id[]'] = $status->id;
                     $queryParams['active_status_start_date_range'] = $this->generateMonthRangeForSpecificMonth($month);
                 }
 
@@ -612,17 +612,22 @@ class MADKPIService
     }
 
     /**
-     * Generate month range in format of given_month_d/m/y - next_month_d/m/y for month.
+     * Generate month range in format:
+     * given_month_d/m/y - last_day_of_month_d/m/y
      *
      * Used only when generating 'current_processes_link' for months of general statuses
      * not (5(Кк) and 7(НПР)), by merging parameters into links query.
      */
     protected function generateMonthRangeForSpecificMonth($month): string
     {
-        $monthStart = Carbon::createFromFormat('Y-m-d', $this->year . '-' . $month['id'] . '-01');
-        $nextMonthStart = $monthStart->copy()->addMonth()->startOfMonth();
+        $monthStart = Carbon::createFromFormat(
+            'Y-m-d',
+            $this->year . '-' . $month['id'] . '-01'
+        );
 
-        return $monthStart->format('d/m/Y') . ' - ' . $nextMonthStart->format('d/m/Y');
+        $monthEnd = $monthStart->copy()->endOfMonth();
+
+        return $monthStart->format('Y-m-d') . ' - ' . $monthEnd->format('Y-m-d');
     }
 
     /**

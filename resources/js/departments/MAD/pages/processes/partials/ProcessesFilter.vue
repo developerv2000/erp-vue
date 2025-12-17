@@ -45,6 +45,20 @@ const refreshSmartFiltersDebounced = debounce(refreshSmartFilters, 500);
 
 <template>
     <StoreBindedFilter :store="store">
+        <FilterTextField
+            v-if="store.filters.contracted_on_specific_month"
+            :label="t('Special filter')"
+            :value="t('Special filter.Contract on specific month')"
+            readonly
+        />
+
+        <FilterTextField
+            v-if="store.filters.registered_on_specific_month"
+            :label="t('Special filter')"
+            :value="t('Special filter.Registration on specific month')"
+            readonly
+        />
+
         <FilterBooleanAutocomplete
             :label="t('deadline.Order by deadline')"
             name="order_by_days_past_since_last_activity"

@@ -34,9 +34,7 @@ const option = computed(() => {
                 return `${params.name}: ${params.value} (${params.percent}%)`;
             },
         },
-        legend: {
-            ...defaulLegendOptions,
-        },
+        legend: defaulLegendOptions,
         series: [
             {
                 ...arcPieDefaultSeriesOptions,

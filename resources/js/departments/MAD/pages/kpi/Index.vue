@@ -8,6 +8,13 @@ import useQueryParams from "@/core/composables/useQueryParams";
 import KPIFilter from "./partials/KPIFilter.vue";
 import CurrentProcessesPie from "./partials/charts/CurrentProcessesPie.vue";
 import MaximumProcessesPie from "./partials/charts/MaximumProcessesPie.vue";
+import CurrentProcessesTable from "./partials/tables/CurrentProcessesTable.vue";
+import CurrentProcessesGraph from "./partials/charts/CurrentProcessesGraph.vue";
+import CurrentProcessesTreemap from "./partials/charts/CurrentProcessesTreemap.vue";
+import MaximumProcessesTable from "./partials/tables/MaximumProcessesTable.vue";
+import MaximumProcessesGraph from "./partials/charts/MaximumProcessesGraph.vue";
+import ActiveManufacturersTable from "./partials/tables/ActiveManufacturersTable.vue";
+import ActiveManufacturersGraph from "./partials/charts/ActiveManufacturersGraph.vue";
 
 const page = usePage();
 const { t } = useI18n();
@@ -33,13 +40,21 @@ const chartsWrapperStyles = {
 
 <template>
     <MainLayout :title="title" :display-title-at-header="true">
-        <div class="d-flex ga-6 align-start">
+        <div class="d-flex ga-6 align-start pb-6">
             <div class="d-flex flex-column flex-grow-1 ga-6" :style="chartsWrapperStyles">
                 <!-- Pies -->
                 <div class="d-flex ga-6">
                     <CurrentProcessesPie />
                     <MaximumProcessesPie />
                 </div>
+
+                <CurrentProcessesTable />
+                <CurrentProcessesGraph />
+                <CurrentProcessesTreemap />
+                <MaximumProcessesTable />
+                <MaximumProcessesGraph />
+                <ActiveManufacturersTable />
+                <ActiveManufacturersGraph />
             </div>
 
             <KPIFilter />

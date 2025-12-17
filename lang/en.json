@@ -155,9 +155,25 @@
     "dates.Duration days": "Duration days",
     "dates.Historical": "Historical date",
 
+    "Days": "Days",
+    "days.past": "Days past",
     "Year": "Year",
     "Month": "Month",
     "Months": "Months",
+    "January": "January",
+    "February": "February",
+    "March": "March",
+    "April": "April",
+    "May": "May",
+    "June": "June",
+    "July": "July",
+    "August": "August",
+    "September": "September",
+    "October": "October",
+    "November": "November",
+    "December": "December",
+
+    "calculations.Sum": "Sum",
 
     "filter.Filtered records": "Filtered records",
     "filter.Region": "Region",
@@ -201,11 +217,10 @@
     "deadline.No deadline": "No deadline",
     "deadline.Order by deadline": "Order by deadline",
 
-    "Days": "Days",
-    "days.past": "Days past",
-
     "charts.MAD KPI current processes count": "Key performance indicators for thorough food processing by month",
     "charts.MAD KPI maximum processes count": "Key performance indicators for the amount of work completed at each stage by month",
+    "charts.MAD KPI active manufacturers count": "Number of active manufacturers by month",
+    "charts.MAD KPI processes counts of countries": "Number of ongoing processes by country",
 
     "fields.Abbreviation": "Abbreviation",
     "fields.Description": "Description",

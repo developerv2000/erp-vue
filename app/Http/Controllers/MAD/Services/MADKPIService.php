@@ -58,8 +58,9 @@ class MADKPIService
             'months' => $this->months,
             'countries' => $this->countries,
             'generalStatuses' => $this->generalStatuses,
-            'currentProcessesCountOfYear' => $this->generalStatuses->sum('year_current_processes'),
-            'maximumProcessesCountOfYear' => $this->generalStatuses->sum('year_maximum_processes'),
+            'currentProcessesCountOfYear' => $this->generalStatuses->sum('year_current_processes_count'),
+            'maximumProcessesCountOfYear' => $this->generalStatuses->sum('year_maximum_processes_count'),
+            'activeManufacturersOfYear' => $this->months->sum('active_manufacturers_count'),
         ];
     }
 
@@ -96,7 +97,7 @@ class MADKPIService
 
     protected function resolveMonths()
     {
-        $this->months = GeneralHelper::collectCalendarMonthsTranslated();
+        $this->months = GeneralHelper::collectCalendarMonths();
 
         if ($this->request->filled('months')) {
             $this->months = $this->months->whereIn('id', $this->request->input('months'));

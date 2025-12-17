@@ -161,9 +161,25 @@
     "dates.Duration days": "Длительность дней",
     "dates.Historical": "Историческая дата",
 
+    "Days": "Дней",
+    "days.past": "Дней прошло",
     "Year": "Год",
     "Month": "Месяц",
     "Months": "Месяцы",
+    "January": "Январь",
+    "February": "Февраль",
+    "March": "Март",
+    "April": "Апрель",
+    "May": "Май",
+    "June": "Июнь",
+    "July": "Июль",
+    "August": "Август",
+    "September": "Сентябрь",
+    "October": "Октябрь",
+    "November": "Ноябрь",
+    "December": "Декабрь",
+
+    "calculations.Sum": "Сумма",
 
     "Similar records": "Схожие записи",
     "similar records.Not found": "Схожие записи не найдены.",
@@ -203,11 +219,10 @@
     "deadline.No deadline": "Без дедлайна",
     "deadline.Order by deadline": "Сортировать по дедлайну",
 
-    "Days": "Дней",
-    "days.past": "Дней прошло",
-
     "charts.MAD KPI current processes count": "Ключевые показатели по тщательной обработке продуктов по месяцам",
     "charts.MAD KPI maximum processes count": "Ключевые показатели по количеству выполненных работ на каждом этапе по месяцам",
+    "charts.MAD KPI active manufacturers count": "Количество активных производителей по месяцам",
+    "charts.MAD KPI processes counts of countries": "Количество текущих процессов по странам",
 
     "fields.Abbreviation": "Аббревиатура",
     "fields.Description": "Описание",

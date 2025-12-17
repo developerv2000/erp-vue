@@ -21,3 +21,4 @@
 - Add :return typos for controller functions
 - FIx profile edit form (make it like MAD CRUD forms)
 - Refactor Products 'getMatchedProductSearchesAttribute()'
+- Refactor MAD KPI addActiveManufacturersCountsForMonths() when count_id is filled

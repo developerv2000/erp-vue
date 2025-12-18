@@ -1,0 +1,1 @@
+import{bT as s,c as r,o,w as n,e as c,aM as l,a6 as _,b as e,B as u}from"./app-SLdfdST1.js";const i={class:"text-none"},h={__name:"DefaultButton",setup(p){const t=s();return(a,d)=>(o(),r(u,_({color:"primary",variant:"flat",height:e(t).size?"":"40",rounded:"lg"},e(t)),{default:n(()=>[c("span",i,[l(a.$slots,"default")])]),_:3},16,["height"]))}};export{h as _};

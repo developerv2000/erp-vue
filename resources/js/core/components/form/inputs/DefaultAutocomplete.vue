@@ -20,6 +20,25 @@ const inputAttrs = useAttrs();
 const isMultiple = computed(
     () => inputAttrs.multiple === "" || !!inputAttrs.multiple
 );
+
+// Custom filter
+const orderedFilter = (value, query, item) => {
+    if (!query) return true;
+    if (!value) return false;
+
+    const text = String(value).toLowerCase();
+    const tokens = query.toLowerCase().trim().split(/\s+/);
+
+    let lastIndex = 0;
+
+    for (const token of tokens) {
+        const index = text.indexOf(token, lastIndex);
+        if (index === -1) return false;
+        lastIndex = index + token.length;
+    }
+
+    return true;
+};
 </script>
 
 <template>
@@ -41,6 +60,9 @@ const isMultiple = computed(
             :clear-on-select="isMultiple ? true : false"
             :chips="isMultiple ? true : false"
             :closable-chips="isMultiple ? true : false"
+            auto-select-first
+            hide-selected
+            :custom-filter="orderedFilter"
             v-bind="inputAttrs"
         />
     </StandardLabeledGroup>

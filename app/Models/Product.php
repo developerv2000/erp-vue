@@ -517,7 +517,7 @@ class Product extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
             // Merge the product attributes into the request
             $mergedRequest = $request->merge([
                 'dosage' => $product['dosage'],
-                'pack' => $product['pack'],
+                'pack' => isset($product['pack']) ? $product['pack'] : null,
                 'moq' => isset($product['moq']) ? $product['moq'] : null,
             ]);
 

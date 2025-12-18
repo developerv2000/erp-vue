@@ -1,0 +1,1 @@
+import{aP as e}from"./app-D1YberCH.js";const o=e("comments",{state:()=>({editDialog:!1,destroyDialog:!1,activeRecord:{id:null,body:null}}),actions:{resetState(){this.editDialog=!1,this.destroyDialog=!1,this.activeRecord.id=null,this.activeRecord.body=null}}});export{o as u};

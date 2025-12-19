@@ -34,15 +34,15 @@ class Department extends Model
     const MAD_NAME = 'Отдел анализа производителей'; // Manufacturer Analysis Department
     const MAD_ABBREVIATION = 'ОАП';
 
-    const CMD_NAME = 'Департамент контрактного производства'; // Contract Manufacturing Department
-    const CMD_ABBREVIATION = 'ДКП';
+    const CMD_NAME = 'Отдел контрактного производства'; // Contract Manufacturing Department
+    const CMD_ABBREVIATION = 'ОКП';
 
     const PLD_NAME = 'Департамент закупок и логистики'; // Purchasing and Logistics Department
     const PLD_ABBREVIATION = 'ДЗЛ';
 
     const PRD_NAME = 'Отдел платёжной реконсиляции'; // Payment Reconciliation Department
     const PRD_ABBREVIATION = 'ОПР';
-
+    
     const PPDD_NAME = 'Отдел развития продуктового портфеля'; // Product Portfolio Development Department
     const PPDD_ABBREVIATION = 'ОРПП';
 

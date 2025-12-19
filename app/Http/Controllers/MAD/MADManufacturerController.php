@@ -12,9 +12,8 @@ use App\Models\ManufacturerCategory;
 use App\Models\ProductClass;
 use App\Models\User;
 use App\Models\Zone;
-use App\Support\FilterDependencies\SimpleFilters\MAD\ManufacturersSimpleFilter;
-use App\Support\FilterDependencies\SmartFilters\MAD\ManufacturersSmartFilter;
 use App\Support\Helpers\ControllerHelper;
+use App\Support\SmartFilters\MAD\ManufacturersSmartFilter;
 use App\Support\Traits\Controller\DestroysModelRecords;
 use App\Support\Traits\Controller\RestoresModelRecords;
 use Illuminate\Http\Request;
@@ -42,7 +41,7 @@ class MADManufacturerController extends Controller
             'tableVisibleHeaders' => $getVisibleHeaders,
 
             // Lazy loads. Never refetched again
-            'simpleFilterDependencies' => fn() => ManufacturersSimpleFilter::getAllDependencies(),
+            'simpleFilterDependencies' => fn() => $this->getSimpleFilterDependencies(),
         ]);
     }
 
@@ -62,7 +61,7 @@ class MADManufacturerController extends Controller
             'tableVisibleHeaders' => $getVisibleHeaders,
 
             // Lazy loads. Never refetched again
-            'simpleFilterDependencies' => fn() => ManufacturersSimpleFilter::getAllDependencies(),
+            'simpleFilterDependencies' => fn() => $this->getSimpleFilterDependencies(),
         ]);
     }
 
@@ -134,5 +133,18 @@ class MADManufacturerController extends Controller
         return response()->json([
             'success' => true,
         ]);
+    }
+
+    private function getSimpleFilterDependencies(): array
+    {
+        return [
+            'bdmUsers' => User::getCMDBDMsMinifed(),
+            'regions' => Country::getRegionOptions(),
+            'categories' => ManufacturerCategory::orderByName()->get(),
+            'productClasses' => ProductClass::orderByName()->get(),
+            'zones' => Zone::orderByName()->get(),
+            'countriesOrderedByProcessesCount' => Country::orderByProcessesCount()->get(), // Used in has processes_for_country filter
+            'blacklists' => ManufacturerBlacklist::orderByName()->get(),
+        ];
     }
 }

@@ -570,9 +570,16 @@ class User extends Authenticatable
      */
     public static function resetSettingsOfAllUsers(): void
     {
-        self::all()->each(function ($user) {
-            $user->resetSettings();
-        });
+        self::with([
+            'roles' => function ($rolesQuery) {
+                $rolesQuery->with('permissions');
+            },
+            'permissions',
+        ])
+            ->get()
+            ->each(function ($user) {
+                $user->resetSettings();
+            });
     }
 
     /*

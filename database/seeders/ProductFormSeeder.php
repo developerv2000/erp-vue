@@ -14,7 +14,7 @@ class ProductFormSeeder extends Seeder
     public function run(): void
     {
         // Parents
-        $parents = ['AMPOULES', 'BATHS', 'CAPSULES', 'CARTRIDGE/PENS', 'CREAMS', 'GASES', 'GEL/SOL', 'INFUSIONS', 'LIQUIDS', 'MED.DRESSINGS', 'MEDICAL AIDS', 'OINTMENTS', 'OTHER FORMS', 'P-F SYRINGES', 'POWDER/GRANULE', 'PRESS AEROSOLS', 'SPEC.SOL.FORMS', 'SUPPOSITORIES', 'TABLETS', 'TEAS', 'VIALS'];
+        $parents = ['AMPOULES', 'BATHS', 'CAPSULES', 'CARTRIDGE/PENS', 'CREAMS', 'GASES', 'GEL/SOL', 'INFUSIONS', 'LIQUIDS', 'MED.DRESSINGS', 'MEDICAL AIDS', 'OINTMENTS'];
 
         foreach ($parents as $parent) {
             $record = new ProductForm();
@@ -24,14 +24,6 @@ class ProductFormSeeder extends Seeder
 
         // Childs
         $childs = [
-            array(
-                'name' => 'AMP INS',
-                'parent_id' => 1,
-            ),
-            array(
-                'name' => 'AMP PWD',
-                'parent_id' => 1,
-            ),
             array(
                 'name' => 'IM-PWD-RT',
                 'parent_id' => 1,
@@ -61,18 +53,6 @@ class ProductFormSeeder extends Seeder
                 'parent_id' => 3,
             ),
             array(
-                'name' => 'TC-TAB CT',
-                'parent_id' => 19,
-            ),
-            array(
-                'name' => 'TC-TAB GC',
-                'parent_id' => 19,
-            ),
-            array(
-                'name' => 'TC-TAB RT',
-                'parent_id' => 19,
-            ),
-            array(
                 'name' => 'COMB CREAM',
                 'parent_id' => 5,
             ),
@@ -98,18 +78,6 @@ class ProductFormSeeder extends Seeder
             ),
             array(
                 'name' => 'EY-GEL DR',
-                'parent_id' => 7,
-            ),
-            array(
-                'name' => 'EY-GEL-U',
-                'parent_id' => 7,
-            ),
-            array(
-                'name' => 'VG-GEL',
-                'parent_id' => 7,
-            ),
-            array(
-                'name' => 'VG-GEL-U',
                 'parent_id' => 7,
             ),
             array(

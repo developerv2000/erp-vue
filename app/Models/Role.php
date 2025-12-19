@@ -44,6 +44,21 @@ class Role extends Model
     // CMD
     const CMD_BDM_NAME = 'CMD BDM';                             // User is assosiated as 'BDM'. Not fully implemented yet!
 
+    // PLPD
+    const PLD_LOGISTICIAN_NAME = 'PLD logistician';           // Not fully implemented yet!
+
+    // DD
+    const DD_DESIGNER_NAME = 'DD Designer';                     // Not fully implemented yet!
+
+    // PRD
+    const PRD_FINANCIER_NAME = 'PRD Financier';                 // Not fully implemented yet!
+
+    // MSD
+    const MSD_SERIALIZER_NAME = 'MSD Serializer';                 // Not fully implemented yet!
+
+    // ELD
+    const ELD_LOGISTICIAN_NAME = 'ELD Logistician';                 // Not fully implemented yet!
+
     /*
     |--------------------------------------------------------------------------
     | Properties

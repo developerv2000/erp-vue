@@ -7,8 +7,10 @@ use App\Http\Requests\MAD\ProcessStoreRequest;
 use App\Http\Requests\MAD\ProcessUpdateRequest;
 use App\Models\Country;
 use App\Models\Currency;
+use App\Models\ManufacturerCategory;
 use App\Models\MarketingAuthorizationHolder;
 use App\Models\Process;
+use App\Models\ProcessGeneralStatus;
 use App\Models\ProcessResponsiblePerson;
 use App\Models\ProcessStatus;
 use App\Models\Product;
@@ -16,9 +18,8 @@ use App\Models\ProductClass;
 use App\Models\ProductForm;
 use App\Models\ProductShelfLife;
 use App\Models\User;
-use App\Support\FilterDependencies\SimpleFilters\MAD\ProcessesSimpleFilter;
-use App\Support\FilterDependencies\SmartFilters\MAD\ProcessesSmartFilter;
 use App\Support\Helpers\ControllerHelper;
+use App\Support\SmartFilters\MAD\ProcessesSmartFilter;
 use App\Support\Traits\Controller\DestroysModelRecords;
 use App\Support\Traits\Controller\RestoresModelRecords;
 use Illuminate\Http\Request;
@@ -46,7 +47,7 @@ class MADProcessController extends Controller
             'tableVisibleHeaders' => $getVisibleHeaders,
 
             // Lazy loads. Never refetched again
-            'simpleFilterDependencies' => fn() => ProcessesSimpleFilter::getAllDependencies(),
+            'simpleFilterDependencies' => fn() => $this->getSimpleFilterDependencies(),
         ]);
     }
 
@@ -66,7 +67,7 @@ class MADProcessController extends Controller
             'tableVisibleHeaders' => $getVisibleHeaders,
 
             // Lazy loads. Never refetched again
-            'simpleFilterDependencies' => fn() => ProcessesSimpleFilter::getAllDependencies(),
+            'simpleFilterDependencies' => fn() => $this->getSimpleFilterDependencies(),
         ]);
     }
 
@@ -296,5 +297,23 @@ class MADProcessController extends Controller
         $record->addGeneralStatusPeriods();
 
         return $record;
+    }
+
+    private function getSimpleFilterDependencies(): array
+    {
+        return [
+            'deadlineStatusOptions' => Process::getDeadlineStatusOptions(),
+            'countriesOrderedByName' => Country::orderByName()->get(),
+            'analystUsers' => User::getMADAnalystsMinified(),
+            'bdmUsers' => User::getCMDBDMsMinifed(),
+            'responsiblePeople' => ProcessResponsiblePerson::orderByName()->get(),
+            'MAHs' => MarketingAuthorizationHolder::orderByName()->get(),
+            'productClasses' => ProductClass::orderByName()->get(),
+            'manufacturerCategories' => ManufacturerCategory::orderByName()->get(),
+            'generalStatuses' => ProcessGeneralStatus::all(),
+            'generalStatusNamesForAnalysts' => ProcessGeneralStatus::getUniqueNamesForAnalysts(),
+            'regions' => Country::getRegionOptions(),
+            'brands' => Product::getAllUniqueBrands(),
+        ];
     }
 }

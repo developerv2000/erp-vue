@@ -15,9 +15,8 @@ use App\Models\ProductForm;
 use App\Models\ProductShelfLife;
 use App\Models\User;
 use App\Models\Zone;
-use App\Support\FilterDependencies\SimpleFilters\MAD\ProductsSimpleFilter;
-use App\Support\FilterDependencies\SmartFilters\MAD\ProductsSmartFilter;
 use App\Support\Helpers\ControllerHelper;
+use App\Support\SmartFilters\MAD\ProductsSmartFilter;
 use App\Support\Traits\Controller\DestroysModelRecords;
 use App\Support\Traits\Controller\RestoresModelRecords;
 use Illuminate\Http\Request;
@@ -45,7 +44,7 @@ class MADProductController extends Controller
             'tableVisibleHeaders' => $getVisibleHeaders,
 
             // Lazy loads. Never refetched again
-            'simpleFilterDependencies' => fn() => ProductsSimpleFilter::getAllDependencies(),
+            'simpleFilterDependencies' => fn() => $this->getSimpleFilterDependencies(),
         ]);
     }
 
@@ -65,7 +64,7 @@ class MADProductController extends Controller
             'tableVisibleHeaders' => $getVisibleHeaders,
 
             // Lazy loads. Never refetched again
-            'simpleFilterDependencies' => fn() => ProductsSimpleFilter::getAllDependencies(),
+            'simpleFilterDependencies' => fn() => $this->getSimpleFilterDependencies(),
         ]);
     }
 
@@ -179,5 +178,19 @@ class MADProductController extends Controller
         return response()->json([
             'success' => true,
         ]);
+    }
+
+    private function getSimpleFilterDependencies(): array
+    {
+        return [
+            'analystUsers' => User::getMADAnalystsMinified(),
+            'bdmUsers' => User::getCMDBDMsMinifed(),
+            'productClasses' => ProductClass::orderByName()->get(),
+            'shelfLifes' => ProductShelfLife::all(),
+            'zones' => Zone::orderByName()->get(),
+            'countriesOrderedByName' => Country::orderByName()->get(),
+            'manufacturerCategories' => ManufacturerCategory::orderByName()->get(),
+            'brands' => Product::getAllUniqueBrands(),
+        ];
     }
 }

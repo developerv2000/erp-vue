@@ -20,7 +20,7 @@ class PermissionSeeder extends Seeder
         |--------------------------------------------------------------------------
         */
 
-        $globals = [
+        $globalPerms = [
             Permission::CAN_DELETE_FROM_TRASH_NAME,
             Permission::CAN_EDIT_COMMENTS_NAME,
             Permission::CAN_EXPORT_RECORDS_AS_EXCEL_NAME,
@@ -28,9 +28,9 @@ class PermissionSeeder extends Seeder
             Permission::CAN_EXPORT_UNLIMITED_RECORDS_AS_EXCEL_NAME,
         ];
 
-        foreach ($globals as $global) {
+        foreach ($globalPerms as $perm) {
             Permission::create([
-                'name' => $global,
+                'name' => $perm,
                 'global' => true,
             ]);
         }
@@ -41,9 +41,9 @@ class PermissionSeeder extends Seeder
         |--------------------------------------------------------------------------
         */
 
-        $departmentID = Department::findByName(Department::MAD_NAME)->id;
+        $MADId = Department::findByName(Department::MAD_NAME)->id;
 
-        $MADs = [
+        $MADPerms = [
             Permission::CAN_VIEW_MAD_EPP_NAME,
             Permission::CAN_VIEW_MAD_KVPP_NAME,
             Permission::CAN_VIEW_MAD_IVP_NAME,
@@ -89,14 +89,93 @@ class PermissionSeeder extends Seeder
             Permission::CAN_EDIT_MAD_VPS_OF_ALL_ANALYSTS_NAME,
             Permission::CAN_EDIT_MAD_VPS_STATUS_HISTORY_NAME,
             Permission::CAN_UPGRADE_MAD_VPS_STATUS_AFTER_CONTRACT_STAGE_NAME,
-            Permission::CAN_RECEIVE_NOTIFICATION_ON_MAD_VPS_CONTRACT,
             Permission::CAN_MARK_MAD_VPS_AS_READY_FOR_ORDER,
         ];
 
-        foreach ($MADs as $mad) {
+        foreach ($MADPerms as $perm) {
             Permission::create([
-                'name' => $mad,
-                'department_id' => $departmentID,
+                'name' => $perm,
+                'department_id' => $MADId,
+            ]);
+        }
+
+        $notificationPerms = [
+            Permission::CAN_RECEIVE_NOTIFICATION_ON_MAD_VPS_CONTRACT,
+        ];
+
+        foreach ($notificationPerms as $perm) {
+            Permission::create([
+                'name' => $perm,
+                'global' => true,
+            ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | CMD permissions
+        |--------------------------------------------------------------------------
+        */
+
+        $CMDId = Department::findByName(Department::CMD_NAME)->id;
+
+        $CMDPerms = [
+            Permission::CAN_VIEW_CMD_ORDERS_NAME,
+            Permission::CAN_VIEW_CMD_ORDER_PRODUCTS_NAME,
+            Permission::CAN_VIEW_CMD_INVOICES_NAME,
+
+            Permission::CAN_EDIT_CMD_ORDERS_NAME,
+            Permission::CAN_EDIT_CMD_ORDER_PRODUCTS_NAME,
+            Permission::CAN_EDIT_CMD_INVOICES_NAME,
+
+            Permission::CAN_RECEIVE_NOTIFICATION_WHEN_PLD_ORDER_IS_SENT_TO_CMD_BDM,
+            Permission::CAN_RECEIVE_NOTIFICATION_WHEN_ORDER_IS_CONFIRMED_BY_PLD,
+        ];
+
+        foreach ($CMDPerms as $perm) {
+            Permission::create([
+                'name' => $perm,
+                'department_id' => $CMDId,
+            ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | PLD permissions
+        |--------------------------------------------------------------------------
+        */
+
+        $PLDId = Department::findByName(Department::PLD_NAME)->id;
+
+        $PLDPerms = [
+            Permission::CAN_VIEW_PLD_READY_FOR_ORDER_PROCESSES_NAME,
+            Permission::CAN_VIEW_PLD_ORDERS_NAME,
+            Permission::CAN_VIEW_PLD_ORDER_PRODUCTS_NAME,
+            Permission::CAN_VIEW_PLD_INVOICES_NAME,
+
+            Permission::CAN_EDIT_PLD_ORDERS_NAME,
+            Permission::CAN_EDIT_PLD_ORDER_PRODUCTS_NAME,
+        ];
+
+        foreach ($PLDPerms as $PLD) {
+            Permission::create([
+                'name' => $PLD,
+                'department_id' => $PLDId,
+            ]);
+        }
+
+        $notificationPerms = [
+            Permission::CAN_RECEIVE_NOTIFICATION_WHEN_MAD_VPS_IS_MARKED_AS_READY_FOR_ORDER,
+            Permission::CAN_RECEIVE_NOTIFICATION_WHEN_CMD_ORDER_IS_SENT_FOR_CONFIRMATION,
+
+            Permission::CAN_RECEIVE_NOTIFICATION_WHEN_CMD_ORDER_IS_SENT_TO_MANUFACTURER, // shared
+            Permission::CAN_RECEIVE_NOTIFICATION_WHEN_CMD_INVOICE_IS_SENT_FOR_PAYMENT, // shared
+            Permission::CAN_RECEIVE_NOTIFICATION_WHEN_PRD_INVOICE_PAYMENT_IS_COMPLETED, // shared
+        ];
+
+        foreach ($notificationPerms as $perm) {
+            Permission::create([
+                'name' => $perm,
+                'global' => true,
             ]);
         }
     }

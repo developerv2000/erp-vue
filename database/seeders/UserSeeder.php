@@ -13,6 +13,10 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
+        $allDepartments = Department::all();
+        $allRoles = Role::all();
+        $countryCount = Country::count();
+
         // Default password
         $password = 'evolet';
 
@@ -22,8 +26,8 @@ class UserSeeder extends Seeder
         |--------------------------------------------------------------------------
         */
 
-        $managmentDepartmentID = Department::findByName(Department::MGMT_NAME)->id;
-        $globalAdminRoleID = Role::findByName(Role::GLOBAL_ADMINISTRATOR_NAME);
+        $managmentDepartmentID = $allDepartments->firstWhere('name', Department::MGMT_NAME)->id;
+        $globalAdminRoleID = $allRoles->firstWhere('name', Role::GLOBAL_ADMINISTRATOR_NAME)->id;
 
         $globalAdmins = [
             ['name' => 'Mister developer', 'email' => 'developer@mail.com', 'photo' => 'developer.jpg'],
@@ -49,12 +53,12 @@ class UserSeeder extends Seeder
         |--------------------------------------------------------------------------
         */
 
-        $MadID = Department::findByName(Department::MAD_NAME)->id;
+        $MadID = $allDepartments->firstWhere('name', Department::MAD_NAME)->id;
 
-        $MADAdminRoleID = Role::findByName(Role::MAD_ADMINISTRATOR_NAME);
-        $MADModeratorRoleID = Role::findByName(Role::MAD_MODERATOR_NAME);
-        $MADGuestRoleID = Role::findByName(Role::MAD_GUEST_NAME);
-        $MADAnalystRoleID = Role::findByName(Role::MAD_ANALYST_NAME);
+        $MADAdminRoleID = $allRoles->firstWhere('name', Role::MAD_ADMINISTRATOR_NAME)->id;
+        $MADModeratorRoleID = $allRoles->firstWhere('name', Role::MAD_MODERATOR_NAME)->id;
+        $MADGuestRoleID = $allRoles->firstWhere('name', Role::MAD_GUEST_NAME)->id;
+        $MADAnalystRoleID = $allRoles->firstWhere('name', Role::MAD_ANALYST_NAME)->id;
 
         $MADAdmins = [
             ['name' => 'Firdavs Kilichbekov', 'email' => 'firdavs@mail.com', 'photo' => 'developer.jpg'],
@@ -94,7 +98,7 @@ class UserSeeder extends Seeder
             ]);
 
             $newUser->roles()->attach([$MADModeratorRoleID, $MADAnalystRoleID]);
-            $newUser->responsibleCountries()->attach(rand(1, Country::count()));
+            $newUser->responsibleCountries()->attach(rand(1, $countryCount));
         }
 
         // Create MAD guests
@@ -116,13 +120,13 @@ class UserSeeder extends Seeder
         |--------------------------------------------------------------------------
         */
 
-        $CmdID = Department::findByName(Department::CMD_NAME)->id;
-        $bdmRoleID = Role::findByName(Role::CMD_BDM_NAME);
+        $CmdID = $allDepartments->firstWhere('name', Department::CMD_NAME)->id;
+        $bdmRoleID = $allRoles->firstWhere('name', Role::CMD_BDM_NAME)->id;
 
         $bdms = [
-            ['name' => 'Irini Kouimtzidou', 'email' => 'irini@mail.com', 'photo' => 'bdm.png'],
-            ['name' => 'Darya Rassulova', 'email' => 'darya@mail.com', 'photo' => 'bdm.png'],
-            ['name' => 'Nastya Karimova', 'email' => 'nastya@mail.com', 'photo' => 'bdm.png'],
+            ['name' => 'Irini Kouimtzidou', 'email' => 'cmd_bdm@mail.com', 'photo' => 'cmd_bdm.png'],
+            ['name' => 'Darya Rassulova', 'email' => 'darya@mail.com', 'photo' => 'cmd_bdm.png'],
+            ['name' => 'Nastya Karimova', 'email' => 'nastya@mail.com', 'photo' => 'cmd_bdm.png'],
         ];
 
         // Create CMD BDMs
@@ -137,6 +141,136 @@ class UserSeeder extends Seeder
 
             $newUser->roles()->attach($bdmRoleID);
         }
+
+        /*
+        |--------------------------------------------------------------------------
+        | PLD users
+        |--------------------------------------------------------------------------
+        */
+
+        $plpdID = $allDepartments->firstWhere('name', Department::PLD_NAME)->id;
+        $logisticianRoleID = $allRoles->firstWhere('name', Role::PLD_LOGISTICIAN_NAME)->id;
+
+        $logisticians = [
+            ['name' => 'PLD Logistic', 'email' => 'pld_logistician@mail.com', 'photo' => 'pld_logistician.png'],
+        ];
+
+        // Create PLPD logisticians
+        foreach ($logisticians as $user) {
+            $newUser = User::create([
+                'name' => $user['name'],
+                'email' => $user['email'],
+                'photo' => $user['photo'],
+                'department_id' => $plpdID,
+                'password' => bcrypt($password),
+            ]);
+
+            $newUser->roles()->attach($logisticianRoleID);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | DD users
+        |--------------------------------------------------------------------------
+        */
+
+        // $ddID = Department::findByName(Department::DD_NAME)->id;
+        // $designerRoleID = Role::findByName(Role::DD_DESIGNER_NAME);
+
+        // $designers = [
+        //     ['name' => 'DD Designer', 'email' => 'dd_designer@mail.com', 'photo' => 'dd_designer.png'],
+        // ];
+
+        // // Create DD designers
+        // foreach ($designers as $user) {
+        //     $newUser = User::create([
+        //         'name' => $user['name'],
+        //         'email' => $user['email'],
+        //         'photo' => $user['photo'],
+        //         'department_id' => $ddID,
+        //         'password' => bcrypt($password),
+        //     ]);
+
+        //     $newUser->roles()->attach($designerRoleID);
+        // }
+
+        /*
+        |--------------------------------------------------------------------------
+        | PRD users
+        |--------------------------------------------------------------------------
+        */
+
+        // $prdID = Department::findByName(Department::PRD_NAME)->id;
+        // $financierRoleID = Role::findByName(Role::PRD_FINANCIER_NAME);
+
+        // $financiers = [
+        //     ['name' => 'Financier man', 'email' => 'prd_financier@mail.com', 'photo' => 'prd_financier.png'],
+        // ];
+
+        // // Create PRD financiers
+        // foreach ($financiers as $user) {
+        //     $newUser = User::create([
+        //         'name' => $user['name'],
+        //         'email' => $user['email'],
+        //         'photo' => $user['photo'],
+        //         'department_id' => $prdID,
+        //         'password' => bcrypt($password),
+        //     ]);
+
+        //     $newUser->roles()->attach($financierRoleID);
+        // }
+
+        /*
+        |--------------------------------------------------------------------------
+        | MSD users
+        |--------------------------------------------------------------------------
+        */
+
+        // $msdID = Department::findByName(Department::MSD_NAME)->id;
+        // $serializerRoleID = Role::findByName(Role::MSD_SERIALIZER_NAME);
+
+        // $serializers = [
+        //     ['name' => 'Serializer man', 'email' => 'msd_serializer@mail.com', 'photo' => 'msd_serializer.png'],
+        // ];
+
+        // // Create MSD Serializers
+        // foreach ($serializers as $user) {
+        //     $newUser = User::create([
+        //         'name' => $user['name'],
+        //         'email' => $user['email'],
+        //         'photo' => $user['photo'],
+        //         'department_id' => $msdID,
+        //         'password' => bcrypt($password),
+        //     ]);
+
+        //     $newUser->roles()->attach($serializerRoleID);
+        // }
+
+        /*
+        |--------------------------------------------------------------------------
+        | ELD users
+        |--------------------------------------------------------------------------
+        */
+
+        // $eldID = Department::findByName(Department::ELD_NAME)->id;
+        // $logisticianRoleID = Role::findByName(Role::ELD_LOGISTICIAN_NAME);
+
+        // $logisticians = [
+        //     ['name' => 'Europe logistic', 'email' => 'eld_logistician@mail.com', 'photo' => 'eld_logistician.png'],
+        // ];
+
+        // // Create ELD Logisticians
+        // foreach ($logisticians as $user) {
+        //     $newUser = User::create([
+        //         'name' => $user['name'],
+        //         'email' => $user['email'],
+        //         'photo' => $user['photo'],
+        //         'department_id' => $eldID,
+        //         'password' => bcrypt($password),
+        //     ]);
+
+        //     $newUser->roles()->attach($logisticianRoleID);
+        // }
 
         /*
         |--------------------------------------------------------------------------

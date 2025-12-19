@@ -15,6 +15,8 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
+        $allPermissions = Permission::all();
+
         /*
         |--------------------------------------------------------------------------
         | Global roles
@@ -51,7 +53,7 @@ class RoleSeeder extends Seeder
         $permissionNames = Permission::getMADAdministratorPermissionNames();
 
         foreach ($permissionNames as $permissionName) {
-            $role->permissions()->attach(Permission::findByName($permissionName)->id);
+            $role->permissions()->attach($allPermissions->where('name', $permissionName)->first()->id);
         }
 
         // MAD Moderator
@@ -64,7 +66,7 @@ class RoleSeeder extends Seeder
         $permissionNames = Permission::getMADModeratorPermissionNames();
 
         foreach ($permissionNames as $permissionName) {
-            $role->permissions()->attach(Permission::findByName($permissionName)->id);
+            $role->permissions()->attach($allPermissions->where('name', $permissionName)->first()->id);
         }
 
         // MAD Guest
@@ -77,7 +79,7 @@ class RoleSeeder extends Seeder
         $permissionNames = Permission::getMADGuestPermissionNames();
 
         foreach ($permissionNames as $permissionName) {
-            $role->permissions()->attach(Permission::findByName($permissionName)->id);
+            $role->permissions()->attach($allPermissions->where('name', $permissionName)->first()->id);
         }
 
         // MAD Intern
@@ -90,7 +92,7 @@ class RoleSeeder extends Seeder
         $permissionNames = Permission::getMADInternPermissionNames();
 
         foreach ($permissionNames as $permissionName) {
-            $role->permissions()->attach(Permission::findByName($permissionName)->id);
+            $role->permissions()->attach($allPermissions->where('name', $permissionName)->first()->id);
         }
 
         // MAD Analyst
@@ -116,7 +118,26 @@ class RoleSeeder extends Seeder
         $permissionNames = Permission::getCMDBDMPermissionNames();
 
         foreach ($permissionNames as $permissionName) {
-            $role->permissions()->attach(Permission::findByName($permissionName)->id);
+            $role->permissions()->attach($allPermissions->where('name', $permissionName)->first()->id);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | PLD roles
+        |--------------------------------------------------------------------------
+        */
+
+        // PLD Logistician
+        $role = new Role();
+        $role->name = Role::PLD_LOGISTICIAN_NAME;
+        $role->description = "Not fully implemented yet!";
+        $role->department_id = Department::findByName(Department::PLD_NAME)->id;
+        $role->save();
+
+        $permissionNames = Permission::getPLDLogisticianPermissionNames();
+
+        foreach ($permissionNames as $permissionName) {
+            $role->permissions()->attach($allPermissions->where('name', $permissionName)->first()->id);
         }
     }
 }

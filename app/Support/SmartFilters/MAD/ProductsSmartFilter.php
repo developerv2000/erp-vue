@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Support\FilterDependencies\SmartFilters\MAD;
+namespace App\Support\SmartFilters\MAD;
 
 use App\Models\Inn;
 use App\Models\Manufacturer;

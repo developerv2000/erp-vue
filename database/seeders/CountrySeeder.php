@@ -14,13 +14,13 @@ class CountrySeeder extends Seeder
     public function run(): void
     {
         $countries = [
+            ['name' => 'Tajikistan', 'code' => 'TJ'],
+            ['name' => 'Kazakstan', 'code' => 'KZ'],
             ['name' => 'Dominican Republic', 'code' => 'DO'],
             ['name' => 'Guatemala', 'code' => 'GT'],
             ['name' => 'Russia', 'code' => 'RU'],
             ['name' => 'Azerbaijan', 'code' => 'AZ'],
             ['name' => 'Moldova', 'code' => 'MD'],
-            ['name' => 'Kenya', 'code' => 'KE'],
-            ['name' => 'Tanzania', 'code' => 'TZ'],
             ['name' => 'India', 'code' => 'IN'],
         ];
 

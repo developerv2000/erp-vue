@@ -25,7 +25,7 @@ class ProductFactory extends Factory
     public function definition(): array
     {
         return [
-            'manufacturer_id' => rand(1, Manufacturer::count()),
+            'manufacturer_id' => rand(1, Manufacturer::count() - 2), // Exclude 2 special factories
             'inn_id' => rand(1, Inn::count()),
             'brand' => fake()->name(),
             'form_id' => rand(1, ProductForm::count()),

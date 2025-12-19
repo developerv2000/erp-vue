@@ -91,9 +91,29 @@ export default function useAuth() {
         return array.some((item) => item.id === user.value.id)
     }
 
+    /**
+     * Checks whether the current user can receive notifications.
+     *
+     * A user can receive notifications if they have at least one permission
+     * (either directly or via a role) whose name starts with
+     * `can-receive-notification`.
+     *
+     * @returns {boolean}
+     */
     const canReceiveNotifications = () => {
-        if (!user.value) return false;
-        return canAny(['receive-notification-on-MAD-VPS-contract']);
+        if (isGlobalAdministrator()) return true
+        if (!user.value) return false
+
+        const hasNotificationPermission = permissions =>
+            permissions?.some(p => p.name.startsWith('can-receive-notification'))
+
+        return (
+            hasNotificationPermission(user.value.permissions) ||
+            user.value.roles?.some(role =>
+                hasNotificationPermission(role.permissions)
+            ) ||
+            false
+        )
     }
 
     return {

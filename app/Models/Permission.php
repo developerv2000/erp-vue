@@ -41,6 +41,32 @@ class Permission extends Model
 
     /*
     |--------------------------------------------------------------------------
+    | Global notification permissions
+    |--------------------------------------------------------------------------
+    */
+
+    // MAD
+    const CAN_RECEIVE_NOTIFICATION_ON_MAD_VPS_CONTRACT = 'can-receive-notification-on-MAD-VPS-contract';
+
+    // PLD
+    const CAN_RECEIVE_NOTIFICATION_WHEN_MAD_VPS_IS_MARKED_AS_READY_FOR_ORDER = 'can-receive-notification-when-MAD-VPS-is-marked-as-ready-for-order';
+    const CAN_RECEIVE_NOTIFICATION_WHEN_CMD_ORDER_IS_SENT_FOR_CONFIRMATION = 'can-receive-notification-when-CMD-order-is-sent-for-confirmation';
+
+    // CMD
+    const CAN_RECEIVE_NOTIFICATION_WHEN_PLD_ORDER_IS_SENT_TO_CMD_BDM = 'can-receive-notification-when-PLD-order-is-sent-to-CMD-BDM';
+    const CAN_RECEIVE_NOTIFICATION_WHEN_ORDER_IS_CONFIRMED_BY_PLD = 'can-receive-notification-when-order-is-confirmed-by-PLD';
+
+    // PLPD and DD permissions
+    const CAN_RECEIVE_NOTIFICATION_WHEN_CMD_ORDER_IS_SENT_TO_MANUFACTURER = 'can-receive-notification-when-CMD-order-is-sent-to-manufacturer';
+
+    // PLPD and PRD permissions
+    const CAN_RECEIVE_NOTIFICATION_WHEN_CMD_INVOICE_IS_SENT_FOR_PAYMENT = 'can-receive-notification-when-CMD-invoice-is-sent-for-payment';
+
+    // PLPD and CMD permissions
+    const CAN_RECEIVE_NOTIFICATION_WHEN_PRD_INVOICE_PAYMENT_IS_COMPLETED = 'can-receive-notification-when-PRD-invoice-payment-is-completed';
+
+    /*
+    |--------------------------------------------------------------------------
     | MAD permissions
     |--------------------------------------------------------------------------
     */
@@ -98,8 +124,39 @@ class Permission extends Model
     const CAN_EDIT_MAD_VPS_OF_ALL_ANALYSTS_NAME = 'can-edit-MAD-VPS-of-all-analysts';
     const CAN_EDIT_MAD_VPS_STATUS_HISTORY_NAME = 'can-edit-MAD-VPS-status-history';
     const CAN_UPGRADE_MAD_VPS_STATUS_AFTER_CONTRACT_STAGE_NAME = 'can-upgrade-MAD-VPS-status-after-contract-stage';
-    const CAN_RECEIVE_NOTIFICATION_ON_MAD_VPS_CONTRACT = 'can-receive-notification-on-MAD-VPS-contract';
     const CAN_MARK_MAD_VPS_AS_READY_FOR_ORDER = 'can-mark-MAD-VPS-as-ready-for-order';
+
+    /*
+    |--------------------------------------------------------------------------
+    | PLD permissions
+    |--------------------------------------------------------------------------
+    */
+
+    // View
+    const CAN_VIEW_PLD_READY_FOR_ORDER_PROCESSES_NAME = 'can-view-PLD-ready-for-order-processes';
+    const CAN_VIEW_PLD_ORDERS_NAME = 'can-view-PLD-orders';
+    const CAN_VIEW_PLD_ORDER_PRODUCTS_NAME = 'can-view-PLD-order-products';
+    const CAN_VIEW_PLD_INVOICES_NAME = 'can-view-PLD-invoices';
+
+    // Edit
+    const CAN_EDIT_PLD_ORDERS_NAME = 'can-edit-PLD-orders';
+    const CAN_EDIT_PLD_ORDER_PRODUCTS_NAME = 'can-edit-PLD-order-products';
+
+    /*
+    |--------------------------------------------------------------------------
+    | CMD permissions
+    |--------------------------------------------------------------------------
+    */
+
+    // View
+    const CAN_VIEW_CMD_ORDERS_NAME = 'can-view-CMD-orders';
+    const CAN_VIEW_CMD_ORDER_PRODUCTS_NAME = 'can-view-CMD-order-products';
+    const CAN_VIEW_CMD_INVOICES_NAME = 'can-view-CMD-invoices';
+
+    // Edit
+    const CAN_EDIT_CMD_ORDERS_NAME = 'can-edit-CMD-orders';
+    const CAN_EDIT_CMD_ORDER_PRODUCTS_NAME = 'can-edit-CMD-order-products';
+    const CAN_EDIT_CMD_INVOICES_NAME = 'can-edit-CMD-invoices';
 
     /*
     |--------------------------------------------------------------------------
@@ -318,6 +375,38 @@ class Permission extends Model
 
     public static function getCMDBDMPermissionNames()
     {
-        return [];
+        return [
+            self::CAN_VIEW_CMD_ORDERS_NAME,
+            self::CAN_VIEW_CMD_ORDER_PRODUCTS_NAME,
+            self::CAN_VIEW_CMD_INVOICES_NAME,
+
+            self::CAN_EDIT_CMD_ORDERS_NAME,
+            self::CAN_EDIT_CMD_ORDER_PRODUCTS_NAME,
+            self::CAN_EDIT_CMD_INVOICES_NAME,
+
+            self::CAN_RECEIVE_NOTIFICATION_WHEN_PLD_ORDER_IS_SENT_TO_CMD_BDM,
+            self::CAN_RECEIVE_NOTIFICATION_WHEN_ORDER_IS_CONFIRMED_BY_PLD,
+            self::CAN_RECEIVE_NOTIFICATION_WHEN_PRD_INVOICE_PAYMENT_IS_COMPLETED,
+        ];
+    }
+
+    public static function getPLDLogisticianPermissionNames()
+    {
+        return [
+            self::CAN_VIEW_PLD_READY_FOR_ORDER_PROCESSES_NAME,
+            self::CAN_VIEW_PLD_ORDERS_NAME,
+            self::CAN_VIEW_PLD_ORDER_PRODUCTS_NAME,
+            self::CAN_VIEW_PLD_INVOICES_NAME,
+
+            self::CAN_EDIT_PLD_ORDERS_NAME,
+            self::CAN_EDIT_PLD_ORDER_PRODUCTS_NAME,
+
+            self::CAN_RECEIVE_NOTIFICATION_WHEN_MAD_VPS_IS_MARKED_AS_READY_FOR_ORDER,
+            self::CAN_RECEIVE_NOTIFICATION_WHEN_CMD_ORDER_IS_SENT_FOR_CONFIRMATION,
+
+            self::CAN_RECEIVE_NOTIFICATION_WHEN_CMD_ORDER_IS_SENT_TO_MANUFACTURER,
+            self::CAN_RECEIVE_NOTIFICATION_WHEN_CMD_INVOICE_IS_SENT_FOR_PAYMENT,
+            self::CAN_RECEIVE_NOTIFICATION_WHEN_PRD_INVOICE_PAYMENT_IS_COMPLETED,
+        ];
     }
 }

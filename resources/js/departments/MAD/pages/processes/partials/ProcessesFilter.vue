@@ -151,6 +151,7 @@ const refreshSmartFiltersDebounced = debounce(refreshSmartFilters, 500);
             :label="'* ' + t('fields.Dosage')"
             name="product_dosage"
             v-model="store.filters.product_dosage"
+            @update:modelValue="refreshSmartFiltersDebounced"
         />
 
         <FilterTextField

@@ -1,11 +1,13 @@
 <script setup>
 import MadNav from "./partials/MadNav.vue";
 import AdministrationNav from "./partials/AdministrationNav.vue";
+import PldNav from "./partials/PldNav.vue";
 </script>
 
 <template>
     <div class="leftbar-nav">
         <MadNav />
+        <PldNav />
         <AdministrationNav />
     </div>
 </template>

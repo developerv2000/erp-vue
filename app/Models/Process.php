@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection as SupportCollection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
@@ -50,6 +51,7 @@ class Process extends Model implements
     |--------------------------------------------------------------------------
     */
 
+    // MAD
     const DEFAULT_ORDER_BY = 'updated_at';
     const DEFAULT_ORDER_DIRECTION = 'desc';
     const DEFAULT_PER_PAGE = 50;
@@ -62,6 +64,11 @@ class Process extends Model implements
     const DEADLINE_NOT_EXPIRED_STATUS_NAME = 'Not expired';
     const DEADLINE_STOPPED_STATUS_NAME = 'Stopped';
     const NO_DEADLINE_STATUS_NAME = 'No deadline';
+
+    // PLD
+    const DEFAULT_READY_FOR_ORDER_ORDER_BY = 'readiness_for_order_date';
+    const DEFAULT_READY_FOR_ORDER_ORDER_TYPE = 'desc';
+    const DEFAULT_READY_FOR_ORDER_PAGINATION_LIMIT = 50;
 
     /*
     |--------------------------------------------------------------------------
@@ -104,6 +111,9 @@ class Process extends Model implements
         return $this->belongsTo(Product::class)->withTrashed();
     }
 
+    // Slow relation, use only when necessary.
+    // On eager loading use $processes->product->manufacturer || with('product.manufacturer')
+    // On filtering use whereHas('manufacturer', ...)
     public function manufacturer()
     {
         return $this->hasOneThrough(
@@ -183,6 +193,18 @@ class Process extends Model implements
             'increased_price_percentage',
             'days_past',
         ]);
+    }
+
+    public static function appendRecordsBasicOrderAttributes($records): void
+    {
+        foreach ($records as $record) {
+            $record->appendBasicOrderAttributes();
+        }
+    }
+
+    public function appendBasicOrderAttributes(): void
+    {
+        $this->append([]);
     }
 
     public function getDeadlineStatusAttribute()
@@ -444,7 +466,6 @@ class Process extends Model implements
         ]);
     }
 
-
     /**
      * Add 'product_manufacturer_name' attribute.
      *
@@ -539,6 +560,65 @@ class Process extends Model implements
                         },
                     ]);
             },
+        ]);
+    }
+
+    public function scopeOnlyReadyForOrder($query): Builder
+    {
+        return $query->whereNotNull('readiness_for_order_date');
+    }
+
+    public function scopeWithRelationsForOrder($query): Builder
+    {
+        return $query->with([
+            'searchCountry',
+            'mah',
+
+            'product' => function ($productQuery) {
+                $productQuery->select(
+                    'products.id',
+                    'products.manufacturer_id',
+                    'inn_id',
+                    'form_id',
+                    'dosage',
+                    'pack',
+                )
+                    ->with([
+                        'inn',
+                        'form',
+
+                        'manufacturer' => function ($manufQuery) {
+                            $manufQuery->select(
+                                'manufacturers.id',
+                                'manufacturers.name',
+                                'bdm_user_id',
+                            )
+                                ->with([
+                                    'bdm:id,name,photo',
+                                ]);
+                        },
+                    ]);
+            },
+        ]);
+    }
+
+    public function scopeWithOnlySelectsForOrder($query): Builder
+    {
+        return $query->select(
+            'processes.id',
+            'readiness_for_order_date',
+            'trademark_en',
+            'trademark_ru',
+            'processes.product_id',
+            'processes.country_id',
+            'processes.marketing_authorization_holder_id',
+        );
+    }
+
+    public function scopeWithRelationCountsForOrder($query): Builder
+    {
+        return $query->withCount([
+            // 'orderProducts',
         ]);
     }
 
@@ -710,7 +790,7 @@ class Process extends Model implements
             );
     }
 
-    // Implement method declared in ExportsRecordsAsExcel Interface
+    // Implement method declared in ExportsProductSelection Interface
     public static function queryRecordsForProductSelection(Request $request): Builder
     {
         $query = self::withRelationsForProductSelection();
@@ -792,6 +872,43 @@ class Process extends Model implements
             // Append 'general_statuses_with_periods'
             self::addGeneralStatusPeriodsForRecords($records);
         }
+
+        return $records;
+    }
+
+    /**
+     * Build and execute a model query for processes ready for order,
+     * based on request parameters.
+     *
+     * Steps:
+     *  - Apply default relations & counts for order
+     *  - Normalize query params (pagination, sorting, etc.)
+     *  - Apply filters (without permissions filter)
+     *  - Finalize query with sorting & pagination
+     *
+     * @param $action  ('paginate', 'get' or 'query')
+     * @return mixed
+     */
+    public static function queryReadyForOrderRecordsFromRequest(Request $request, string $action = 'paginate')
+    {
+        $query = self::onlyReadyForOrder()
+            ->withRelationsForOrder()
+            ->withOnlySelectsForOrder()
+            ->withRelationCountsForOrder();
+
+        // Normalize request parameters
+        self::addDefaultQueryParamsToRequest(
+            $request,
+            'DEFAULT_READY_FOR_ORDER_ORDER_BY',
+            'DEFAULT_READY_FOR_ORDER_ORDER_TYPE',
+            'DEFAULT_READY_FOR_ORDER_PAGINATION_LIMIT'
+        );
+
+        // Apply filters
+        self::filterQueryForRequest($query, $request, applyPermissionsFilter: false);
+
+        // Finalize (sorting & pagination)
+        $records = ModelHelper::finalizeQueryForRequest($query, $request, $action);
 
         return $records;
     }
@@ -1452,18 +1569,20 @@ class Process extends Model implements
     }
 
     // Used on filters.
-    public static function pluckAllEnTrademarks(): Collection
+    public static function pluckAllEnTrademarks(): SupportCollection
     {
-        return self::select('trademark_en')
+        return self::whereNotNull('trademark_en')
+            ->select('trademark_en')
             ->distinct()
             ->orderBy('trademark_en', 'asc')
             ->pluck('trademark_en');
     }
 
     // Used on filters.
-    public static function pluckAllRuTrademarks(): Collection
+    public static function pluckAllRuTrademarks(): SupportCollection
     {
-        return self::select('trademark_ru')
+        return self::whereNotNull('trademark_ru')
+            ->select('trademark_ru')
             ->distinct()
             ->orderBy('trademark_ru', 'asc')
             ->pluck('trademark_ru');
@@ -1606,7 +1725,7 @@ class Process extends Model implements
 
             ['title' => 'fields.BDM', 'key' => 'manufacturer_bdm', 'width' => 146, 'sortable' => false],
             ['title' => 'fields.Analyst', 'key' => 'manufacturer_analyst', 'width' => 146, 'sortable' => false],
-            ['title' => 'fields.Search country', 'key' => 'country_id', 'width' => 130, 'sortable' => false],
+            ['title' => 'fields.Search country', 'key' => 'country_id', 'width' => 130, 'sortable' => true],
 
             ['title' => 'fields.Manufacturer category', 'key' => 'manufacturer_category_name', 'width' => 110, 'sortable' => false],
             ['title' => 'fields.Manufacturer country', 'key' => 'manufacturer_country_name', 'width' => 140, 'sortable' => false],
@@ -1633,7 +1752,7 @@ class Process extends Model implements
             ['title' => 'fields.Product class', 'key' => 'product_class', 'width' => 80, 'sortable' => false],
             ['title' => 'fields.ATX', 'key' => 'product_atx_name', 'width' => 190, 'sortable' => false],
             ['title' => 'fields.Our ATX', 'key' => 'product_atx_short_name', 'width' => 150, 'sortable' => false],
-            ['title' => 'fields.MAH', 'key' => 'marketing_authorization_holder_id', 'width' => 102, 'sortable' => false],
+            ['title' => 'fields.MAH', 'key' => 'marketing_authorization_holder_id', 'width' => 102, 'sortable' => true],
             ['title' => 'fields.TM Eng', 'key' => 'trademark_en', 'width' => 110, 'sortable' => true],
             ['title' => 'fields.TM Rus', 'key' => 'trademark_ru', 'width' => 110, 'sortable' => true],
 

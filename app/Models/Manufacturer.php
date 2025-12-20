@@ -105,6 +105,9 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
         return $this->hasMany(Product::class);
     }
 
+    // Slow relation, use only when necessary.
+    // On eager loading use $manufacturer->products->processes || with('products.processes')
+    // On filtering use whereHas('processes', ...)
     public function processes()
     {
         return $this->hasManyThrough(
@@ -229,6 +232,13 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
             'products',
             'meetings',
         ]);
+    }
+
+    public function scopeOnlyRecordsWithProcessesReadyForOrder($query)
+    {
+        return $query->whereHas('processes', function ($processesQuery) {
+            $processesQuery->whereNotNull('readiness_for_order_date');
+        });
     }
 
     /*
@@ -547,6 +557,19 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
 
         // Delete removed presences
         $this->presences()->whereNotIn('name', $presences)->delete();
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Order part
+    |--------------------------------------------------------------------------
+    */
+
+    public static function getMinifiedRecordsWithProcessesReadyForOrder()
+    {
+        return self::onlyRecordsWithProcessesReadyForOrder()
+            ->minifiedRecordsWithName()
+            ->get();
     }
 
     /*

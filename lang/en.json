@@ -29,12 +29,13 @@
     "validations.max_items": "Select no more than {max} items.",
     "validations.timestamp": "Value must be in the format 'YYYY-MM-DD HH:mm:ss'.",
 
-    "Administration": "Administration",
-    "departments.MAD": "MAD",
-
-    "Departments": "Departments",
     "Roles": "Roles",
     "Permissions": "Permissions",
+    "Administration": "Administration",
+    "Department": "Department",
+    "Departments": "Departments",
+    "departments.MAD": "MAD",
+    "departments.PLD": "PLD",
 
     "pages.Main": "Main",
     "pages.Trash": "Trash",
@@ -52,6 +53,7 @@
     "pages.Roles": "Roles",
     "pages.Permissions": "Permissions",
     "pages.Users": "Users",
+    "pages.Ready for order": "Ready for order",
 
     "actions.Logout": "Logout",
     "actions.Add": "Add",
@@ -154,6 +156,7 @@
     "dates.End date": "End date",
     "dates.Duration days": "Duration days",
     "dates.Historical": "Historical date",
+    "dates.Readiness": "Readiness date",
 
     "Days": "Days",
     "days.past": "Days past",
@@ -194,6 +197,9 @@
     "Processes": "Processes",
     "processes.add": "Add process",
     "processes.count": "{count} processes",
+
+    "Order": "Order",
+    "Orders": "Orders",
 
     "Status": "Status",
     "status.Date": "Status date",

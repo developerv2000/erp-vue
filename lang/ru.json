@@ -30,13 +30,13 @@
     "validations.max_items": "Выберите не более {max} элементов.",
     "validations.timestamp": "Значение должен быть в формате 'YYYY-MM-DD HH:mm:ss'.",
 
-    "Administration": "Администрация",
-    "departments.MAD": "ОАП",
-
-    "Department": "Отдел",
-    "Departments": "Отделы",
     "Roles": "Роли",
     "Permissions": "Разрешения",
+    "Administration": "Администрация",
+    "Department": "Отдел",
+    "Departments": "Отделы",
+    "departments.MAD": "ОАП",
+    "departments.PLD": "ДЗЛ",
 
     "pages.Main": "Главная",
     "pages.Trash": "Корзина",
@@ -54,6 +54,7 @@
     "pages.Roles": "Роли",
     "pages.Permissions": "Разрешения",
     "pages.Users": "Пользователи",
+    "pages.Ready for order": "Готовые к заказу",
 
     "actions.Logout": "Выйти",
     "actions.Create": "Создать",
@@ -164,6 +165,7 @@
     "dates.End date": "Дата окончания",
     "dates.Duration days": "Длительность дней",
     "dates.Historical": "Историческая дата",
+    "dates.Readiness": "Дата готовности",
 
     "Days": "Дней",
     "days.past": "Дней прошло",
@@ -196,6 +198,9 @@
     "Processes": "Процессы",
     "processes.add": "Добавить процесс",
     "processes.count": "{count} процесса",
+
+    "Order": "Заказ",
+    "Orders": "Заказы",
 
     "Status": "Статус",
     "status.Date": "Дата Статуса",

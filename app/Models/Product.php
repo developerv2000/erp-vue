@@ -123,7 +123,10 @@ class Product extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
             'index_link_of_related_processes',
             'matched_product_searches',
         ]);
+
+        $this->form->append('parent_name');
     }
+
     // Used in products.index/trash pages table
     public function getIndexLinkOfRelatedProcessesAttribute(): string
     {

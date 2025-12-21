@@ -177,6 +177,12 @@ return [
     */
 
     'custom' => [
+        // Administration
+        'users' => [
+            'user_is_in_use' => 'User :name is use, please replace it with another user and retry again.',
+        ],
+
+        // MAD
         'ivp' => [
             'unique' => 'Product with a given manufacturer, IMN, form, dosage and pack already exists.',
         ],
@@ -193,8 +199,8 @@ return [
             'unique' => 'Meeting for such a year, with a current manufacturer already exists.',
         ],
 
-        'users' => [
-            'user_is_in_use' => 'User :name is use, please replace it with another user and retry again.',
+        'process' => [
+            'marked_as_ready_for_order_has_orders' => 'Process can`t be unmarked, because it already has orders.',
         ],
     ],
 

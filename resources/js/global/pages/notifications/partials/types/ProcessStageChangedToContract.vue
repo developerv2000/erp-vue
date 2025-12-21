@@ -21,7 +21,6 @@ const { t } = useI18n();
 
     <InertiaLink
         class="text-primary"
-
         :link="
             route('mad.processes.index', {
                 'id[]': data.process_id,
@@ -29,6 +28,6 @@ const { t } = useI18n();
             })
         "
     >
-        {{ t("actions.Check") }} #{{ data.process_id }}
+        <strong>{{ t("actions.Check") }} #{{ data.process_id }}</strong>
     </InertiaLink>
 </template>

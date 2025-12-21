@@ -124,6 +124,7 @@
 
     "notifications.Mark selected as read": "Mark as read",
     "notifications.Process stage updated to contract": "Status of process #{process_id} has been updated to {status_name}.",
+    "notifications.New product for order received": "New product for order has been received",
 
     "files.Generating": "Generating file",
     "files.Download started": "Download started",

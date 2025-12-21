@@ -133,6 +133,7 @@
 
     "notifications.Mark selected as read": "Пометить как прочитанное",
     "notifications.Process stage updated to contract": "Статус процесса #{process_id} был изменён на {status_name}.",
+    "notifications.New product for order received": "Получен новый продукт для заказа",
 
     "files.Generating": "Генерация файла",
     "files.Download started": "Загрузка началась",

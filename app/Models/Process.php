@@ -341,6 +341,36 @@ class Process extends Model implements
             || !$this->status->generalStatus->requires_permission;
     }
 
+    /**
+     * Used on order pages.
+     */
+    public function getFullEnglishProductLabelAttribute()
+    {
+        return collect([
+            $this->trademark_en,
+            $this->product->form->name,
+            $this->product->dosage,
+            $this->product->pack,
+        ])
+            ->filter()
+            ->implode(' ');
+    }
+
+    /**
+     * Used on order pages.
+     */
+    public function getFullRussianProductLabelAttribute()
+    {
+        return collect([
+            $this->trademark_ru,
+            $this->product->form->name,
+            $this->product->dosage,
+            $this->product->pack,
+        ])
+            ->filter()
+            ->implode(' ');
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Events

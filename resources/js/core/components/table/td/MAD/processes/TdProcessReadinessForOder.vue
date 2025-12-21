@@ -21,7 +21,7 @@ const toggle = (value) => {
     axios
         .post(route("mad.processes.update-ready-for-order-value"), {
             id: props.record.id,
-            is_ready: value,
+            new_value: value,
         })
         .then((response) => {
             messagesStore.addSuccessMessage();

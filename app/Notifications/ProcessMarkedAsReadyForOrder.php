@@ -8,20 +8,23 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class ProcessStageChangedToContract extends Notification
+class ProcessMarkedAsReadyForOrder extends Notification
 {
     use Queueable;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(Process $process, $statusName)
+    public function __construct(Process $process)
     {
         // Freeze data at the time of notification creation
         $this->data = [
             'type' => class_basename(static::class),
             'process_id' => $process->id,
-            'status_name' => $statusName,
+            'full_english_product_label' => $process->full_english_product_label,
+            'manufacturer' => $process->product->manufacturer->name,
+            'country' => $process->searchCountry->code,
+            'marketing_authorization_holder' => $process->MAH?->name,
         ];
     }
 

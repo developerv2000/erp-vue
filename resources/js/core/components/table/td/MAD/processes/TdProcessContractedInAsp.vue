@@ -27,8 +27,12 @@ const toggle = (value) => {
             messagesStore.addSuccessMessage();
             processesStore.updateRecord(response.data);
         })
-        .catch(() => {
-            messagesStore.addSubmitionFailedMessage();
+        .catch((error) => {
+            if (error.response?.status === 422) {
+                messagesStore.addValidationErrors(error.response.data.errors);
+            } else {
+                messagesStore.addSubmitionFailedMessage();
+            }
         })
         .finally(() => {
             globalStore.loading = false;

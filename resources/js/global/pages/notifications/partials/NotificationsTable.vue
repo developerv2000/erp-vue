@@ -12,6 +12,7 @@ import TableDefaultSkeleton from "@/core/components/table/misc/TableDefaultSkele
 import TableNavigateToPage from "@/core/components/table/misc/TableNavigateToPage.vue";
 import TdMediumWeightText from "@/core/components/table/td/TdMediumWeightText.vue";
 import ProcessStageChangedToContract from "./types/ProcessStageChangedToContract.vue";
+import ProcessMarkedAsReadyForOrder from "./types/ProcessMarkedAsReadyForOrder.vue";
 
 const { t } = useI18n();
 const { get } = useQueryParams();
@@ -21,6 +22,7 @@ const { formatDate } = useDateFormatter();
 
 const types = {
     ProcessStageChangedToContract,
+    ProcessMarkedAsReadyForOrder,
 };
 
 onMounted(() => {

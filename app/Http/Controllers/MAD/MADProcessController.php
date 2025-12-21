@@ -18,11 +18,13 @@ use App\Models\ProductClass;
 use App\Models\ProductForm;
 use App\Models\ProductShelfLife;
 use App\Models\User;
+use App\Notifications\ProcessMarkedAsReadyForOrder;
 use App\Support\Helpers\ControllerHelper;
 use App\Support\SmartFilters\MAD\ProcessesSmartFilter;
 use App\Support\Traits\Controller\DestroysModelRecords;
 use App\Support\Traits\Controller\RestoresModelRecords;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
 class MADProcessController extends Controller
@@ -217,7 +219,7 @@ class MADProcessController extends Controller
 
         // Update record
         $record->update([
-            'contracted_in_asp' => $request->input('new_value'),
+            'contracted_in_asp' => $request->boolean('new_value'),
         ]);
 
         // Refetch record because relations lost after update() call
@@ -249,7 +251,7 @@ class MADProcessController extends Controller
 
         // Update record
         $record->update([
-            'registered_in_asp' => $request->input('new_value'),
+            'registered_in_asp' => $request->boolean('new_value'),
         ]);
 
         // Refetch record because relations lost after update() call
@@ -279,12 +281,36 @@ class MADProcessController extends Controller
             abort(403);
         }
 
-        // Update record
-        $isReady = $request->input('is_ready');
+        // Get new value
+        $isReady = $request->boolean('new_value', false);
 
-        $record->update([
-            'readiness_for_order_date' => $isReady ? now() : null,
-        ]);
+        // Mark as ready for order
+        if ($isReady && !$record->readiness_for_order_date) {
+            $record->update([
+                'readiness_for_order_date' => now(),
+            ]);
+
+            // Send notification (basically to PLD)
+            User::notifyUsersBasedOnPermission(
+                new ProcessMarkedAsReadyForOrder($record),
+                'receive-notification-when-MAD-VPS-is-marked-as-ready-for-order'
+            );
+        }
+
+        // Unmark as ready for order
+        else {
+            // Return error if process already has orders
+            if ($record->orderProducts()->exists()) {
+                throw ValidationException::withMessages([
+                    'has_orders' => trans('validation.custom.process.marked_as_ready_for_order_has_orders'),
+                ]);
+            };
+
+            // Unmark as ready for order
+            $record->update([
+                'readiness_for_order_date' => null,
+            ]);
+        }
 
         // Refetch record because relations lost after update() call
         $record = Process::withTrashed()

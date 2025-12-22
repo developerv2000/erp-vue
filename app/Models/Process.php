@@ -652,6 +652,40 @@ class Process extends Model implements
         ]);
     }
 
+    public function scopeWithRelationsForOrderProduct($query)
+    {
+        return $query->with([
+            'searchCountry',
+            'mah',
+
+            'product' => function ($productQuery) {
+                $productQuery->select(
+                    'products.id',
+                    'inn_id',
+                    'form_id',
+                    'dosage',
+                    'pack',
+                )
+                    ->with([
+                        'inn',
+                        'form',
+                    ]);
+            },
+        ]);
+    }
+
+    public function scopeWithOnlySelectsForOrderProduct($query)
+    {
+        return $query->select(
+            'processes.id',
+            'trademark_en',
+            'trademark_ru',
+            'processes.product_id',
+            'processes.country_id',
+            'processes.marketing_authorization_holder_id',
+        );
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Contracts
@@ -869,7 +903,8 @@ class Process extends Model implements
      */
     public static function queryRecordsFromRequest(Request $request, string $action = 'paginate', bool $appendAttributes = false)
     {
-        $query = self::withBasicRelations()->withBasicRelationCounts();
+        $query = self::withBasicRelations()
+            ->withBasicRelationCounts();
 
         // Apply trashed filter
         if ($request->boolean('only_trashed')) {

@@ -392,7 +392,8 @@ class Product extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
      */
     public static function queryRecordsFromRequest(Request $request, string $action = 'paginate', bool $appendAttributes = false)
     {
-        $query = self::withBasicRelations()->withBasicRelationCounts();
+        $query = self::withBasicRelations()
+            ->withBasicRelationCounts();
 
         // Apply trashed filter
         if ($request->boolean('only_trashed')) {
@@ -480,21 +481,6 @@ class Product extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
     | Store & update
     |--------------------------------------------------------------------------
     */
-
-    /**
-     * AJAX request
-     */
-    public static function storeByMADFromRequest(ProductStoreRequest $request): void
-    {
-        $record = self::create($request->all());
-
-        // BelongsToMany relations
-        $record->zones()->attach($request->input('zones'));
-
-        // HasMany relations
-        $record->storeCommentFromRequest($request);
-        $record->storeAttachmentsFromRequest($request);
-    }
 
     /**
      * Create multiple instances of the model from the request data.

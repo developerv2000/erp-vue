@@ -343,7 +343,8 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
      */
     public static function queryRecordsFromRequest(Request $request, string $action = 'paginate', bool $appendAttributes = false)
     {
-        $query = self::withBasicRelations()->withBasicRelationCounts();
+        $query = self::withBasicRelations()
+            ->withBasicRelationCounts();
 
         // Apply trashed filter
         if ($request->boolean('only_trashed')) {

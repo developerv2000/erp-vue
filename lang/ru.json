@@ -55,6 +55,9 @@
     "pages.Permissions": "Разрешения",
     "pages.Users": "Пользователи",
     "pages.Ready for order": "Готовые к заказу",
+    "pages.Orders": "Заказы",
+    "pages.Products": "Продукты",
+    "pages.Invoices": "Инвойсы",
 
     "actions.Logout": "Выйти",
     "actions.Create": "Создать",
@@ -118,6 +121,7 @@
     "messages.Similar records update failed": "Обновление схожих записей не удалось!",
     "messages.ATX updated successfully": "ATX успешно обновлен!",
     "messages.ATX update failed": "Обновление ATX не удалось!",
+    "messages.No products found for the given manufacturer and country": "Продуктов не найдено для указанного производителя и страны",
 
     "modals.Delete selected": "Удалить отмеченные",
     "modals.Delete selected question": "Вы уверены, что хотите удалить отмеченные",
@@ -167,6 +171,8 @@
     "dates.Duration days": "Длительность дней",
     "dates.Historical": "Историческая дата",
     "dates.Readiness": "Дата готовности",
+    "dates.Receive": "Дата получения",
+    "dates.Confirmation": "Дата подтверждения",
 
     "Days": "Дней",
     "days.past": "Дней прошло",
@@ -314,6 +320,13 @@
     "fields.Registered in ASP": "Зарегистрирован в СПГ",
 
     "fields.Extensive version": "Расширенная версия",
+
+    "fields.PO №": "Номер заявки",
+    "fields.PO date": "Дата заявки",
+    "fields.Sent to BDM": "Отправлено БДМ-у",
+    "fields.Sent to manufacturer": "Отправлено заводу",
+    "fields.Quantity": "Количество",
+    "fields.Serialization type": "Тип сериализации",
 
     "AAAAAAAAAAAAAA": "AAAAAAAAAAAAAA"
 }

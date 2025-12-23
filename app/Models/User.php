@@ -53,11 +53,16 @@ class User extends Authenticatable
     const DEFAULT_LOCALE = 'ru';
     const DEFAULT_IS_LEFTBAR_COLLAPSED = false;
 
-    // Setting keys of table headers
-    // MAD
+    // Setting keys of table headers:
+    // 1. MAD
     const MAD_EPP_HEADERS_KEY = 'MAD_EPP';
     const MAD_IVP_HEADERS_KEY = 'MAD_IVP';
     const MAD_VPS_HEADERS_KEY = 'MAD_VPS';
+
+    // 2. PLD
+    const PLD_ORDERS_HEADERS_KEY = 'PLD_ORDERS';
+    const PLD_ORDER_PRODUCTS_HEADERS_KEY = 'PLD_ORDER_PRODUCTS';
+    const PLD_INVOICES_HEADERS_KEY = 'PLD_INVOICES';
 
     /*
     |--------------------------------------------------------------------------
@@ -563,6 +568,7 @@ class User extends Authenticatable
 
         // Table headers
         $this->resetMADTableHeaders($settings);
+        $this->resetPLDTableHeaders($settings);
     }
 
     /**
@@ -595,9 +601,15 @@ class User extends Authenticatable
         $headersSettings = $settings['table_headers'];
 
         $defaultHeaders = match ($key) {
+            // MAD
             self::MAD_EPP_HEADERS_KEY => Manufacturer::getMADTableHeadersForUser($this),
             self::MAD_IVP_HEADERS_KEY => Product::getMADTableHeadersForUser($this),
             self::MAD_VPS_HEADERS_KEY => Process::getMADTableHeadersForUser($this),
+
+            // PLD
+            self::PLD_ORDERS_HEADERS_KEY => Order::getPLDTableHeadersForUser($this),
+            self::PLD_ORDER_PRODUCTS_HEADERS_KEY => OrderProduct::getPLDTableHeadersForUser($this),
+            self::PLD_INVOICES_HEADERS_KEY => Invoice::getPLDTableHeadersForUser($this),
 
             default => throw new InvalidArgumentException("Unknown key: $key"),
         };
@@ -664,6 +676,21 @@ class User extends Authenticatable
         $headersSettings[self::MAD_EPP_HEADERS_KEY] = Manufacturer::getMADTableHeadersForUser($this);
         $headersSettings[self::MAD_IVP_HEADERS_KEY] = Product::getMADTableHeadersForUser($this);
         $headersSettings[self::MAD_VPS_HEADERS_KEY] = Process::getMADTableHeadersForUser($this);
+
+        $settings['table_headers'] = $headersSettings;
+        $this->settings = $settings;
+        $this->save();
+    }
+
+    public function resetPLDTableHeaders($settings): void
+    {
+        $this->refresh();
+        $settings = $this->settings;
+        $headersSettings = $settings['table_headers'];
+
+        $headersSettings[self::PLD_ORDERS_HEADERS_KEY] = Order::getPLDTableHeadersForUser($this);
+        // $headersSettings[self::PLD_ORDER_PRODUCTS_HEADERS_KEY] = OrderProduct::getPLDTableHeadersForUser($this);
+        // $headersSettings[self::PLD_INVOICES_HEADERS_KEY] = Invoice::getPLDTableHeadersForUser($this);
 
         $settings['table_headers'] = $headersSettings;
         $this->settings = $settings;

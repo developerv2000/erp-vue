@@ -52,6 +52,7 @@ const actionAfterSuccessDelete = () => {
                     v-if="can('delete-from-trash') && store.isTrashPage"
                     :delete-link="route('mad.processes.destroy')"
                     :store="store"
+                    :actionOnSuccess="actionAfterSuccessDelete"
                 />
             </template>
 

@@ -54,6 +54,9 @@
     "pages.Permissions": "Permissions",
     "pages.Users": "Users",
     "pages.Ready for order": "Ready for order",
+    "pages.Orders": "Orders",
+    "pages.Products": "Products",
+    "pages.Invoices": "Invoices",
 
     "actions.Logout": "Logout",
     "actions.Add": "Add",
@@ -109,6 +112,7 @@
     "messages.Similar records update failed": "Similar records update failed!",
     "messages.ATX updated successfully": "ATX updated successfully!",
     "messages.ATX update failed": "ATX update failed!",
+    "messages.No products found for the given manufacturer and country": "No products found for the given manufacturer and country",
 
     "modals.Delete selected": "Delete selected",
     "modals.Delete selected question": "Are you sure you want to delete selected",
@@ -158,6 +162,8 @@
     "dates.Duration days": "Duration days",
     "dates.Historical": "Historical date",
     "dates.Readiness": "Readiness date",
+    "dates.Receive": "Receive date",
+    "dates.Confirmation": "Confirmation date",
 
     "Days": "Days",
     "days.past": "Days past",
@@ -311,7 +317,15 @@
     "fields.Days have passed": "Days have passed",
     "fields.Contracted in ASP": "Contracted in ASP",
     "fields.Registered in ASP": "Registered in ASP",
+
     "fields.Extensive version": "Extensive version",
+
+    "fields.PO №": "PO №",
+    "fields.PO date": "PO date",
+    "fields.Sent to BDM": "Sent to BDM",
+    "fields.Sent to manufacturer": "Sent to manufacturer",
+    "fields.Quantity": "Quantity",
+    "fields.Serialization type": "Serialization type",
 
     "AAAAAAAAAAAAAA": "AAAAAAAAAAAAAA"
 }

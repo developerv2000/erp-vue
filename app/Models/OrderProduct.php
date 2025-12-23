@@ -32,7 +32,7 @@ class OrderProduct extends Model implements HasTitleAttribute
     |--------------------------------------------------------------------------
     */
 
-    // Files
+    // Storage files
     const STORAGE_FILES_PATH = 'app/private/order-products';
     const PACKING_LIST_FOLDER_NAME = 'packing-lists';
     const COA_FILE_FOLDER_NAME = 'COA-files';
@@ -603,7 +603,7 @@ class OrderProduct extends Model implements HasTitleAttribute
     /**
      * AJAX request by CMD
      */
-    public function updateByCMDFromRequest(CMDOrderProductUpdateRequest $request)
+    public function updateByCMDFromRequest(CMDOrderProductUpdateRequest $request): void
     {
         $this->update($request->safe());
 
@@ -620,7 +620,7 @@ class OrderProduct extends Model implements HasTitleAttribute
     /**
      * AJAX request by DD
      */
-    function updateByDDFromRequest(DDOrderProductUpdateRequest $request)
+    function updateByDDFromRequest(DDOrderProductUpdateRequest $request): void
     {
         $this->fill($request->safe()->all());
 
@@ -638,7 +638,7 @@ class OrderProduct extends Model implements HasTitleAttribute
     /**
      * AJAX request by MSD
      */
-    function updateByMSDFromRequest(MSDOrderProductUpdateRequest $request)
+    function updateByMSDFromRequest(MSDOrderProductUpdateRequest $request): void
     {
         $this->update($request->safe());
 
@@ -670,6 +670,77 @@ class OrderProduct extends Model implements HasTitleAttribute
     public static function getDeclarationForEuropeFileFolderPath(): string
     {
         return storage_path(self::STORAGE_FILES_PATH . '/' . self::DECLARATION_FOR_EUROPE_FILE_FOLDER_NAME);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Action availability
+    |--------------------------------------------------------------------------
+    */
+
+    public function canAttachNewProductionInvoice(): bool
+    {
+        return $this->canAttachProductionInvoiceOFPrepaymentType()
+            || $this->canAttachProductionInvoiceOfFinalPaymentType()
+            || $this->canAttachProductionInvoiceOfFullPaymentType();
+    }
+
+    public function canAttachProductionInvoiceOFPrepaymentType(): bool
+    {
+        return $this->productionInvoices->count() == 0;
+    }
+
+    public function canAttachProductionInvoiceOfFinalPaymentType(): bool
+    {
+        return $this->productionInvoices
+            ->where('payment_type_id', InvoicePaymentType::PREPAYMENT_ID)
+            ->count() > 0
+
+            && $this->productionInvoices
+            ->where('payment_type_id', InvoicePaymentType::FINAL_PAYMENT_ID)
+            ->count() == 0;
+    }
+
+    public function canAttachProductionInvoiceOfFullPaymentType(): bool
+    {
+        return $this->productionInvoices->count() == 0;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Synchronizations
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Sync the price of the related Process with this model.
+     * If the price differs, it updates the 'increased_price' field.
+     *
+     * Used in models created/updated events.
+     */
+    public function syncPriceWithRelatedProcess(): void
+    {
+        if ($this->price && ($this->process->agreed_price != $this->price)) {
+            $this->process->update([
+                'increased_price' => $this->price
+            ]);
+        }
+    }
+
+    /**
+     * Sync the currency of the related Process with this model.
+     *
+     * Used in related 'Order' models updated event!
+     */
+    public function syncCurrencyWithRelatedProcess(): void
+    {
+        $this->refresh();
+
+        if ($this->order->currency_id && ($this->process->currency_id != $this->order->currency_id)) {
+            $this->process->update([
+                'currency_id' => $this->order->currency_id,
+            ]);
+        }
     }
 
     /*

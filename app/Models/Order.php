@@ -12,6 +12,7 @@ use App\Support\Traits\Model\AddsDefaultQueryParamsToRequest;
 use App\Support\Traits\Model\GetsMinifiedRecordsWithName;
 use App\Support\Traits\Model\HasComments;
 use App\Support\Traits\Model\HasModelNamespaceAttributes;
+use App\Support\Traits\Model\ScopesOrderingByName;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -23,6 +24,7 @@ class Order extends Model implements HasTitleAttribute
     use HasModelNamespaceAttributes;
     use AddsDefaultQueryParamsToRequest;
     use GetsMinifiedRecordsWithName;
+    use ScopesOrderingByName;
 
     /*
     |--------------------------------------------------------------------------
@@ -136,6 +138,7 @@ class Order extends Model implements HasTitleAttribute
     {
         $this->append([
             'base_model_class',
+            'status',
         ]);
     }
 
@@ -611,29 +614,21 @@ class Order extends Model implements HasTitleAttribute
         }
 
         $additionalColumns = [
-            ['title' => 'fields.BDM', 'key' => 'bdm_user_id', 'width' => 146, 'sortable' => true],
-            ['title' => 'fields.Analyst', 'key' => 'analyst_user_id', 'width' => 146, 'sortable' => true],
-            ['title' => 'fields.Country', 'key' => 'country_id', 'width' => 144, 'sortable' => true],
-            ['title' => 'pages.IVP', 'key' => 'products_count', 'width' => 104, 'sortable' => true],
-            ['title' => 'fields.Manufacturer', 'key' => 'name', 'width' => 140, 'sortable' => true],
-            ['title' => 'fields.Category', 'key' => 'category_id', 'width' => 104, 'sortable' => true],
-            ['title' => 'fields.Status', 'key' => 'active', 'width' => 106, 'sortable' => true],
-            ['title' => 'properties.Important', 'key' => 'important', 'width' => 100, 'sortable' => true],
-            ['title' => 'fields.Product class', 'key' => 'product_classes_name', 'width' => 114, 'sortable' => false],
-            ['title' => 'fields.Zones', 'key' => 'zones_name', 'width' => 54, 'sortable' => false],
-            ['title' => 'fields.Blacklist', 'key' => 'blacklists_name', 'width' => 120, 'sortable' => false],
-            ['title' => 'fields.Presence', 'key' => 'presences_name', 'width' => 128, 'sortable' => false],
-            ['title' => 'fields.Website', 'key' => 'website', 'width' => 180, 'sortable' => false],
-            ['title' => 'fields.About company', 'key' => 'about', 'width' => 240, 'sortable' => false],
-            ['title' => 'fields.Relationship', 'key' => 'relationship', 'width' => 200, 'sortable' => false],
-            ['title' => 'Comments', 'key' => 'comments_count', 'width' => 132, 'sortable' => false],
-            ['title' => 'comments.Last', 'key' => 'last_comment_body', 'width' => 240, 'sortable' => false],
-            ['title' => 'comments.Date', 'key' => 'last_comment_created_at', 'width' => 116, 'sortable' => false],
-            ['title' => 'dates.Date of creation', 'key' => 'created_at', 'width' => 130, 'sortable' => true],
-            ['title' => 'dates.Update date', 'key' => 'updated_at', 'width' => 150, 'sortable' => true],
-            ['title' => 'pages.Meetings', 'key' => 'meetings_count', 'width' => 86, 'sortable' => true],
             ['title' => 'ID', 'key' => 'id', 'width' => 62, 'sortable' => true],
-            ['title' => 'Attachments', 'key' => 'attachments_count', 'width' => 340, 'sortable' => true],
+            ['title' => 'fields.BDM', 'key' => 'manufacturer_bdm', 'width' => 146, 'sortable' => false],
+            ['title' => 'dates.Receive', 'key' => 'receive_date', 'width' => 142, 'sortable' => true],
+            ['title' => 'fields.Manufacturer', 'key' => 'manufacturer_id', 'width' => 140, 'sortable' => true],
+            ['title' => 'fields.Country', 'key' => 'country_id', 'width' => 80, 'sortable' => true],
+            ['title' => 'Products', 'key' => 'products_count', 'width' => 100, 'sortable' => false],
+            ['title' => 'Comments', 'key' => 'comments_count', 'width' => 132, 'sortable' => false],
+            ['title' => 'comments.Last', 'key' => 'last_comment_body', 'width' => 200, 'sortable' => false],
+            ['title' => 'Status', 'key' => 'status', 'width' => 120, 'sortable' => false],
+            ['title' => 'fields.Sent to BDM', 'key' => 'sent_to_bdm_date', 'width' => 160, 'sortable' => true],
+
+            ['title' => 'fields.PO №', 'key' => 'name', 'width' => 136, 'sortable' => true],
+            ['title' => 'fields.PO date', 'key' => 'purchase_date', 'width' => 120, 'sortable' => true],
+            ['title' => 'dates.Confirmation', 'key' => 'confirmation_date', 'width' => 172, 'sortable' => true],
+            ['title' => 'fields.Sent to manufacturer', 'key' => 'sent_to_manufacturer_date', 'width' => 168, 'sortable' => true],
         ];
 
         foreach ($additionalColumns as $column) {

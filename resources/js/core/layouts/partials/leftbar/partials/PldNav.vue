@@ -5,7 +5,10 @@ import InertiaLinkedListItem from "@/core/components/inertia/InertiaLinkedListIt
 import useAuth from "@/core/composables/useAuth";
 
 import {
-    mdiCheckCircleOutline,
+    mdiCheckBold,
+    mdiPillMultiple,
+    mdiScriptOutline,
+    mdiStar,
 } from "@mdi/js";
 
 const { t } = useI18n();
@@ -18,7 +21,34 @@ const listItems = computed(() => [
         routeParams: null,
         activeOnRoutes: "pld.ready-for-order-processes.index",
         permission: "view-PLD-ready-for-order-processes",
-        prependIcon: mdiCheckCircleOutline,
+        prependIcon: mdiCheckBold,
+    },
+
+    {
+        title: t("pages.Orders"),
+        routeName: "pld.orders.index",
+        routeParams: null,
+        activeOnRoutes: "pld.orders.*",
+        permission: "view-PLD-orders",
+        prependIcon: mdiStar,
+    },
+
+    {
+        title: t("pages.Products"),
+        routeName: "pld.order-products.index",
+        routeParams: null,
+        activeOnRoutes: "pld.order-products.*",
+        permission: "view-PLD-order-products",
+        prependIcon: mdiPillMultiple,
+    },
+
+    {
+        title: t("pages.Invoices"),
+        routeName: "pld.invoices.index",
+        routeParams: null,
+        activeOnRoutes: "pld.invoices.index",
+        permission: "view-PLD-invoices",
+        prependIcon: mdiScriptOutline,
     },
 ]);
 </script>

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\global\MainController;
 use App\Models\Manufacturer;
+use App\Models\Order;
 use App\Models\Process;
 use App\Models\Product;
 use App\Models\User;
@@ -52,6 +53,12 @@ Route::middleware('auth:sanctum')->name('api.')->group(function () {
     Route::prefix('/ready-for-order-processes')->name('ready-for-order-processes.')->group(function () {
         Route::get('/', fn(Request $request) => Process::queryReadyForOrderRecordsFromRequest($request, 'paginate', true))
             ->middleware('can:view-PLD-ready-for-order-processes')
+            ->name('get');
+    });
+
+    Route::prefix('/orders')->name('orders.')->group(function () {
+        Route::get('/', fn(Request $request) => Order::queryPLDRecordsFromRequest($request, 'paginate', true))
+            ->middleware('can:view-PLD-orders')
             ->name('get');
     });
 });

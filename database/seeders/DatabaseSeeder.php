@@ -38,6 +38,7 @@ class DatabaseSeeder extends Seeder
             // PortfolioManagerSeeder::class,
             // ProductSearchSeeder::class,
             // MeetingSeeder::class,
+            SerializationTypeSeeder::class,
         ]);
     }
 }

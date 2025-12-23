@@ -359,6 +359,22 @@ class Process extends Model implements
     /**
      * Used on order pages.
      */
+    public function getFullEnglishProductLabelWithIdAttribute()
+    {
+        return collect([
+            $this->trademark_en,
+            $this->product->form->name,
+            $this->product->dosage,
+            $this->product->pack,
+            ' — #' . $this->id,
+        ])
+            ->filter()
+            ->implode(' ');
+    }
+
+    /**
+     * Used on order pages.
+     */
     public function getFullRussianProductLabelAttribute()
     {
         return collect([
@@ -369,6 +385,14 @@ class Process extends Model implements
         ])
             ->filter()
             ->implode(' ');
+    }
+
+    /**
+     * Used on order pages.
+     */
+    public function getMahNameWithIdAttribute()
+    {
+        return $this->mah->name . ' — #' . $this->id;
     }
 
     /*
@@ -1685,6 +1709,24 @@ class Process extends Model implements
             // Add general statuses with periods
             $record->addGeneralStatusPeriods($clonedGeneralStatuses);
         }
+    }
+
+    /**
+     * Get self with all its similar records for order.
+     */
+    public function getSelfWithSimilarRecordsForOrder($appendMAHNameWithID = false)
+    {
+        $processes = self::onlyReadyForOrder()
+            ->where('product_id', $this->product_id)
+            ->where('country_id', $this->country_id)
+            ->with('mah')
+            ->get();
+
+        if ($appendMAHNameWithID) {
+            $processes->each->append('mah_name_with_id');
+        }
+
+        return $processes;
     }
 
     /**

@@ -5,10 +5,10 @@ import InertiaLinkedListItem from "@/core/components/inertia/InertiaLinkedListIt
 import useAuth from "@/core/composables/useAuth";
 
 import {
-    mdiHome ,
-    mdiAccountStar,
-    mdiLock,
-    mdiAccountCircle,
+    mdiSitemap,
+    mdiAccountTie,
+    mdiLockOutline,
+    mdiAccountGroup,
 } from "@mdi/js";
 
 const { t } = useI18n();
@@ -20,15 +20,15 @@ const listItems = computed(() => [
         routeName: "administration.departments.index",
         routeParams: null,
         activeOnRoutes: "administration.departments.index",
-        prependIcon: mdiHome ,
+        prependIcon: mdiSitemap,
     },
 
     {
         title: t("pages.Roles"),
         routeName: "administration.roles.index",
         routeParams: null,
-        activeOnRoutes: "administration.roles.index",
-        prependIcon: mdiAccountStar,
+        activeOnRoutes: "admiistration.roles.index",
+        prependIcon: mdiAccountTie,
     },
 
     {
@@ -36,7 +36,7 @@ const listItems = computed(() => [
         routeName: "administration.permissions.index",
         routeParams: null,
         activeOnRoutes: "administration.permissions.index",
-        prependIcon: mdiLock,
+        prependIcon: mdiLockOutline,
     },
 
     {
@@ -44,7 +44,7 @@ const listItems = computed(() => [
         routeName: "administration.users.index",
         routeParams: null,
         activeOnRoutes: "administration.users.*",
-        prependIcon: mdiAccountCircle,
+        prependIcon: mdiAccountGroup,
     },
 ]);
 </script>

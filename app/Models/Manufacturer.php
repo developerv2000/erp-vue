@@ -573,6 +573,24 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
             ->get();
     }
 
+    public function getReadyForOrderProcessesOfCountry($countryId, $appendFullEnglishProductLabelWithId = false)
+    {
+        $processes = $this->processes()
+            ->onlyReadyForOrder()
+            ->withRelationsForOrder()
+            ->withOnlySelectsForOrder()
+            ->where('country_id', $countryId)
+            ->get();
+
+        if ($appendFullEnglishProductLabelWithId) {
+            foreach ($processes as $process) {
+                $process->append('full_english_product_label_with_id');
+            }
+        }
+
+        return $processes;
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Misc

@@ -9,6 +9,7 @@ import { mdiDelete } from "@mdi/js";
 const props = defineProps({
     deleteLink: String,
     store: Object,
+    actionOnSuccess: Function, // Reset selected values, refetch records etc.
 });
 
 const { t } = useI18n();
@@ -22,9 +23,18 @@ function submit() {
             force_delete: true,
         })
         .then((response) => {
-            showModal.value = false;
             messages.addDeletedSuccessfullyMessage(response.data.count);
-            props.store.fetchRecords({ updateUrl: false });
+            props.actionOnSuccess();
+        })
+        .catch((error) => {
+            if (error.response?.status === 422) {
+                messages.addValidationErrors(error);
+            } else {
+                messages.addSubmitionFailedMessage();
+            }
+        })
+        .finally(() => {
+            showModal.value = false;
         });
 }
 </script>

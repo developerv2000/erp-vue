@@ -1,0 +1,1 @@
+import{u as c,c as s,o,b as t,aG as a,bu as l}from"./app-BLgoNwh9.js";import{E as p}from"./mdi-FFd_BlEo.js";const d={__name:"FullscreenListItem",setup(u){const{t:n}=c(),r=()=>{const e=document.querySelector(".default-table-wrapper");l(e)};return(e,i)=>(o(),s(a,{title:t(n)("actions.Fullscreen"),"prepend-icon":t(p),onClick:r},null,8,["title","prepend-icon"]))}};export{d as _};

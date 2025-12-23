@@ -1,1 +1,0 @@
-import{_ as n}from"./InertiaLinkedButtonedIcon-BgFVkzlG.js";import{I as o}from"./mdi-DS42Ge1w.js";import{c as t,o as e,b as i}from"./app-hg2q9IKQ.js";const _={__name:"TdEditButton",props:{link:{type:String,required:!0}},setup(r){return(a,c)=>(e(),t(n,{color:"amber",variant:"tonal",size:"small",icon:i(o),link:r.link},null,8,["icon","link"]))}};export{_};

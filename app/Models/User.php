@@ -598,7 +598,7 @@ class User extends Authenticatable
     {
         $this->refresh();
         $settings = $this->settings;
-        $headersSettings = $settings['table_headers'];
+        $headersSettings = isset($settings['table_headers']) ? $settings['table_headers'] : [];
 
         $defaultHeaders = match ($key) {
             // MAD
@@ -671,7 +671,7 @@ class User extends Authenticatable
     {
         $this->refresh();
         $settings = $this->settings;
-        $headersSettings = $settings['table_headers'];
+        $headersSettings = isset($settings['table_headers']) ? $settings['table_headers'] : [];
 
         $headersSettings[self::MAD_EPP_HEADERS_KEY] = Manufacturer::getMADTableHeadersForUser($this);
         $headersSettings[self::MAD_IVP_HEADERS_KEY] = Product::getMADTableHeadersForUser($this);
@@ -686,7 +686,7 @@ class User extends Authenticatable
     {
         $this->refresh();
         $settings = $this->settings;
-        $headersSettings = $settings['table_headers'];
+        $headersSettings = isset($settings['table_headers']) ? $settings['table_headers'] : [];
 
         $headersSettings[self::PLD_ORDERS_HEADERS_KEY] = Order::getPLDTableHeadersForUser($this);
         // $headersSettings[self::PLD_ORDER_PRODUCTS_HEADERS_KEY] = OrderProduct::getPLDTableHeadersForUser($this);

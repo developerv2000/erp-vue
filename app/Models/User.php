@@ -885,6 +885,9 @@ class User extends Authenticatable
             'mad.manufacturers.index' => 'view-MAD-EPP',
             'mad.products.index' => 'view-MAD-IVP',
             'mad.processes.index' => 'view-MAD-VPS',
+
+            // PLD
+            'pld.orders.index' => 'view-PLD-orders',
         ];
 
         foreach ($homepageRoutes as $routeName => $gate) {

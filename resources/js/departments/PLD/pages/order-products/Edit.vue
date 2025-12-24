@@ -5,19 +5,24 @@ import { usePage } from "@inertiajs/vue3";
 import { useI18n } from "vue-i18n";
 import InertiaBreadcrumbs from "@/core/components/inertia/InertiaBreadcrumbs.vue";
 import PageIntro from "@/core/layouts/PageIntro.vue";
-import OrdersEditForm from "./partials/OrdersEditForm.vue";
+import OrderProductsEditForm from "./partials/OrderProductsEditForm.vue";
 
 const page = usePage();
 const { t } = useI18n();
 
 const title = computed(
-    () => t("pages.Orders") + " — " + page.props.record.title
+    () => t("pages.Products") + " — " + page.props.record.title
 );
 
 const breadcrumbs = computed(() => [
     {
         title: t("pages.Orders"),
         link: route("pld.orders.index"),
+    },
+
+    {
+        title: t("pages.Products"),
+        link: route("pld.order-products.index"),
     },
 
     {
@@ -36,6 +41,6 @@ const breadcrumbs = computed(() => [
             <template #title>{{ page.props.record.title }}</template>
         </PageIntro>
 
-        <OrdersEditForm />
+        <!-- <OrderProductsEditForm /> -->
     </MainLayout>
 </template>

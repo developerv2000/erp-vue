@@ -32,6 +32,9 @@ class MADGatesDefiner
             Permission::CAN_VIEW_MAD_KPI_NAME,
             Permission::CAN_VIEW_KPI_OF_ALL_ANALYSTS,
             Permission::CAN_VIEW_KPI_EXTENDED_VERSION_NAME,
+
+            // ASP
+            Permission::CAN_CONTROL_MAD_ASP_PROCESSES,
         ];
 
         GatesDefiner::definePermissionBasedGates($permission);

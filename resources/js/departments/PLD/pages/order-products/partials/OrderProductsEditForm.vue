@@ -3,11 +3,10 @@ import { ref, computed, watch } from "vue";
 import { usePage, router } from "@inertiajs/vue3";
 import { useI18n } from "vue-i18n";
 import { Form, useForm } from "vee-validate";
-import { object, string, number, date } from "yup";
+import { object, number } from "yup";
 import { useVeeFormFields } from "@/core/composables/useVeeFormFields";
 import { useFormData } from "@/core/composables/useFormData";
 import { useMessagesStore } from "@/core/stores/messages";
-import { useDateFormatter } from "@/core/composables/useDateFormatter";
 
 import DefaultSheet from "@/core/components/containers/DefaultSheet.vue";
 import DefaultTitle from "@/core/components/titles/DefaultTitle.vue";
@@ -25,7 +24,6 @@ const { t } = useI18n();
 const { objectToFormData } = useFormData();
 const page = usePage();
 const messages = useMessagesStore();
-const { removeDateTimezonesFromFormData } = useDateFormatter();
 
 const record = computed(() => page.props.record);
 const loading = ref(false);
@@ -34,15 +32,14 @@ const redirectBack = ref(false);
 // Yup schema
 const schema = computed(() => {
     const base = {
-        manufacturer_id: number().required(),
-        country_id: number().required(),
-        receive_date: date().required(),
+        process_id: number().required(),
+        quantity: number().required(),
+        serialization_type_id: number().required(),
     };
 
     // After confirmation inputs
     if (record.value.is_sent_to_confirmation) {
-        base.name = string().required();
-        base.currency_id = number().required();
+        base.price = number().required();
     }
 
     return object(base);
@@ -50,11 +47,10 @@ const schema = computed(() => {
 
 // Backend-driven values (reactive to record)
 const baseInitialValues = computed(() => ({
-    manufacturer_id: record.value.manufacturer_id,
-    country_id: record.value.country_id,
-    receive_date: record.value.receive_date,
-    name: record.value.name,
-    currency_id: record.value.currency_id,
+    process_id: record.value.process_id,
+    quantity: record.value.quantity,
+    serialization_type_id: record.value.serialization_type_id,
+    price: record.value.price,
 }));
 
 // Always-reset values
@@ -80,12 +76,13 @@ const { values } = useVeeFormFields(Object.keys(mergedInitialValues.value));
 // Submit handler
 const submit = handleSubmit((values) => {
     const formData = objectToFormData(values);
-    removeDateTimezonesFromFormData(formData);
-
     loading.value = true;
 
     axios
-        .post(route("pld.orders.update", { record: record.value.id }), formData)
+        .post(
+            route("pld.order-products.update", { record: record.value.id }),
+            formData
+        )
         .then(() => {
             messages.addUpdatedSuccessfullyMessage();
 
@@ -126,33 +123,42 @@ const reloadRequiredDataAndResetForm = () => {
             <DefaultTitle>{{ t("departments.PLD") }}</DefaultTitle>
 
             <v-row>
-                <v-col cols="4">
+                <v-col cols="3">
                     <DefaultAutocomplete
-                        :label="t('fields.Manufacturer')"
-                        :items="page.props.manufacturers"
-                        v-model="values.manufacturer_id"
-                        :error-messages="errors.manufacturer_id"
+                        :label="t('fields.TM Eng')"
+                        v-model="values.ready_for_order_process_id"
+                        :items="readyForOrderProcesses"
+                        item-title="full_english_product_label_with_id"
+                        @update:modelValue="
+                            (processId) => updateMAHOptions(field, processId)
+                        "
                         required
                     />
                 </v-col>
 
-                <v-col cols="4">
+                <v-col cols="3">
                     <DefaultAutocomplete
-                        :label="t('fields.Country')"
-                        :items="page.props.countriesOrderedByProcessesCount"
-                        item-title="code"
-                        v-model="values.country_id"
-                        :error-messages="errors.country_id"
+                        :label="t('fields.MAH')"
+                        v-model="values.process_id"
+                        :items="mahOptions"
+                        item-title="mah_name_with_id"
                         required
                     />
                 </v-col>
 
-                <v-col cols="4">
-                    <DefaultDateInput
-                        :label="t('dates.Receive')"
-                        v-model="values.receive_date"
-                        :error-messages="errors.receive_date"
-                        value-format="yyyy-MM-dd"
+                <v-col cols="3">
+                    <DefaultNumberInput
+                        :label="t('fields.Quantity')"
+                        v-model="values.quantity"
+                        :min="0"
+                    />
+                </v-col>
+
+                <v-col cols="3">
+                    <DefaultAutocomplete
+                        :label="t('fields.Serialization type')"
+                        v-model="values.serialization_type_id"
+                        :items="page.props.serializationTypes"
                         required
                     />
                 </v-col>
@@ -164,20 +170,15 @@ const reloadRequiredDataAndResetForm = () => {
 
             <v-row>
                 <v-col cols="4">
-                    <DefaultTextField
-                        :label="t('fields.Name')"
-                        v-model="values.Name"
-                        :error-messages="errors.Name"
-                        required
-                    />
-                </v-col>
-
-                <v-col cols="4">
-                    <DefaultAutocomplete
-                        :label="t('fields.Currency')"
-                        :items="page.props.currencies"
-                        v-model="values.currency_id"
-                        :error-messages="errors.currency_id"
+                    <DefaultNumberInput
+                        :label="t('fields.Price')"
+                        v-model="values.price"
+                        :error-messages="
+                            errors.price
+                        "
+                        :min="0"
+                        :precision="2"
+                        :step="0.01"
                         required
                     />
                 </v-col>

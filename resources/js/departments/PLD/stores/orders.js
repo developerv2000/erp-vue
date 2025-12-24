@@ -44,6 +44,9 @@ export const usePLDOrdersTableStore = defineStore('PLDOrdersTable', {
         initializedFromInertiaPage: false,
         selected: [],
 
+        editDialog: false,
+        editDialogRecord: undefined,
+
         pagination: {
             ...defaultPaginationOptions
         },
@@ -159,6 +162,9 @@ export const usePLDOrdersTableStore = defineStore('PLDOrdersTable', {
             this.records = [];
             this.loading = false;
             this.selected = [];
+
+            this.editDialog = false;
+            this.editDialogRecord = undefined;
 
             this.pagination = {
                 ...defaultPaginationOptions

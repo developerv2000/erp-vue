@@ -41,7 +41,7 @@ Route::prefix('pld')->name('pld.')->middleware('auth', 'auth.session')->group(fu
     Route::get('/invoices', [PLDInvoiceController::class, 'index'])->name('invoices.index')->middleware('can:view-PLPD-invoices');
 
     // Helpers
-    Route::prefix('/orders/products')->controller(PLDHelperController::class)->group(function () {
+    Route::prefix('/orders')->controller(PLDHelperController::class)->group(function () {
         // AJAX request on orders.create
         Route::get('/ready-for-order-processes-of-manufacturer', 'getReadyForOrderProcessesOfManufacturer')
             ->middleware('can:edit-PLD-orders')

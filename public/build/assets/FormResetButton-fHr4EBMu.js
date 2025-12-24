@@ -1,1 +1,0 @@
-import{u as o,c as r,o as s,w as a,g as n,t as c,b as e}from"./app-BLgoNwh9.js";import{_ as p}from"./DefaultButton-As932Yet.js";import{H as _}from"./mdi-FFd_BlEo.js";const x={__name:"FormResetButton",setup(i){const{t}=o();return(m,u)=>(s(),r(p,{color:"orange-darken-1","prepend-icon":e(_)},{default:a(()=>[n(c(e(t)("actions.Reset")),1)]),_:1},8,["prepend-icon"]))}};export{x as _};

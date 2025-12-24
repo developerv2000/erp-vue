@@ -36,6 +36,7 @@
     "Departments": "Departments",
     "departments.MAD": "MAD",
     "departments.PLD": "PLD",
+    "departments.CMD": "CMD",
 
     "pages.Main": "Main",
     "pages.Trash": "Trash",
@@ -66,6 +67,7 @@
     "actions.Reset": "Reset",
     "actions.New": "New",
     "actions.Delete": "Delete",
+    "actions.Edit": "Edit",
     "actions.Permanent delete": "Permanent delete",
     "actions.Restore": "Restore",
     "actions.Export": "Export",
@@ -125,6 +127,7 @@
     "modals.Edit record": "Edit record",
     "modals.Delete record": "Delete record",
     "modals.Delete record question": "Are you sure you want to delete this record",
+    "modals.Edit products of order": "Edit products of order",
 
     "notifications.Mark selected as read": "Mark as read",
     "notifications.Process stage updated to contract": "Status of process #{process_id} has been updated to {status_name}.",

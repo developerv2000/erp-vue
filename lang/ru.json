@@ -37,6 +37,7 @@
     "Departments": "Отделы",
     "departments.MAD": "ОАП",
     "departments.PLD": "ДЗЛ",
+    "departments.CMD": "ОКП",
 
     "pages.Main": "Главная",
     "pages.Trash": "Корзина",
@@ -67,6 +68,7 @@
     "actions.Reset": "Сбросить",
     "actions.New": "Новый",
     "actions.Delete": "Удалить",
+    "actions.Edit": "Редактировать",
     "actions.Permanent delete": "Удалить навсегда",
     "actions.Restore": "Востановить",
     "actions.Export": "Экспорт",
@@ -134,6 +136,7 @@
     "modals.Edit record": "Редактировать запись",
     "modals.Delete record": "Удалить запись",
     "modals.Delete record question": "Вы уверены, что хотите удалить эту запись",
+    "modals.Edit products of order": "Редактировать продукты заказа",
 
     "notifications.Mark selected as read": "Пометить как прочитанное",
     "notifications.Process stage updated to contract": "Статус процесса #{process_id} был изменён на {status_name}.",

@@ -16,6 +16,7 @@ import TogglableThreeLinesLimitedText from "@/core/components/misc/TogglableThre
 import TdRecordCommentsLink from "@/core/components/table/td/TdRecordCommentsLink.vue";
 import TableNavigateToPage from "@/core/components/table/misc/TableNavigateToPage.vue";
 import TdOrderStatus from "@/core/components/table/td/shared/TdOrderStatus.vue";
+import { mdiArrowRight, mdiPencil } from "@mdi/js";
 
 const { t } = useI18n();
 const { get } = useQueryParams();
@@ -36,9 +37,14 @@ onMounted(() => {
     store.fetchRecords({ updateUrl: true });
 });
 
-function handleTableOptionsUpdate(options) {
+const handleTableOptionsUpdate = (options) => {
     store.fetchRecordsIfOptionsChanged(options); // Doesn`t fire on mount
-}
+};
+
+const editProductsOfOrder = (order) => {
+    store.editDialogRecord = order;
+    store.editDialog = true;
+};
 </script>
 
 <template>

@@ -519,7 +519,7 @@ class Order extends Model implements HasTitleAttribute
      */
     public function updateByPLDFromRequest(PLDOrderUpdateRequest $request): void
     {
-        $this->update($request->safe());
+        $this->update($request->all());
 
         // HasMany relations
         $this->storeCommentFromRequest($request);
@@ -619,7 +619,7 @@ class Order extends Model implements HasTitleAttribute
             ['title' => 'dates.Receive', 'key' => 'receive_date', 'width' => 142, 'sortable' => true],
             ['title' => 'fields.Manufacturer', 'key' => 'manufacturer_id', 'width' => 140, 'sortable' => true],
             ['title' => 'fields.Country', 'key' => 'country_id', 'width' => 80, 'sortable' => true],
-            ['title' => 'Products', 'key' => 'products_count', 'width' => 100, 'sortable' => false],
+            ['title' => 'Products', 'key' => 'products_count', 'width' => 144, 'sortable' => false],
             ['title' => 'Comments', 'key' => 'comments_count', 'width' => 132, 'sortable' => false],
             ['title' => 'comments.Last', 'key' => 'last_comment_body', 'width' => 200, 'sortable' => false],
             ['title' => 'Status', 'key' => 'status', 'width' => 120, 'sortable' => false],

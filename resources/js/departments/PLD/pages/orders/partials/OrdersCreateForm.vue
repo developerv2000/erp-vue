@@ -6,8 +6,8 @@ import { Form, useForm, useFieldArray } from "vee-validate";
 import { object, string, number, array, date } from "yup";
 import { useVeeFormFields } from "@/core/composables/useVeeFormFields";
 import { useFormData } from "@/core/composables/useFormData";
-import { useGlobalStore } from "@/core/stores/global";
 import { useMessagesStore } from "@/core/stores/messages";
+import { useDateFormatter } from "@/core/composables/useDateFormatter";
 import axios from "axios";
 
 import DefaultSheet from "@/core/components/containers/DefaultSheet.vue";
@@ -26,6 +26,7 @@ const { t } = useI18n();
 const { objectToFormData } = useFormData();
 const page = usePage();
 const messages = useMessagesStore();
+const { removeDateTimezonesFromFormData } = useDateFormatter();
 
 const loading = ref(false);
 const redirectBack = ref(false);
@@ -77,8 +78,10 @@ const {
 
 // Submit handler
 const submit = handleSubmit((values) => {
-    loading.value = true;
     const formData = objectToFormData(values);
+    removeDateTimezonesFromFormData(formData);
+
+    loading.value = true;
 
     axios
         .post(route("pld.orders.store"), formData)

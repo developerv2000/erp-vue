@@ -21,4 +21,6 @@
 - Add :return typos for controller functions
 - FIx profile edit form (make it like MAD CRUD forms)
 - Refactor Products 'getMatchedProductSearchesAttribute()'
-- Refactor MAD KPI addActiveManufacturersCountsForMonths() when count_id is filled
+- Refactor MAD KPI addActiveManufacturersCountsForMonths() when country_id is filled
+- Use request()->safe() for PLD/CMD and other requests instead of request->all
+- removeDateTimezonesFromFormData from MAD part

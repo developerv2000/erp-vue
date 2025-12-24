@@ -72,7 +72,6 @@ class PLDOrderController extends Controller
             'manufacturers' => Manufacturer::getMinifiedRecordsWithProcessesReadyForOrder(),
             'countriesOrderedByProcessesCount' => Country::orderByProcessesCount()->get(),
             'currencies' => Currency::orderByName()->get(),
-            'defaultSelectedCurrencyID' => Currency::getDefaultIdValueForMADProcesses(),
         ]);
     }
 

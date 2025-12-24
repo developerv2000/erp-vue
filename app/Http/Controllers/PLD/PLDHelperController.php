@@ -23,6 +23,12 @@ class PLDHelperController extends Controller
         return $manufacturer->getReadyForOrderProcessesOfCountry($countryId, appendFullEnglishProductLabelWithId: true);
     }
 
+    /**
+     * AJAX request
+     *
+     * Used on 'pld.orders.create' page to fetch 'ready for order processes'
+     * of the selected manufacturer and country and Trademark EN.
+     */
     public function getProcessWithItSimilarRecordsForOrder(Request $request)
     {
         $process = Process::findOrFail($request->input('process_id'));

@@ -14,7 +14,7 @@ class PLDOrderUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            
         ];
     }
 }

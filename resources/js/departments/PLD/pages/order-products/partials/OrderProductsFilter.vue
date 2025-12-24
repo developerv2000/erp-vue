@@ -1,32 +1,31 @@
 <script setup>
 import { usePage } from "@inertiajs/vue3";
 import { useI18n } from "vue-i18n";
-import { usePLDOrdersTableStore } from "@/departments/PLD/stores/orders";
+import { usePLDOrderProductsTableStore } from "@/departments/PLD/stores/orderProducts";
 
 import StoreBindedFilter from "@/core/components/filters/StoreBindedFilter.vue";
 import FilterAutocomplete from "@/core/components/filters/inputs/FilterAutocomplete.vue";
 import FilterDefaultInputs from "@/core/components/filters/inputs/FilterDefaultInputs.vue";
-import FilterDateInput from "@/core/components/filters/inputs/FilterDateInput.vue";
 
 const { t } = useI18n();
 const page = usePage();
-const store = usePLDOrdersTableStore();
+const store = usePLDOrderProductsTableStore();
 </script>
 
 <template>
     <StoreBindedFilter :store="store">
         <FilterAutocomplete
             :label="t('fields.PO №')"
-            name="name[]"
-            v-model="store.filters.name"
+            name="order_name[]"
+            v-model="store.filters.order_name"
             :items="page.props.filterDependencies.orderNames"
             multiple
         />
 
         <FilterAutocomplete
             :label="t('fields.BDM')"
-            name="manufacturer_bdm_user_id"
-            v-model="store.filters.manufacturer_bdm_user_id"
+            name="order_manufacturer_bdm_user_id"
+            v-model="store.filters.order_manufacturer_bdm_user_id"
             :items="page.props.filterDependencies.bdmUsers"
         />
 
@@ -37,43 +36,44 @@ const store = usePLDOrdersTableStore();
             :items="page.props.filterDependencies.statusOptions"
         />
 
-        <FilterDateInput
-            :label="t('dates.Receive')"
-            name="receive_date"
-            v-model="store.filters.receive_date"
-            multiple="range"
-        />
-
         <FilterAutocomplete
             :label="t('fields.Manufacturer')"
-            name="manufacturer_id[]"
-            v-model="store.filters.manufacturer_id"
+            name="order_manufacturer_id[]"
+            v-model="store.filters.order_manufacturer_id"
             :items="page.props.filterDependencies.manufacturers"
             multiple
         />
 
         <FilterAutocomplete
             :label="t('fields.Country')"
-            name="country_id[]"
-            v-model="store.filters.country_id"
+            name="process_country_id[]"
+            v-model="store.filters.process_country_id"
             :items="
                 page.props.filterDependencies.countriesOrderedByProcessesCount
             "
             multiple
         />
 
-        <FilterDateInput
-            :label="t('fields.Sent to BDM')"
-            name="sent_to_bdm_date"
-            v-model="store.filters.sent_to_bdm_date"
-            multiple="range"
+        <FilterAutocomplete
+            :label="t('fields.TM Eng')"
+            name="process_trademark_en"
+            v-model="store.filters.process_trademark_en"
+            :items="page.props.filterDependencies.enTrademarks"
         />
 
-        <FilterDateInput
-            :label="t('fields.Sent to manufacturer')"
-            name="sent_to_manufacturer_date"
-            v-model="store.filters.sent_to_manufacturer_date"
-            multiple="range"
+        <FilterAutocomplete
+            :label="t('fields.TM Rus')"
+            name="process_trademark_ru"
+            v-model="store.filters.process_trademark_ru"
+            :items="page.props.filterDependencies.ruTrademarks"
+        />
+
+        <FilterAutocomplete
+            :label="t('fields.MAH')"
+            name="process_marketing_authorization_holder_id[]"
+            v-model="store.filters.process_marketing_authorization_holder_id"
+            :items="page.props.filterDependencies.MAHs"
+            multiple
         />
 
         <FilterDefaultInputs :store="store" />

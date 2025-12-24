@@ -2,12 +2,12 @@
 import { onMounted } from "vue";
 import { usePage } from "@inertiajs/vue3";
 import useQueryParams from "@/core/composables/useQueryParams";
-import { usePLDOrdersTableStore } from "@/departments/PLD/stores/orders";
+import { usePLDOrderProductsTableStore } from "@/departments/PLD/stores/orderProducts";
 import { useI18n } from "vue-i18n";
 import { useDateFormatter } from "@/core/composables/useDateFormatter";
 import { DEFAULT_PER_PAGE_OPTIONS } from "@/core/scripts/constants";
 
-import OrdersTableTop from "./OrdersTableTop.vue";
+import OrdersTableTop from "../../orders/partials/OrdersTableTop.vue";
 import TableDefaultSkeleton from "@/core/components/table/misc/TableDefaultSkeleton.vue";
 import TdEditButton from "@/core/components/table/td/TdEditButton.vue";
 import TdAva from "@/core/components/table/td/TdAva.vue";
@@ -21,7 +21,7 @@ import { mdiArrowRight, mdiPencil } from "@mdi/js";
 const { t } = useI18n();
 const { get } = useQueryParams();
 const page = usePage();
-const store = usePLDOrdersTableStore();
+const store = usePLDOrderProductsTableStore();
 const { formatDate } = useDateFormatter();
 
 onMounted(() => {
@@ -83,38 +83,50 @@ const handleTableOptionsUpdate = (options) => {
 
         <!-- Item slots -->
         <template #item.edit="{ item }">
-            <TdEditButton :link="route('pld.orders.edit', item.id)" />
+            <TdEditButton :link="route('pld.order-products.edit', item.id)" />
         </template>
 
-        <template #item.manufacturer_bdm="{ item }">
-            <TdAva :user="item.manufacturer.bdm" />
+        <template #item.order_manufacturer_id="{ item }">
+            {{ item.order.manufacturer.name }}
         </template>
 
-        <template #item.receive_date="{ item }">
-            {{ formatDate(item.receive_date) }}
+        <template #item.order_country_id="{ item }">
+            {{ item.order.country.code }}
         </template>
 
-        <template #item.manufacturer_id="{ item }">
-            {{ item.manufacturer.name }}
-        </template>
-
-        <template #item.country_id="{ item }">
-            {{ item.country.code }}
-        </template>
-
-        <template #item.products_count="{ item }">
+        <template #item.order_id="{ item }">
             <TdInertiaLink
                 :link="
-                    route('pld.order-products.index', {
-                        'order_id[]': item.id,
+                    route('pld.orders.index', {
+                        'id[]': item.order.id,
                         initialize_from_inertia_page: true,
                     })
                 "
             >
-                <span class="text-lowercase">
-                    {{ item.products_count }} {{ t("Products") }}
-                </span>
+                {{ item.order.title }}
             </TdInertiaLink>
+        </template>
+
+        <template #item.process_trademark_en="{ item }">
+            <TogglableThreeLinesLimitedText
+                class="main-table__last-comment"
+                :text="item.process.full_english_product_label"
+            />
+        </template>
+
+        <template #item.process_trademark_ru="{ item }">
+            <TogglableThreeLinesLimitedText
+                class="main-table__last-comment"
+                :text="item.process.full_russian_product_label"
+            />
+        </template>
+
+        <template #item.process_marketing_authorization_holder_id="{ item }">
+            {{ item.process.mah.name }}
+        </template>
+
+        <template #item.status="{ item }">
+            <TdOrderStatus :status="item.status" />
         </template>
 
         <template #item.comments_count="{ item }">
@@ -128,28 +140,12 @@ const handleTableOptionsUpdate = (options) => {
             />
         </template>
 
-        <template #item.status="{ item }">
-            <TdOrderStatus :status="item.status" />
+        <template #item.serialization_type_id="{ item }">
+            {{ item.serialization_type.name }}
         </template>
 
-        <template #item.name="{ item }">
-            {{ item.name }}
-        </template>
-
-        <template #item.sent_to_bdm_date="{ item }">
-            {{ formatDate(item.sent_to_bdm_date) }}
-        </template>
-
-        <template #item.purchase_date="{ item }">
-            {{ formatDate(item.purchase_date) }}
-        </template>
-
-        <template #item.confirmation_date="{ item }">
-            {{ formatDate(item.confirmation_date) }}
-        </template>
-
-        <template #item.sent_to_manufacturer_date="{ item }">
-            {{ formatDate(item.sent_to_manufacturer_date) }}
+        <template #item.layout_approved_date="{ item }">
+            {{ formatDate(item.layout_approved_date) }}
         </template>
     </v-data-table-server>
 </template>

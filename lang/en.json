@@ -329,6 +329,15 @@
     "fields.Sent to manufacturer": "Sent to manufacturer",
     "fields.Quantity": "Quantity",
     "fields.Serialization type": "Serialization type",
+    "fields.Price": "Price",
+    "fields.Total price": "Total price",
+    "fields.Layout approved date": "Layout approved date",
+    "fields.Prepayment completion date": "Prepayment completion date",
+    "fields.Production end date": "Production end date",
+    "fields.Final payment request date": "Final payment request date",
+    "fields.Final payment completion date": "Final payment completion date",
+    "fields.Ready for shipment": "Ready for shipment",
+    "fields.Production status": "Production status",
 
     "AAAAAAAAAAAAAA": "AAAAAAAAAAAAAA"
 }

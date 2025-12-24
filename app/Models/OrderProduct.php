@@ -162,6 +162,16 @@ class OrderProduct extends Model implements HasTitleAttribute
     {
         $this->append([
             'base_model_class',
+            'status',
+        ]);
+
+        $this->order->append([
+            'title',
+        ]);
+
+        $this->process->append([
+            'full_english_product_label',
+            'full_russian_product_label',
         ]);
     }
 
@@ -581,17 +591,6 @@ class OrderProduct extends Model implements HasTitleAttribute
     /**
      * AJAX request by PLD
      */
-    public static function storeByPLDFromRequest(PLDOrderProductStoreRequest $request): void
-    {
-        $record = self::create($request->safe());
-
-        // HasMany relations
-        $record->storeCommentFromRequest($request);
-    }
-
-    /**
-     * AJAX request by PLD
-     */
     public function updateByPLDFromRequest(PLDOrderProductUpdateRequest $request): void
     {
         $this->update($request->safe());
@@ -751,14 +750,14 @@ class OrderProduct extends Model implements HasTitleAttribute
 
     public static function getPLDTableHeadersForUser($user): array|null
     {
-        if (Gate::forUser($user)->denies(Permission::extractAbilityName(Permission::CAN_VIEW_PLD_ORDERS_NAME))) {
+        if (Gate::forUser($user)->denies(Permission::extractAbilityName(Permission::CAN_VIEW_PLD_ORDER_PRODUCTS_NAME))) {
             return null;
         }
 
         $order = 1;
         $columns = array();
 
-        if (Gate::forUser($user)->allows(Permission::extractAbilityName(Permission::CAN_EDIT_PLD_ORDERS_NAME))) {
+        if (Gate::forUser($user)->allows(Permission::extractAbilityName(Permission::CAN_EDIT_PLD_ORDER_PRODUCTS_NAME))) {
             array_push(
                 $columns,
                 ['title' => 'Record', 'key' => 'edit', 'width' => 60, 'sortable' => false, 'visible' => 1, 'order' => $order++],
@@ -766,29 +765,30 @@ class OrderProduct extends Model implements HasTitleAttribute
         }
 
         $additionalColumns = [
-            ['title' => 'fields.BDM', 'key' => 'bdm_user_id', 'width' => 146, 'sortable' => true],
-            ['title' => 'fields.Analyst', 'key' => 'analyst_user_id', 'width' => 146, 'sortable' => true],
-            ['title' => 'fields.Country', 'key' => 'country_id', 'width' => 144, 'sortable' => true],
-            ['title' => 'pages.IVP', 'key' => 'products_count', 'width' => 104, 'sortable' => true],
-            ['title' => 'fields.Manufacturer', 'key' => 'name', 'width' => 140, 'sortable' => true],
-            ['title' => 'fields.Category', 'key' => 'category_id', 'width' => 104, 'sortable' => true],
-            ['title' => 'fields.Status', 'key' => 'active', 'width' => 106, 'sortable' => true],
-            ['title' => 'properties.Important', 'key' => 'important', 'width' => 100, 'sortable' => true],
-            ['title' => 'fields.Product class', 'key' => 'product_classes_name', 'width' => 114, 'sortable' => false],
-            ['title' => 'fields.Zones', 'key' => 'zones_name', 'width' => 54, 'sortable' => false],
-            ['title' => 'fields.Blacklist', 'key' => 'blacklists_name', 'width' => 120, 'sortable' => false],
-            ['title' => 'fields.Presence', 'key' => 'presences_name', 'width' => 128, 'sortable' => false],
-            ['title' => 'fields.Website', 'key' => 'website', 'width' => 180, 'sortable' => false],
-            ['title' => 'fields.About company', 'key' => 'about', 'width' => 240, 'sortable' => false],
-            ['title' => 'fields.Relationship', 'key' => 'relationship', 'width' => 200, 'sortable' => false],
+            ['title' => 'fields.Manufacturer', 'key' => 'order_manufacturer_id', 'width' => 140, 'sortable' => false],
+            ['title' => 'fields.Country', 'key' => 'order_country_id', 'width' => 80, 'sortable' => false],
+            ['title' => 'Order', 'key' => 'order_id', 'width' => 120, 'sortable' => true],
+            ['title' => 'fields.TM Eng', 'key' => 'process_trademark_en', 'width' => 146, 'sortable' => false],
+            ['title' => 'fields.TM Rus', 'key' => 'process_trademark_ru', 'width' => 146, 'sortable' => false],
+            ['title' => 'fields.MAH', 'key' => 'process_marketing_authorization_holder_id', 'width' => 102, 'sortable' => true],
+            ['title' => 'fields.Quantity', 'key' => 'quantity', 'width' => 112, 'sortable' => false],
+            ['title' => 'fields.Price', 'key' => 'price', 'width' => 70, 'sortable' => false],
+            ['title' => 'fields.Currency', 'key' => 'order_currency_id', 'width' => 84, 'sortable' => false],
+            ['title' => 'fields.Total price', 'key' => 'total_price', 'width' => 132, 'sortable' => false],
+            ['title' => 'Status', 'key' => 'status', 'width' => 120, 'sortable' => false],
+
             ['title' => 'Comments', 'key' => 'comments_count', 'width' => 132, 'sortable' => false],
-            ['title' => 'comments.Last', 'key' => 'last_comment_body', 'width' => 240, 'sortable' => false],
-            ['title' => 'comments.Date', 'key' => 'last_comment_created_at', 'width' => 116, 'sortable' => false],
-            ['title' => 'dates.Date of creation', 'key' => 'created_at', 'width' => 130, 'sortable' => true],
-            ['title' => 'dates.Update date', 'key' => 'updated_at', 'width' => 150, 'sortable' => true],
-            ['title' => 'pages.Meetings', 'key' => 'meetings_count', 'width' => 86, 'sortable' => true],
-            ['title' => 'ID', 'key' => 'id', 'width' => 62, 'sortable' => true],
-            ['title' => 'Attachments', 'key' => 'attachments_count', 'width' => 340, 'sortable' => true],
+            ['title' => 'comments.Last', 'key' => 'last_comment_body', 'width' => 200, 'sortable' => false],
+
+            ['title' => 'fields.Serialization type', 'key' => 'serialization_type_id', 'width' => 156, 'sortable' => true],
+            ['title' => 'fields.Production status', 'key' => 'production_status', 'width' => 160, 'sortable' => false],
+
+            ['title' => 'fields.Layout approved date', 'key' => 'layout_approved_date', 'width' => 170, 'sortable' => false],
+            ['title' => 'fields.Prepayment completion date', 'key' => 'production_prepayment_completed_date', 'width' => 216, 'sortable' => false],
+            ['title' => 'fields.Production end date', 'key' => 'production_end_date', 'width' => 218, 'sortable' => false],
+            ['title' => 'fields.Final payment request date', 'key' => 'production_final_payment_request_date', 'width' => 236, 'sortable' => false],
+            ['title' => 'fields.Final payment completion date', 'key' => 'production_final_payment_completed_date', 'width' => 264, 'sortable' => false],
+            ['title' => 'fields.Ready for shipment', 'key' => 'readiness_for_shipment_from_manufacturer_date', 'width' => 160, 'sortable' => false],
         ];
 
         foreach ($additionalColumns as $column) {

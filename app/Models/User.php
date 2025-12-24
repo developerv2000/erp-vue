@@ -689,7 +689,7 @@ class User extends Authenticatable
         $headersSettings = isset($settings['table_headers']) ? $settings['table_headers'] : [];
 
         $headersSettings[self::PLD_ORDERS_HEADERS_KEY] = Order::getPLDTableHeadersForUser($this);
-        // $headersSettings[self::PLD_ORDER_PRODUCTS_HEADERS_KEY] = OrderProduct::getPLDTableHeadersForUser($this);
+        $headersSettings[self::PLD_ORDER_PRODUCTS_HEADERS_KEY] = OrderProduct::getPLDTableHeadersForUser($this);
         // $headersSettings[self::PLD_INVOICES_HEADERS_KEY] = Invoice::getPLDTableHeadersForUser($this);
 
         $settings['table_headers'] = $headersSettings;

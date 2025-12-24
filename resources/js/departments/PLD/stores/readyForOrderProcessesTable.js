@@ -34,7 +34,7 @@ const defaultFilters = {
     marketing_authorization_holder_id: [],
 }
 
-const API_URL = route('api.ready-for-order-processes.get');
+const API_URL = route('api.pld.ready-for-order-processes.get');
 
 export const usePLDReadyForOrderProcessesTableStore = defineStore('PLDReadyForOrderProcessesTable', {
     state: () => ({

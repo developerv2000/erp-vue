@@ -41,6 +41,6 @@ const breadcrumbs = computed(() => [
             <template #title>{{ page.props.record.title }}</template>
         </PageIntro>
 
-        <!-- <OrderProductsEditForm /> -->
+        <OrderProductsEditForm />
     </MainLayout>
 </template>

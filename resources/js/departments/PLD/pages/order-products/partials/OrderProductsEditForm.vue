@@ -7,13 +7,13 @@ import { object, number } from "yup";
 import { useVeeFormFields } from "@/core/composables/useVeeFormFields";
 import { useFormData } from "@/core/composables/useFormData";
 import { useMessagesStore } from "@/core/stores/messages";
+import { useGlobalStore } from "@/core/stores/global";
 
 import DefaultSheet from "@/core/components/containers/DefaultSheet.vue";
 import DefaultTitle from "@/core/components/titles/DefaultTitle.vue";
-import DefaultTextField from "@/core/components/form/inputs/DefaultTextField.vue";
 import DefaultAutocomplete from "@/core/components/form/inputs/DefaultAutocomplete.vue";
 import DefaultWysiwyg from "@/core/components/form/inputs/DefaultWysiwyg.vue";
-import DefaultDateInput from "@/core/components/form/inputs/DefaultDateInput.vue";
+import DefaultNumberInput from "@/core/components/form/inputs/DefaultNumberInput.vue";
 import FormActionsContainer from "@/core/components/form/containers/FormActionsContainer.vue";
 import FormResetButton from "@/core/components/form/buttons/FormResetButton.vue";
 import FormUpdateAndRedirectBack from "@/core/components/form/buttons/FormUpdateAndRedirectBack.vue";
@@ -24,10 +24,13 @@ const { t } = useI18n();
 const { objectToFormData } = useFormData();
 const page = usePage();
 const messages = useMessagesStore();
+const globalStore = useGlobalStore();
 
 const record = computed(() => page.props.record);
 const loading = ref(false);
 const redirectBack = ref(false);
+const readyForOrderProcesses = ref(page.props.readyForOrderProcesses);
+const mahOptions = ref(page.props.mahOptions);
 
 // Yup schema
 const schema = computed(() => {
@@ -38,7 +41,7 @@ const schema = computed(() => {
     };
 
     // After confirmation inputs
-    if (record.value.is_sent_to_confirmation) {
+    if (record.value?.is_sent_to_confirmation) {
         base.price = number().required();
     }
 
@@ -47,6 +50,7 @@ const schema = computed(() => {
 
 // Backend-driven values (reactive to record)
 const baseInitialValues = computed(() => ({
+    ready_for_order_process_id: record.value.process_id,
     process_id: record.value.process_id,
     quantity: record.value.quantity,
     serialization_type_id: record.value.serialization_type_id,
@@ -107,13 +111,39 @@ const submit = handleSubmit((values) => {
 
 const reloadRequiredDataAndResetForm = () => {
     router.reload({
-        only: ["record"],
+        only: ["record", "readyForOrderProcesses"],
         onSuccess: () => {
             resetForm({
                 values: mergedInitialValues.value,
             });
         },
     });
+};
+
+const updateMAHOptions = async (processId) => {
+    if (!processId) {
+        mahOptions.value = [];
+        values.process_id = null;
+        return;
+    }
+
+    globalStore.loading = true;
+
+    try {
+        const response = await axios.get(
+            route("pld.get-process-with-it-similar-records-for-order", {
+                process_id: processId,
+            })
+        );
+
+        mahOptions.value = response.data ?? [];
+    } catch (error) {
+        mahOptions.value = [];
+        messages.addSubmitionFailedMessage();
+    } finally {
+        values.process_id = null;
+        globalStore.loading = false;
+    }
 };
 </script>
 
@@ -129,9 +159,7 @@ const reloadRequiredDataAndResetForm = () => {
                         v-model="values.ready_for_order_process_id"
                         :items="readyForOrderProcesses"
                         item-title="full_english_product_label_with_id"
-                        @update:modelValue="
-                            (processId) => updateMAHOptions(field, processId)
-                        "
+                        @update:modelValue="updateMAHOptions"
                         required
                     />
                 </v-col>
@@ -173,9 +201,7 @@ const reloadRequiredDataAndResetForm = () => {
                     <DefaultNumberInput
                         :label="t('fields.Price')"
                         v-model="values.price"
-                        :error-messages="
-                            errors.price
-                        "
+                        :error-messages="errors.price"
                         :min="0"
                         :precision="2"
                         :step="0.01"

@@ -26,7 +26,7 @@ class PLDHelperController extends Controller
     /**
      * AJAX request
      *
-     * Used on 'pld.orders.create' page to fetch 'ready for order processes'
+     * Used on 'pld.orders.create' and 'pld.order-products.edit' pages to fetch 'MAH options'
      * of the selected manufacturer and country and Trademark EN.
      */
     public function getProcessWithItSimilarRecordsForOrder(Request $request)

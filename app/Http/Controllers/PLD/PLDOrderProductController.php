@@ -44,11 +44,20 @@ class PLDOrderProductController extends Controller
         $record->appendBasicAttributes();
         $record->append('title'); // Used on generating breadcrumbs
 
+        $getReadyForOrderProcesses = fn() => $record->order->manufacturer->getReadyForOrderProcessesOfCountry(
+            $record->order->country_id,
+            appendFullEnglishProductLabelWithId: true
+        );
+
+        $getMahOptions = fn() => $record->process->getSelfWithSimilarRecordsForOrder(appendMAHNameWithID: true);
+
         return Inertia::render('departments/PLD/pages/order-products/Edit', [
             // Refetched after record update
             'record' => $record,
+            'readyForOrderProcesses' => $getReadyForOrderProcesses,
 
             // Lazy loads. Never refetched again
+            'mahOptions' => $getMahOptions,
             'serializationTypes' => SerializationType::defaultOrdered()->get(),
         ]);
     }

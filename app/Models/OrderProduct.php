@@ -593,7 +593,7 @@ class OrderProduct extends Model implements HasTitleAttribute
      */
     public function updateByPLDFromRequest(PLDOrderProductUpdateRequest $request): void
     {
-        $this->update($request->safe());
+        $this->update($request->all());
 
         // HasMany relations
         $this->storeCommentFromRequest($request);
@@ -604,7 +604,7 @@ class OrderProduct extends Model implements HasTitleAttribute
      */
     public function updateByCMDFromRequest(CMDOrderProductUpdateRequest $request): void
     {
-        $this->update($request->safe());
+        $this->update($request->all());
 
         // HasMany relations
         $this->storeCommentFromRequest($request);

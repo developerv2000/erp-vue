@@ -27,7 +27,7 @@ const listItems = computed(() => [
         title: t("pages.Roles"),
         routeName: "administration.roles.index",
         routeParams: null,
-        activeOnRoutes: "admiistration.roles.index",
+        activeOnRoutes: "administration.roles.index",
         prependIcon: mdiAccountTie,
     },
 

@@ -37,9 +37,9 @@ const defaultFilters = {
     country_id: [],
 }
 
-const API_URL = route('api.pld.orders.get');
+const API_URL = route('api.cmd.orders.get');
 
-export const usePLDOrdersTableStore = defineStore('PLDOrdersTable', {
+export const useCMDOrdersTableStore = defineStore('CMDOrdersTable', {
     state: () => ({
         records: [],
         loading: false,

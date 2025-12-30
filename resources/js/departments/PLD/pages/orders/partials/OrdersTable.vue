@@ -15,8 +15,8 @@ import TdInertiaLink from "@/core/components/table/td/TdInertiaLink.vue";
 import TogglableThreeLinesLimitedText from "@/core/components/misc/TogglableThreeLinesLimitedText.vue";
 import TdRecordCommentsLink from "@/core/components/table/td/TdRecordCommentsLink.vue";
 import TableNavigateToPage from "@/core/components/table/misc/TableNavigateToPage.vue";
-import TdOrderStatus from "@/core/components/table/td/shared/TdOrderStatus.vue";
-import { mdiArrowRight, mdiPencil } from "@mdi/js";
+import TdOrderStatus from "@/core/components/table/td/shared/orders/TdOrderStatus.vue";
+import TdOrderSentToBdm from "@/core/components/table/td/shared/orders/TdOrderSentToBdm.vue";
 
 const { t } = useI18n();
 const { get } = useQueryParams();
@@ -132,12 +132,16 @@ const handleTableOptionsUpdate = (options) => {
             <TdOrderStatus :status="item.status" />
         </template>
 
-        <template #item.name="{ item }">
-            {{ item.name }}
+        <template #item.sent_to_bdm_date="{ item }">
+            <template v-if="item.is_sent_to_bdm">
+                {{ formatDate(item.sent_to_bdm_date) }}
+            </template>
+
+            <TdOrderSentToBdm v-else :order-id="item.id" />
         </template>
 
-        <template #item.sent_to_bdm_date="{ item }">
-            {{ formatDate(item.sent_to_bdm_date) }}
+        <template #item.name="{ item }">
+            {{ item.name }}
         </template>
 
         <template #item.purchase_date="{ item }">

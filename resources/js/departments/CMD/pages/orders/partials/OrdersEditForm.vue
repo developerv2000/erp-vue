@@ -1,31 +1,29 @@
 <script setup>
-import { ref, computed, watch } from "vue";
+import { ref, computed } from "vue";
 import { usePage, router } from "@inertiajs/vue3";
 import { useI18n } from "vue-i18n";
 import { Form, useForm } from "vee-validate";
-import { object, string, number, date } from "yup";
+import { object, string, number, date, array } from "yup";
 import { useVeeFormFields } from "@/core/composables/useVeeFormFields";
 import { useFormData } from "@/core/composables/useFormData";
 import { useMessagesStore } from "@/core/stores/messages";
-import { useDateFormatter } from "@/core/composables/useDateFormatter";
 
 import DefaultSheet from "@/core/components/containers/DefaultSheet.vue";
 import DefaultTitle from "@/core/components/titles/DefaultTitle.vue";
 import DefaultTextField from "@/core/components/form/inputs/DefaultTextField.vue";
 import DefaultAutocomplete from "@/core/components/form/inputs/DefaultAutocomplete.vue";
 import DefaultWysiwyg from "@/core/components/form/inputs/DefaultWysiwyg.vue";
-import DefaultDateInput from "@/core/components/form/inputs/DefaultDateInput.vue";
 import FormActionsContainer from "@/core/components/form/containers/FormActionsContainer.vue";
 import FormResetButton from "@/core/components/form/buttons/FormResetButton.vue";
 import FormUpdateAndRedirectBack from "@/core/components/form/buttons/FormUpdateAndRedirectBack.vue";
 import FormUpdateWithourRedirect from "@/core/components/form/buttons/FormUpdateWithourRedirect.vue";
+import DefaultNumberInput from "@/core/components/form/inputs/DefaultNumberInput.vue";
 
 // Dependencies
 const { t } = useI18n();
 const { objectToFormData } = useFormData();
 const page = usePage();
 const messages = useMessagesStore();
-const { removeDateTimezonesFromFormData } = useDateFormatter();
 
 const record = computed(() => page.props.record);
 const loading = ref(false);
@@ -34,15 +32,20 @@ const redirectBack = ref(false);
 // Yup schema
 const schema = computed(() => {
     const base = {
-        manufacturer_id: number().required(),
-        country_id: number().required(),
-        receive_date: date().required(),
+        name: string().required(),
+        currency_id: number().required(),
+
+        products: array().of(
+            object({
+                price: number().required(),
+                production_status: string().nullable(),
+            })
+        ),
     };
 
     // After confirmation inputs
-    if (record.value?.is_sent_to_confirmation) {
-        base.name = string().required();
-        base.currency_id = number().required();
+    if (record.value.is_sent_to_manufacturer) {
+        base.expected_dispatch_date = date().nullable();
     }
 
     return object(base);
@@ -50,11 +53,26 @@ const schema = computed(() => {
 
 // Backend-driven values (reactive to record)
 const baseInitialValues = computed(() => ({
-    manufacturer_id: record.value.manufacturer_id,
-    country_id: record.value.country_id,
-    receive_date: record.value.receive_date,
     name: record.value.name,
-    currency_id: record.value.currency_id,
+    currency_id:
+        record.value.currency_id ?? page.props.defaultSelectedCurrencyID,
+
+    products: record.value.products.map((p) => ({
+        id: p.id,
+        full_english_product_label: p.process.full_english_product_label,
+        mah_name: p.process.mah.name,
+        last_comment: p.last_comment?.plain_text,
+        quantity: p.quantity,
+        price: Number(p.price ?? p.process.agreed_price),
+
+        production_status: record.production_is_started
+            ? p.production_status
+            : null,
+    })),
+
+    expected_dispatch_date: record.value.is_sent_to_manufacturer
+        ? record.value.expected_dispatch_date
+        : null,
 }));
 
 // Always-reset values
@@ -80,12 +98,10 @@ const { values } = useVeeFormFields(Object.keys(mergedInitialValues.value));
 // Submit handler
 const submit = handleSubmit((values) => {
     const formData = objectToFormData(values);
-    removeDateTimezonesFromFormData(formData);
-
     loading.value = true;
 
     axios
-        .post(route("pld.orders.update", { record: record.value.id }), formData)
+        .post(route("cmd.orders.update", { record: record.value.id }), formData)
         .then(() => {
             messages.addUpdatedSuccessfullyMessage();
 
@@ -122,63 +138,94 @@ const reloadRequiredDataAndResetForm = () => {
 
 <template>
     <Form class="d-flex flex-column ga-6 pb-8" enctype="multipart/form-data">
+        <!-- Order -->
         <DefaultSheet>
-            <DefaultTitle>{{ t("departments.PLD") }}</DefaultTitle>
+            <DefaultTitle>{{ t("Order") }}</DefaultTitle>
 
             <v-row>
-                <v-col cols="4">
-                    <DefaultAutocomplete
-                        :label="t('fields.Manufacturer')"
-                        :items="page.props.manufacturers"
-                        v-model="values.manufacturer_id"
-                        :error-messages="errors.manufacturer_id"
-                        required
-                    />
-                </v-col>
-
-                <v-col cols="4">
-                    <DefaultAutocomplete
-                        :label="t('fields.Country')"
-                        :items="page.props.countriesOrderedByProcessesCount"
-                        item-title="code"
-                        v-model="values.country_id"
-                        :error-messages="errors.country_id"
-                        required
-                    />
-                </v-col>
-
-                <v-col cols="4">
-                    <DefaultDateInput
-                        :label="t('dates.Receive')"
-                        v-model="values.receive_date"
-                        :error-messages="errors.receive_date"
-                        value-format="yyyy-MM-dd"
-                        required
-                    />
-                </v-col>
-            </v-row>
-        </DefaultSheet>
-
-        <DefaultSheet v-if="record.is_sent_to_confirmation">
-            <DefaultTitle>{{ t("departments.CMD") }}</DefaultTitle>
-
-            <v-row>
-                <v-col cols="4">
+                <v-col>
                     <DefaultTextField
                         :label="t('fields.Name')"
-                        v-model="values.Name"
-                        :error-messages="errors.Name"
+                        v-model="values.name"
+                        :error-messages="errors.name"
                         required
                     />
                 </v-col>
 
-                <v-col cols="4">
+                <v-col>
                     <DefaultAutocomplete
                         :label="t('fields.Currency')"
                         :items="page.props.currencies"
                         v-model="values.currency_id"
                         :error-messages="errors.currency_id"
                         required
+                    />
+                </v-col>
+
+                <v-col v-if="record.production_is_started">
+                    <DefaultTextField
+                        :label="t('dates.Expected dispatch')"
+                        v-model="values.expected_dispatch_date"
+                        :error-messages="errors.expected_dispatch_date"
+                        required
+                    />
+                </v-col>
+            </v-row>
+        </DefaultSheet>
+
+        <!-- Products -->
+        <DefaultSheet>
+            <DefaultTitle>{{ t("Products") }}</DefaultTitle>
+
+            <v-row v-for="product in values.products" :key="product.id">
+                <v-col>
+                    <DefaultTextField
+                        :label="t('fields.TM Eng')"
+                        v-model="product.full_english_product_label"
+                        disabled
+                    />
+                </v-col>
+
+                <v-col>
+                    <DefaultTextField
+                        :label="t('fields.MAH')"
+                        v-model="product.mah_name"
+                        disabled
+                    />
+                </v-col>
+
+                <v-col>
+                    <DefaultTextField
+                        :label="t('comments.Last')"
+                        v-model="product.last_comment"
+                        disabled
+                    />
+                </v-col>
+
+                <v-col v-if="!record.production_is_started">
+                    <DefaultTextField
+                        :label="t('fields.Quantity')"
+                        v-model="product.quantity"
+                        disabled
+                    />
+                </v-col>
+
+                <v-col>
+                    <DefaultNumberInput
+                        :label="t('fields.Price')"
+                        v-model="product.price"
+                        :error-messages="errors.price"
+                        :min="0"
+                        :precision="2"
+                        :step="0.01"
+                        required
+                    />
+                </v-col>
+
+                <v-col v-if="record.production_is_started">
+                    <DefaultTextField
+                        :label="t('fields.Production status')"
+                        v-model="product.production_status"
                     />
                 </v-col>
             </v-row>

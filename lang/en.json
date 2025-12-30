@@ -8,6 +8,21 @@
     "Multiple records": "Multiple records",
     "History": "History",
 
+    "Product": "Product",
+    "product.About": "About product",
+    "Products": "Products",
+    "products.Matched ATX": "Matched ATX",
+
+    "Processes": "Processes",
+    "processes.add": "Add process",
+    "processes.count": "{count} processes",
+
+    "Order": "Order",
+    "Orders": "Orders",
+
+    "Invoice": "Invoice",
+    "Invoices": "Invoices",
+
     "validations.required": "This field is required.",
     "validations.invalid": "The value is invalid.",
     "validations.one_of": "Value must be one of: {values}.",
@@ -80,6 +95,7 @@
     "actions.Apply": "Apply",
     "actions.Check": "Check",
     "actions.Go to page": "Go to page",
+    "actions.Send": "Send",
     "actions.Store": "Store",
     "actions.Store and redirect back": "Store and redirect back",
     "actions.Store and reset form": "Store and reset form",
@@ -132,6 +148,7 @@
     "notifications.Mark selected as read": "Mark as read",
     "notifications.Process stage updated to contract": "Status of process #{process_id} has been updated to {status_name}.",
     "notifications.New product for order received": "New product for order has been received",
+    "notifications.New order received": "New order received",
 
     "files.Generating": "Generating file",
     "files.Download started": "Download started",
@@ -167,6 +184,18 @@
     "dates.Readiness": "Readiness date",
     "dates.Receive": "Receive date",
     "dates.Confirmation": "Confirmation date",
+    "dates.Sent to confirmation": "Sent to confirmation date",
+    "dates.PO": "PO date",
+    "dates.Sent to BDM": "Sent to BDM date",
+    "dates.Sent to manufacturer": "Sent to manufacturer date",
+    "dates.Layout approved": "Layout approved date",
+    "dates.Prepayment completion": "Prepayment completion date",
+    "dates.Expected dispatch": "Expected dispatch date",
+    "dates.Production start": "Production start date",
+    "dates.Production end": "Production end date",
+    "dates.Final payment request": "Final payment request date",
+    "dates.Final payment completion": "Final payment completion date",
+    "dates.Ready for shipment": "Ready for shipment date",
 
     "Days": "Days",
     "days.past": "Days past",
@@ -198,18 +227,6 @@
 
     "Similar records": "Similar records",
     "similar records.Not found": "Similar records not found.",
-
-    "Product": "Product",
-    "product.About": "About product",
-    "Products": "Products",
-    "products.Matched ATX": "Matched ATX",
-
-    "Processes": "Processes",
-    "processes.add": "Add process",
-    "processes.count": "{count} processes",
-
-    "Order": "Order",
-    "Orders": "Orders",
 
     "Status": "Status",
     "status.Date": "Status date",
@@ -324,19 +341,10 @@
     "fields.Extensive version": "Extensive version",
 
     "fields.PO №": "PO №",
-    "fields.PO date": "PO date",
-    "fields.Sent to BDM": "Sent to BDM",
-    "fields.Sent to manufacturer": "Sent to manufacturer",
     "fields.Quantity": "Quantity",
     "fields.Serialization type": "Serialization type",
     "fields.Price": "Price",
     "fields.Total price": "Total price",
-    "fields.Layout approved date": "Layout approved date",
-    "fields.Prepayment completion date": "Prepayment completion date",
-    "fields.Production end date": "Production end date",
-    "fields.Final payment request date": "Final payment request date",
-    "fields.Final payment completion date": "Final payment completion date",
-    "fields.Ready for shipment": "Ready for shipment",
     "fields.Production status": "Production status",
 
     "AAAAAAAAAAAAAA": "AAAAAAAAAAAAAA"

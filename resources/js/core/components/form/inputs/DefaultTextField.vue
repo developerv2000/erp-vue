@@ -24,8 +24,8 @@ const inputAttrs = useAttrs();
             variant="outlined"
             density="compact"
             hide-details="auto"
-            v-bind="inputAttrs"
             clearable
+            v-bind="inputAttrs"
         />
     </WrappedLabelGroup>
 </template>

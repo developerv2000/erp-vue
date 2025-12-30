@@ -64,6 +64,11 @@ class User extends Authenticatable
     const PLD_ORDER_PRODUCTS_HEADERS_KEY = 'PLD_ORDER_PRODUCTS';
     const PLD_INVOICES_HEADERS_KEY = 'PLD_INVOICES';
 
+    // 3. CMD
+    const CMD_ORDERS_HEADERS_KEY = 'CMD_ORDERS';
+    const CMD_ORDER_PRODUCTS_HEADERS_KEY = 'CMD_ORDER_PRODUCTS';
+    const CMD_INVOICES_HEADERS_KEY = 'CMD_INVOICES';
+
     /*
     |--------------------------------------------------------------------------
     | Properties
@@ -569,6 +574,7 @@ class User extends Authenticatable
         // Table headers
         $this->resetMADTableHeaders($settings);
         $this->resetPLDTableHeaders($settings);
+        $this->resetCMDTableHeaders($settings);
     }
 
     /**
@@ -610,6 +616,11 @@ class User extends Authenticatable
             self::PLD_ORDERS_HEADERS_KEY => Order::getPLDTableHeadersForUser($this),
             self::PLD_ORDER_PRODUCTS_HEADERS_KEY => OrderProduct::getPLDTableHeadersForUser($this),
             self::PLD_INVOICES_HEADERS_KEY => Invoice::getPLDTableHeadersForUser($this),
+
+            // CMD
+            self::CMD_ORDERS_HEADERS_KEY => Order::getCMDTableHeadersForUser($this),
+            self::CMD_ORDER_PRODUCTS_HEADERS_KEY => OrderProduct::getCMDTableHeadersForUser($this),
+            self::CMD_INVOICES_HEADERS_KEY => Invoice::getCMDTableHeadersForUser($this),
 
             default => throw new InvalidArgumentException("Unknown key: $key"),
         };
@@ -691,6 +702,21 @@ class User extends Authenticatable
         $headersSettings[self::PLD_ORDERS_HEADERS_KEY] = Order::getPLDTableHeadersForUser($this);
         $headersSettings[self::PLD_ORDER_PRODUCTS_HEADERS_KEY] = OrderProduct::getPLDTableHeadersForUser($this);
         // $headersSettings[self::PLD_INVOICES_HEADERS_KEY] = Invoice::getPLDTableHeadersForUser($this);
+
+        $settings['table_headers'] = $headersSettings;
+        $this->settings = $settings;
+        $this->save();
+    }
+
+    public function resetCMDTableHeaders($settings): void
+    {
+        $this->refresh();
+        $settings = $this->settings;
+        $headersSettings = isset($settings['table_headers']) ? $settings['table_headers'] : [];
+
+        $headersSettings[self::CMD_ORDERS_HEADERS_KEY] = Order::getCMDTableHeadersForUser($this);
+        // $headersSettings[self::CMD_ORDER_PRODUCTS_HEADERS_KEY] = OrderProduct::getCMDTableHeadersForUser($this);
+        // $headersSettings[self::CMD_INVOICES_HEADERS_KEY] = Invoice::getCMDTableHeadersForUser($this);
 
         $settings['table_headers'] = $headersSettings;
         $this->settings = $settings;
@@ -888,6 +914,9 @@ class User extends Authenticatable
 
             // PLD
             'pld.orders.index' => 'view-PLD-orders',
+
+            // CMD
+            'cmd.orders.index' => 'view-CMD-orders',
         ];
 
         foreach ($homepageRoutes as $routeName => $gate) {

@@ -1,5 +1,5 @@
 <script setup>
-import TdMediumWeightText from "../TdMediumWeightText.vue";
+import TdMediumWeightText from '../../TdMediumWeightText.vue';
 
 defineProps({
     status: String,
@@ -10,7 +10,7 @@ defineProps({
     <TdMediumWeightText
         :class="{
             'text-grey': status == 'Created',
-            'text-yellow': status == 'Sent to BDM',
+            'text-yellow-darken-2': status == 'Sent to BDM',
             'text-orange': status == 'Sent to confirmation',
             'text-green': status == 'Confirmed',
             'text-blue': status == 'Sent to manufacturer',

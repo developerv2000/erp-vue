@@ -11,25 +11,24 @@ const { t } = useI18n();
 
 <template>
     <p>
-        {{ t("notifications.New product for order received") }}:
+        {{ t("notifications.New order received") }}:
 
         <InertiaLink
             class="text-primary"
             :link="
-                route('pld.ready-for-order-processes.index', {
-                    'id[]': data.process_id,
+                route('cmd.orders.index', {
+                    'id[]': data.order_id,
                     initialize_from_inertia_page: true,
                 })
             "
         >
-            <strong>{{ data.full_english_product_label }}</strong>
+            <strong># {{ data.order_id }}</strong>
         </InertiaLink>
     </p>
 
     <p>
+        {{ t("Products") }}: {{ data.products_count }}<br />
         {{ t("fields.Manufacturer") }}: {{ data.manufacturer }}<br />
-        {{ t("fields.Country") }}: {{ data.country }}<br />
-        {{ t("fields.MAH") }}:
-        {{ data.marketing_authorization_holder }}
+        {{ t("fields.Country") }}: {{ data.country }}
     </p>
 </template>

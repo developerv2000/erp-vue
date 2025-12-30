@@ -25,6 +25,8 @@ Route::prefix('pld')->name('pld.')->middleware('auth', 'auth.session')->group(fu
             'can:view-PLD-orders',
             'can:edit-PLD-orders'
         );
+
+        Route::post('/sent-to-bdm/{record}', 'sentToBDM')->name('sent-to-bdm');  // AJAX request
     });
 
     // Order products

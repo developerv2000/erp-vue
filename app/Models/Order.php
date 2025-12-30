@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Http\Requests\CMD\CMDOrderUpdateRequest;
 use App\Http\Requests\PLD\PLDOrderStoreRequest;
 use App\Http\Requests\PLD\PLDOrderUpdateRequest;
+use App\Notifications\OrderSentToBdm;
 use App\Support\Contracts\Model\HasTitleAttribute;
 use App\Support\Helpers\ModelHelper;
 use App\Support\Helpers\QueryFilterHelper;
@@ -139,6 +140,11 @@ class Order extends Model implements HasTitleAttribute
         $this->append([
             'base_model_class',
             'status',
+            'is_sent_to_bdm',
+            'is_sent_to_confirmation',
+            'is_confirmed',
+            'is_sent_to_manufacturer',
+            'production_is_started',
         ]);
     }
 
@@ -354,6 +360,48 @@ class Order extends Model implements HasTitleAttribute
         return $records;
     }
 
+    /**
+     * Build and execute a model query based on request parameters.
+     *
+     * Steps:
+     *  - Apply default relations & counts
+     *  - Apply soft delete scope (if requested)
+     *  - Normalize query params (pagination, sorting, etc.)
+     *  - Apply filters
+     *  - Finalize query with sorting & pagination
+     *  - Append basic attributes (if requested and unless returning raw query)
+     *
+     * @param $action  ('paginate', 'get' or 'query')
+     * @return mixed
+     */
+    public static function queryCMDRecordsFromRequest(Request $request, string $action = 'paginate', bool $appendAttributes = false)
+    {
+        $query = self::onlySentToBdm()
+            ->withBasicRelations()
+            ->withBasicRelationCounts();
+
+        // Normalize request parameters
+        self::addDefaultQueryParamsToRequest(
+            $request,
+            'DEFAULT_CMD_ORDER_BY',
+            'DEFAULT_CMD_ORDER_DIRECTION',
+            'DEFAULT_CMD_PER_PAGE'
+        );
+
+        // Apply filters
+        self::filterQueryForRequest($query, $request);
+
+        // Finalize (sorting & pagination)
+        $records = ModelHelper::finalizeQueryForRequest($query, $request, $action);
+
+        // Append attributes unless raw query is requested
+        if ($appendAttributes && $action !== 'query') {
+            self::appendRecordsBasicAttributes($records);
+        }
+
+        return $records;
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Filtering
@@ -530,7 +578,7 @@ class Order extends Model implements HasTitleAttribute
      */
     public function updateByCMDFromRequest(CMDOrderUpdateRequest $request): void
     {
-        $this->update($request->safe());
+        $this->update($request->all());
 
         // Update 'purchase_date'
         if (is_null($this->purchase_date)) {
@@ -543,8 +591,8 @@ class Order extends Model implements HasTitleAttribute
         $this->storeCommentFromRequest($request);
 
         // Update products
-        foreach ($request->products as $id => $product) {
-            $orderProduct = $this->products()->findOrFail($id);
+        foreach ($request->products as $product) {
+            $orderProduct = $this->products()->findOrFail($product['id']);
 
             $orderProduct->update([
                 'price' => $product['price'],
@@ -593,6 +641,23 @@ class Order extends Model implements HasTitleAttribute
 
     /*
     |--------------------------------------------------------------------------
+    | Actions
+    |--------------------------------------------------------------------------
+    */
+
+    public function sendToBdm(): void
+    {
+        if (!$this->is_sent_to_bdm) {
+            $this->sent_to_bdm_date = now();
+            $this->save();
+
+            $notification = new OrderSentToBdm($this);
+            User::notifyUsersBasedOnPermission($notification, 'receive-notification-when-PLD-order-is-sent-to-CMD-BDM');
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Table headers
     |--------------------------------------------------------------------------
     */
@@ -619,16 +684,68 @@ class Order extends Model implements HasTitleAttribute
             ['title' => 'dates.Receive', 'key' => 'receive_date', 'width' => 142, 'sortable' => true],
             ['title' => 'fields.Manufacturer', 'key' => 'manufacturer_id', 'width' => 140, 'sortable' => true],
             ['title' => 'fields.Country', 'key' => 'country_id', 'width' => 80, 'sortable' => true],
-            ['title' => 'Products', 'key' => 'products_count', 'width' => 144, 'sortable' => false],
+            ['title' => 'Products', 'key' => 'products_count', 'width' => 100, 'sortable' => false],
             ['title' => 'Comments', 'key' => 'comments_count', 'width' => 132, 'sortable' => false],
             ['title' => 'comments.Last', 'key' => 'last_comment_body', 'width' => 200, 'sortable' => false],
             ['title' => 'Status', 'key' => 'status', 'width' => 120, 'sortable' => false],
-            ['title' => 'fields.Sent to BDM', 'key' => 'sent_to_bdm_date', 'width' => 160, 'sortable' => true],
+            ['title' => 'dates.Sent to BDM', 'key' => 'sent_to_bdm_date', 'width' => 160, 'sortable' => true],
 
             ['title' => 'fields.PO №', 'key' => 'name', 'width' => 136, 'sortable' => true],
-            ['title' => 'fields.PO date', 'key' => 'purchase_date', 'width' => 120, 'sortable' => true],
+            ['title' => 'dates.PO', 'key' => 'purchase_date', 'width' => 120, 'sortable' => true],
             ['title' => 'dates.Confirmation', 'key' => 'confirmation_date', 'width' => 172, 'sortable' => true],
-            ['title' => 'fields.Sent to manufacturer', 'key' => 'sent_to_manufacturer_date', 'width' => 168, 'sortable' => true],
+            ['title' => 'dates.Sent to manufacturer', 'key' => 'sent_to_manufacturer_date', 'width' => 168, 'sortable' => true],
+        ];
+
+        foreach ($additionalColumns as $column) {
+            array_push($columns, [
+                ...$column,
+                'visible' => 1,
+                'order' => $order++,
+            ]);
+        }
+
+        return $columns;
+    }
+
+    public static function getCMDTableHeadersForUser($user): array|null
+    {
+        if (Gate::forUser($user)->denies(Permission::extractAbilityName(Permission::CAN_VIEW_CMD_ORDERS_NAME))) {
+            return null;
+        }
+
+        $order = 1;
+        $columns = array();
+
+        if (Gate::forUser($user)->allows(Permission::extractAbilityName(Permission::CAN_EDIT_CMD_ORDERS_NAME))) {
+            array_push(
+                $columns,
+                ['title' => 'Record', 'key' => 'edit', 'width' => 60, 'sortable' => false, 'visible' => 1, 'order' => $order++],
+            );
+        }
+
+        $additionalColumns = [
+            ['title' => 'ID', 'key' => 'id', 'width' => 62, 'sortable' => true],
+            ['title' => 'fields.BDM', 'key' => 'manufacturer_bdm', 'width' => 146, 'sortable' => false],
+            ['title' => 'dates.Receive', 'key' => 'receive_date', 'width' => 142, 'sortable' => true],
+            ['title' => 'fields.Manufacturer', 'key' => 'manufacturer_id', 'width' => 140, 'sortable' => true],
+            ['title' => 'fields.Country', 'key' => 'country_id', 'width' => 80, 'sortable' => true],
+            ['title' => 'Products', 'key' => 'products_count', 'width' => 100, 'sortable' => false],
+            ['title' => 'Comments', 'key' => 'comments_count', 'width' => 132, 'sortable' => false],
+            ['title' => 'comments.Last', 'key' => 'last_comment_body', 'width' => 200, 'sortable' => false],
+            ['title' => 'Status', 'key' => 'status', 'width' => 120, 'sortable' => false],
+            ['title' => 'dates.Sent to BDM', 'key' => 'sent_to_bdm_date', 'width' => 160, 'sortable' => true],
+
+            ['title' => 'fields.PO №', 'key' => 'name', 'width' => 136, 'sortable' => true],
+            ['title' => 'dates.PO', 'key' => 'purchase_date', 'width' => 120, 'sortable' => true],
+            ['title' => 'fields.Currency', 'key' => 'currency_id', 'width' => 86, 'sortable' => true],
+            ['title' => 'dates.Sent to confirmation', 'key' => 'sent_to_confirmation_date', 'width' => 244, 'sortable' => true],
+            ['title' => 'dates.Confirmation', 'key' => 'confirmation_date', 'width' => 172, 'sortable' => true],
+            ['title' => 'dates.Sent to manufacturer', 'key' => 'sent_to_manufacturer_date', 'width' => 168, 'sortable' => true],
+            ['title' => 'dates.Expected dispatch', 'key' => 'expected_dispatch_date', 'width' => 204, 'sortable' => true],
+            ['title' => 'Invoices', 'key' => 'invoices_count', 'width' => 216, 'sortable' => false],
+            ['title' => 'dates.Production start', 'key' => 'production_start_date', 'width' => 204, 'sortable' => true],
+            ['title' => 'dates.Date of creation', 'key' => 'created_at', 'width' => 130, 'sortable' => true],
+            ['title' => 'dates.Update date', 'key' => 'updated_at', 'width' => 150, 'sortable' => true],
         ];
 
         foreach ($additionalColumns as $column) {

@@ -87,6 +87,23 @@ class PLDOrderController extends Controller
         ]);
     }
 
+    /**
+     * AJAX request
+     */
+    public function sentToBDM(Order $record)
+    {
+        $record->sendToBdm();
+
+        // Return refetched updated record
+        $record = Order::withBasicRelations()
+            ->withBasicRelationCounts()
+            ->findOrFail($record->id);
+
+        $record->appendBasicAttributes();
+
+        return $record;
+    }
+
     private function getfilterDependencies(): array
     {
         return [

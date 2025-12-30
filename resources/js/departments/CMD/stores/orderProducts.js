@@ -2,7 +2,6 @@ import { defineStore } from 'pinia'
 import { router } from '@inertiajs/vue3'
 import axios from 'axios';
 import { cleanQueryParams, normalizeDateRangesFromQuery, normalizeDateRangesToQueryFormat, normalizeMultiIDsFromQuery, normalizeSingleIDsFromQuery } from '@/core/scripts/queryHelper';
-import { createRecordActions } from '@/core/stores/helpers/createRecordActions';
 
 const defaultPaginationOptions = {
     page: 1,
@@ -16,30 +15,30 @@ const defaultPaginationOptions = {
 
 const defaultFilters = {
     // Date ranges
-    receive_date: null,
-    sent_to_bdm_date: null,
-    sent_to_manufacturer_date: null,
     created_at: null,
     updated_at: null,
 
     // Singular autocompletes
     status: null,
+    process_trademark_en: null,
+    process_trademark_ru: null,
 
     // Singular id-based autocompletes
-    manufacturer_bdm_user_id: null,
+    order_manufacturer_bdm_user_id: null,
 
     // Multiple autocompletes
-    name: [],
+    order_name: [],
     id: [],
 
     // Multiple id-based autocompletes
-    manufacturer_id: [],
-    country_id: [],
+    order_manufacturer_id: [],
+    process_country_id: [],
+    process_marketing_authorization_holder_id: [],
 }
 
-const API_URL = route('api.pld.orders.get');
+const API_URL = route('api.cmd.order-products.get');
 
-export const usePLDOrdersTableStore = defineStore('PLDOrdersTable', {
+export const useCMDOrderProductsTableStore = defineStore('CMDOrderProductsTable', {
     state: () => ({
         records: [],
         loading: false,
@@ -56,7 +55,6 @@ export const usePLDOrdersTableStore = defineStore('PLDOrdersTable', {
     }),
 
     actions: {
-        ...createRecordActions(this),
         initFromInertiaPage(page) {
             this.records = [];
             const query = page.props.query;
@@ -70,13 +68,15 @@ export const usePLDOrdersTableStore = defineStore('PLDOrdersTable', {
 
             // Filters that don`t require normalization
             this.filters.status = query.status;
-            this.filters.name = query.name;
+            this.filters.process_trademark_en = query.process_trademark_en;
+            this.filters.process_trademark_ru = query.process_trademark_ru;
+            this.filters.order_name = query.order_name;
             this.filters.id = query.id;
 
             // Normalize filters
-            normalizeSingleIDsFromQuery(this.filters, query, ['manufacturer_bdm_user_id']);
-            normalizeMultiIDsFromQuery(this.filters, query, ['manufacturer_id', 'country_id']);
-            normalizeDateRangesFromQuery(this.filters, query, ['receive_date', 'sent_to_bdm_date', 'sent_to_manufacturer_date', 'created_at', 'updated_at']);
+            normalizeSingleIDsFromQuery(this.filters, query, ['order_manufacturer_bdm_user_id']);
+            normalizeMultiIDsFromQuery(this.filters, query, ['order_manufacturer_id ', 'process_country_id', 'process_marketing_authorization_holder_id']);
+            normalizeDateRangesFromQuery(this.filters, query, ['created_at', 'updated_at']);
 
             // Mark as initialized
             this.initializedFromInertiaPage = true;
@@ -92,7 +92,7 @@ export const usePLDOrdersTableStore = defineStore('PLDOrdersTable', {
 
                 // Filters
                 ...this.filters,
-                ...normalizeDateRangesToQueryFormat(this.filters, ['receive_date', 'sent_to_bdm_date', 'sent_to_manufacturer_date', 'created_at', 'updated_at']),
+                ...normalizeDateRangesToQueryFormat(this.filters, ['created_at', 'updated_at']),
             };
 
             // Remove default pagination params if same as default

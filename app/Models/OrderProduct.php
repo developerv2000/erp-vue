@@ -783,12 +783,12 @@ class OrderProduct extends Model implements HasTitleAttribute
             ['title' => 'fields.Serialization type', 'key' => 'serialization_type_id', 'width' => 156, 'sortable' => true],
             ['title' => 'fields.Production status', 'key' => 'production_status', 'width' => 160, 'sortable' => false],
 
-            ['title' => 'fields.Layout approved date', 'key' => 'layout_approved_date', 'width' => 170, 'sortable' => false],
-            ['title' => 'fields.Prepayment completion date', 'key' => 'production_prepayment_completed_date', 'width' => 216, 'sortable' => false],
-            ['title' => 'fields.Production end date', 'key' => 'production_end_date', 'width' => 218, 'sortable' => false],
-            ['title' => 'fields.Final payment request date', 'key' => 'production_final_payment_request_date', 'width' => 236, 'sortable' => false],
-            ['title' => 'fields.Final payment completion date', 'key' => 'production_final_payment_completed_date', 'width' => 264, 'sortable' => false],
-            ['title' => 'fields.Ready for shipment', 'key' => 'readiness_for_shipment_from_manufacturer_date', 'width' => 160, 'sortable' => false],
+            ['title' => 'dates.Layout approved', 'key' => 'layout_approved_date', 'width' => 170, 'sortable' => false],
+            ['title' => 'dates.Prepayment completion', 'key' => 'production_prepayment_completed_date', 'width' => 216, 'sortable' => false],
+            ['title' => 'dates.Production end', 'key' => 'production_end_date', 'width' => 218, 'sortable' => false],
+            ['title' => 'dates.Final payment request', 'key' => 'production_final_payment_request_date', 'width' => 236, 'sortable' => false],
+            ['title' => 'dates.Final payment completion', 'key' => 'production_final_payment_completed_date', 'width' => 264, 'sortable' => false],
+            ['title' => 'dates.Ready for shipment', 'key' => 'readiness_for_shipment_from_manufacturer_date', 'width' => 160, 'sortable' => false],
         ];
 
         foreach ($additionalColumns as $column) {

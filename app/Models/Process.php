@@ -167,6 +167,11 @@ class Process extends Model implements
         return $this->belongsToMany(Country::class, 'clinical_trial_country_process');
     }
 
+    public function orderProducts()
+    {
+        return $this->hasMany(OrderProduct::class);
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Additional attributes & appends

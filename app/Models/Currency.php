@@ -48,6 +48,11 @@ class Currency extends Model
         return self::where('name', 'USD')->value('id');
     }
 
+    public static function getDefaultIdValueForOrders()
+    {
+        return self::where('name', 'USD')->value('id');
+    }
+
     /**
      * Update all currencies 'usd_ratio' using an external API.
      *

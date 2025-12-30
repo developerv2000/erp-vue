@@ -16,38 +16,29 @@ const { can, canAny } = useAuth();
 
 const listItems = computed(() => [
     {
-        title: t("pages.Ready for order"),
-        routeName: "pld.ready-for-order-processes.index",
-        routeParams: null,
-        activeOnRoutes: "pld.ready-for-order-processes.index",
-        permission: "view-PLD-ready-for-order-processes",
-        prependIcon: mdiCheckBold,
-    },
-
-    {
         title: t("pages.Orders"),
-        routeName: "pld.orders.index",
+        routeName: "cmd.orders.index",
         routeParams: null,
-        activeOnRoutes: "pld.orders.*",
-        permission: "view-PLD-orders",
+        activeOnRoutes: "cmd.orders.*",
+        permission: "view-CMD-orders",
         prependIcon: mdiStar,
     },
 
     {
         title: t("pages.Products"),
-        routeName: "pld.order-products.index",
+        routeName: "cmd.order-products.index",
         routeParams: null,
-        activeOnRoutes: "pld.order-products.*",
-        permission: "view-PLD-order-products",
+        activeOnRoutes: "cmd.order-products.*",
+        permission: "view-CMD-order-products",
         prependIcon: mdiPillMultiple,
     },
 
     {
         title: t("pages.Invoices"),
-        routeName: "pld.invoices.index",
+        routeName: "cmd.invoices.index",
         routeParams: null,
-        activeOnRoutes: "pld.invoices.index",
-        permission: "view-PLD-invoices",
+        activeOnRoutes: "cmd.invoices.*",
+        permission: "view-CMD-invoices",
         prependIcon: mdiScriptOutline,
     },
 ]);
@@ -57,16 +48,15 @@ const listItems = computed(() => [
     <v-list
         v-if="
             canAny([
-                'view-PLD-ready-for-order-processes',
-                'view-PLD-orders',
-                'view-PLD-order-products',
-                'view-PLD-invoices',
+                'view-CMD-orders',
+                'view-CMD-order-products',
+                'view-CMD-invoices',
             ])
         "
         density="compact"
         color="primary"
     >
-        <v-list-subheader>{{ $t("departments.PLD") }}</v-list-subheader>
+        <v-list-subheader>{{ $t("departments.CMD") }}</v-list-subheader>
 
         <template v-for="(item, index) in listItems" :key="index">
             <InertiaLinkedListItem

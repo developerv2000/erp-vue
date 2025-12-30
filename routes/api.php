@@ -66,7 +66,22 @@ Route::middleware('auth:sanctum')->name('api.')->group(function () {
 
         Route::prefix('/order-products')->name('order-products.')->group(function () {
             Route::get('/', fn(Request $request) => OrderProduct::queryPLDRecordsFromRequest($request, 'paginate', true))
-                ->middleware('can:view-PLD-orders')
+                ->middleware('can:view-PLD-order-products')
+                ->name('get');
+        });
+    });
+
+    // CMD
+    Route::prefix('/cmd')->name('cmd.')->group(function () {
+        Route::prefix('/orders')->name('orders.')->group(function () {
+            Route::get('/', fn(Request $request) => Order::queryCMDRecordsFromRequest($request, 'paginate', true))
+                ->middleware('can:view-CMD-orders')
+                ->name('get');
+        });
+
+        Route::prefix('/order-products')->name('order-products.')->group(function () {
+            Route::get('/', fn(Request $request) => OrderProduct::queryCMDRecordsFromRequest($request, 'paginate', true))
+                ->middleware('can:view-CMD-order-products')
                 ->name('get');
         });
     });

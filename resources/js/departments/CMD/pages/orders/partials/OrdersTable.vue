@@ -16,7 +16,7 @@ import TogglableThreeLinesLimitedText from "@/core/components/misc/TogglableThre
 import TdRecordCommentsLink from "@/core/components/table/td/TdRecordCommentsLink.vue";
 import TableNavigateToPage from "@/core/components/table/misc/TableNavigateToPage.vue";
 import TdOrderStatus from "@/core/components/table/td/shared/orders/TdOrderStatus.vue";
-import TdOrderSentToBdm from "@/core/components/table/td/shared/orders/TdOrderSentToBdm.vue";
+import TdOrderSentToConfirmation from "@/core/components/table/td/shared/orders/TdOrderSentToConfirmation.vue";
 
 const { t } = useI18n();
 const { get } = useQueryParams();
@@ -148,12 +148,33 @@ const handleTableOptionsUpdate = (options) => {
             {{ item.currency?.name }}
         </template>
 
+        <template #item.sent_to_confirmation_date="{ item }">
+            <template v-if="item.is_sent_to_confirmation">
+                {{ formatDate(item.sent_to_confirmation_date) }}
+            </template>
+
+            <TdOrderSentToConfirmation
+                v-else-if="item.can_be_sent_for_confirmation"
+                :order-id="item.id"
+            />
+        </template>
+
         <template #item.confirmation_date="{ item }">
             {{ formatDate(item.confirmation_date) }}
         </template>
 
         <template #item.sent_to_manufacturer_date="{ item }">
             {{ formatDate(item.sent_to_manufacturer_date) }}
+        </template>
+
+        <template #item.expected_dispatch_date="{ item }">
+            {{ formatDate(item.expected_dispatch_date) }}
+        </template>
+
+        <template #item.invoices_count="{ item }"> Invoices </template>
+
+        <template #item.production_start_date="{ item }">
+            {{ formatDate(item.production_start_date) }}
         </template>
 
         <template #item.created_at="{ item }">

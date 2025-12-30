@@ -1,5 +1,5 @@
 <script setup>
-import { usePLDOrdersTableStore } from "@/departments/PLD/stores/orders";
+import { useCMDOrdersTableStore } from "@/departments/CMD/stores/orders";
 import { useMessagesStore } from "@/core/stores/messages";
 import { useGlobalStore } from "@/core/stores/global";
 import { useI18n } from "vue-i18n";
@@ -13,7 +13,7 @@ const props = defineProps({
 });
 
 const { t } = useI18n();
-const ordersStore = usePLDOrdersTableStore();
+const ordersStore = useCMDOrdersTableStore();
 const globalStore = useGlobalStore();
 const messagesStore = useMessagesStore();
 
@@ -21,7 +21,7 @@ const send = (id) => {
     globalStore.loading = true;
 
     axios
-        .post(route("pld.orders.sent-to-bdm", { record: id }))
+        .post(route("cmd.orders.sent-to-confirmation", { record: id }))
         .then((response) => {
             messagesStore.addSuccessMessage();
             ordersStore.updateRecord(response.data);
@@ -39,7 +39,7 @@ const send = (id) => {
     <DefaultButton
         size="small"
         :append-icon="mdiArrowRight"
-        color="amber"
+        color="deep-orange"
         @click="send(props.orderId)"
     >
         {{ t("actions.Send") }}

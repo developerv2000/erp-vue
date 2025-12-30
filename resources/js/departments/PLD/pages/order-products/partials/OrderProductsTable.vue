@@ -127,6 +127,14 @@ const handleTableOptionsUpdate = (options) => {
             <TdOrderStatus :status="item.status" />
         </template>
 
+        <template #item.order_currency_id="{ item }">
+            {{ item.order.currency?.name }}
+        </template>
+
+        <template #item.total_price="{ item }">
+            {{ item.total_price }}
+        </template>
+
         <template #item.comments_count="{ item }">
             <TdRecordCommentsLink :record="item" />
         </template>

@@ -8,7 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class OrderSentToBdm extends Notification
+class OrderConfirmed extends Notification
 {
     use Queueable;
 
@@ -21,9 +21,9 @@ class OrderSentToBdm extends Notification
         $this->data = [
             'type' => class_basename(static::class),
             'order_id' => $order->id,
+            'order_name' => $order->name,
+            'purchase_date' => $order->purchase_date->isoformat('DD MMM Y'),
             'products_count' => $order->products()->count(),
-            'manufacturer' => $order->manufacturer->name,
-            'country' => $order->country->code,
         ];
     }
 

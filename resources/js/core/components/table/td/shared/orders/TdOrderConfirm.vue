@@ -6,7 +6,7 @@ import { useI18n } from "vue-i18n";
 import axios from "axios";
 
 import DefaultButton from "@/core/components/buttons/DefaultButton.vue";
-import { mdiArrowRight } from "@mdi/js";
+import { mdiCheck } from "@mdi/js";
 
 const props = defineProps({
     orderId: Number,
@@ -21,7 +21,7 @@ const send = (id) => {
     globalStore.loading = true;
 
     axios
-        .post(route("pld.orders.sent-to-bdm", { record: id }))
+        .post(route("pld.orders.confirm", { record: id }))
         .then((response) => {
             messagesStore.addSuccessMessage();
             ordersStore.updateRecord(response.data);
@@ -38,10 +38,10 @@ const send = (id) => {
 <template>
     <DefaultButton
         size="small"
-        :append-icon="mdiArrowRight"
-        color="amber"
+        :append-icon="mdiCheck"
+        color="green"
         @click="send(props.orderId)"
     >
-        {{ t("actions.Send") }}
+        {{ t("actions.Confirm") }}
     </DefaultButton>
 </template>

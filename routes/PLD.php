@@ -27,6 +27,7 @@ Route::prefix('pld')->name('pld.')->middleware('auth', 'auth.session')->group(fu
         );
 
         Route::post('/sent-to-bdm/{record}', 'sentToBDM')->name('sent-to-bdm');  // AJAX request
+        Route::post('/confirm/{record}', 'confirm')->name('confirm');  // AJAX request
     });
 
     // Order products

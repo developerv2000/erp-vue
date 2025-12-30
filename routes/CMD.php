@@ -15,6 +15,8 @@ Route::prefix('cmd')->name('cmd.')->middleware('auth', 'auth.session')->group(fu
             'can:view-CMD-orders',
             'can:edit-CMD-orders'
         );
+
+        Route::post('/sent-to-confirmation/{record}', 'sentToConfirmation')->name('sent-to-confirmation');  // AJAX request
     });
 
     // Order products

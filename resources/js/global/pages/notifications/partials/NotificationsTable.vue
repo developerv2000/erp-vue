@@ -14,6 +14,8 @@ import TdMediumWeightText from "@/core/components/table/td/TdMediumWeightText.vu
 import ProcessStageChangedToContract from "./types/ProcessStageChangedToContract.vue";
 import ProcessMarkedAsReadyForOrder from "./types/ProcessMarkedAsReadyForOrder.vue";
 import OrderSentToBdm from "./types/OrderSentToBdm.vue";
+import OrderSentToConfirmation from "./types/OrderSentToConfirmation.vue";
+import OrderConfirmed from "./types/OrderConfirmed.vue";
 
 const { t } = useI18n();
 const { get } = useQueryParams();
@@ -25,6 +27,8 @@ const types = {
     ProcessStageChangedToContract,
     ProcessMarkedAsReadyForOrder,
     OrderSentToBdm,
+    OrderSentToConfirmation,
+    OrderConfirmed,
 };
 
 onMounted(() => {

@@ -79,6 +79,23 @@ class CMDOrderController extends Controller
         ]);
     }
 
+    /**
+     * AJAX request
+     */
+    public function sentToConfirmation(Order $record)
+    {
+        $record->sendToConfirmation();
+
+        // Return refetched updated record
+        $record = Order::withBasicRelations()
+            ->withBasicRelationCounts()
+            ->findOrFail($record->id);
+
+        $record->appendBasicAttributes();
+
+        return $record;
+    }
+
     private function getfilterDependencies(): array
     {
         return [

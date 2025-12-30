@@ -17,6 +17,7 @@ import TdRecordCommentsLink from "@/core/components/table/td/TdRecordCommentsLin
 import TableNavigateToPage from "@/core/components/table/misc/TableNavigateToPage.vue";
 import TdOrderStatus from "@/core/components/table/td/shared/orders/TdOrderStatus.vue";
 import TdOrderSentToBdm from "@/core/components/table/td/shared/orders/TdOrderSentToBdm.vue";
+import TdOrderConfirm from "@/core/components/table/td/shared/orders/TdOrderConfirm.vue";
 
 const { t } = useI18n();
 const { get } = useQueryParams();
@@ -149,7 +150,14 @@ const handleTableOptionsUpdate = (options) => {
         </template>
 
         <template #item.confirmation_date="{ item }">
-            {{ formatDate(item.confirmation_date) }}
+            <template v-if="item.is_confirmed">
+                {{ formatDate(item.confirmation_date) }}
+            </template>
+
+            <TdOrderConfirm
+                v-else-if="item.is_sent_to_confirmation"
+                :order-id="item.id"
+            />
         </template>
 
         <template #item.sent_to_manufacturer_date="{ item }">

@@ -126,7 +126,7 @@ const reloadRequiredDataAndResetForm = () => {
             <DefaultTitle>{{ t("departments.PLD") }}</DefaultTitle>
 
             <v-row>
-                <v-col cols="4">
+                <v-col>
                     <DefaultAutocomplete
                         :label="t('fields.Manufacturer')"
                         :items="page.props.manufacturers"
@@ -136,7 +136,7 @@ const reloadRequiredDataAndResetForm = () => {
                     />
                 </v-col>
 
-                <v-col cols="4">
+                <v-col>
                     <DefaultAutocomplete
                         :label="t('fields.Country')"
                         :items="page.props.countriesOrderedByProcessesCount"
@@ -147,7 +147,7 @@ const reloadRequiredDataAndResetForm = () => {
                     />
                 </v-col>
 
-                <v-col cols="4">
+                <v-col>
                     <DefaultDateInput
                         :label="t('dates.Receive')"
                         v-model="values.receive_date"
@@ -163,16 +163,16 @@ const reloadRequiredDataAndResetForm = () => {
             <DefaultTitle>{{ t("departments.CMD") }}</DefaultTitle>
 
             <v-row>
-                <v-col cols="4">
+                <v-col>
                     <DefaultTextField
                         :label="t('fields.Name')"
-                        v-model="values.Name"
-                        :error-messages="errors.Name"
+                        v-model="values.name"
+                        :error-messages="errors.name"
                         required
                     />
                 </v-col>
 
-                <v-col cols="4">
+                <v-col>
                     <DefaultAutocomplete
                         :label="t('fields.Currency')"
                         :items="page.props.currencies"

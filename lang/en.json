@@ -96,6 +96,7 @@
     "actions.Check": "Check",
     "actions.Go to page": "Go to page",
     "actions.Send": "Send",
+    "actions.Confirm": "Confirm",
     "actions.Store": "Store",
     "actions.Store and redirect back": "Store and redirect back",
     "actions.Store and reset form": "Store and reset form",
@@ -149,6 +150,8 @@
     "notifications.Process stage updated to contract": "Status of process #{process_id} has been updated to {status_name}.",
     "notifications.New product for order received": "New product for order has been received",
     "notifications.New order received": "New order received",
+    "notifications.New order for confirmation received": "New order for confirmation received",
+    "notifications.Order confirmed": "Below order has been confirmed",
 
     "files.Generating": "Generating file",
     "files.Download started": "Download started",

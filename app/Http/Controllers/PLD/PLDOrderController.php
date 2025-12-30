@@ -104,6 +104,23 @@ class PLDOrderController extends Controller
         return $record;
     }
 
+    /**
+     * AJAX request
+     */
+    public function confirm(Order $record)
+    {
+        $record->confirm();
+
+        // Return refetched updated record
+        $record = Order::withBasicRelations()
+            ->withBasicRelationCounts()
+            ->findOrFail($record->id);
+
+        $record->appendBasicAttributes();
+
+        return $record;
+    }
+
     private function getfilterDependencies(): array
     {
         return [

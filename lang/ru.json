@@ -96,6 +96,7 @@
     "actions.Check": "Проверить",
     "actions.Go to page": "Перейти на страницу",
     "actions.Send": "Отправтить",
+    "actions.Confirm": "Подтвердить",
     "actions.Store": "Сохранить",
     "actions.Store and redirect back": "Сохранить и вернуться",
     "actions.Store and reset form": "Сохранить и сбросить форму",
@@ -157,6 +158,8 @@
     "notifications.Process stage updated to contract": "Статус процесса #{process_id} был изменён на {status_name}.",
     "notifications.New product for order received": "Получен новый продукт для заказа",
     "notifications.New order received": "Получен новый заказ",
+    "notifications.New order for confirmation received": "Получен новый заказ для подтверждения",
+    "notifications.Order confirmed": "Данный заказ был подтверждён",
 
     "files.Generating": "Генерация файла",
     "files.Download started": "Загрузка началась",

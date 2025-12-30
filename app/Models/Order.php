@@ -5,7 +5,9 @@ namespace App\Models;
 use App\Http\Requests\CMD\CMDOrderUpdateRequest;
 use App\Http\Requests\PLD\PLDOrderStoreRequest;
 use App\Http\Requests\PLD\PLDOrderUpdateRequest;
+use App\Notifications\OrderConfirmed;
 use App\Notifications\OrderSentToBdm;
+use App\Notifications\OrderSentToConfirmation;
 use App\Support\Contracts\Model\HasTitleAttribute;
 use App\Support\Helpers\ModelHelper;
 use App\Support\Helpers\QueryFilterHelper;
@@ -142,6 +144,7 @@ class Order extends Model implements HasTitleAttribute
             'status',
             'is_sent_to_bdm',
             'is_sent_to_confirmation',
+            'can_be_sent_for_confirmation',
             'is_confirmed',
             'is_sent_to_manufacturer',
             'production_is_started',
@@ -156,6 +159,11 @@ class Order extends Model implements HasTitleAttribute
     public function getIsSentToConfirmationAttribute(): bool
     {
         return !is_null($this->sent_to_confirmation_date);
+    }
+
+    public function getCanBeSentForConfirmationAttribute(): bool
+    {
+        return !is_null($this->name);
     }
 
     public function getIsConfirmedAttribute(): bool
@@ -645,6 +653,11 @@ class Order extends Model implements HasTitleAttribute
     |--------------------------------------------------------------------------
     */
 
+    /**
+     * AJAX request
+     *
+     * Send to CMD by PLD
+     */
     public function sendToBdm(): void
     {
         if (!$this->is_sent_to_bdm) {
@@ -653,6 +666,38 @@ class Order extends Model implements HasTitleAttribute
 
             $notification = new OrderSentToBdm($this);
             User::notifyUsersBasedOnPermission($notification, 'receive-notification-when-PLD-order-is-sent-to-CMD-BDM');
+        }
+    }
+
+    /**
+     * AJAX request
+     *
+     * Sent to confirmation to PLD by CMD
+     */
+    public function sendToConfirmation(): void
+    {
+        if (!$this->is_sent_to_confirmation) {
+            $this->sent_to_confirmation_date = now();
+            $this->save();
+
+            $notification = new OrderSentToConfirmation($this);
+            User::notifyUsersBasedOnPermission($notification, 'receive-notification-when-CMD-order-is-sent-for-confirmation');
+        }
+    }
+
+    /**
+     * AJAX request
+     * 
+     * Confirm by PLD
+     */
+    public function confirm(): void
+    {
+        if (!$this->is_confirmed) {
+            $this->confirmation_date = now();
+            $this->save();
+
+            $notification = new OrderConfirmed($this);
+            User::notifyUsersBasedOnPermission($notification, 'receive-notification-when-order-is-confirmed-by-PLD');
         }
     }
 
@@ -687,7 +732,7 @@ class Order extends Model implements HasTitleAttribute
             ['title' => 'Products', 'key' => 'products_count', 'width' => 100, 'sortable' => false],
             ['title' => 'Comments', 'key' => 'comments_count', 'width' => 132, 'sortable' => false],
             ['title' => 'comments.Last', 'key' => 'last_comment_body', 'width' => 200, 'sortable' => false],
-            ['title' => 'Status', 'key' => 'status', 'width' => 120, 'sortable' => false],
+            ['title' => 'Status', 'key' => 'status', 'width' => 140, 'sortable' => false],
             ['title' => 'dates.Sent to BDM', 'key' => 'sent_to_bdm_date', 'width' => 160, 'sortable' => true],
 
             ['title' => 'fields.PO №', 'key' => 'name', 'width' => 136, 'sortable' => true],
@@ -732,7 +777,7 @@ class Order extends Model implements HasTitleAttribute
             ['title' => 'Products', 'key' => 'products_count', 'width' => 100, 'sortable' => false],
             ['title' => 'Comments', 'key' => 'comments_count', 'width' => 132, 'sortable' => false],
             ['title' => 'comments.Last', 'key' => 'last_comment_body', 'width' => 200, 'sortable' => false],
-            ['title' => 'Status', 'key' => 'status', 'width' => 120, 'sortable' => false],
+            ['title' => 'Status', 'key' => 'status', 'width' => 140, 'sortable' => false],
             ['title' => 'dates.Sent to BDM', 'key' => 'sent_to_bdm_date', 'width' => 160, 'sortable' => true],
 
             ['title' => 'fields.PO №', 'key' => 'name', 'width' => 136, 'sortable' => true],

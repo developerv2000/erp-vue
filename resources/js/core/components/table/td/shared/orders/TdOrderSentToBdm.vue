@@ -17,7 +17,7 @@ const ordersStore = usePLDOrdersTableStore();
 const globalStore = useGlobalStore();
 const messagesStore = useMessagesStore();
 
-const send = (id) => {
+const submit = (id) => {
     globalStore.loading = true;
 
     axios
@@ -40,7 +40,7 @@ const send = (id) => {
         size="small"
         :append-icon="mdiArrowRight"
         color="amber"
-        @click="send(props.orderId)"
+        @click="submit(props.orderId)"
     >
         {{ t("actions.Send") }}
     </DefaultButton>

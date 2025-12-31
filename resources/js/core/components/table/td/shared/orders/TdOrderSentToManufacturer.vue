@@ -21,7 +21,7 @@ const submit = (id) => {
     globalStore.loading = true;
 
     axios
-        .post(route("cmd.orders.sent-to-confirmation", { record: id }))
+        .post(route("cmd.orders.sent-to-manufacturer", { record: id }))
         .then((response) => {
             messagesStore.addSuccessMessage();
             ordersStore.updateRecord(response.data);
@@ -39,7 +39,7 @@ const submit = (id) => {
     <DefaultButton
         size="small"
         :append-icon="mdiArrowRight"
-        color="deep-orange"
+        color="blue"
         @click="submit(props.orderId)"
     >
         {{ t("actions.Send") }}

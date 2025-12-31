@@ -16,6 +16,7 @@ import ProcessMarkedAsReadyForOrder from "./types/ProcessMarkedAsReadyForOrder.v
 import OrderSentToBdm from "./types/OrderSentToBdm.vue";
 import OrderSentToConfirmation from "./types/OrderSentToConfirmation.vue";
 import OrderConfirmed from "./types/OrderConfirmed.vue";
+import OrderSentToManufacturer from "./types/OrderSentToManufacturer.vue";
 
 const { t } = useI18n();
 const { get } = useQueryParams();
@@ -29,6 +30,7 @@ const types = {
     OrderSentToBdm,
     OrderSentToConfirmation,
     OrderConfirmed,
+    OrderSentToManufacturer,
 };
 
 onMounted(() => {

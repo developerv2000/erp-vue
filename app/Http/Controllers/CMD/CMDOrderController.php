@@ -96,6 +96,40 @@ class CMDOrderController extends Controller
         return $record;
     }
 
+    /**
+     * AJAX request
+     */
+    public function sentToManufacturer(Order $record)
+    {
+        $record->sendToManufacturer();
+
+        // Return refetched updated record
+        $record = Order::withBasicRelations()
+            ->withBasicRelationCounts()
+            ->findOrFail($record->id);
+
+        $record->appendBasicAttributes();
+
+        return $record;
+    }
+
+    /**
+     * AJAX request
+     */
+    public function startProduction(Order $record)
+    {
+        $record->startProduction();
+
+        // Return refetched updated record
+        $record = Order::withBasicRelations()
+            ->withBasicRelationCounts()
+            ->findOrFail($record->id);
+
+        $record->appendBasicAttributes();
+
+        return $record;
+    }
+
     private function getfilterDependencies(): array
     {
         return [

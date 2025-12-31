@@ -97,6 +97,7 @@
     "actions.Go to page": "Go to page",
     "actions.Send": "Send",
     "actions.Confirm": "Confirm",
+    "actions.Start": "Start",
     "actions.Store": "Store",
     "actions.Store and redirect back": "Store and redirect back",
     "actions.Store and reset form": "Store and reset form",
@@ -152,6 +153,7 @@
     "notifications.New order received": "New order received",
     "notifications.New order for confirmation received": "New order for confirmation received",
     "notifications.Order confirmed": "Below order has been confirmed",
+    "notifications.Order sent to manufacturer": "Below order has been sent to manufacturer",
 
     "files.Generating": "Generating file",
     "files.Download started": "Download started",

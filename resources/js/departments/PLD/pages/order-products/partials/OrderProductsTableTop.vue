@@ -4,7 +4,6 @@ import { usePLDOrderProductsTableStore } from "@/departments/PLD/stores/orderPro
 import useAuth from "@/core/composables/useAuth";
 
 import DefaultTableToolbar from "@/core/components/table/toolbar/DefaultTableToolbar.vue";
-import NewRecordButton from "@/core/components/table/toolbar/actions/NewRecordButton.vue";
 import DeleteSelectedButton from "@/core/components/table/toolbar/actions/DeleteSelectedButton.vue";
 import ColumnsListItem from "@/core/components/table/toolbar/more-action-items/ColumnsListItem.vue";
 import FullscreenListItem from "@/core/components/table/toolbar/more-action-items/FullscreenListItem.vue";
@@ -29,8 +28,6 @@ const actionAfterSuccessDelete = () => {
         <template #actions>
             <!-- Edit actions -->
             <template v-if="can('edit-PLD-order-products')">
-                <NewRecordButton :link="route('pld.order-products.create')" />
-
                 <DeleteSelectedButton
                     :delete-link="route('pld.order-products.destroy')"
                     :store="store"

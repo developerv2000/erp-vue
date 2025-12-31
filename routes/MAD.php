@@ -13,7 +13,7 @@ Route::prefix('mad')->name('mad.')->middleware('auth', 'auth.session')->group(fu
     // VP - Product selection
     Route::prefix('product-selection')
         ->controller(MADProductSelectionController::class)
-        ->middleware('can:export-records-as-excel')
+        ->middleware('can:export-records-as-excel', 'can:view-MAD-IVP')
         ->name('product-selection.')
         ->group(function () {
             // Generate and store an export file for a given model
@@ -42,8 +42,13 @@ Route::prefix('mad')->name('mad.')->middleware('auth', 'auth.session')->group(fu
             'can:edit-MAD-IVP'
         );
 
-        Route::post('/get-similar-records', 'getSimilarRecordsForRequest')->name('get-similar-records');  // AJAX request on products.create for uniqness
-        Route::post('/get-matched-atx', 'getMatchedATXForRequest')->name('get-matched-atx');  // AJAX request on products.create
+        Route::middleware('can:edit-MAD-IVP')->group(function () {
+            // AJAX request on products.create for uniqness
+            Route::post('/get-similar-records', 'getSimilarRecordsForRequest')->name('get-similar-records');
+
+            // AJAX request on products.create
+            Route::post('/get-matched-atx', 'getMatchedATXForRequest')->name('get-matched-atx');
+        });
     });
 
     // VPS

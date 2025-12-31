@@ -776,7 +776,7 @@ class OrderProduct extends Model implements HasTitleAttribute
             ['title' => 'fields.Price', 'key' => 'price', 'width' => 70, 'sortable' => false],
             ['title' => 'fields.Currency', 'key' => 'order_currency_id', 'width' => 84, 'sortable' => false],
             ['title' => 'fields.Total price', 'key' => 'total_price', 'width' => 132, 'sortable' => false],
-            ['title' => 'Status', 'key' => 'status', 'width' => 140, 'sortable' => false],
+            ['title' => 'Status', 'key' => 'status', 'width' => 142, 'sortable' => false],
 
             ['title' => 'Comments', 'key' => 'comments_count', 'width' => 132, 'sortable' => false],
             ['title' => 'comments.Last', 'key' => 'last_comment_body', 'width' => 200, 'sortable' => false],

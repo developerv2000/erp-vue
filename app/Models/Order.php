@@ -8,6 +8,7 @@ use App\Http\Requests\PLD\PLDOrderUpdateRequest;
 use App\Notifications\OrderConfirmed;
 use App\Notifications\OrderSentToBdm;
 use App\Notifications\OrderSentToConfirmation;
+use App\Notifications\OrderSentToManufacturer;
 use App\Support\Contracts\Model\HasTitleAttribute;
 use App\Support\Helpers\ModelHelper;
 use App\Support\Helpers\QueryFilterHelper;
@@ -615,14 +616,6 @@ class Order extends Model implements HasTitleAttribute
     |--------------------------------------------------------------------------
     */
 
-    public function canAttachNewProducts(): bool
-    {
-        // Use eager-loaded count if available, otherwise fallback to counting the relation
-        $invoiceCount = $this->production_invoices_count ?? $this->productionInvoices()->count();
-
-        return $invoiceCount === 0;
-    }
-
     public function canAttachNewInvoice(): bool
     {
         return $this->is_sent_to_manufacturer
@@ -687,7 +680,7 @@ class Order extends Model implements HasTitleAttribute
 
     /**
      * AJAX request
-     * 
+     *
      * Confirm by PLD
      */
     public function confirm(): void
@@ -698,6 +691,35 @@ class Order extends Model implements HasTitleAttribute
 
             $notification = new OrderConfirmed($this);
             User::notifyUsersBasedOnPermission($notification, 'receive-notification-when-order-is-confirmed-by-PLD');
+        }
+    }
+
+    /**
+     * AJAX request
+     *
+     * Sent to manufacturer by CMD
+     */
+    public function sendToManufacturer(): void
+    {
+        if (!$this->is_sent_to_manufacturer) {
+            $this->sent_to_manufacturer_date = now();
+            $this->save();
+
+            $notification = new OrderSentToManufacturer($this);
+            User::notifyUsersBasedOnPermission($notification, 'receive-notification-when-CMD-order-is-sent-to-manufacturer');
+        }
+    }
+
+    /**
+     * AJAX request
+     *
+     * Start production by CMD
+     */
+    public function startProduction(): void
+    {
+        if (!$this->production_is_started) {
+            $this->production_start_date = now();
+            $this->save();
         }
     }
 
@@ -732,7 +754,7 @@ class Order extends Model implements HasTitleAttribute
             ['title' => 'Products', 'key' => 'products_count', 'width' => 100, 'sortable' => false],
             ['title' => 'Comments', 'key' => 'comments_count', 'width' => 132, 'sortable' => false],
             ['title' => 'comments.Last', 'key' => 'last_comment_body', 'width' => 200, 'sortable' => false],
-            ['title' => 'Status', 'key' => 'status', 'width' => 140, 'sortable' => false],
+            ['title' => 'Status', 'key' => 'status', 'width' => 142, 'sortable' => false],
             ['title' => 'dates.Sent to BDM', 'key' => 'sent_to_bdm_date', 'width' => 160, 'sortable' => true],
 
             ['title' => 'fields.PO №', 'key' => 'name', 'width' => 136, 'sortable' => true],
@@ -777,7 +799,7 @@ class Order extends Model implements HasTitleAttribute
             ['title' => 'Products', 'key' => 'products_count', 'width' => 100, 'sortable' => false],
             ['title' => 'Comments', 'key' => 'comments_count', 'width' => 132, 'sortable' => false],
             ['title' => 'comments.Last', 'key' => 'last_comment_body', 'width' => 200, 'sortable' => false],
-            ['title' => 'Status', 'key' => 'status', 'width' => 140, 'sortable' => false],
+            ['title' => 'Status', 'key' => 'status', 'width' => 142, 'sortable' => false],
             ['title' => 'dates.Sent to BDM', 'key' => 'sent_to_bdm_date', 'width' => 160, 'sortable' => true],
 
             ['title' => 'fields.PO №', 'key' => 'name', 'width' => 136, 'sortable' => true],

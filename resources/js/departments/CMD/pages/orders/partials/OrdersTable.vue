@@ -17,6 +17,8 @@ import TdRecordCommentsLink from "@/core/components/table/td/TdRecordCommentsLin
 import TableNavigateToPage from "@/core/components/table/misc/TableNavigateToPage.vue";
 import TdOrderStatus from "@/core/components/table/td/shared/orders/TdOrderStatus.vue";
 import TdOrderSentToConfirmation from "@/core/components/table/td/shared/orders/TdOrderSentToConfirmation.vue";
+import TdOrderSentToManufacturer from "@/core/components/table/td/shared/orders/TdOrderSentToManufacturer.vue";
+import TdOrderStartProduction from "@/core/components/table/td/shared/orders/TdOrderStartProduction.vue";
 
 const { t } = useI18n();
 const { get } = useQueryParams();
@@ -164,17 +166,45 @@ const handleTableOptionsUpdate = (options) => {
         </template>
 
         <template #item.sent_to_manufacturer_date="{ item }">
-            {{ formatDate(item.sent_to_manufacturer_date) }}
+            <template v-if="item.is_sent_to_manufacturer">
+                {{ formatDate(item.sent_to_manufacturer_date) }}
+            </template>
+
+            <TdOrderSentToManufacturer
+                v-else-if="item.is_confirmed"
+                :order-id="item.id"
+            />
         </template>
 
         <template #item.expected_dispatch_date="{ item }">
             {{ formatDate(item.expected_dispatch_date) }}
         </template>
 
-        <template #item.invoices_count="{ item }"> Invoices </template>
+        <template #item.invoices_count="{ item }">
+            <TdInertiaLink
+                :link="
+                    route('cmd.invoices.index', {
+                        'order_id[]': item.id,
+                        initialize_from_inertia_page: true,
+                    })
+                "
+            >
+                <span class="text-lowercase">
+                    <!-- {{ item.invoices_count }} -->
+                    {{ t("Invoices") }}
+                </span>
+            </TdInertiaLink>
+        </template>
 
         <template #item.production_start_date="{ item }">
-            {{ formatDate(item.production_start_date) }}
+            <template v-if="item.production_is_started">
+                {{ formatDate(item.production_start_date) }}
+            </template>
+
+            <TdOrderStartProduction
+                v-else-if="item.is_sent_to_manufacturer"
+                :order-id="item.id"
+            />
         </template>
 
         <template #item.created_at="{ item }">

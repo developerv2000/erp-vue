@@ -16,7 +16,11 @@ Route::prefix('cmd')->name('cmd.')->middleware('auth', 'auth.session')->group(fu
             'can:edit-CMD-orders'
         );
 
-        Route::post('/sent-to-confirmation/{record}', 'sentToConfirmation')->name('sent-to-confirmation');  // AJAX request
+        Route::middleware('can:edit-CMD-orders')->group(function () {
+            Route::post('/sent-to-confirmation/{record}', 'sentToConfirmation')->name('sent-to-confirmation');  // AJAX request
+            Route::post('/sent-to-manufacturer/{record}', 'sentToManufacturer')->name('sent-to-manufacturer');  // AJAX request
+            Route::post('/start-production/{record}', 'startProduction')->name('start-production');  // AJAX request
+        });
     });
 
     // Order products

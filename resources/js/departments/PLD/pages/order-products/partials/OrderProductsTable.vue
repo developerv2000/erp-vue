@@ -7,7 +7,7 @@ import { useI18n } from "vue-i18n";
 import { useDateFormatter } from "@/core/composables/useDateFormatter";
 import { DEFAULT_PER_PAGE_OPTIONS } from "@/core/scripts/constants";
 
-import OrdersTableTop from "../../orders/partials/OrdersTableTop.vue";
+import OrderProductsTableTop from "./OrderProductsTableTop.vue";
 import TableDefaultSkeleton from "@/core/components/table/misc/TableDefaultSkeleton.vue";
 import TdEditButton from "@/core/components/table/td/TdEditButton.vue";
 import TdInertiaLink from "@/core/components/table/td/TdInertiaLink.vue";
@@ -66,7 +66,7 @@ const handleTableOptionsUpdate = (options) => {
     >
         <!-- Top slot -->
         <template #top>
-            <OrdersTableTop />
+            <OrderProductsTableTop />
         </template>
 
         <!-- Loading slot -->

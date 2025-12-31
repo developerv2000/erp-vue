@@ -127,7 +127,7 @@ class PermissionSeeder extends Seeder
             Permission::CAN_EDIT_CMD_ORDER_PRODUCTS_NAME,
             Permission::CAN_EDIT_CMD_INVOICES_NAME,
 
-            Permission::CAN_RECEIVE_NOTIFICATION_WHEN_PLD_ORDER_IS_SENT_TO_CMD_BDM,
+            Permission::CAN_RECEIVE_NOTIFICATION_WHEN_ORDER_IS_SENT_TO_CMD_BY_PLD,
             Permission::CAN_RECEIVE_NOTIFICATION_WHEN_ORDER_IS_CONFIRMED_BY_PLD,
         ];
 
@@ -165,11 +165,11 @@ class PermissionSeeder extends Seeder
 
         $notificationPerms = [
             Permission::CAN_RECEIVE_NOTIFICATION_WHEN_MAD_VPS_IS_MARKED_AS_READY_FOR_ORDER,
-            Permission::CAN_RECEIVE_NOTIFICATION_WHEN_CMD_ORDER_IS_SENT_FOR_CONFIRMATION,
+            Permission::CAN_RECEIVE_NOTIFICATION_WHEN_ORDER_IS_SENT_FOR_CONFIRMATION_BY_CMD,
 
-            Permission::CAN_RECEIVE_NOTIFICATION_WHEN_CMD_ORDER_IS_SENT_TO_MANUFACTURER, // shared
-            Permission::CAN_RECEIVE_NOTIFICATION_WHEN_CMD_INVOICE_IS_SENT_FOR_PAYMENT, // shared
-            Permission::CAN_RECEIVE_NOTIFICATION_WHEN_PRD_INVOICE_PAYMENT_IS_COMPLETED, // shared
+            Permission::CAN_RECEIVE_NOTIFICATION_WHEN_ORDER_IS_SENT_TO_MANUFACTURER_BY_CMD, // shared
+            Permission::CAN_RECEIVE_NOTIFICATION_WHEN_INVOICE_IS_SENT_FOR_PAYMENT_BY_CMD, // shared
+            Permission::CAN_RECEIVE_NOTIFICATION_WHEN_INVOICE_PAYMENT_IS_COMPLETED_BY_RPD, // shared
         ];
 
         foreach ($notificationPerms as $perm) {

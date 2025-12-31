@@ -101,8 +101,8 @@ export default function useAuth() {
      * @returns {boolean}
      */
     const canReceiveNotifications = () => {
-        if (isGlobalAdministrator()) return true
         if (!user.value) return false
+        if (isGlobalAdministrator()) return true
 
         const hasNotificationPermission = permissions =>
             permissions?.some(p => p.name.startsWith('can-receive-notification'))

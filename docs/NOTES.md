@@ -14,13 +14,13 @@
 
 ## Misc
 - Permissions fully updated. Reattach users direct permission manually
-- Fix uploading attachments for muptiple "products" create
+- Fix uploading attachments for multiple "Products" create
 - Fix moving to the top FilterBooleanAutocomplete when selected "false" value
 - User model, fix 'productSearches relation/count' after adding 'ProductSearch'
-- Remove redundant MAD SimpleFilters
 - Add :return typos for controller functions
-- FIx profile edit form (make it like MAD CRUD forms)
 - Refactor Products 'getMatchedProductSearchesAttribute()'
 - Refactor MAD KPI addActiveManufacturersCountsForMonths() when country_id is filled
 - Use request()->safe() for PLD/CMD and other requests instead of request->all
 - removeDateTimezonesFromFormData from MAD part
+- Rename permissions like "receive-notification-when-CMD-invoice-is-sent-for-payment" to
+"receive-notification-when-invoice-is-sent-for-payment-by-CMD"

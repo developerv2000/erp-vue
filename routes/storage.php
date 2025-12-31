@@ -8,7 +8,9 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth', 'auth.session')->group(function () {
     // Attachment management routes
     Route::prefix('attachments')->controller(AttachmentController::class)->name('attachments.')->group(function () {
-        Route::get('/view-model-attachments/{attachable_type}/{attachable_id}', 'viewModelAttachments')->name('view-model-attachments');
+        Route::get('/view-model-attachments/{attachable_type}/{attachable_id}', 'viewModelAttachments')
+            ->name('view-model-attachments');
+
         Route::get('/show/{record}', 'show')->name('show');
         Route::post('/destroy', 'destroy')->name('destroy');
     });
@@ -26,8 +28,13 @@ Route::middleware('auth', 'auth.session')->group(function () {
             Route::post('/{model}/download/{filename}', 'download')->name('download');
         });
 
-    // Private storage route for accessing order files
+    // Private storage route for accessing order product files
     Route::get('/order-products/files/{path}', [PrivateStorageController::class, 'getOrderProductFile'])
         ->where('path', '.*')
         ->name('order-products.files');
+
+    // Private storage route for accessing invoice files
+    Route::get('/invoices/files/{path}', [PrivateStorageController::class, 'getInvoiceFile'])
+        ->where('path', '.*')
+        ->name('invoices.files');
 });

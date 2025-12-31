@@ -7,6 +7,7 @@ use App\Support\GateDefiners\GlobalGatesDefiner;
 use App\Support\GateDefiners\MADGatesDefiner;
 use App\Support\GateDefiners\NotificationGatesDefiner;
 use App\Support\GateDefiners\PLDGatesDefiner;
+use App\Support\GateDefiners\PRDGatesDefiner;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 
@@ -33,5 +34,6 @@ class AppServiceProvider extends ServiceProvider
         MADGatesDefiner::defineAll();
         CMDGatesDefiner::defineAll();
         PLDGatesDefiner::defineAll();
+        PRDGatesDefiner::defineAll();
     }
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\global\LoginRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class AuthenticationController extends Controller
 {
@@ -20,7 +21,8 @@ class AuthenticationController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended('/');
+        // Force full page reload
+        return Inertia::location(url('/'));
     }
 
     public function logout(Request $request)
@@ -31,6 +33,7 @@ class AuthenticationController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect()->route('login', ['logged_out' => true]);
+        // Force full page reload
+        return Inertia::location(route('login.show'));
     }
 }

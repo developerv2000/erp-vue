@@ -39,6 +39,8 @@ class DatabaseSeeder extends Seeder
             // ProductSearchSeeder::class,
             // MeetingSeeder::class,
             SerializationTypeSeeder::class,
+            InvoiceTypeSeeder::class,
+            InvoicePaymentTypeSeeder::class,
         ]);
     }
 }

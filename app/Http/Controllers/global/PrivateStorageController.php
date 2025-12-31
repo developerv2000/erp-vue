@@ -18,4 +18,16 @@ class PrivateStorageController extends Controller
 
         return response()->file($fullPath);
     }
+
+    public function getInvoiceFile(Request $request, $path)
+    {
+        $fullPath = storage_path('app/private/invoices/' . $path);
+
+        // Check if the file exists
+        if (!file_exists($fullPath)) {
+            abort(403);
+        }
+
+        return response()->file($fullPath);
+    }
 }

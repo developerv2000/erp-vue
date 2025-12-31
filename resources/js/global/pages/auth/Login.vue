@@ -48,13 +48,6 @@ const submit = handleSubmit((values) => {
         },
     });
 });
-
-// Reset all stores after logout
-onMounted(() => {
-    if (get("logged_out")) {
-        globalStore.resetAllStores();
-    }
-});
 </script>
 
 <template>

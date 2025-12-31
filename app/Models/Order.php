@@ -117,7 +117,7 @@ class Order extends Model implements HasTitleAttribute
 
     /**
      * 'ProductionType' invoices associated with the 'Order' and
-     * can have many 'Products' attached.
+     * can have multiple attached 'Products'.
      */
     public function productionInvoices()
     {
@@ -249,9 +249,9 @@ class Order extends Model implements HasTitleAttribute
                 $product->delete();
             }
 
-            // foreach ($record->invoices as $invoice) {
-            //     $invoice->delete();
-            // }
+            foreach ($record->invoices as $invoice) {
+                $invoice->delete();
+            }
         });
     }
 
@@ -286,7 +286,7 @@ class Order extends Model implements HasTitleAttribute
         return $query->withCount([
             'comments',
             'products',
-            // 'invoices',
+            'invoices',
         ]);
     }
 
@@ -658,7 +658,7 @@ class Order extends Model implements HasTitleAttribute
             $this->save();
 
             $notification = new OrderSentToBdm($this);
-            User::notifyUsersBasedOnPermission($notification, 'receive-notification-when-PLD-order-is-sent-to-CMD-BDM');
+            User::notifyUsersBasedOnPermission($notification, 'receive-notification-when-order-is-sent-to-CMD-by-PLD');
         }
     }
 
@@ -674,7 +674,7 @@ class Order extends Model implements HasTitleAttribute
             $this->save();
 
             $notification = new OrderSentToConfirmation($this);
-            User::notifyUsersBasedOnPermission($notification, 'receive-notification-when-CMD-order-is-sent-for-confirmation');
+            User::notifyUsersBasedOnPermission($notification, 'receive-notification-when-order-is-sent-for-confirmation-by-CMD');
         }
     }
 
@@ -706,7 +706,7 @@ class Order extends Model implements HasTitleAttribute
             $this->save();
 
             $notification = new OrderSentToManufacturer($this);
-            User::notifyUsersBasedOnPermission($notification, 'receive-notification-when-CMD-order-is-sent-to-manufacturer');
+            User::notifyUsersBasedOnPermission($notification, 'receive-notification-when-order-is-sent-to-manufacturer-by-CMD');
         }
     }
 

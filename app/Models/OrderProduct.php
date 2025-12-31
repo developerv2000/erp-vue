@@ -311,8 +311,8 @@ class OrderProduct extends Model implements HasTitleAttribute
         });
 
         static::deleting(function ($record) {
-            // // Detach 'productionInvoices'
-            // $record->productionInvoices()->detach();
+            // Detach 'productionInvoices'
+            $record->productionInvoices()->detach();
         });
     }
 

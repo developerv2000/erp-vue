@@ -14,7 +14,7 @@ defineProps({
             'text-green': status == 'Confirmed',
             'text-blue': status == 'Sent to manufacturer',
             'text-indigo': status == 'Production started',
-            'text-purple': status == 'Production is finished',
+            'text-purple': status == 'Production is ended',
             'text-pink': status == 'Ready for shipment from manufacturer',
         }"
     >

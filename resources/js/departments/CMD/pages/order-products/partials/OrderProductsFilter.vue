@@ -1,7 +1,7 @@
 <script setup>
 import { usePage } from "@inertiajs/vue3";
 import { useI18n } from "vue-i18n";
-import { usePLDOrderProductsTableStore } from "@/departments/PLD/stores/orderProducts";
+import { useCMDOrderProductsTableStore } from "@/departments/CMD/stores/orderProducts";
 
 import StoreBindedFilter from "@/core/components/filters/StoreBindedFilter.vue";
 import FilterAutocomplete from "@/core/components/filters/inputs/FilterAutocomplete.vue";
@@ -10,7 +10,7 @@ import FilterNumberInput from "@/core/components/filters/inputs/FilterNumberInpu
 
 const { t } = useI18n();
 const page = usePage();
-const store = usePLDOrderProductsTableStore();
+const store = useCMDOrderProductsTableStore();
 </script>
 
 <template>

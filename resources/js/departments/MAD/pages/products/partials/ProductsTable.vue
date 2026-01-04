@@ -23,6 +23,7 @@ import TableNavigateToPage from "@/core/components/table/misc/TableNavigateToPag
 import TdMediumWeightText from "@/core/components/table/td/TdMediumWeightText.vue";
 
 import { mdiArrowRight } from "@mdi/js";
+import TdArrowedInertiaLink from "@/core/components/table/td/TdArrowedInertiaLink.vue";
 
 const { t } = useI18n();
 const { get } = useQueryParams();
@@ -100,15 +101,11 @@ function handleTableOptionsUpdate(options) {
         </template>
 
         <template #item.processes_count="{ item }">
-            <InertiaLink
-                class="d-flex ga-2 mb-2 text-high-emphasis"
-                :link="item.index_link_of_related_processes"
-            >
+            <TdArrowedInertiaLink :link="item.index_link_of_related_processes">
                 <span>{{
                     t("processes.count", { count: item.processes_count })
                 }}</span>
-                <v-icon :icon="mdiArrowRight" />
-            </InertiaLink>
+            </TdArrowedInertiaLink>
 
             <TdInertiaLink
                 :link="

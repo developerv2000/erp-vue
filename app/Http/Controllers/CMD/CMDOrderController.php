@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\CMD\CMDOrderUpdateRequest;
 use App\Models\Country;
 use App\Models\Currency;
+use App\Models\InvoicePaymentType;
 use App\Models\Manufacturer;
 use App\Models\Order;
 use App\Models\User;
@@ -26,6 +27,7 @@ class CMDOrderController extends Controller
 
             // Lazy loads. Never refetched again
             'filterDependencies' => fn() => $this->getfilterDependencies(),
+            'invoicePaymentTypes' => fn() => InvoicePaymentType::all(), // Used on generating invoice links
         ]);
     }
 
@@ -52,6 +54,7 @@ class CMDOrderController extends Controller
 
         // Append additional attributes
         foreach ($record->products as $product) {
+            $product->append('production_is_started');
             $product->lastComment?->append('plain_text');
             $product->process->append('full_english_product_label');
         }

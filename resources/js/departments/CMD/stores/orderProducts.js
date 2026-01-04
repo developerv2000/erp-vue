@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia'
 import { router } from '@inertiajs/vue3'
 import axios from 'axios';
-import { cleanQueryParams, normalizeDateRangesFromQuery, normalizeDateRangesToQueryFormat, normalizeMultiIDsFromQuery, normalizeSingleIDsFromQuery } from '@/core/scripts/queryHelper';
+import { cleanQueryParams, normalizeDateRangesFromQuery, normalizeDateRangesToQueryFormat, normalizeMultiIDsFromQuery, normalizeNumbersFromQuery, normalizeSingleIDsFromQuery } from '@/core/scripts/queryHelper';
+import { createRecordActions } from '@/core/stores/helpers/createRecordActions';
 
 const defaultPaginationOptions = {
     page: 1,
@@ -17,6 +18,9 @@ const defaultFilters = {
     // Date ranges
     created_at: null,
     updated_at: null,
+
+    // Numbers
+    order_id: null,
 
     // Singular autocompletes
     status: null,
@@ -55,6 +59,7 @@ export const useCMDOrderProductsTableStore = defineStore('CMDOrderProductsTable'
     }),
 
     actions: {
+        ...createRecordActions(this),
         initFromInertiaPage(page) {
             this.records = [];
             const query = page.props.query;
@@ -74,6 +79,7 @@ export const useCMDOrderProductsTableStore = defineStore('CMDOrderProductsTable'
             this.filters.id = query.id;
 
             // Normalize filters
+            normalizeNumbersFromQuery(this.filters, query, ['order_id']);
             normalizeSingleIDsFromQuery(this.filters, query, ['order_manufacturer_bdm_user_id']);
             normalizeMultiIDsFromQuery(this.filters, query, ['order_manufacturer_id ', 'process_country_id', 'process_marketing_authorization_holder_id']);
             normalizeDateRangesFromQuery(this.filters, query, ['created_at', 'updated_at']);

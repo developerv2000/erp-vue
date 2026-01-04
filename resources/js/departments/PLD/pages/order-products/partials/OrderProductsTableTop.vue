@@ -37,7 +37,7 @@ const actionAfterSuccessDelete = () => {
         </template>
 
         <template #moreActions>
-            <ColumnsListItem v-if="!store.isTrashPage" settings-key="PLD_ORDER_PRODUCTS" />
+            <ColumnsListItem settings-key="PLD_ORDER_PRODUCTS" />
             <FullscreenListItem />
         </template>
     </DefaultTableToolbar>

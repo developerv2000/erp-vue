@@ -1,6 +1,6 @@
 <script setup>
-import { onMounted } from "vue";
-import { usePage } from "@inertiajs/vue3";
+import { computed, onMounted } from "vue";
+import { usePage, } from "@inertiajs/vue3";
 import useQueryParams from "@/core/composables/useQueryParams";
 import { useCMDOrdersTableStore } from "@/departments/CMD/stores/orders";
 import { useI18n } from "vue-i18n";
@@ -19,6 +19,7 @@ import TdOrderStatus from "@/core/components/table/td/shared/orders/TdOrderStatu
 import TdOrderSentToConfirmation from "@/core/components/table/td/shared/orders/TdOrderSentToConfirmation.vue";
 import TdOrderSentToManufacturer from "@/core/components/table/td/shared/orders/TdOrderSentToManufacturer.vue";
 import TdOrderStartProduction from "@/core/components/table/td/shared/orders/TdOrderStartProduction.vue";
+import TdCMDOrderInvoices from "@/core/components/table/td/shared/orders/TdCMDOrderInvoices.vue";
 
 const { t } = useI18n();
 const { get } = useQueryParams();
@@ -42,6 +43,17 @@ onMounted(() => {
 const handleTableOptionsUpdate = (options) => {
     store.fetchRecordsIfOptionsChanged(options); // Doesn`t fire on mount
 };
+
+/**
+ * Map payment types by name for fast access
+ *
+ * Shared with TdCMDOrderInvoices for performance
+ */
+const paymentTypesByName = computed(() =>
+    Object.fromEntries(
+        (page.props.invoicePaymentTypes ?? []).map((type) => [type.name, type])
+    )
+);
 </script>
 
 <template>
@@ -180,20 +192,11 @@ const handleTableOptionsUpdate = (options) => {
             {{ item.expected_dispatch_date }}
         </template>
 
-        <template #item.invoices_count="{ item }">
-            <TdInertiaLink
-                :link="
-                    route('cmd.invoices.index', {
-                        'order_id[]': item.id,
-                        initialize_from_inertia_page: true,
-                    })
-                "
-            >
-                <span class="text-lowercase">
-                    <!-- {{ item.invoices_count }} -->
-                    {{ t("Invoices") }}
-                </span>
-            </TdInertiaLink>
+        <template #item.production_invoices_count="{ item }">
+            <TdCMDOrderInvoices
+                :item="item"
+                :payment-types-by-name="paymentTypesByName"
+            />
         </template>
 
         <template #item.production_start_date="{ item }">

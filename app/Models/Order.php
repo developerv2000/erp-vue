@@ -158,6 +158,10 @@ class Order extends Model implements HasTitleAttribute
             'is_confirmed',
             'is_sent_to_manufacturer',
             'production_is_started',
+            'can_attach_any_production_invoice',
+            'can_attach_production_prepayment_invoice',
+            'can_attach_production_final_payment_invoice',
+            'can_attach_production_full_payment_invoice',
         ]);
     }
 
@@ -191,15 +195,23 @@ class Order extends Model implements HasTitleAttribute
         return !is_null($this->production_start_date);
     }
 
-    public function getAllProductProductionsAreFinishedAttribute(): bool
+    /**
+     * Required loaded relations:
+     * - products
+     */
+    public function getAllProductProductionsAreEndedAttribute(): bool
     {
         if ($this->products->isEmpty()) {
             return false;
         }
 
-        return $this->products->every(fn($product) => $product->production_is_finished);
+        return $this->products->every(fn($product) => $product->production_is_ended);
     }
 
+    /**
+     * Required loaded relations:
+     * - products
+     */
     public function getAllProductsAreReadyForShipmentFromManufacturerAttribute(): bool
     {
         if ($this->products->isEmpty()) {
@@ -215,8 +227,8 @@ class Order extends Model implements HasTitleAttribute
             $this->all_products_are_ready_for_shipment_from_manufacturer
             => OrderProduct::STATUS_IS_READY_FOR_SHIPMENT_FROM_MANUFACTURER_NAME,
 
-            $this->all_products_production_is_finished
-            => OrderProduct::STATUS_PRODUCTION_IS_FINISHED_NAME,
+            $this->all_product_productions_are_ended
+            => OrderProduct::STATUS_PRODUCTION_IS_ENDED_NAME,
 
             $this->production_is_started
             => self::STATUS_PRODUCTION_IS_STARTED_NAME,
@@ -239,7 +251,7 @@ class Order extends Model implements HasTitleAttribute
     }
 
     /**
-     * Indicates whether a new production invoice can be attached to the order.
+     * Indicates whether any new production invoice can be attached to the order.
      *
      * Requirements:
      * - Order must be sent to the manufacturer
@@ -249,10 +261,10 @@ class Order extends Model implements HasTitleAttribute
      * - products
      * - products.productionInvoices
      */
-    public function getCanAttachProductionInvoiceAttribute(): bool
+    public function getCanAttachAnyProductionInvoiceAttribute(): bool
     {
         return $this->is_sent_to_manufacturer
-            && $this->products->contains->can_attach_production_invoice;
+            && $this->products->contains->can_attach_any_production_invoice;
     }
 
     /**
@@ -348,6 +360,8 @@ class Order extends Model implements HasTitleAttribute
                         'bdm:id,name,photo',
                     ]);
             },
+
+            'products', // Maybe required when detecting 'status' of the order/product,
         ]);
     }
 
@@ -376,6 +390,17 @@ class Order extends Model implements HasTitleAttribute
                         'bdm:id,name,photo',
                     ]);
             },
+
+            'products' => function ($productsQuery) { // Maybe required when detecting 'status' of the order/product,
+                $productsQuery->with([
+                    'productionInvoices' => function ($invoicesQuery) { // Required in various places
+                        $invoicesQuery->with([
+                            'type',
+                            'paymentType',
+                        ]);
+                    }
+                ]);
+            }
         ]);
     }
 
@@ -557,7 +582,7 @@ class Order extends Model implements HasTitleAttribute
             self::STATUS_IS_CONFIRMED_NAME,
             self::STATUS_IS_SENT_TO_MANUFACTURER_NAME,
             self::STATUS_PRODUCTION_IS_STARTED_NAME,
-            OrderProduct::STATUS_PRODUCTION_IS_FINISHED_NAME,
+            OrderProduct::STATUS_PRODUCTION_IS_ENDED_NAME,
             OrderProduct::STATUS_IS_READY_FOR_SHIPMENT_FROM_MANUFACTURER_NAME,
         ];
     }
@@ -605,7 +630,7 @@ class Order extends Model implements HasTitleAttribute
                     fn($pq) => $pq->whereNotNull('production_end_date')
                 ),
 
-            OrderProduct::STATUS_PRODUCTION_IS_FINISHED_NAME =>
+            OrderProduct::STATUS_PRODUCTION_IS_ENDED_NAME =>
             $query
                 ->whereDoesntHave(
                     'products',
@@ -877,7 +902,7 @@ class Order extends Model implements HasTitleAttribute
             ['title' => 'dates.Confirmation', 'key' => 'confirmation_date', 'width' => 172, 'sortable' => true],
             ['title' => 'dates.Sent to manufacturer', 'key' => 'sent_to_manufacturer_date', 'width' => 168, 'sortable' => true],
             ['title' => 'dates.Expected dispatch', 'key' => 'expected_dispatch_date', 'width' => 190, 'sortable' => false],
-            ['title' => 'Invoices', 'key' => 'invoices_count', 'width' => 216, 'sortable' => false],
+            ['title' => 'Invoices', 'key' => 'production_invoices_count', 'width' => 212, 'sortable' => false],
             ['title' => 'dates.Production start', 'key' => 'production_start_date', 'width' => 204, 'sortable' => true],
             ['title' => 'dates.Date of creation', 'key' => 'created_at', 'width' => 130, 'sortable' => true],
             ['title' => 'dates.Update date', 'key' => 'updated_at', 'width' => 150, 'sortable' => true],

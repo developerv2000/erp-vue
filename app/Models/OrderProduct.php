@@ -34,7 +34,7 @@ class OrderProduct extends Model implements HasTitleAttribute
 
     // Storage files
     const STORAGE_FILES_PATH = 'app/private/order-products';
-    const PACKING_LIST_FOLDER_NAME = 'packing-lists';
+    const PACKING_LIST_FILE_FOLDER_NAME = 'packing-lists';
     const COA_FILE_FOLDER_NAME = 'COA-files';
     const COO_FILE_FOLDER_NAME = 'COO-files';
     const DECLARATION_FOR_EUROPE_FILE_FOLDER_NAME = 'declarations-for-europe';
@@ -70,7 +70,7 @@ class OrderProduct extends Model implements HasTitleAttribute
     const DEFAULT_MSD_SERIALIZED_BY_MANUFACTURER_PER_PAGE = 50;
 
     // Statuses
-    const STATUS_PRODUCTION_IS_FINISHED_NAME = 'Production is finished';
+    const STATUS_PRODUCTION_IS_ENDED_NAME = 'Production is ended';
     const STATUS_IS_READY_FOR_SHIPMENT_FROM_MANUFACTURER_NAME = 'Ready for shipment from manufacturer';
 
     // Serialization statuses
@@ -176,6 +176,39 @@ class OrderProduct extends Model implements HasTitleAttribute
         ]);
     }
 
+    public static function appendRecordsBasicCMDAttributes($records): void
+    {
+        foreach ($records as $record) {
+            $record->appendBasicCMDAttributes();
+        }
+    }
+
+    public function appendBasicCMDAttributes(): void
+    {
+        $this->append([
+            'base_model_class',
+            'status',
+            'total_price',
+            'production_is_started',
+            'production_is_ended',
+            'packing_list_file_url',
+            'coa_file_url',
+            'coo_file_url',
+            'declaration_for_europe_file_url',
+            'is_ready_for_shipment_from_manufacturer',
+            'can_be_set_as_ready_for_shipment_from_manufacturer',
+        ]);
+
+        $this->order->append([
+            'title',
+        ]);
+
+        $this->process->append([
+            'full_english_product_label',
+            'full_russian_product_label',
+        ]);
+    }
+
     public function getLayoutApprovedAttribute(): bool
     {
         return !is_null($this->layout_approved_date);
@@ -188,9 +221,35 @@ class OrderProduct extends Model implements HasTitleAttribute
         return floor($total * 100) / 100;
     }
 
-    public function getProductionIsFinishedAttribute(): bool
+    public function getProductionIsStartedAttribute(): bool
+    {
+        return $this->order->production_is_started;
+    }
+
+    public function getProductionIsEndedAttribute(): bool
     {
         return !is_null($this->production_end_date);
+    }
+
+    /**
+     * Used on "cmd.order-products.edit" page
+     * to display additional inputs
+     */
+    public function getCanBePreparedForShippingFromManufacturerAttribute(): bool
+    {
+        return $this->productionInvoices
+            ->whereIn('payment_type_id', [
+                InvoicePaymentType::FULL_PAYMENT_ID,
+                InvoicePaymentType::FINAL_PAYMENT_ID,
+            ])
+            ->whereNotNull('sent_for_payment_date')
+            ->isNotEmpty();
+    }
+
+    public function getCanBeSetAsReadyForShipmentFromManufacturerAttribute(): bool
+    {
+        return $this->production_is_ended
+            && !is_null($this->packing_list_file);
     }
 
     public function getIsReadyForShipmentFromManufacturerAttribute(): bool
@@ -204,8 +263,8 @@ class OrderProduct extends Model implements HasTitleAttribute
             $this->is_ready_for_shipment_from_manufacturer
             => self::STATUS_IS_READY_FOR_SHIPMENT_FROM_MANUFACTURER_NAME,
 
-            $this->production_is_finished
-            => self::STATUS_PRODUCTION_IS_FINISHED_NAME,
+            $this->production_is_ended
+            => self::STATUS_PRODUCTION_IS_ENDED_NAME,
 
             default
             => $this->order->status,
@@ -232,53 +291,8 @@ class OrderProduct extends Model implements HasTitleAttribute
         };
     }
 
-    public function getCanBePreparedForShippingFromManufacturerAttribute(): bool
-    {
-        return $this->productionInvoices()
-            ->whereIn('payment_type_id', [
-                InvoicePaymentType::FULL_PAYMENT_ID,
-                InvoicePaymentType::FINAL_PAYMENT_ID,
-            ])
-            ->whereNotNull('sent_for_payment_date')
-            ->exists();
-    }
-
-    public function getCanBeMarkedAsReadyForShipmentFromManufacturerAttribute(): bool
-    {
-        return $this->production_is_finished
-            && !is_null($this->packing_list_file);
-    }
-
-    public function getPackingListUrlAttribute(): string
-    {
-        return route('order-products.files', [
-            'path' => self::PACKING_LIST_FOLDER_NAME . '/' . $this->packing_list_file,
-        ]);
-    }
-
-    public function getCooFileUrlAttribute(): string
-    {
-        return route('order-products.files', [
-            'path' => self::COO_FILE_FOLDER_NAME . '/' . $this->coo_file,
-        ]);
-    }
-
-    public function getCoaFileUrlAttribute(): string
-    {
-        return route('order-products.files', [
-            'path' => self::COA_FILE_FOLDER_NAME . '/' . $this->coa_file,
-        ]);
-    }
-
-    public function getDeclarationForEuropeFileUrlAttribute(): string
-    {
-        return route('order-products.files', [
-            'path' => self::DECLARATION_FOR_EUROPE_FILE_FOLDER_NAME . '/' . $this->declaration_for_europe_file,
-        ]);
-    }
-
     /**
-     * Indicates whether a new production invoice can be attached to the product.
+     * Indicates whether any new production invoice can be attached to the product.
      *
      * Rule:
      * - Any of the payment-type-specific rules must be satisfied
@@ -286,7 +300,7 @@ class OrderProduct extends Model implements HasTitleAttribute
      * Required loaded relations:
      * - productionInvoices
      */
-    public function getCanAttachProductionInvoiceAttribute(): bool
+    public function getCanAttachAnyProductionInvoiceAttribute(): bool
     {
         return $this->can_attach_production_prepayment_invoice
             || $this->can_attach_production_final_payment_invoice
@@ -369,6 +383,34 @@ class OrderProduct extends Model implements HasTitleAttribute
             ->first();
     }
 
+    public function getPackingListFileUrlAttribute(): string
+    {
+        return route('order-products.files', [
+            'path' => self::PACKING_LIST_FILE_FOLDER_NAME . '/' . $this->packing_list_file,
+        ]);
+    }
+
+    public function getCooFileUrlAttribute(): string
+    {
+        return route('order-products.files', [
+            'path' => self::COO_FILE_FOLDER_NAME . '/' . $this->coo_file,
+        ]);
+    }
+
+    public function getCoaFileUrlAttribute(): string
+    {
+        return route('order-products.files', [
+            'path' => self::COA_FILE_FOLDER_NAME . '/' . $this->coa_file,
+        ]);
+    }
+
+    public function getDeclarationForEuropeFileUrlAttribute(): string
+    {
+        return route('order-products.files', [
+            'path' => self::DECLARATION_FOR_EUROPE_FILE_FOLDER_NAME . '/' . $this->declaration_for_europe_file,
+        ]);
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Events
@@ -404,6 +446,46 @@ class OrderProduct extends Model implements HasTitleAttribute
             'serializationType',
 
             'order' => function ($orderQuery) {
+                $orderQuery->with([ // $orderQuery->withBasicRelations() not used because of redundant/extra relations
+                    'country',
+                    'currency',
+
+                    'manufacturer' => function ($manufacturersQuery) {
+                        $manufacturersQuery->select(
+                            'manufacturers.id',
+                            'manufacturers.name',
+                            'bdm_user_id',
+                        )
+                            ->with([
+                                'bdm:id,name,photo',
+                            ]);
+                    },
+
+                    'products', // Maybe required when detecting 'status' of the order/product
+                ]);
+            },
+
+            'process' => function ($processQuery) {
+                $processQuery->withRelationsForOrderProduct()
+                    ->withOnlySelectsForOrderProduct();
+            },
+        ]);
+    }
+
+    public function scopeWithBasicPLDRelationCounts($query): Builder
+    {
+        return $query->withCount([
+            'comments',
+        ]);
+    }
+
+    public function scopeWithBasicCMDRelations($query)
+    {
+        return $query->with([
+            'lastComment',
+            'serializationType',
+
+            'order' => function ($orderQuery) {
                 $orderQuery->with([ // $orderQuery->withBasicRelations() not used because of redundant 'lastComment'
                     'country',
                     'currency',
@@ -418,6 +500,8 @@ class OrderProduct extends Model implements HasTitleAttribute
                                 'bdm:id,name,photo',
                             ]);
                     },
+
+                    'products', // Maybe required when detecting 'status' of the order/product
                 ]);
             },
 
@@ -428,7 +512,7 @@ class OrderProduct extends Model implements HasTitleAttribute
         ]);
     }
 
-    public function scopeWithBasicPLDRelationCounts($query): Builder
+    public function scopeWithBasicCMDRelationCounts($query): Builder
     {
         return $query->withCount([
             'comments',
@@ -534,6 +618,47 @@ class OrderProduct extends Model implements HasTitleAttribute
         return $records;
     }
 
+    /**
+     * Build and execute a model query based on request parameters.
+     *
+     * Steps:
+     *  - Apply default relations & counts
+     *  - Apply soft delete scope (if requested)
+     *  - Normalize query params (pagination, sorting, etc.)
+     *  - Apply filters
+     *  - Finalize query with sorting & pagination
+     *  - Append basic attributes (if requested and unless returning raw query)
+     *
+     * @param $action  ('paginate', 'get' or 'query')
+     * @return mixed
+     */
+    public static function queryCMDRecordsFromRequest(Request $request, string $action = 'paginate', bool $appendAttributes = false)
+    {
+        $query = self::withBasicCMDRelations()
+            ->withBasicCMDRelationCounts();
+
+        // Normalize request parameters
+        self::addDefaultQueryParamsToRequest(
+            $request,
+            'DEFAULT_CMD_ORDER_BY',
+            'DEFAULT_CMD_ORDER_DIRECTION',
+            'DEFAULT_CMD_PER_PAGE'
+        );
+
+        // Apply filters
+        self::filterQueryForRequest($query, $request);
+
+        // Finalize (sorting & pagination)
+        $records = ModelHelper::finalizeQueryForRequest($query, $request, $action);
+
+        // Append attributes unless raw query is requested
+        if ($appendAttributes && $action !== 'query') {
+            self::appendRecordsBasicCMDAttributes($records);
+        }
+
+        return $records;
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Filtering
@@ -634,7 +759,7 @@ class OrderProduct extends Model implements HasTitleAttribute
                 )
                 ->whereNull('production_end_date'),
 
-            self::STATUS_PRODUCTION_IS_FINISHED_NAME =>
+            self::STATUS_PRODUCTION_IS_ENDED_NAME =>
             $query
                 ->whereNotNull('production_end_date')
                 ->whereNull('readiness_for_shipment_from_manufacturer_date'),
@@ -680,7 +805,7 @@ class OrderProduct extends Model implements HasTitleAttribute
         $this->storeCommentFromRequest($request);
 
         // Upload files
-        $this->uploadFile('packing_list_file', self::getPackingListFolderPath());
+        $this->uploadFile('packing_list_file', self::getPackingListFileFolderPath());
         $this->uploadFile('coa_file', self::getCoaFileFolderPath());
         $this->uploadFile('coo_file', self::getCooFileFolderPath());
         $this->uploadFile('declaration_for_europe_file', self::getDeclarationForEuropeFileFolderPath());
@@ -717,13 +842,45 @@ class OrderProduct extends Model implements HasTitleAttribute
 
     /*
     |--------------------------------------------------------------------------
+    | Actions
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * AJAX request
+     *
+     * End production by CMD
+     */
+    public function endProduction(): void
+    {
+        if (!$this->production_is_ended) {
+            $this->production_end_date = now();
+            $this->save();
+        }
+    }
+
+    /**
+     * AJAX request
+     *
+     * End production by CMD
+     */
+    public function setAsReadyForShipmentFromManufacturer(): void
+    {
+        if (!$this->is_ready_for_shipment_from_manufacturer) {
+            $this->readiness_for_shipment_from_manufacturer_date = now();
+            $this->save();
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Storage paths
     |--------------------------------------------------------------------------
     */
 
-    public static function getPackingListFolderPath(): string
+    public static function getPackingListFileFolderPath(): string
     {
-        return storage_path(self::STORAGE_FILES_PATH . '/' . self::PACKING_LIST_FOLDER_NAME);
+        return storage_path(self::STORAGE_FILES_PATH . '/' . self::PACKING_LIST_FILE_FOLDER_NAME);
     }
 
     public static function getCooFileFolderPath(): string
@@ -825,6 +982,75 @@ class OrderProduct extends Model implements HasTitleAttribute
             ['title' => 'dates.Final payment request', 'key' => 'production_final_payment_request_date', 'width' => 236, 'sortable' => false],
             ['title' => 'dates.Final payment completion', 'key' => 'production_final_payment_completed_date', 'width' => 264, 'sortable' => false],
             ['title' => 'dates.Ready for shipment', 'key' => 'readiness_for_shipment_from_manufacturer_date', 'width' => 160, 'sortable' => false],
+        ];
+
+        foreach ($additionalColumns as $column) {
+            array_push($columns, [
+                ...$column,
+                'visible' => 1,
+                'order' => $order++,
+            ]);
+        }
+
+        return $columns;
+    }
+
+    public static function getCMDTableHeadersForUser($user): array|null
+    {
+        if (Gate::forUser($user)->denies(Permission::extractAbilityName(Permission::CAN_VIEW_CMD_ORDER_PRODUCTS_NAME))) {
+            return null;
+        }
+
+        $order = 1;
+        $columns = array();
+
+        if (Gate::forUser($user)->allows(Permission::extractAbilityName(Permission::CAN_EDIT_CMD_ORDER_PRODUCTS_NAME))) {
+            array_push(
+                $columns,
+                ['title' => 'Record', 'key' => 'edit', 'width' => 60, 'sortable' => false, 'visible' => 1, 'order' => $order++],
+            );
+        }
+
+        $additionalColumns = [
+            ['title' => 'ID', 'key' => 'id', 'width' => 62, 'sortable' => true],
+            ['title' => 'fields.Manufacturer', 'key' => 'order_manufacturer_id', 'width' => 140, 'sortable' => false],
+            ['title' => 'fields.Country', 'key' => 'order_country_id', 'width' => 80, 'sortable' => false],
+            ['title' => 'Order', 'key' => 'order_id', 'width' => 120, 'sortable' => true],
+            ['title' => 'fields.TM Eng', 'key' => 'process_trademark_en', 'width' => 146, 'sortable' => false],
+            ['title' => 'fields.TM Rus', 'key' => 'process_trademark_ru', 'width' => 146, 'sortable' => false],
+            ['title' => 'fields.MAH', 'key' => 'process_marketing_authorization_holder_id', 'width' => 102, 'sortable' => true],
+            ['title' => 'fields.Quantity', 'key' => 'quantity', 'width' => 112, 'sortable' => false],
+            ['title' => 'fields.Price', 'key' => 'price', 'width' => 70, 'sortable' => false],
+            ['title' => 'fields.Currency', 'key' => 'order_currency_id', 'width' => 84, 'sortable' => false],
+            ['title' => 'fields.Total price', 'key' => 'total_price', 'width' => 132, 'sortable' => false],
+            ['title' => 'Status', 'key' => 'status', 'width' => 142, 'sortable' => false],
+
+            ['title' => 'Comments', 'key' => 'comments_count', 'width' => 132, 'sortable' => false],
+            ['title' => 'comments.Last', 'key' => 'last_comment_body', 'width' => 200, 'sortable' => false],
+
+            ['title' => 'dates.Sent to BDM', 'key' => 'order_sent_to_bdm_date', 'width' => 142, 'sortable' => false],
+            ['title' => 'fields.PO №', 'key' => 'order_name', 'width' => 136, 'sortable' => false],
+            ['title' => 'dates.PO', 'key' => 'order_purchase_date', 'width' => 120, 'sortable' => false],
+            ['title' => 'dates.Sent to confirmation', 'key' => 'order_sent_to_confirmation_date', 'width' => 224, 'sortable' => false],
+            ['title' => 'dates.Confirmation', 'key' => 'order_confirmation_date', 'width' => 156, 'sortable' => false],
+            ['title' => 'dates.Sent to manufacturer', 'key' => 'order_sent_to_manufacturer_date', 'width' => 152, 'sortable' => false],
+            ['title' => 'dates.Production start', 'key' => 'order_production_start_date', 'width' => 192, 'sortable' => false],
+            ['title' => 'fields.Production status', 'key' => 'production_status', 'width' => 180, 'sortable' => false],
+            ['title' => 'dates.Production end', 'key' => 'production_end_date', 'width' => 232, 'sortable' => true],
+            ['title' => 'fields.Packing list', 'key' => 'packing_list_file', 'width' => 152, 'sortable' => false],
+            ['title' => 'fields.COA', 'key' => 'coa_file', 'width' => 152, 'sortable' => false],
+            ['title' => 'fields.COO', 'key' => 'coo_file', 'width' => 152, 'sortable' => false],
+            ['title' => 'fields.Declaration for EUR1', 'key' => 'declaration_for_europe_file', 'width' => 160, 'sortable' => false],
+            ['title' => 'dates.Ready for shipment', 'key' => 'readiness_for_shipment_from_manufacturer_date', 'width' => 160, 'sortable' => true],
+
+            ['title' => 'fields.Layout status', 'key' => 'new_layout', 'width' => 126, 'sortable' => true],
+            ['title' => 'dates.Layout sent', 'key' => 'date_of_sending_new_layout_to_manufacturer', 'width' => 178, 'sortable' => true],
+            ['title' => 'dates.Print proof receive', 'key' => 'date_of_receiving_print_proof_from_manufacturer', 'width' => 228, 'sortable' => true],
+            ['title' => 'fields.Box article', 'key' => 'box_article', 'width' => 140, 'sortable' => false],
+            ['title' => 'dates.Layout approved', 'key' => 'layout_approved_date', 'width' => 188, 'sortable' => true],
+
+            ['title' => 'dates.Date of creation', 'key' => 'created_at', 'width' => 130, 'sortable' => true],
+            ['title' => 'dates.Update date', 'key' => 'updated_at', 'width' => 150, 'sortable' => true],
         ];
 
         foreach ($additionalColumns as $column) {

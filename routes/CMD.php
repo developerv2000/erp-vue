@@ -31,6 +31,10 @@ Route::prefix('cmd')->name('cmd.')->middleware('auth', 'auth.session')->group(fu
             'can:view-CMD-order-products',
             'can:edit-CMD-order-products'
         );
+
+        Route::post('/end-production/{record}', 'endProduction')->name('end-production');  // AJAX request
+        Route::post('/set-as-ready-for-shipment-from-manufacturer/{record}', 'setAsReadyForShipmentFromManufacturer')
+            ->name('set-as-ready-for-shipment-from-manufacturer');  // AJAX request
     });
 
     // Invoices

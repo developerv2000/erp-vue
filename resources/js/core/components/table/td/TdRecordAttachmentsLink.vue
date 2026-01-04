@@ -1,7 +1,6 @@
 <script setup>
 import { useI18n } from "vue-i18n";
-import InertiaLink from "../../inertia/InertiaLink.vue";
-import { mdiArrowRight } from "@mdi/js";
+import TdArrowedInertiaLink from "./TdArrowedInertiaLink.vue";
 
 defineProps({
     record: Object,
@@ -11,8 +10,7 @@ const { t } = useI18n();
 </script>
 
 <template>
-    <InertiaLink
-        class="d-flex ga-2 mb-2 text-high-emphasis"
+    <TdArrowedInertiaLink
         :link="
             route('attachments.view-model-attachments', {
                 attachable_type: record.base_model_class,
@@ -23,6 +21,5 @@ const { t } = useI18n();
         <span class="text-lowercase"
             >{{ record.attachments_count }} {{ t("Attachments") }}</span
         >
-        <v-icon :icon="mdiArrowRight" />
-    </InertiaLink>
+    </TdArrowedInertiaLink>
 </template>

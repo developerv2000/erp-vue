@@ -26,3 +26,4 @@
 "receive-notification-when-invoice-is-sent-for-payment-by-CMD"
 - Optimize Orders/OrderProduct scopeWithBasicPLDRelations/scopeWithBasicPLDRelationCounts/appendBasicPLDAttributes
 etc functions
+- Add middlewares for storage routes!!!!!!!

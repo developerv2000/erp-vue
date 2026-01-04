@@ -1,12 +1,12 @@
 <script setup>
 import { useI18n } from "vue-i18n";
-import { useCMDOrdersTableStore } from "@/departments/CMD/stores/orders";
+import { useCMDOrderProductsTableStore } from "@/departments/CMD/stores/orderProducts";
 
 import DefaultTableToolbar from "@/core/components/table/toolbar/DefaultTableToolbar.vue";
 import ColumnsListItem from "@/core/components/table/toolbar/more-action-items/ColumnsListItem.vue";
 import FullscreenListItem from "@/core/components/table/toolbar/more-action-items/FullscreenListItem.vue";
 
-const store = useCMDOrdersTableStore();
+const store = useCMDOrderProductsTableStore();
 const { t } = useI18n();
 </script>
 
@@ -18,7 +18,7 @@ const { t } = useI18n();
         </template>
 
         <template #moreActions>
-            <ColumnsListItem settings-key="CMD_ORDERS" />
+            <ColumnsListItem settings-key="CMD_ORDER_PRODUCTS" />
             <FullscreenListItem />
         </template>
     </DefaultTableToolbar>

@@ -3,50 +3,52 @@ import { ref, computed } from "vue";
 import { usePage, router } from "@inertiajs/vue3";
 import { useI18n } from "vue-i18n";
 import { Form, useForm } from "vee-validate";
-import { object, string, number, date, array } from "yup";
+import { object, number, mixed, string } from "yup";
 import { useVeeFormFields } from "@/core/composables/useVeeFormFields";
 import { useFormData } from "@/core/composables/useFormData";
 import { useMessagesStore } from "@/core/stores/messages";
+import { useGlobalStore } from "@/core/stores/global";
 
 import DefaultSheet from "@/core/components/containers/DefaultSheet.vue";
 import DefaultTitle from "@/core/components/titles/DefaultTitle.vue";
-import DefaultTextField from "@/core/components/form/inputs/DefaultTextField.vue";
 import DefaultAutocomplete from "@/core/components/form/inputs/DefaultAutocomplete.vue";
 import DefaultWysiwyg from "@/core/components/form/inputs/DefaultWysiwyg.vue";
+import DefaultNumberInput from "@/core/components/form/inputs/DefaultNumberInput.vue";
 import FormActionsContainer from "@/core/components/form/containers/FormActionsContainer.vue";
 import FormResetButton from "@/core/components/form/buttons/FormResetButton.vue";
 import FormUpdateAndRedirectBack from "@/core/components/form/buttons/FormUpdateAndRedirectBack.vue";
 import FormUpdateWithourRedirect from "@/core/components/form/buttons/FormUpdateWithourRedirect.vue";
-import DefaultNumberInput from "@/core/components/form/inputs/DefaultNumberInput.vue";
+import DefaultTextField from "@/core/components/form/inputs/DefaultTextField.vue";
+import DefaultFileInput from "@/core/components/form/inputs/DefaultFileInput.vue";
 
 // Dependencies
 const { t } = useI18n();
 const { objectToFormData } = useFormData();
 const page = usePage();
 const messages = useMessagesStore();
+const globalStore = useGlobalStore();
 
 const record = computed(() => page.props.record);
-console.log(record.value);
 const loading = ref(false);
 const redirectBack = ref(false);
 
 // Yup schema
 const schema = computed(() => {
     const base = {
-        name: string().required(),
-        currency_id: number().required(),
-
-        products: array().of(
-            object({
-                price: number().required(),
-                production_status: string().nullable(),
-            })
-        ),
+        price: number().required(),
     };
 
-    // After confirmation inputs
-    if (record.value?.is_sent_to_manufacturer) {
-        base.expected_dispatch_date = string().nullable();
+    // After production start inputs
+    if (record.value?.production_is_started) {
+        base.production_status = string();
+    }
+
+    // Preparing for shipment from manufacturer inputs
+    if (record.value?.can_be_prepared_for_shipping_from_manufacturer) {
+        base.packing_list_file = mixed().nullable();
+        base.coa_file = mixed().nullable();
+        base.coo_file = mixed().nullable();
+        base.declaration_for_europe_file = mixed().nullable();
     }
 
     return object(base);
@@ -54,26 +56,14 @@ const schema = computed(() => {
 
 // Backend-driven values (reactive to record)
 const baseInitialValues = computed(() => ({
-    name: record.value.name,
-    currency_id:
-        record.value.currency_id ?? page.props.defaultSelectedCurrencyID,
-
-    products: record.value.products.map((p) => ({
-        id: p.id,
-        full_english_product_label: p.process.full_english_product_label,
-        mah_name: p.process.mah.name,
-        last_comment: p.last_comment?.plain_text,
-        quantity: p.quantity,
-        price: Number(p.price ?? p.process.agreed_price),
-
-        production_status: p.production_is_started
-            ? p.production_status
-            : null,
-    })),
-
-    expected_dispatch_date: record.value.is_sent_to_manufacturer
-        ? record.value.expected_dispatch_date
+    price: Number(record.value.price ?? record.value.process.agreed_price),
+    production_status: record.value.production_is_started
+        ? record.value.production_status
         : null,
+    packing_list_file: null,
+    coa_file: null,
+    coo_file: null,
+    declaration_for_europe_file: null,
 }));
 
 // Always-reset values
@@ -102,7 +92,10 @@ const submit = handleSubmit((values) => {
     loading.value = true;
 
     axios
-        .post(route("cmd.orders.update", { record: record.value.id }), formData)
+        .post(
+            route("cmd.order-products.update", { record: record.value.id }),
+            formData
+        )
         .then(() => {
             messages.addUpdatedSuccessfullyMessage();
 
@@ -139,82 +132,38 @@ const reloadRequiredDataAndResetForm = () => {
 
 <template>
     <Form class="d-flex flex-column ga-6 pb-8" enctype="multipart/form-data">
-        <!-- Order -->
         <DefaultSheet>
-            <DefaultTitle>{{ t("Order") }}</DefaultTitle>
+            <DefaultTitle>{{ t("Product") }}</DefaultTitle>
 
             <v-row>
-                <v-col>
-                    <DefaultTextField
-                        :label="t('fields.Name')"
-                        v-model="values.name"
-                        :error-messages="errors.name"
-                        required
-                    />
-                </v-col>
-
-                <v-col>
-                    <DefaultAutocomplete
-                        :label="t('fields.Currency')"
-                        :items="page.props.currencies"
-                        v-model="values.currency_id"
-                        :error-messages="errors.currency_id"
-                        required
-                    />
-                </v-col>
-
-                <v-col v-if="record.production_is_started">
-                    <DefaultTextField
-                        :label="t('dates.Expected dispatch')"
-                        v-model="values.expected_dispatch_date"
-                        :error-messages="errors.expected_dispatch_date"
-                        required
-                    />
-                </v-col>
-            </v-row>
-        </DefaultSheet>
-
-        <!-- Products -->
-        <DefaultSheet>
-            <DefaultTitle>{{ t("Products") }}</DefaultTitle>
-
-            <v-row v-for="product in values.products" :key="product.id">
-                <v-col>
+                <v-col cols="4">
                     <DefaultTextField
                         :label="t('fields.TM Eng')"
-                        v-model="product.full_english_product_label"
+                        :value="record.process.full_english_product_label"
                         disabled
                     />
                 </v-col>
 
-                <v-col>
-                    <DefaultTextField
+                <v-col cols="4">
+                    <DefaultAutocomplete
                         :label="t('fields.MAH')"
-                        v-model="product.mah_name"
+                        :value="record.process.mah.name"
                         disabled
                     />
                 </v-col>
 
-                <v-col>
-                    <DefaultTextField
-                        :label="t('comments.Last')"
-                        v-model="product.last_comment"
-                        disabled
-                    />
-                </v-col>
-
-                <v-col v-if="!record.production_is_started">
-                    <DefaultTextField
+                <v-col cols="4">
+                    <DefaultNumberInput
                         :label="t('fields.Quantity')"
-                        v-model="product.quantity"
+                        :value="record.quantity"
                         disabled
                     />
                 </v-col>
 
-                <v-col>
+                <v-col cols="4">
                     <DefaultNumberInput
                         :label="t('fields.Price')"
-                        v-model="product.price"
+                        v-model="values.price"
                         :error-messages="errors.price"
                         :min="0"
                         :precision="2"
@@ -223,10 +172,51 @@ const reloadRequiredDataAndResetForm = () => {
                     />
                 </v-col>
 
-                <v-col v-if="record.production_is_started">
+                <v-col v-if="record.production_is_started" cols="4">
                     <DefaultTextField
                         :label="t('fields.Production status')"
-                        v-model="product.production_status"
+                        v-model="values.production_status"
+                        :error-messages="errors.production_status"
+                    />
+                </v-col>
+            </v-row>
+        </DefaultSheet>
+
+        <DefaultSheet
+            v-if="record.can_be_prepared_for_shipping_from_manufacturer"
+        >
+            <DefaultTitle>{{ t("titles.Prepare for shipment") }}</DefaultTitle>
+
+            <v-row>
+                <v-col cols="4">
+                    <DefaultFileInput
+                        :label="t('fields.Packing list')"
+                        v-model="values.packing_list_file"
+                        :error-messages="errors.packing_list_file"
+                    />
+                </v-col>
+
+                <v-col cols="4">
+                    <DefaultFileInput
+                        :label="t('fields.COA')"
+                        v-model="values.coa_file"
+                        :error-messages="errors.coa_file"
+                    />
+                </v-col>
+
+                <v-col cols="4">
+                    <DefaultFileInput
+                        :label="t('fields.COO')"
+                        v-model="values.coo_file"
+                        :error-messages="errors.coo_file"
+                    />
+                </v-col>
+
+                <v-col cols="4">
+                    <DefaultFileInput
+                        :label="t('fields.Declaration for EUR1')"
+                        v-model="values.declaration_for_europe_file"
+                        :error-messages="errors.declaration_for_europe_file"
                     />
                 </v-col>
             </v-row>

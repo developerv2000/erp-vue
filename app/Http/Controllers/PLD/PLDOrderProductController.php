@@ -41,7 +41,7 @@ class PLDOrderProductController extends Controller
 
     public function edit(OrderProduct $record)
     {
-        $record->appendBasicAttributes();
+        $record->appendBasicPLDAttributes();
         $record->append('title'); // Used on generating breadcrumbs
 
         $getReadyForOrderProcesses = fn() => $record->order->manufacturer->getReadyForOrderProcessesOfCountry(

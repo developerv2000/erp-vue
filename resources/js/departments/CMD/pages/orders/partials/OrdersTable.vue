@@ -177,7 +177,7 @@ const handleTableOptionsUpdate = (options) => {
         </template>
 
         <template #item.expected_dispatch_date="{ item }">
-            {{ formatDate(item.expected_dispatch_date) }}
+            {{ item.expected_dispatch_date }}
         </template>
 
         <template #item.invoices_count="{ item }">

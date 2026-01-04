@@ -365,18 +365,18 @@ const normalizeInputDebounced = debounce((value, values, key) => {
         <FormActionsContainer>
             <FormResetButton @click="resetForm" :loading="loading" />
 
-            <FormUpdateAndRedirectBack
+            <FormUpdateWithourRedirect
                 @click="
-                    redirectBack = true;
+                    redirectBack = false;
                     submit();
                 "
                 :loading="loading"
                 :disabled="!meta.valid"
             />
 
-            <FormUpdateWithourRedirect
+            <FormUpdateAndRedirectBack
                 @click="
-                    redirectBack = false;
+                    redirectBack = true;
                     submit();
                 "
                 :loading="loading"

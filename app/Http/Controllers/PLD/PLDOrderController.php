@@ -61,7 +61,7 @@ class PLDOrderController extends Controller
 
     public function edit(Order $record)
     {
-        $record->appendBasicAttributes();
+        $record->appendBasicPLDAttributes();
         $record->append('title'); // Used on generating breadcrumbs
 
         return Inertia::render('departments/PLD/pages/orders/Edit', [
@@ -95,11 +95,11 @@ class PLDOrderController extends Controller
         $record->sendToBdm();
 
         // Return refetched updated record
-        $record = Order::withBasicRelations()
-            ->withBasicRelationCounts()
+        $record = Order::withBasicPLDRelations()
+            ->withBasicPLDRelationCounts()
             ->findOrFail($record->id);
 
-        $record->appendBasicAttributes();
+        $record->appendBasicPLDAttributes();
 
         return $record;
     }
@@ -112,11 +112,11 @@ class PLDOrderController extends Controller
         $record->confirm();
 
         // Return refetched updated record
-        $record = Order::withBasicRelations()
-            ->withBasicRelationCounts()
+        $record = Order::withBasicPLDRelations()
+            ->withBasicPLDRelationCounts()
             ->findOrFail($record->id);
 
-        $record->appendBasicAttributes();
+        $record->appendBasicPLDAttributes();
 
         return $record;
     }

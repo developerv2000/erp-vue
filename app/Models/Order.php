@@ -107,21 +107,12 @@ class Order extends Model implements HasTitleAttribute
     }
 
     /**
-     * Can have invoices of 'ProductionType' and maybe later (not fully planned yet)
-     * can also have invoices of 'Delivery to warehouse' type.
-     */
-    public function invoices()
-    {
-        return $this->morphMany(Invoice::class, 'invoiceable');
-    }
-
-    /**
      * 'ProductionType' invoices associated with the 'Order' and
      * can have multiple attached 'Products'.
      */
     public function productionInvoices()
     {
-        return $this->invoices()
+        return $this->morphMany(Invoice::class, 'invoiceable')
             ->onlyProductionType();
     }
 
@@ -131,19 +122,37 @@ class Order extends Model implements HasTitleAttribute
     |--------------------------------------------------------------------------
     */
 
-    public static function appendRecordsBasicAttributes($records): void
+    public static function appendRecordsBasicPLDAttributes($records): void
     {
         foreach ($records as $record) {
-            $record->appendBasicAttributes();
+            $record->appendBasicPLDAttributes();
         }
     }
 
-    public function appendBasicAttributes(): void
+    public function appendBasicPLDAttributes(): void
     {
         $this->append([
             'base_model_class',
             'status',
             'is_sent_to_bdm',
+            'is_sent_to_confirmation',
+            'is_confirmed',
+            'is_sent_to_manufacturer',
+        ]);
+    }
+
+    public static function appendRecordsBasicCMDAttributes($records): void
+    {
+        foreach ($records as $record) {
+            $record->appendBasicCMDAttributes();
+        }
+    }
+
+    public function appendBasicCMDAttributes(): void
+    {
+        $this->append([
+            'base_model_class',
+            'status',
             'is_sent_to_confirmation',
             'can_be_sent_for_confirmation',
             'is_confirmed',
@@ -229,6 +238,68 @@ class Order extends Model implements HasTitleAttribute
         };
     }
 
+    /**
+     * Indicates whether a new production invoice can be attached to the order.
+     *
+     * Requirements:
+     * - Order must be sent to the manufacturer
+     * - At least one product must allow attaching a production invoice
+     *
+     * Required loaded relations:
+     * - products
+     * - products.productionInvoices
+     */
+    public function getCanAttachProductionInvoiceAttribute(): bool
+    {
+        return $this->is_sent_to_manufacturer
+            && $this->products->contains->can_attach_production_invoice;
+    }
+
+    /**
+     * Indicates whether a prepayment production invoice can be attached to the order.
+     *
+     * Rule:
+     * - No production invoices exist for the order
+     *
+     * Optimization:
+     * - Uses eager-loaded production_invoices_count if available
+     */
+    public function getCanAttachProductionPrepaymentInvoiceAttribute(): bool
+    {
+        $invoiceCount = $this->production_invoices_count ?? $this->productionInvoices()->count();
+
+        return $invoiceCount === 0;
+    }
+
+    /**
+     * Indicates whether a final payment production invoice can be attached.
+     *
+     * Rule:
+     * - At least one product allows attaching a final payment invoice
+     *
+     * Required loaded relations:
+     * - products
+     * - products.productionInvoices
+     */
+    public function getCanAttachProductionFinalPaymentInvoiceAttribute(): bool
+    {
+        return $this->products->contains->can_attach_production_final_payment_invoice;
+    }
+
+    /**
+     * Indicates whether a full payment production invoice can be attached.
+     *
+     * Rule:
+     * - At least one product allows attaching a full payment invoice
+     *
+     * Required loaded relations:
+     * - products
+     * - products.productionInvoices
+     */
+    public function getCanAttachProductionFullPaymentInvoiceAttribute(): bool
+    {
+        return $this->products->contains->can_attach_production_full_payment_invoice;
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -261,7 +332,34 @@ class Order extends Model implements HasTitleAttribute
     |--------------------------------------------------------------------------
     */
 
-    public function scopeWithBasicRelations($query): Builder
+    public function scopeWithBasicPLDRelations($query): Builder
+    {
+        return $query->with([
+            'country',
+            'lastComment',
+
+            'manufacturer' => function ($manufacturersQuery) {
+                $manufacturersQuery->select(
+                    'manufacturers.id',
+                    'manufacturers.name',
+                    'bdm_user_id',
+                )
+                    ->with([
+                        'bdm:id,name,photo',
+                    ]);
+            },
+        ]);
+    }
+
+    public function scopeWithBasicPLDRelationCounts($query): Builder
+    {
+        return $query->withCount([
+            'comments',
+            'products',
+        ]);
+    }
+
+    public function scopeWithBasicCMDRelations($query): Builder
     {
         return $query->with([
             'country',
@@ -281,12 +379,12 @@ class Order extends Model implements HasTitleAttribute
         ]);
     }
 
-    public function scopeWithBasicRelationCounts($query): Builder
+    public function scopeWithBasicCMDRelationCounts($query): Builder
     {
         return $query->withCount([
             'comments',
             'products',
-            'invoices',
+            'productionInvoices',
         ]);
     }
 
@@ -344,8 +442,8 @@ class Order extends Model implements HasTitleAttribute
      */
     public static function queryPLDRecordsFromRequest(Request $request, string $action = 'paginate', bool $appendAttributes = false)
     {
-        $query = self::withBasicRelations()
-            ->withBasicRelationCounts();
+        $query = self::withBasicPLDRelations()
+            ->withBasicPLDRelationCounts();
 
         // Normalize request parameters
         self::addDefaultQueryParamsToRequest(
@@ -363,7 +461,7 @@ class Order extends Model implements HasTitleAttribute
 
         // Append attributes unless raw query is requested
         if ($appendAttributes && $action !== 'query') {
-            self::appendRecordsBasicAttributes($records);
+            self::appendRecordsBasicPLDAttributes($records);
         }
 
         return $records;
@@ -386,8 +484,8 @@ class Order extends Model implements HasTitleAttribute
     public static function queryCMDRecordsFromRequest(Request $request, string $action = 'paginate', bool $appendAttributes = false)
     {
         $query = self::onlySentToBdm()
-            ->withBasicRelations()
-            ->withBasicRelationCounts();
+            ->withBasicCMDRelations()
+            ->withBasicCMDRelationCounts();
 
         // Normalize request parameters
         self::addDefaultQueryParamsToRequest(
@@ -405,7 +503,7 @@ class Order extends Model implements HasTitleAttribute
 
         // Append attributes unless raw query is requested
         if ($appendAttributes && $action !== 'query') {
-            self::appendRecordsBasicAttributes($records);
+            self::appendRecordsBasicCMDAttributes($records);
         }
 
         return $records;
@@ -612,36 +710,6 @@ class Order extends Model implements HasTitleAttribute
 
     /*
     |--------------------------------------------------------------------------
-    | Action availability
-    |--------------------------------------------------------------------------
-    */
-
-    public function canAttachNewInvoice(): bool
-    {
-        return $this->is_sent_to_manufacturer
-            && $this->products->contains->canAttachNewProductionInvoice();
-    }
-
-    public function canAttachProductionInvoiceOFPrepaymentType(): bool
-    {
-        // Use eager-loaded count if available, otherwise fallback to counting the relation
-        $invoiceCount = $this->production_invoices_count ?? $this->productionInvoices()->count();
-
-        return $invoiceCount === 0;
-    }
-
-    public function canAttachProductionInvoiceOfFinalPaymentType(): bool
-    {
-        return $this->products->contains->canAttachProductionInvoiceOfFinalPaymentType();
-    }
-
-    public function canAttachProductionInvoiceOfFullPaymentType(): bool
-    {
-        return $this->products->contains->canAttachProductionInvoiceOfFullPaymentType();
-    }
-
-    /*
-    |--------------------------------------------------------------------------
     | Actions
     |--------------------------------------------------------------------------
     */
@@ -808,7 +876,7 @@ class Order extends Model implements HasTitleAttribute
             ['title' => 'dates.Sent to confirmation', 'key' => 'sent_to_confirmation_date', 'width' => 244, 'sortable' => true],
             ['title' => 'dates.Confirmation', 'key' => 'confirmation_date', 'width' => 172, 'sortable' => true],
             ['title' => 'dates.Sent to manufacturer', 'key' => 'sent_to_manufacturer_date', 'width' => 168, 'sortable' => true],
-            ['title' => 'dates.Expected dispatch', 'key' => 'expected_dispatch_date', 'width' => 204, 'sortable' => true],
+            ['title' => 'dates.Expected dispatch', 'key' => 'expected_dispatch_date', 'width' => 190, 'sortable' => false],
             ['title' => 'Invoices', 'key' => 'invoices_count', 'width' => 216, 'sortable' => false],
             ['title' => 'dates.Production start', 'key' => 'production_start_date', 'width' => 204, 'sortable' => true],
             ['title' => 'dates.Date of creation', 'key' => 'created_at', 'width' => 130, 'sortable' => true],

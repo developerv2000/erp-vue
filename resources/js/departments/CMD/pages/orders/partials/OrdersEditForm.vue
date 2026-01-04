@@ -44,8 +44,8 @@ const schema = computed(() => {
     };
 
     // After confirmation inputs
-    if (record.value.is_sent_to_manufacturer) {
-        base.expected_dispatch_date = date().nullable();
+    if (record.value?.is_sent_to_manufacturer) {
+        base.expected_dispatch_date = string().nullable();
     }
 
     return object(base);
@@ -258,18 +258,18 @@ const reloadRequiredDataAndResetForm = () => {
         <FormActionsContainer>
             <FormResetButton @click="resetForm" :loading="loading" />
 
-            <FormUpdateAndRedirectBack
+            <FormUpdateWithourRedirect
                 @click="
-                    redirectBack = true;
+                    redirectBack = false;
                     submit();
                 "
                 :loading="loading"
                 :disabled="!meta.valid"
             />
 
-            <FormUpdateWithourRedirect
+            <FormUpdateAndRedirectBack
                 @click="
-                    redirectBack = false;
+                    redirectBack = true;
                     submit();
                 "
                 :loading="loading"

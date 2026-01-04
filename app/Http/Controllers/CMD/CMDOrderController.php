@@ -31,7 +31,7 @@ class CMDOrderController extends Controller
 
     public function edit(Order $record)
     {
-        $record->appendBasicAttributes();
+        $record->appendBasicCMDAttributes();
         $record->append('title'); // Used on generating breadcrumbs
 
         // Load required relations
@@ -87,11 +87,11 @@ class CMDOrderController extends Controller
         $record->sendToConfirmation();
 
         // Return refetched updated record
-        $record = Order::withBasicRelations()
-            ->withBasicRelationCounts()
+        $record = Order::withBasicCMDRelations()
+            ->withBasicCMDRelationCounts()
             ->findOrFail($record->id);
 
-        $record->appendBasicAttributes();
+        $record->appendBasicCMDAttributes();
 
         return $record;
     }
@@ -104,11 +104,11 @@ class CMDOrderController extends Controller
         $record->sendToManufacturer();
 
         // Return refetched updated record
-        $record = Order::withBasicRelations()
-            ->withBasicRelationCounts()
+        $record = Order::withBasicCMDRelations()
+            ->withBasicCMDRelationCounts()
             ->findOrFail($record->id);
 
-        $record->appendBasicAttributes();
+        $record->appendBasicCMDAttributes();
 
         return $record;
     }
@@ -121,11 +121,11 @@ class CMDOrderController extends Controller
         $record->startProduction();
 
         // Return refetched updated record
-        $record = Order::withBasicRelations()
-            ->withBasicRelationCounts()
+        $record = Order::withBasicCMDRelations()
+            ->withBasicCMDRelationCounts()
             ->findOrFail($record->id);
 
-        $record->appendBasicAttributes();
+        $record->appendBasicCMDAttributes();
 
         return $record;
     }

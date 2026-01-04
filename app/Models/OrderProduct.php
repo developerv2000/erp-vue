@@ -151,14 +151,14 @@ class OrderProduct extends Model implements HasTitleAttribute
     |--------------------------------------------------------------------------
     */
 
-    public static function appendRecordsBasicAttributes($records): void
+    public static function appendRecordsBasicPLDAttributes($records): void
     {
         foreach ($records as $record) {
-            $record->appendBasicAttributes();
+            $record->appendBasicPLDAttributes();
         }
     }
 
-    public function appendBasicAttributes(): void
+    public function appendBasicPLDAttributes(): void
     {
         $this->append([
             'base_model_class',
@@ -174,23 +174,6 @@ class OrderProduct extends Model implements HasTitleAttribute
             'full_english_product_label',
             'full_russian_product_label',
         ]);
-    }
-
-    public function getProductionPrepaymentInvoiceAttribute()
-    {
-        return $this->productionInvoices
-            ->where('payment_type_id', InvoicePaymentType::PREPAYMENT_ID)
-            ->first();
-    }
-
-    public function getProductionFinalOrFullPaymentInvoiceAttribute()
-    {
-        return $this->productionInvoices
-            ->whereIn('payment_type_id', [
-                InvoicePaymentType::FINAL_PAYMENT_ID,
-                InvoicePaymentType::FULL_PAYMENT_ID,
-            ])
-            ->first();
     }
 
     public function getLayoutApprovedAttribute(): bool
@@ -294,6 +277,98 @@ class OrderProduct extends Model implements HasTitleAttribute
         ]);
     }
 
+    /**
+     * Indicates whether a new production invoice can be attached to the product.
+     *
+     * Rule:
+     * - Any of the payment-type-specific rules must be satisfied
+     *
+     * Required loaded relations:
+     * - productionInvoices
+     */
+    public function getCanAttachProductionInvoiceAttribute(): bool
+    {
+        return $this->can_attach_production_prepayment_invoice
+            || $this->can_attach_production_final_payment_invoice
+            || $this->can_attach_production_full_payment_invoice;
+    }
+
+    /**
+     * Indicates whether a prepayment production invoice can be attached.
+     *
+     * Rule:
+     * - No production invoices exist for the product
+     *
+     * Required loaded relations:
+     * - productionInvoices
+     */
+    public function getCanAttachProductionPrepaymentInvoiceAttribute(): bool
+    {
+        return $this->productionInvoices->count() === 0;
+    }
+
+    /**
+     * Indicates whether a final payment production invoice can be attached.
+     *
+     * Rule:
+     * - A prepayment invoice exists
+     * - No final payment invoice exists yet
+     *
+     * Required loaded relations:
+     * - productionInvoices
+     */
+    public function getCanAttachProductionFinalPaymentInvoiceAttribute(): bool
+    {
+        $hasPrepayment = $this->productionInvoices
+            ->where('payment_type_id', InvoicePaymentType::PREPAYMENT_ID)
+            ->isNotEmpty();
+
+        $hasFinalPayment = $this->productionInvoices
+            ->where('payment_type_id', InvoicePaymentType::FINAL_PAYMENT_ID)
+            ->isNotEmpty();
+
+        return $hasPrepayment && ! $hasFinalPayment;
+    }
+
+    /**
+     * Indicates whether a full payment production invoice can be attached.
+     *
+     * Rule:
+     * - No production invoices exist for the product
+     *
+     * Required loaded relations:
+     * - productionInvoices
+     */
+    public function getCanAttachProductionFullPaymentInvoiceAttribute(): bool
+    {
+        return $this->productionInvoices->count() === 0;
+    }
+
+    /**
+     * Required loaded relations:
+     * - productionInvoices
+     */
+    public function getProductionPrepaymentInvoiceAttribute()
+    {
+        return $this->productionInvoices
+            ->where('payment_type_id', InvoicePaymentType::PREPAYMENT_ID)
+            ->first();
+    }
+
+    /**
+     * Required loaded relations:
+     * - productionInvoices
+     */
+    public function getProductionFinalOrFullPaymentInvoiceAttribute()
+    {
+        return $this->productionInvoices
+            ->whereIn('payment_type_id', [
+                InvoicePaymentType::FINAL_PAYMENT_ID,
+                InvoicePaymentType::FULL_PAYMENT_ID,
+            ])
+            ->first();
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Events
@@ -322,7 +397,7 @@ class OrderProduct extends Model implements HasTitleAttribute
     |--------------------------------------------------------------------------
     */
 
-    public function scopeWithBasicRelations($query)
+    public function scopeWithBasicPLDRelations($query)
     {
         return $query->with([
             'lastComment',
@@ -350,16 +425,10 @@ class OrderProduct extends Model implements HasTitleAttribute
                 $processQuery->withRelationsForOrderProduct()
                     ->withOnlySelectsForOrderProduct();
             },
-
-            // 'productionInvoices' => function ($invoicesQuery) {
-            //     $invoicesQuery->with([
-            //         'paymentType',
-            //     ]);
-            // },
         ]);
     }
 
-    public function scopeWithBasicRelationCounts($query): Builder
+    public function scopeWithBasicPLDRelationCounts($query): Builder
     {
         return $query->withCount([
             'comments',
@@ -440,8 +509,8 @@ class OrderProduct extends Model implements HasTitleAttribute
      */
     public static function queryPLDRecordsFromRequest(Request $request, string $action = 'paginate', bool $appendAttributes = false)
     {
-        $query = self::withBasicRelations()
-            ->withBasicRelationCounts();
+        $query = self::withBasicPLDRelations()
+            ->withBasicPLDRelationCounts();
 
         // Normalize request parameters
         self::addDefaultQueryParamsToRequest(
@@ -459,7 +528,7 @@ class OrderProduct extends Model implements HasTitleAttribute
 
         // Append attributes unless raw query is requested
         if ($appendAttributes && $action !== 'query') {
-            self::appendRecordsBasicAttributes($records);
+            self::appendRecordsBasicPLDAttributes($records);
         }
 
         return $records;
@@ -670,40 +739,6 @@ class OrderProduct extends Model implements HasTitleAttribute
     public static function getDeclarationForEuropeFileFolderPath(): string
     {
         return storage_path(self::STORAGE_FILES_PATH . '/' . self::DECLARATION_FOR_EUROPE_FILE_FOLDER_NAME);
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Action availability
-    |--------------------------------------------------------------------------
-    */
-
-    public function canAttachNewProductionInvoice(): bool
-    {
-        return $this->canAttachProductionInvoiceOFPrepaymentType()
-            || $this->canAttachProductionInvoiceOfFinalPaymentType()
-            || $this->canAttachProductionInvoiceOfFullPaymentType();
-    }
-
-    public function canAttachProductionInvoiceOFPrepaymentType(): bool
-    {
-        return $this->productionInvoices->count() == 0;
-    }
-
-    public function canAttachProductionInvoiceOfFinalPaymentType(): bool
-    {
-        return $this->productionInvoices
-            ->where('payment_type_id', InvoicePaymentType::PREPAYMENT_ID)
-            ->count() > 0
-
-            && $this->productionInvoices
-            ->where('payment_type_id', InvoicePaymentType::FINAL_PAYMENT_ID)
-            ->count() == 0;
-    }
-
-    public function canAttachProductionInvoiceOfFullPaymentType(): bool
-    {
-        return $this->productionInvoices->count() == 0;
     }
 
     /*

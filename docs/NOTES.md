@@ -24,3 +24,5 @@
 - removeDateTimezonesFromFormData from MAD part
 - Rename permissions like "receive-notification-when-CMD-invoice-is-sent-for-payment" to
 "receive-notification-when-invoice-is-sent-for-payment-by-CMD"
+- Optimize Orders/OrderProduct scopeWithBasicPLDRelations/scopeWithBasicPLDRelationCounts/appendBasicPLDAttributes
+etc functions

@@ -26,7 +26,7 @@ class CMDOrderController extends Controller
             'tableVisibleHeaders' => $getVisibleHeaders,
 
             // Lazy loads. Never refetched again
-            'filterDependencies' => fn() => $this->getfilterDependencies(),
+            'filterDependencies' => fn() => $this->getFilterDependencies(),
             'invoicePaymentTypes' => fn() => InvoicePaymentType::all(), // Used on generating invoice links
         ]);
     }
@@ -133,7 +133,7 @@ class CMDOrderController extends Controller
         return $record;
     }
 
-    private function getfilterDependencies(): array
+    private function getFilterDependencies(): array
     {
         return [
             'manufacturers' => Manufacturer::getMinifiedRecordsWithProcessesReadyForOrder(),

@@ -73,6 +73,7 @@ const availableInvoiceActions = computed(() =>
             :key="action.paymentTypeName"
             :link="
                 route('cmd.invoices.create', {
+                    order_id: item.id,
                     payment_type_id:
                         paymentTypesByName[action.paymentTypeName].id,
                 })

@@ -52,6 +52,7 @@ const store = useCMDOrderProductsTableStore();
             :items="
                 page.props.filterDependencies.countriesOrderedByProcessesCount
             "
+            item-title="code"
             multiple
         />
 

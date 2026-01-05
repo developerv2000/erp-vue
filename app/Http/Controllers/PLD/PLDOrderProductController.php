@@ -35,7 +35,7 @@ class PLDOrderProductController extends Controller
             'tableVisibleHeaders' => $getVisibleHeaders,
 
             // Lazy loads. Never refetched again
-            'filterDependencies' => fn() => $this->getfilterDependencies(),
+            'filterDependencies' => fn() => $this->getFilterDependencies(),
         ]);
     }
 
@@ -74,7 +74,7 @@ class PLDOrderProductController extends Controller
         ]);
     }
 
-    private function getfilterDependencies(): array
+    private function getFilterDependencies(): array
     {
         return [
             'manufacturers' => Manufacturer::getMinifiedRecordsWithProcessesReadyForOrder(),

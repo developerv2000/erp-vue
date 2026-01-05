@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\global\MainController;
+use App\Models\Invoice;
 use App\Models\Manufacturer;
 use App\Models\Order;
 use App\Models\OrderProduct;
@@ -82,6 +83,12 @@ Route::middleware('auth:sanctum')->name('api.')->group(function () {
         Route::prefix('/order-products')->name('order-products.')->group(function () {
             Route::get('/', fn(Request $request) => OrderProduct::queryCMDRecordsFromRequest($request, 'paginate', true))
                 ->middleware('can:view-CMD-order-products')
+                ->name('get');
+        });
+
+        Route::prefix('/invoices')->name('invoices.')->group(function () {
+            Route::get('/', fn(Request $request) => Invoice::queryCMDRecordsFromRequest($request, 'paginate', true))
+                ->middleware('can:view-CMD-invoices')
                 ->name('get');
         });
     });

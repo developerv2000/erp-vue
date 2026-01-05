@@ -716,7 +716,7 @@ class User extends Authenticatable
 
         $headersSettings[self::CMD_ORDERS_HEADERS_KEY] = Order::getCMDTableHeadersForUser($this);
         $headersSettings[self::CMD_ORDER_PRODUCTS_HEADERS_KEY] = OrderProduct::getCMDTableHeadersForUser($this);
-        // $headersSettings[self::CMD_INVOICES_HEADERS_KEY] = Invoice::getCMDTableHeadersForUser($this);
+        $headersSettings[self::CMD_INVOICES_HEADERS_KEY] = Invoice::getCMDTableHeadersForUser($this);
 
         $settings['table_headers'] = $headersSettings;
         $this->settings = $settings;

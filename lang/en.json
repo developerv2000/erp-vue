@@ -187,6 +187,11 @@
     "dates.Layout sent": "Layout sent date",
     "dates.Print proof receive": "Print proof receive date",
     "dates.Layout approved": "Layout approved date",
+    "dates.Sent for payment": "Sent for payment date",
+    "dates.Payment completed": "Payment completed date",
+    "dates.Accepted": "Accepted date",
+    "dates.Payment request": "Payment request date",
+    "dates.Payment": "Payment date",
 
     "Days": "Days",
     "days.past": "Days past",
@@ -212,6 +217,7 @@
     "filter.Region": "Region",
     "filter.Has VPS for country": "Has VPS for country",
     "filter.Order ID": "Order ID",
+    "filter.Product ID": "Product ID",
     "Special filter": "Special filter",
     "Special filter.Contract on specific month": "Contract on specific month",
     "Special filter.Registration on specific month": "Registration on specific month",
@@ -346,6 +352,11 @@
     "fields.Declaration for EUR1": "Declaration for EUR1",
     "fields.Layout status": "Layout status",
     "fields.Box article": "Box article",
+
+    "fields.Payment type": "Payment type",
+    "fields.Pdf": "Pdf",
+    "fields.Invoie №": "Invoie №",
+    "fields.Swift": "Swift",
 
     "AAAAAAAAAAAAAA": "AAAAAAAAAAAAAA",
 

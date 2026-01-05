@@ -59,6 +59,7 @@ const store = usePLDOrdersTableStore();
             :items="
                 page.props.filterDependencies.countriesOrderedByProcessesCount
             "
+            item-title="code"
             multiple
         />
 

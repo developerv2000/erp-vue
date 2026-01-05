@@ -98,7 +98,7 @@ class Invoice extends Model implements HasTitleAttribute
     /**
      * Only for invoices of 'Production' type
      */
-    public function orderProducts()
+    public function products()
     {
         return $this->belongsToMany(OrderProduct::class);
     }
@@ -109,18 +109,25 @@ class Invoice extends Model implements HasTitleAttribute
     |--------------------------------------------------------------------------
     */
 
-    public static function appendRecordsBasicAttributes($records): void
+    public static function appendRecordsBasicCMDAttributes($records): void
     {
         foreach ($records as $record) {
-            $record->appendBasicAttributes();
+            $record->appendBasicCMDAttributes();
         }
     }
 
-    public function appendBasicAttributes(): void
+    public function appendBasicCMDAttributes(): void
     {
         $this->append([
             'base_model_class',
+            'pdf_file_url',
         ]);
+
+        $this->invoiceable->append([
+            'title',
+        ]);
+
+        $this->products->each(fn($product) => $product->process->append('full_english_product_label'));
     }
 
     public function getIsSentForPaymentAttribute(): bool
@@ -141,7 +148,7 @@ class Invoice extends Model implements HasTitleAttribute
     public function getPdfFileUrlAttribute(): string
     {
         return route('invoices.files', [
-            'path' => self::PDF_FILES_FOLDER_NAME . '/' . $this->pdf,
+            'path' => self::PDF_FILES_FOLDER_NAME . '/' . $this->pdf_file,
         ]);
     }
 
@@ -161,7 +168,7 @@ class Invoice extends Model implements HasTitleAttribute
     protected static function booted(): void
     {
         static::deleting(function ($record) {
-            $record->orderProducts()->detach();
+            $record->products()->detach();
         });
     }
 
@@ -171,13 +178,13 @@ class Invoice extends Model implements HasTitleAttribute
     |--------------------------------------------------------------------------
     */
 
-    public function scopeWithBasicRelations($query): Builder
+    public function scopeWithBasicCMDRelations($query): Builder
     {
         return $query->with([
             'type',
             'paymentType',
 
-            'order' => function ($orderQuery) {
+            'invoiceable' => function ($orderQuery) {
                 $orderQuery->with([ // ->withBasicRelations not used because of redundant relations
                     'country',
 
@@ -189,20 +196,23 @@ class Invoice extends Model implements HasTitleAttribute
                     },
                 ]);
             },
+
+            'products' => function ($productsQuery) {
+                $productsQuery->with([
+                    'process' => function ($processQuery) {
+                        $processQuery->withRelationsForOrderProduct()
+                            ->withOnlySelectsForOrderProduct();
+                    },
+                ]);
+            }
         ]);
     }
 
-    public function scopeWithBasicRelationCounts($query): Builder
+    public function scopeWithBasicCMDRelationCounts($query): Builder
     {
         return $query->withCount([
             'comments',
-            'orderProducts',
         ]);
-    }
-
-    public function scopeOnlySentForPayment($query)
-    {
-        return $query->whereNotNull('sent_for_payment_date');
     }
 
     public function scopeOnlyProductionType($query)
@@ -218,6 +228,11 @@ class Invoice extends Model implements HasTitleAttribute
     public function scopeOnlyExportType($query)
     {
         return $query->where('type_id', InvoiceType::EXPORT_TYPE_ID);
+    }
+
+    public function scopeOnlySentForPayment($query)
+    {
+        return $query->whereNotNull('sent_for_payment_date');
     }
 
     /*
@@ -252,17 +267,17 @@ class Invoice extends Model implements HasTitleAttribute
      * @param $action  ('paginate', 'get' or 'query')
      * @return mixed
      */
-    public static function queryPRDRecordsFromRequest(Request $request, string $action = 'paginate', bool $appendAttributes = false)
+    public static function queryCMDRecordsFromRequest(Request $request, string $action = 'paginate', bool $appendAttributes = false)
     {
-        $query = self::withBasicRelations()
-            ->withBasicRelationCounts();
+        $query = self::withBasicCMDRelations()
+            ->withBasicCMDRelationCounts();
 
         // Normalize request parameters
         self::addDefaultQueryParamsToRequest(
             $request,
-            'DEFAULT_PRD_ORDER_BY',
-            'DEFAULT_PRD_ORDER_DIRECTION',
-            'DEFAULT_PRD_PER_PAGE'
+            'DEFAULT_CMD_ORDER_BY',
+            'DEFAULT_CMD_ORDER_DIRECTION',
+            'DEFAULT_CMD_PER_PAGE'
         );
 
         // Apply filters
@@ -273,7 +288,7 @@ class Invoice extends Model implements HasTitleAttribute
 
         // Append attributes unless raw query is requested
         if ($appendAttributes && $action !== 'query') {
-            self::appendRecordsBasicAttributes($records);
+            self::appendRecordsBasicCMDAttributes($records);
         }
 
         return $records;
@@ -296,8 +311,8 @@ class Invoice extends Model implements HasTitleAttribute
     private static function getFilterConfig(): array
     {
         return [
-            'whereEqual' => ['payment_type_id', 'number'],
-            'whereIn' => ['id', 'order_id'],
+            'whereEqual' => ['order_id'],
+            'whereIn' => ['id', 'payment_type_id', 'number'],
             'dateRange' => [
                 'receive_date',
                 'sent_for_payment_date',
@@ -307,21 +322,29 @@ class Invoice extends Model implements HasTitleAttribute
 
             'relationEqual' => [
                 [
+                    'inputName' => 'product_id',
+                    'relationName' => 'products',
+                    'relationAttribute' => 'order_products.id',
+                ],
+            ],
+
+            'relationIn' => [
+                [
                     'inputName' => 'order_manufacturer_id',
                     'relationName' => 'invoiceable',
                     'relationAttribute' => 'orders.manufacturer_id',
                 ],
 
                 [
-                    'inputName' => 'order_country_id',
+                    'inputName' => 'order_name',
                     'relationName' => 'invoiceable',
-                    'relationAttribute' => 'orders.country_id',
+                    'relationAttribute' => 'orders.name',
                 ],
 
                 [
-                    'inputName' => 'order_product_id',
-                    'relationName' => 'orderProducts',
-                    'relationAttribute' => 'order_products.id',
+                    'inputName' => 'order_country_id',
+                    'relationName' => 'invoiceable',
+                    'relationAttribute' => 'orders.country_id',
                 ],
             ],
         ];
@@ -341,22 +364,22 @@ class Invoice extends Model implements HasTitleAttribute
         $order = Order::findorfail($request->input('order_id'));
 
         // Create invoice
-        $record = self::create([
+        $record = $order->productionInvoices()->create([
             ...$request->all(),
-            'type_id' => InvoiceType::PRODUCTION_TYPE_ID
+            'type_id' => InvoiceType::PRODUCTION_TYPE_ID,
         ]);
 
         // Attach all products of order, for invoice of PREPAYMENT type
         if ($record->payment_type_id == InvoicePaymentType::PREPAYMENT_ID) {
             $allProductIDs = $order->products()->pluck('id')->toArray();
-            $record->orderProducts()->attach($allProductIDs);
+            $record->products()->attach($allProductIDs);
         }
 
         // Attach only selected products for invoices of
         // 'FULL_PAYMENT' and 'FINAL_PAYMENT' types
         else {
-            $selectedProducts = $request->input('order_products', []);
-            $record->orderProducts()->attach($selectedProducts);
+            $selectedProducts = $request->input('products', []);
+            $record->products()->attach($selectedProducts);
         }
 
         // Upload PDF file
@@ -468,16 +491,16 @@ class Invoice extends Model implements HasTitleAttribute
     |--------------------------------------------------------------------------
     */
 
-    public static function getPRDTableHeadersForUser($user): array|null
+    public static function getCMDTableHeadersForUser($user): array|null
     {
-        if (Gate::forUser($user)->denies(Permission::extractAbilityName(Permission::CAN_VIEW_PRD_INVOICES_NAME))) {
+        if (Gate::forUser($user)->denies(Permission::extractAbilityName(Permission::CAN_VIEW_CMD_INVOICES_NAME))) {
             return null;
         }
 
         $order = 1;
         $columns = array();
 
-        if (Gate::forUser($user)->allows(Permission::extractAbilityName(Permission::CAN_EDIT_PRD_INVOICES_NAME))) {
+        if (Gate::forUser($user)->allows(Permission::extractAbilityName(Permission::CAN_EDIT_CMD_INVOICES_NAME))) {
             array_push(
                 $columns,
                 ['title' => 'Record', 'key' => 'edit', 'width' => 60, 'sortable' => false, 'visible' => 1, 'order' => $order++],
@@ -486,20 +509,28 @@ class Invoice extends Model implements HasTitleAttribute
 
         $additionalColumns = [
             ['title' => 'ID', 'key' => 'id', 'width' => 62, 'sortable' => true],
-            ['title' => 'fields.BDM', 'key' => 'manufacturer_bdm', 'width' => 146, 'sortable' => false],
             ['title' => 'dates.Receive', 'key' => 'receive_date', 'width' => 142, 'sortable' => true],
-            ['title' => 'fields.Manufacturer', 'key' => 'manufacturer_id', 'width' => 140, 'sortable' => true],
-            ['title' => 'fields.Country', 'key' => 'country_id', 'width' => 80, 'sortable' => true],
-            ['title' => 'Products', 'key' => 'products_count', 'width' => 100, 'sortable' => false],
+            ['title' => 'fields.Payment type', 'key' => 'payment_type_id', 'width' => 112, 'sortable' => true],
+            ['title' => 'dates.Sent for payment', 'key' => 'sent_for_payment_date', 'width' => 200, 'sortable' => true],
+            ['title' => 'dates.Payment completed', 'key' => 'payment_completed_date', 'width' => 204, 'sortable' => true],
+            ['title' => 'fields.Pdf', 'key' => 'pdf_file', 'width' => 144, 'sortable' => false],
+
+            ['title' => 'Order', 'key' => 'order_title', 'width' => 128, 'sortable' => true],
+            ['title' => 'fields.Manufacturer', 'key' => 'order_manufacturer_name', 'width' => 140, 'sortable' => false],
+            ['title' => 'Products', 'key' => 'products', 'width' => 180, 'sortable' => false],
+            ['title' => 'fields.Country', 'key' => 'order_country_code', 'width' => 64, 'sortable' => false],
+
+            ['title' => 'dates.Accepted', 'key' => 'accepted_by_financier_date', 'width' => 132, 'sortable' => true],
+            ['title' => 'dates.Payment request', 'key' => 'payment_request_date_by_financier', 'width' => 180, 'sortable' => true],
+            ['title' => 'dates.Payment', 'key' => 'payment_date', 'width' => 124, 'sortable' => true],
+            ['title' => 'fields.Invoie №', 'key' => 'number', 'width' => 120, 'sortable' => true],
+            ['title' => 'fields.Swift', 'key' => 'payment_confirmation_document', 'width' => 144, 'sortable' => false],
+
             ['title' => 'Comments', 'key' => 'comments_count', 'width' => 132, 'sortable' => false],
             ['title' => 'comments.Last', 'key' => 'last_comment_body', 'width' => 200, 'sortable' => false],
-            ['title' => 'Status', 'key' => 'status', 'width' => 142, 'sortable' => false],
-            ['title' => 'dates.Sent to BDM', 'key' => 'sent_to_bdm_date', 'width' => 160, 'sortable' => true],
 
-            ['title' => 'fields.PO №', 'key' => 'name', 'width' => 136, 'sortable' => true],
-            ['title' => 'dates.PO', 'key' => 'purchase_date', 'width' => 120, 'sortable' => true],
-            ['title' => 'dates.Confirmation', 'key' => 'confirmation_date', 'width' => 172, 'sortable' => true],
-            ['title' => 'dates.Sent to manufacturer', 'key' => 'sent_to_manufacturer_date', 'width' => 168, 'sortable' => true],
+            ['title' => 'dates.Date of creation', 'key' => 'created_at', 'width' => 130, 'sortable' => true],
+            ['title' => 'dates.Update date', 'key' => 'updated_at', 'width' => 150, 'sortable' => true],
         ];
 
         foreach ($additionalColumns as $column) {

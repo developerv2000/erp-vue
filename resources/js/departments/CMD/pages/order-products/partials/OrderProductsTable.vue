@@ -193,6 +193,7 @@ const handleTableOptionsUpdate = (options) => {
 
         <template #item.packing_list_file="{ item }">
             <a
+                v-if="item.packing_list_file"
                 class="text-primary"
                 :href="item.packing_list_file_url"
                 target="_blank"
@@ -202,19 +203,30 @@ const handleTableOptionsUpdate = (options) => {
         </template>
 
         <template #item.coa_file="{ item }">
-            <a class="text-primary" :href="item.coa_file_url" target="_blank">
+            <a
+                v-if="item.coa_file"
+                class="text-primary"
+                :href="item.coa_file_url"
+                target="_blank"
+            >
                 {{ item.coa_file }}
             </a>
         </template>
 
         <template #item.coo_file="{ item }">
-            <a class="text-primary" :href="item.coo_file_url" target="_blank">
+            <a
+                v-if="item.coo_file"
+                class="text-primary"
+                :href="item.coo_file_url"
+                target="_blank"
+            >
                 {{ item.coo_file }}
             </a>
         </template>
 
         <template #item.declaration_for_europe_file="{ item }">
             <a
+                v-if="item.declaration_for_europe_file"
                 class="text-primary"
                 :href="item.declaration_for_europe_file_url"
                 target="_blank"
@@ -223,13 +235,21 @@ const handleTableOptionsUpdate = (options) => {
             </a>
         </template>
 
-        <template #item.readiness_for_shipment_from_manufacturer_date="{ item }">
+        <template
+            #item.readiness_for_shipment_from_manufacturer_date="{ item }"
+        >
             <template v-if="item.is_ready_for_shipment_from_manufacturer">
-                {{ formatDate(item.readiness_for_shipment_from_manufacturer_date) }}
+                {{
+                    formatDate(
+                        item.readiness_for_shipment_from_manufacturer_date
+                    )
+                }}
             </template>
 
             <TdOrderProductSetAsReadyForShipmentFromManufacturer
-                v-else-if="item.can_be_set_as_ready_for_shipment_from_manufacturer"
+                v-else-if="
+                    item.can_be_set_as_ready_for_shipment_from_manufacturer
+                "
                 :order-id="item.id"
             />
         </template>

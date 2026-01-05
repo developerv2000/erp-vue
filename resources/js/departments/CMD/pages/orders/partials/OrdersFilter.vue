@@ -1,7 +1,7 @@
 <script setup>
 import { usePage } from "@inertiajs/vue3";
 import { useI18n } from "vue-i18n";
-import { usePLDOrdersTableStore } from "@/departments/PLD/stores/orders";
+import { useCMDOrdersTableStore } from "@/departments/CMD/stores/orders";
 
 import StoreBindedFilter from "@/core/components/filters/StoreBindedFilter.vue";
 import FilterAutocomplete from "@/core/components/filters/inputs/FilterAutocomplete.vue";
@@ -10,7 +10,7 @@ import FilterDateInput from "@/core/components/filters/inputs/FilterDateInput.vu
 
 const { t } = useI18n();
 const page = usePage();
-const store = usePLDOrdersTableStore();
+const store = useCMDOrdersTableStore();
 </script>
 
 <template>
@@ -59,6 +59,7 @@ const store = usePLDOrdersTableStore();
             :items="
                 page.props.filterDependencies.countriesOrderedByProcessesCount
             "
+            item-title="code"
             multiple
         />
 

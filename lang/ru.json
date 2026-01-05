@@ -102,6 +102,7 @@
     "filter.Region": "Регион",
     "filter.Has VPS for country": "Имеет ВПЦ для страны",
     "filter.Order ID": "ID заказа",
+    "filter.Product ID": "ID продукта",
     "Special filter": "Особый фильтр",
     "Special filter.Contract on specific month": "Контракт на конкретный месяц",
     "Special filter.Registration on specific month": "Регистрация на конкретный месяц",
@@ -196,6 +197,11 @@
     "dates.Layout sent": "Дата отправки макета",
     "dates.Print proof receive": "Дата получения принт пруфа",
     "dates.Layout approved": "Дата одобрения макета",
+    "dates.Sent for payment": "Дата отправки на оплату",
+    "dates.Payment completed": "Дата завершения оплаты",
+    "dates.Accepted": "Дата принятия",
+    "dates.Payment request": "Дата запроса оплаты",
+    "dates.Payment": "Дата оплаты",
 
     "Days": "Дней",
     "days.past": "Дней прошло",
@@ -346,6 +352,11 @@
     "fields.Declaration for EUR1": "Декларация для EUR1",
     "fields.Layout status": "Статус макета",
     "fields.Box article": "Артикул бокса",
+
+    "fields.Payment type": "Тип оплаты",
+    "fields.Pdf": "Pdf",
+    "fields.Invoie №": "№ инвойса",
+    "fields.Swift": "Swift",
 
     "AAAAAAAAAAAAAA": "AAAAAAAAAAAAAA",
 

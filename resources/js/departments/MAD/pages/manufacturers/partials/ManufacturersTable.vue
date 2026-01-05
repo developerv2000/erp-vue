@@ -211,6 +211,7 @@ function handleTableOptionsUpdate(options) {
                 :link="
                     route('mad.manufacturers.index', {
                         'manufacturer_id[]': item.id,
+                        initialize_from_inertia_page: true,
                     })
                 "
             >

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->unsignedMediumInteger('id')->autoIncrement();
 
             // Step 1:
-            // PLPD part
+            // PLD part
             $table->unsignedMediumInteger('order_id')
                 ->index()
                 ->foreign()

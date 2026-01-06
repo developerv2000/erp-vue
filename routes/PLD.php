@@ -43,7 +43,7 @@ Route::prefix('pld')->name('pld.')->middleware('auth', 'auth.session')->group(fu
     });
 
     // Invoices
-    Route::get('/invoices', [PLDInvoiceController::class, 'index'])->name('invoices.index')->middleware('can:view-PLPD-invoices');
+    Route::get('/invoices', [PLDInvoiceController::class, 'index'])->name('invoices.index')->middleware('can:view-PLD-invoices');
 
     // Helpers
     Route::prefix('/orders')->controller(PLDHelperController::class)->middleware('can:edit-PLD-orders')->group(function () {

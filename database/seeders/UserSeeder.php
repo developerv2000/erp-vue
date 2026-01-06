@@ -148,20 +148,20 @@ class UserSeeder extends Seeder
         |--------------------------------------------------------------------------
         */
 
-        $plpdID = $allDepartments->firstWhere('name', Department::PLD_NAME)->id;
+        $pldID = $allDepartments->firstWhere('name', Department::PLD_NAME)->id;
         $logisticianRoleID = $allRoles->firstWhere('name', Role::PLD_LOGISTICIAN_NAME)->id;
 
         $logisticians = [
             ['name' => 'PLD Logistic', 'email' => 'pld_logistician@mail.com', 'photo' => 'pld_logistician.png'],
         ];
 
-        // Create PLPD logisticians
+        // Create PLD logisticians
         foreach ($logisticians as $user) {
             $newUser = User::create([
                 'name' => $user['name'],
                 'email' => $user['email'],
                 'photo' => $user['photo'],
-                'department_id' => $plpdID,
+                'department_id' => $pldID,
                 'password' => bcrypt($password),
             ]);
 
@@ -230,7 +230,7 @@ class UserSeeder extends Seeder
         $serializerRoleID = Role::findByName(Role::MD_SERIALIZER_NAME);
 
         $serializers = [
-            ['name' => 'MD Serializer', 'email' => 'md_serializer@mail.com', 'photo' => 'msd_serializer.png'],
+            ['name' => 'MD Serializer', 'email' => 'md_serializer@mail.com', 'photo' => 'md_serializer.png'],
         ];
 
         // Create MD Serializers

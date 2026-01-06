@@ -3,6 +3,7 @@ import MadNav from "./partials/MadNav.vue";
 import AdministrationNav from "./partials/AdministrationNav.vue";
 import PldNav from "./partials/PldNav.vue";
 import CmdNav from "./partials/CmdNav.vue";
+import PrdNav from "./partials/PrdNav.vue";
 </script>
 
 <template>
@@ -10,6 +11,7 @@ import CmdNav from "./partials/CmdNav.vue";
         <MadNav />
         <PldNav />
         <CmdNav />
+        <PrdNav />
         <AdministrationNav />
     </div>
 </template>

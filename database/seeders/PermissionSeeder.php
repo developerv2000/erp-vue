@@ -178,5 +178,28 @@ class PermissionSeeder extends Seeder
                 'global' => true,
             ]);
         }
+
+        /*
+        |--------------------------------------------------------------------------
+        | PLD permissions
+        |--------------------------------------------------------------------------
+        */
+
+        $PRDId = Department::findByName(Department::PRD_NAME)->id;
+
+        $PRDPerms = [
+            Permission::CAN_VIEW_PRD_ORDERS_NAME,
+            Permission::CAN_VIEW_PRD_ORDER_PRODUCTS_NAME,
+            Permission::CAN_VIEW_PRD_INVOICES_NAME,
+
+            Permission::CAN_EDIT_PRD_INVOICES_NAME,
+        ];
+
+        foreach ($PRDPerms as $PRD) {
+            Permission::create([
+                'name' => $PRD,
+                'department_id' => $PRDId,
+            ]);
+        }
     }
 }

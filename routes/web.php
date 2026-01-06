@@ -54,3 +54,4 @@ require __DIR__ . '/administration.php';
 require __DIR__ . '/MAD.php';
 require __DIR__ . '/PLD.php';
 require __DIR__ . '/CMD.php';
+require __DIR__ . '/PRD.php';

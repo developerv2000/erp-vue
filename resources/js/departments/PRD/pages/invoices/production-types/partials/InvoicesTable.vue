@@ -2,7 +2,7 @@
 import { onMounted } from "vue";
 import { usePage } from "@inertiajs/vue3";
 import useQueryParams from "@/core/composables/useQueryParams";
-import { useCMDInvoicesTableStore } from "@/departments/CMD/stores/invoices";
+import { usePRDProductionTypeInvoicesStore } from "@/departments/PRD/stores/productionTypeInvoices";
 import { useI18n } from "vue-i18n";
 import { useDateFormatter } from "@/core/composables/useDateFormatter";
 import { DEFAULT_PER_PAGE_OPTIONS } from "@/core/scripts/constants";
@@ -14,12 +14,12 @@ import TdInertiaLink from "@/core/components/table/td/TdInertiaLink.vue";
 import TogglableThreeLinesLimitedText from "@/core/components/misc/TogglableThreeLinesLimitedText.vue";
 import TdRecordCommentsLink from "@/core/components/table/td/TdRecordCommentsLink.vue";
 import TableNavigateToPage from "@/core/components/table/misc/TableNavigateToPage.vue";
-import TdInvoiceSentForPayment from "@/core/components/table/td/shared/invoices/TdInvoiceSentForPayment.vue";
+import TdInvoiceAccept from "@/core/components/table/td/shared/invoices/TdInvoiceAccept.vue";
 
 const { t } = useI18n();
 const { get } = useQueryParams();
 const page = usePage();
-const store = useCMDInvoicesTableStore();
+const store = usePRDProductionTypeInvoicesStore();
 const { formatDate } = useDateFormatter();
 
 onMounted(() => {
@@ -102,11 +102,7 @@ const generateProductsList = (products) => {
         </template>
 
         <template #item.sent_for_payment_date="{ item }">
-            <template v-if="item.is_sent_for_payment">
-                {{ formatDate(item.sent_for_payment_date) }}
-            </template>
-
-            <TdInvoiceSentForPayment v-else :invoice-id="item.id" />
+            {{ formatDate(item.sent_for_payment_date) }}
         </template>
 
         <template #item.payment_completed_date="{ item }">
@@ -147,7 +143,11 @@ const generateProductsList = (products) => {
         </template>
 
         <template #item.accepted_by_financier_date="{ item }">
-            {{ formatDate(item.accepted_by_financier_date) }}
+            <template v-if="item.is_accepted_by_financier">
+                {{ formatDate(item.accepted_by_financier_date) }}
+            </template>
+
+            <TdInvoiceAccept v-else :invoice-id="item.id" />
         </template>
 
         <template #item.payment_request_date_by_financier="{ item }">

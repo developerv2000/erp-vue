@@ -45,5 +45,7 @@ Route::prefix('cmd')->name('cmd.')->middleware('auth', 'auth.session')->group(fu
             'can:view-CMD-invoices',
             'can:edit-CMD-invoices'
         );
+
+        Route::post('/send-for-payment/{record}', 'sendForPayment')->name('send-for-payment');  // AJAX request
     });
 });

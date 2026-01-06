@@ -3,7 +3,9 @@
 namespace App\Http\Requests\MAD;
 
 use App\Models\ProcessStatus;
+use App\Models\Product;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class ProcessStoreRequest extends FormRequest
 {
@@ -76,8 +78,29 @@ class ProcessStoreRequest extends FormRequest
      */
     public function rules(): array
     {
+        $product = Product::findOrFail($this->product_id);
+
         return [
-            //
+            'product_form_id' => [
+                Rule::unique('products', 'form_id')
+                    ->ignore($product->id)
+                    ->where(function ($query) use ($product) {
+                        $query->where('manufacturer_id', $product->manufacturer_id)
+                            ->where('inn_id', $product->inn_id)
+                            ->where('form_id', $this->product_form_id)
+                            ->where('dosage', $this->product_dosage)
+                            ->where('pack', $this->product_pack)
+                            ->where('moq', $this->product_moq)
+                            ->where('shelf_life_id', $this->product_shelf_life_id);
+                    }),
+            ],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'product_form_id.unique' => trans('validation.custom.ivp.unique'),
         ];
     }
 }

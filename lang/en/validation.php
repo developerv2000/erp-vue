@@ -184,7 +184,11 @@ return [
 
         // MAD
         'ivp' => [
-            'unique' => 'Product with a given manufacturer, IMN, form, dosage and pack already exists.',
+            'unique' => 'Product with a given manufacturer, IMN, form, dosage, pack, moq and shelf life already exists.',
+        ],
+
+        'vps' => [
+            'unique' => 'Product with a given manufacturer, IMN, form, dosage, pack, moq, shelf life, search country and MAH already exists.',
         ],
 
         'process_status_history' => [

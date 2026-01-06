@@ -165,8 +165,6 @@ class Permission extends Model
     */
 
     // View
-    const CAN_VIEW_PRD_ORDERS_NAME = 'can-view-PRD-orders';
-    const CAN_VIEW_PRD_ORDER_PRODUCTS_NAME = 'can-view-PRD-order-products';
     const CAN_VIEW_PRD_INVOICES_NAME = 'can-view-PRD-invoices';
 
     // Edit
@@ -421,6 +419,17 @@ class Permission extends Model
             self::CAN_RECEIVE_NOTIFICATION_WHEN_ORDER_IS_SENT_TO_MANUFACTURER_BY_CMD,
             self::CAN_RECEIVE_NOTIFICATION_WHEN_INVOICE_IS_SENT_FOR_PAYMENT_BY_CMD,
             self::CAN_RECEIVE_NOTIFICATION_WHEN_INVOICE_PAYMENT_IS_COMPLETED_BY_RPD,
+        ];
+    }
+
+    public static function getPRDFinancierPermissionNames()
+    {
+        return [
+            self::CAN_VIEW_PRD_INVOICES_NAME,
+
+            self::CAN_EDIT_PRD_INVOICES_NAME,
+
+            self::CAN_RECEIVE_NOTIFICATION_WHEN_INVOICE_IS_SENT_FOR_PAYMENT_BY_CMD,
         ];
     }
 }

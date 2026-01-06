@@ -139,5 +139,24 @@ class RoleSeeder extends Seeder
         foreach ($permissionNames as $permissionName) {
             $role->permissions()->attach($allPermissions->where('name', $permissionName)->first()->id);
         }
+
+        /*
+        |--------------------------------------------------------------------------
+        | PRD roles
+        |--------------------------------------------------------------------------
+        */
+
+        // PRD Financier
+        $role = new Role();
+        $role->name = Role::PRD_FINANCIER_NAME;
+        $role->description = "Not fully implemented yet!";
+        $role->department_id = Department::findByName(Department::PRD_NAME)->id;
+        $role->save();
+
+        $permissionNames = Permission::getPRDFinancierPermissionNames();
+
+        foreach ($permissionNames as $permissionName) {
+            $role->permissions()->attach($allPermissions->where('name', $permissionName)->first()->id);
+        }
     }
 }

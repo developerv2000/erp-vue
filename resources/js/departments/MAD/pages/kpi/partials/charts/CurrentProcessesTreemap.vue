@@ -16,7 +16,6 @@ const { t } = useI18n();
 const store = useMADKPIStore();
 const userSettings = useUserSettingsStore();
 const countries = computed(() => page.props.kpiData.countries);
-console.log(countries);
 
 const series = computed(() => {
     return {
@@ -52,7 +51,7 @@ const option = computed(() => {
 
 const handleContextMenu = (params) => {
     if (!params.data) return;
-    
+
     // Prevent default right-click menu
     params?.event?.event?.preventDefault();
     if (params.data?.kpi_link) window.open(params.data.kpi_link, "_blank");

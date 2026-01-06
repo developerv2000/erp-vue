@@ -10,6 +10,7 @@ use App\Models\Invoice;
 use App\Models\InvoicePaymentType;
 use App\Models\Manufacturer;
 use App\Models\Order;
+use App\Models\OrderProduct;
 use App\Models\User;
 use App\Support\Traits\Controller\DestroysModelRecords;
 use Illuminate\Http\Request;
@@ -48,12 +49,13 @@ class CMDInvoiceController extends Controller
 
         // Get available products for invoice based on payment type
         $paymentType = InvoicePaymentType::findOrFail($request->input('payment_type_id'));
-        $availableProducts = $this->getAvailableProductsForInvoice($order, $paymentType);
+        $availableProducts = $this->getAvailableProductsForInvoiceOnCreate($order, $paymentType);
 
         // No lazy loads required, because user is redirected back on store
         return Inertia::render('departments/CMD/pages/invoices/Create', [
             'order' => $order,
             'paymentType' => $paymentType,
+            'isPrepayment' => $paymentType->name == InvoicePaymentType::PREPAYMENT_NAME,
             'availableProducts' => $availableProducts,
         ]);
     }
@@ -70,14 +72,19 @@ class CMDInvoiceController extends Controller
         ]);
     }
 
-    public function edit(Order $record)
+    public function edit(Request $request, Invoice $record)
     {
         $record->appendBasicCMDAttributes();
         $record->append('title'); // Used on generating breadcrumbs
 
+        // Get available products for invoice based on payment type
+        $availableProducts = $this->getAvailableProductsForInvoiceOnEdit($record);
+
         return Inertia::render('departments/CMD/pages/invoices/Edit', [
             // Refetched after record update
             'record' => $record,
+            'availableProducts' => $availableProducts,
+            'isPrepayment' => $record->paymentType->name == InvoicePaymentType::PREPAYMENT_NAME,
         ]);
     }
 
@@ -93,17 +100,20 @@ class CMDInvoiceController extends Controller
         ]);
     }
 
-    private function getAvailableProductsForInvoice(Order $order, InvoicePaymentType $paymentType)
+    private function getAvailableProductsForInvoiceOnCreate(Order $order, InvoicePaymentType $paymentType)
     {
         $products = match ($paymentType->name) {
+            // Display all products as 'readonly' for invoice of PREPAYMENT type
             InvoicePaymentType::PREPAYMENT_NAME
             => $order->products,
 
+            // Display selectable products list for invoice of FINAL_PAYMENT type
             InvoicePaymentType::FINAL_PAYMENT_NAME
             => $order->products->filter(
                 fn($product) => $product->can_attach_production_final_payment_invoice
             ),
 
+            // Display selectable products list for invoice of FULL_PAYMENT type
             InvoicePaymentType::FULL_PAYMENT_NAME
             => $order->products->filter(
                 fn($product) => $product->can_attach_production_full_payment_invoice
@@ -117,6 +127,47 @@ class CMDInvoiceController extends Controller
         return $products->values();
     }
 
+    private function getAvailableProductsForInvoiceOnEdit(Invoice $invoice)
+    {
+        $products = match ($invoice->paymentType->name) {
+            // Display all products as 'readonly' for invoice of PREPAYMENT type
+            InvoicePaymentType::PREPAYMENT_NAME
+            => $invoice->products,
+
+            // Display selectable products list for invoice of FINAL_PAYMENT type
+            // Concat attached invoice products with order products which can also be attached.
+            InvoicePaymentType::FINAL_PAYMENT_NAME
+            => $invoice->products->concat($invoice->invoiceable->products->filter(fn(OrderProduct $product) => $product->can_attach_production_final_payment_invoice)),
+
+            // Display selectable products list for invoice of FINAL_PAYMENT type
+            // Concat attached invoice products with order products which can also be attached.
+            InvoicePaymentType::FULL_PAYMENT_NAME
+            => $invoice->products->concat($invoice->invoiceable->products->filter(fn(OrderProduct $product) => $product->can_attach_production_full_payment_invoice)),
+        };
+
+        // Append additional attributes
+        $products->each(fn($product) => $product->appendBasicCMDAttributes());
+
+        // Force array-like structure for proper rendering
+        return $products->values();
+    }
+
+    /**
+     * AJAX request
+     */
+    public function sendForPayment(Invoice $record)
+    {
+        $record->sendProductionTypeForPaymentByCMD();
+
+        // Return refetched updated record
+        $record = Invoice::withBasicCMDRelations()
+            ->withBasicCMDRelationCounts()
+            ->findOrFail($record->id);
+
+        $record->appendBasicCMDAttributes();
+
+        return $record;
+    }
 
     private function getFilterDependencies(): array
     {

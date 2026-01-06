@@ -37,7 +37,7 @@ const actionAfterSuccessDelete = () => {
         </template>
 
         <template #moreActions>
-            <ColumnsListItem v-if="!store.isTrashPage" settings-key="CMD_INVOICES" />
+            <ColumnsListItem settings-key="CMD_INVOICES" />
             <FullscreenListItem />
         </template>
     </DefaultTableToolbar>

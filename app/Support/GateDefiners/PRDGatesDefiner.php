@@ -10,8 +10,6 @@ class PRDGatesDefiner
     public static function defineAll()
     {
         $permission = [
-            Permission::CAN_VIEW_PRD_ORDERS_NAME,
-            Permission::CAN_VIEW_PRD_ORDER_PRODUCTS_NAME,
             Permission::CAN_VIEW_PRD_INVOICES_NAME,
 
             Permission::CAN_EDIT_PRD_INVOICES_NAME,

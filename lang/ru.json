@@ -31,6 +31,7 @@
     "departments.MAD": "ОАП",
     "departments.PLD": "ДЗЛ",
     "departments.CMD": "ОКП",
+    "departments.PRD": "ОПР",
 
     "pages.Main": "Главная",
     "pages.Trash": "Корзина",
@@ -52,6 +53,7 @@
     "pages.Orders": "Заказы",
     "pages.Products": "Продукты",
     "pages.Invoices": "Инвойсы",
+    "pages.Production": "Производство",
 
     "actions.Logout": "Выйти",
     "actions.Create": "Создать",
@@ -79,6 +81,7 @@
     "actions.Start": "Начать",
     "actions.End": "Завершить",
     "actions.Mark": "Отметить",
+    "actions.Accept": "Принять",
     "actions.Store": "Сохранить",
     "actions.Store and redirect back": "Сохранить и вернуться",
     "actions.Store and reset form": "Сохранить и сбросить форму",
@@ -148,6 +151,7 @@
     "notifications.New order for confirmation received": "Получен новый заказ для подтверждения",
     "notifications.Order confirmed": "Данный заказ был подтверждён",
     "notifications.Order sent to manufacturer": "Данный заказ был отправлен заводу",
+    "notifications.New invoice for payment received": "Получен новый инвойс для оплаты",
 
     "files.Generating": "Генерация файла",
     "files.Download started": "Загрузка началась",

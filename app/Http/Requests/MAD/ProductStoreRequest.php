@@ -22,7 +22,9 @@ class ProductStoreRequest extends FormRequest
                         ->where('inn_id', $this->inn_id)
                         ->where('form_id', $this->form_id)
                         ->where('dosage', $this->dosage)
-                        ->where('pack', $this->pack);
+                        ->where('pack', $this->pack)
+                        ->where('moq', $this->moq)
+                        ->where('shelf_life_id', $this->shelf_life_id);
                 }),
             ],
         ];

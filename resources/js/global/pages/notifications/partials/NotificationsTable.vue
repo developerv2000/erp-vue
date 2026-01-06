@@ -17,6 +17,7 @@ import OrderSentToBdm from "./types/OrderSentToBdm.vue";
 import OrderSentToConfirmation from "./types/OrderSentToConfirmation.vue";
 import OrderConfirmed from "./types/OrderConfirmed.vue";
 import OrderSentToManufacturer from "./types/OrderSentToManufacturer.vue";
+import NewProductionTypeInvoiceForPaymentReceived from "./types/NewProductionTypeInvoiceForPaymentReceived.vue";
 
 const { t } = useI18n();
 const { get } = useQueryParams();
@@ -31,6 +32,7 @@ const types = {
     OrderSentToConfirmation,
     OrderConfirmed,
     OrderSentToManufacturer,
+    NewProductionTypeInvoiceForPaymentReceived,
 };
 
 onMounted(() => {

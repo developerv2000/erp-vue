@@ -31,6 +31,7 @@
     "departments.MAD": "MAD",
     "departments.PLD": "PLD",
     "departments.CMD": "CMD",
+    "departments.PRD": "PRD",
 
     "pages.Main": "Main",
     "pages.Trash": "Trash",
@@ -52,6 +53,7 @@
     "pages.Orders": "Orders",
     "pages.Products": "Products",
     "pages.Invoices": "Invoices",
+    "pages.Production": "Production",
 
     "actions.Logout": "Logout",
     "actions.Add": "Add",
@@ -79,6 +81,7 @@
     "actions.Start": "Start",
     "actions.End": "End",
     "actions.Mark": "Mark",
+    "actions.Accept": "Accept",
     "actions.Store": "Store",
     "actions.Store and redirect back": "Store and redirect back",
     "actions.Store and reset form": "Store and reset form",
@@ -138,6 +141,7 @@
     "notifications.New order for confirmation received": "New order for confirmation received",
     "notifications.Order confirmed": "Below order has been confirmed",
     "notifications.Order sent to manufacturer": "Below order has been sent to manufacturer",
+    "notifications.New invoice for payment received": "New invoice for payment received",
 
     "files.Generating": "Generating file",
     "files.Download started": "Download started",

@@ -200,25 +200,25 @@ class UserSeeder extends Seeder
         |--------------------------------------------------------------------------
         */
 
-        // $prdID = Department::findByName(Department::PRD_NAME)->id;
-        // $financierRoleID = Role::findByName(Role::PRD_FINANCIER_NAME);
+        $prdID = Department::findByName(Department::PRD_NAME)->id;
+        $financierRoleID = Role::findByName(Role::PRD_FINANCIER_NAME);
 
-        // $financiers = [
-        //     ['name' => 'Financier man', 'email' => 'prd_financier@mail.com', 'photo' => 'prd_financier.png'],
-        // ];
+        $financiers = [
+            ['name' => 'PRD Financier', 'email' => 'prd_financier@mail.com', 'photo' => 'prd_financier.png'],
+        ];
 
-        // // Create PRD financiers
-        // foreach ($financiers as $user) {
-        //     $newUser = User::create([
-        //         'name' => $user['name'],
-        //         'email' => $user['email'],
-        //         'photo' => $user['photo'],
-        //         'department_id' => $prdID,
-        //         'password' => bcrypt($password),
-        //     ]);
+        // Create PRD financiers
+        foreach ($financiers as $user) {
+            $newUser = User::create([
+                'name' => $user['name'],
+                'email' => $user['email'],
+                'photo' => $user['photo'],
+                'department_id' => $prdID,
+                'password' => bcrypt($password),
+            ]);
 
-        //     $newUser->roles()->attach($financierRoleID);
-        // }
+            $newUser->roles()->attach($financierRoleID);
+        }
 
         /*
         |--------------------------------------------------------------------------

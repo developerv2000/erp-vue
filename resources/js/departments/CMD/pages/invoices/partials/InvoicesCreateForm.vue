@@ -28,9 +28,6 @@ const { removeDateTimezonesFromFormData } = useDateFormatter();
 
 const loading = ref(false);
 
-// Disable product checkboxes toggling if payment type is prepayment
-const isPrepayment = page.props.paymentType.name == "Prepayment";
-
 // Yup schema
 const schema = object({
     receive_date: date().required(),
@@ -88,6 +85,7 @@ const submit = handleSubmit((values) => {
 
 <template>
     <Form class="d-flex flex-column ga-6 pb-8" enctype="multipart/form-data">
+        <!-- Invoice -->
         <DefaultSheet>
             <DefaultTitle>{{ t("Invoice") }}</DefaultTitle>
 
@@ -106,23 +104,26 @@ const submit = handleSubmit((values) => {
                         :label="t('fields.Pdf')"
                         v-model="values.pdf_file"
                         :error-messages="errors.pdf_file"
+                        accept=".pdf"
                         required
                     />
                 </v-col>
             </v-row>
         </DefaultSheet>
 
+        <!-- Products -->
         <DefaultSheet>
             <DefaultTitle>{{ t("Products") }}</DefaultTitle>
 
             <div>
+                <!-- Disable checkboxes toggling if payment type is prepayment -->
                 <v-checkbox-btn
                     v-for="product in page.props.availableProducts"
                     :key="product.id"
                     v-model="values.products"
                     :value="product.id"
                     :label="product.process.full_english_product_label"
-                    :disabled="isPrepayment"
+                    :disabled="page.props.isPrepayment"
                     color="primary"
                 >
                 </v-checkbox-btn>
@@ -130,7 +131,7 @@ const submit = handleSubmit((values) => {
         </DefaultSheet>
 
         <DefaultSheet>
-            <DefaultTitle>{{ t("Products") }}</DefaultTitle>
+            <DefaultTitle>{{ t("Comment") }}</DefaultTitle>
 
             <v-row>
                 <v-col cols="12">

@@ -92,4 +92,15 @@ Route::middleware('auth:sanctum')->name('api.')->group(function () {
                 ->name('get');
         });
     });
+
+    // PRD
+    Route::prefix('/prd')->name('prd.')->group(function () {
+        Route::prefix('/invoices')->name('invoices.')->group(function () {
+            Route::prefix('/production-types')->name('production-types.')->group(function () {
+                Route::get('/', fn(Request $request) => Invoice::queryPRDProductionTypeRecordsFromRequest($request, 'paginate', true))
+                    ->middleware('can:view-PRD-invoices')
+                    ->name('get');
+            });
+        });
+    });
 });

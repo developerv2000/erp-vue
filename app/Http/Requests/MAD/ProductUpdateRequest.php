@@ -18,14 +18,17 @@ class ProductUpdateRequest extends FormRequest
         $recordID = $this->route('record');
 
         return [
-            'dosage' => [
-                Rule::unique(Product::class)->ignore($recordID)->where(function ($query) {
-                    $query->where('manufacturer_id', $this->manufacturer_id)
-                        ->where('inn_id', $this->inn_id)
-                        ->where('form_id', $this->form_id)
-                        ->where('dosage', $this->dosage)
-                        ->where('pack', $this->pack);
-                }),
+            'inn_id' => [
+                Rule::unique(Product::class)->ignore($recordID)
+                    ->where(function ($query) {
+                        $query->where('manufacturer_id', $this->manufacturer_id)
+                            ->where('inn_id', $this->inn_id)
+                            ->where('form_id', $this->form_id)
+                            ->where('dosage', $this->dosage)
+                            ->where('pack', $this->pack)
+                            ->where('moq', $this->moq)
+                            ->where('shelf_life_id', $this->shelf_life_id);
+                    }),
             ],
         ];
     }
@@ -33,7 +36,7 @@ class ProductUpdateRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'dosage.unique' => trans('validation.custom.ivp.unique'),
+            'inn_id.unique' => trans('validation.custom.ivp.unique'),
         ];
     }
 }

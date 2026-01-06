@@ -69,6 +69,9 @@ class User extends Authenticatable
     const CMD_ORDER_PRODUCTS_HEADERS_KEY = 'CMD_ORDER_PRODUCTS';
     const CMD_INVOICES_HEADERS_KEY = 'CMD_INVOICES';
 
+    // 3. PRD
+    const PRD_PRODUCTION_TYPE_INVOICES_HEADERS_KEY = 'PRD_PRODUCTION_TYPE_INVOICES';
+
     /*
     |--------------------------------------------------------------------------
     | Properties
@@ -575,6 +578,7 @@ class User extends Authenticatable
         $this->resetMADTableHeaders($settings);
         $this->resetPLDTableHeaders($settings);
         $this->resetCMDTableHeaders($settings);
+        $this->resetPRDTableHeaders($settings);
     }
 
     /**
@@ -621,6 +625,9 @@ class User extends Authenticatable
             self::CMD_ORDERS_HEADERS_KEY => Order::getCMDTableHeadersForUser($this),
             self::CMD_ORDER_PRODUCTS_HEADERS_KEY => OrderProduct::getCMDTableHeadersForUser($this),
             self::CMD_INVOICES_HEADERS_KEY => Invoice::getCMDTableHeadersForUser($this),
+
+            // PRD
+            self::PRD_PRODUCTION_TYPE_INVOICES_HEADERS_KEY => Invoice::getPRDProductionTypesTableHeadersForUser($this),
 
             default => throw new InvalidArgumentException("Unknown key: $key"),
         };
@@ -717,6 +724,19 @@ class User extends Authenticatable
         $headersSettings[self::CMD_ORDERS_HEADERS_KEY] = Order::getCMDTableHeadersForUser($this);
         $headersSettings[self::CMD_ORDER_PRODUCTS_HEADERS_KEY] = OrderProduct::getCMDTableHeadersForUser($this);
         $headersSettings[self::CMD_INVOICES_HEADERS_KEY] = Invoice::getCMDTableHeadersForUser($this);
+
+        $settings['table_headers'] = $headersSettings;
+        $this->settings = $settings;
+        $this->save();
+    }
+
+    public function resetPRDTableHeaders($settings): void
+    {
+        $this->refresh();
+        $settings = $this->settings;
+        $headersSettings = isset($settings['table_headers']) ? $settings['table_headers'] : [];
+
+        $headersSettings[self::PRD_PRODUCTION_TYPE_INVOICES_HEADERS_KEY] = Invoice::getPRDProductionTypesTableHeadersForUser($this);
 
         $settings['table_headers'] = $headersSettings;
         $this->settings = $settings;

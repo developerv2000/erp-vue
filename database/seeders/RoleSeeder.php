@@ -158,5 +158,43 @@ class RoleSeeder extends Seeder
         foreach ($permissionNames as $permissionName) {
             $role->permissions()->attach($allPermissions->where('name', $permissionName)->first()->id);
         }
+
+        /*
+        |--------------------------------------------------------------------------
+        | DD roles
+        |--------------------------------------------------------------------------
+        */
+
+        // DD Designer
+        $role = new Role();
+        $role->name = Role::DD_DESIGNER_NAME;
+        $role->description = "Not fully implemented yet!";
+        $role->department_id = Department::findByName(Department::DD_NAME)->id;
+        $role->save();
+
+        $permissionNames = Permission::getDDDesignerPermissionNames();
+
+        foreach ($permissionNames as $permissionName) {
+            $role->permissions()->attach(Permission::findByName($permissionName)->id);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | MD roles
+        |--------------------------------------------------------------------------
+        */
+
+        // MD Serializer
+        $role = new Role();
+        $role->name = Role::MD_SERIALIZER_NAME;
+        $role->description = "Not fully implemented yet!";
+        $role->department_id = Department::findByName(Department::MD_NAME)->id;
+        $role->save();
+
+        $permissionNames = Permission::getMDSerializerPermissionNames();
+
+        foreach ($permissionNames as $permissionName) {
+            $role->permissions()->attach(Permission::findByName($permissionName)->id);
+        }
     }
 }

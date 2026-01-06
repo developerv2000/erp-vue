@@ -61,6 +61,7 @@ const store = useCMDOrderProductsTableStore();
             name="process_trademark_en"
             v-model="store.filters.process_trademark_en"
             :items="page.props.filterDependencies.enTrademarks"
+            multiple
         />
 
         <FilterAutocomplete
@@ -68,6 +69,7 @@ const store = useCMDOrderProductsTableStore();
             name="process_trademark_ru"
             v-model="store.filters.process_trademark_ru"
             :items="page.props.filterDependencies.ruTrademarks"
+            multiple
         />
 
         <FilterAutocomplete
@@ -82,6 +84,7 @@ const store = useCMDOrderProductsTableStore();
             :label="t('filter.Order ID')"
             name="order_id"
             v-model="store.filters.order_id"
+            :min="1"
         />
 
         <FilterDefaultInputs :store="store" />

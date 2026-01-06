@@ -8,9 +8,13 @@
     "Multiple records": "Multiple records",
     "History": "History",
 
+    "Manufacturer": "Manufacturer",
+    "Manufacturers": "Manufacturers",
+    "Factory": "Factory",
+
     "Product": "Product",
-    "product.About": "About product",
     "Products": "Products",
+    "product.About": "About product",
     "products.Matched ATX": "Matched ATX",
 
     "Processes": "Processes",
@@ -32,6 +36,8 @@
     "departments.PLD": "PLD",
     "departments.CMD": "CMD",
     "departments.PRD": "PRD",
+    "departments.DD": "DD",
+    "departments.MD": "MD",
 
     "pages.Main": "Main",
     "pages.Trash": "Trash",
@@ -150,6 +156,7 @@
     "files.Size": "File size",
 
     "properties.New": "New",
+    "properties.Without changes": "Without changes",
     "properties.Read": "Read",
     "properties.Important": "Important",
     "properties.Active": "Active",
@@ -197,6 +204,10 @@
     "dates.Accepted": "Accepted date",
     "dates.Payment request": "Payment request date",
     "dates.Payment": "Payment date",
+    "dates.Serialization codes request": "Serialization codes request date",
+    "dates.Serialization codes sent": "Serialization codes sent date",
+    "dates.Serialization report received": "Serialization report received date",
+    "dates.Report sent to hub": "Report sent to hub date",
 
     "Days": "Days",
     "days.past": "Days past",
@@ -356,7 +367,9 @@
     "fields.COO": "COO",
     "fields.Declaration for EUR1": "Declaration for EUR1",
     "fields.Layout status": "Layout status",
+    "fields.Layout approved": "Layout approved",
     "fields.Box article": "Box article",
+    "fields.New layout": "New layout",
 
     "fields.Payment type": "Payment type",
     "fields.Pdf": "Pdf",

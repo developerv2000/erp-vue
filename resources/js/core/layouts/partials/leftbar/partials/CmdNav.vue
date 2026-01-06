@@ -56,7 +56,7 @@ const listItems = computed(() => [
         density="compact"
         color="primary"
     >
-        <v-list-subheader>{{ $t("departments.CMD") }}</v-list-subheader>
+        <v-list-subheader>{{ t("departments.CMD") }}</v-list-subheader>
 
         <template v-for="(item, index) in listItems" :key="index">
             <InertiaLinkedListItem

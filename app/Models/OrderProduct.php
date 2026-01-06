@@ -4,7 +4,8 @@ namespace App\Models;
 
 use App\Http\Requests\CMD\CMDOrderProductUpdateRequest;
 use App\Http\Requests\DD\DDOrderProductUpdateRequest;
-use App\Http\Requests\MSD\MSDOrderProductUpdateRequest;
+use App\Http\Requests\MD\MDOrderProductUpdateRequest;
+use App\Http\Requests\MD\MDSerializedByManufacturerUpdateRequest;
 use App\Http\Requests\PLD\PLDOrderProductStoreRequest;
 use App\Http\Requests\PLD\PLDOrderProductUpdateRequest;
 use App\Support\Contracts\Model\HasTitleAttribute;
@@ -63,21 +64,21 @@ class OrderProduct extends Model implements HasTitleAttribute
     const DEFAULT_DD_ORDER_DIRECTION = 'asc';
     const DEFAULT_DD_PER_PAGE = 50;
 
-    // MSD
-    const DEFAULT_MSD_SERIALIZED_BY_MANUFACTURER_ORDER_BY = 'id';
-    // const DEFAULT_MSD_SERIALIZED_BY_MANUFACTURER_ORDER_DIRECTION = 'order_production_start_date';
-    const DEFAULT_MSD_SERIALIZED_BY_MANUFACTURER_ORDER_DIRECTION = 'asc';
-    const DEFAULT_MSD_SERIALIZED_BY_MANUFACTURER_PER_PAGE = 50;
+    // MD
+    const DEFAULT_MD_SERIALIZED_BY_MANUFACTURER_ORDER_BY = 'id';
+    // const DEFAULT_MD_SERIALIZED_BY_MANUFACTURER_ORDER_DIRECTION = 'order_production_start_date';
+    const DEFAULT_MD_SERIALIZED_BY_MANUFACTURER_ORDER_DIRECTION = 'asc';
+    const DEFAULT_MD_SERIALIZED_BY_MANUFACTURER_PER_PAGE = 50;
 
     // Statuses
     const STATUS_PRODUCTION_IS_ENDED_NAME = 'Production is ended';
     const STATUS_IS_READY_FOR_SHIPMENT_FROM_MANUFACTURER_NAME = 'Ready for shipment from manufacturer';
 
     // Serialization statuses
-    const STATUS_REPORT_SENT_TO_HUB_NAME = 'Report sent to hub';
-    const STATUS_SERIALIZATION_CODES_REQUESTED_NAME = 'Serialization codes requested';
-    const STATUS_SERIALIZATION_CODES_SENT_NAME = 'Serialization codes sent';
-    const STATUS_SERIALIZATION_REPORT_RECEIVED_NAME = 'Serialization report received';
+    const SERIALIZATION_STATUS_SERIALIZATION_CODES_REQUESTED_NAME = 'Serialization codes requested';
+    const SERIALIZATION_STATUS_SERIALIZATION_CODES_SENT_NAME = 'Serialization codes sent';
+    const SERIALIZATION_STATUS_SERIALIZATION_REPORT_RECEIVED_NAME = 'Serialization report received';
+    const SERIALIZATION_STATUS_REPORT_SENT_TO_HUB_NAME = 'Report sent to hub';
 
     /*
     |--------------------------------------------------------------------------
@@ -164,6 +165,8 @@ class OrderProduct extends Model implements HasTitleAttribute
             'base_model_class',
             'status',
             'total_price',
+            'production_prepayment_invoice',
+            'production_final_or_full_payment_invoice',
         ]);
 
         $this->order->append([
@@ -201,6 +204,45 @@ class OrderProduct extends Model implements HasTitleAttribute
 
         $this->order->append([
             'title',
+        ]);
+
+        $this->process->append([
+            'full_english_product_label',
+            'full_russian_product_label',
+        ]);
+    }
+
+    public static function appendRecordsBasicDDAttributes($records): void
+    {
+        foreach ($records as $record) {
+            $record->appendBasicDDAttributes();
+        }
+    }
+
+    public function appendBasicDDAttributes(): void
+    {
+        $this->append([
+            'base_model_class',
+        ]);
+
+        $this->process->append([
+            'full_english_product_label',
+            'full_russian_product_label',
+        ]);
+    }
+
+    public static function appendRecordsBasicMDAttributes($records): void
+    {
+        foreach ($records as $record) {
+            $record->appendBasicMDAttributes();
+        }
+    }
+
+    public function appendBasicMDAttributes(): void
+    {
+        $this->append([
+            'base_model_class',
+            'serialization_status',
         ]);
 
         $this->process->append([
@@ -274,17 +316,17 @@ class OrderProduct extends Model implements HasTitleAttribute
     public function getSerializationStatusAttribute(): string
     {
         return match (true) {
-            $this->report_sent_to_hub_date
-            => self::STATUS_REPORT_SENT_TO_HUB_NAME,
+            !is_null($this->report_sent_to_hub_date)
+            => self::SERIALIZATION_STATUS_REPORT_SENT_TO_HUB_NAME,
 
-            $this->serialization_report_recieved_date
-            => self::STATUS_SERIALIZATION_REPORT_RECEIVED_NAME,
+            !is_null($this->serialization_report_recieved_date)
+            => self::SERIALIZATION_STATUS_SERIALIZATION_REPORT_RECEIVED_NAME,
 
-            $this->serialization_codes_sent_date
-            => self::STATUS_SERIALIZATION_CODES_SENT_NAME,
+            !is_null($this->serialization_codes_sent_date)
+            => self::SERIALIZATION_STATUS_SERIALIZATION_CODES_SENT_NAME,
 
-            $this->serialization_codes_request_date
-            => self::STATUS_SERIALIZATION_CODES_REQUESTED_NAME,
+            !is_null($this->serialization_codes_request_date)
+            => self::SERIALIZATION_STATUS_SERIALIZATION_CODES_REQUESTED_NAME,
 
             default
             => Order::STATUS_PRODUCTION_IS_STARTED_NAME,
@@ -445,6 +487,8 @@ class OrderProduct extends Model implements HasTitleAttribute
             'lastComment',
             'serializationType',
 
+            'productionInvoices', // Required when detecting 'payment_completed_date' of invoices
+
             'order' => function ($orderQuery) {
                 $orderQuery->with([ // $orderQuery->withBasicRelations() not used because of redundant/extra relations
                     'country',
@@ -513,6 +557,70 @@ class OrderProduct extends Model implements HasTitleAttribute
     }
 
     public function scopeWithBasicCMDRelationCounts($query): Builder
+    {
+        return $query->withCount([
+            'comments',
+        ]);
+    }
+
+    public function scopeWithBasicDDRelations($query)
+    {
+        return $query->with([
+            'lastComment',
+
+            'order' => function ($orderQuery) {
+                $orderQuery->with([ // $orderQuery->withBasicRelations() not used because of redundant relations
+                    'country',
+
+                    'manufacturer' => function ($manufacturersQuery) {
+                        $manufacturersQuery->select(
+                            'manufacturers.id',
+                            'manufacturers.name',
+                        );
+                    },
+                ]);
+            },
+
+            'process' => function ($processQuery) {
+                $processQuery->withRelationsForOrderProduct()
+                    ->withOnlySelectsForOrderProduct();
+            },
+        ]);
+    }
+
+    public function scopeWithBasicDDRelationCounts($query): Builder
+    {
+        return $query->withCount([
+            'comments',
+        ]);
+    }
+
+    public function scopeWithBasicMDRelations($query)
+    {
+        return $query->with([
+            'lastComment',
+
+            'order' => function ($orderQuery) {
+                $orderQuery->with([ // $orderQuery->withBasicRelations() not used because of redundant relations
+                    'country',
+
+                    'manufacturer' => function ($manufacturersQuery) {
+                        $manufacturersQuery->select(
+                            'manufacturers.id',
+                            'manufacturers.name',
+                        );
+                    },
+                ]);
+            },
+
+            'process' => function ($processQuery) {
+                $processQuery->withRelationsForOrderProduct()
+                    ->withOnlySelectsForOrderProduct();
+            },
+        ]);
+    }
+
+    public function scopeWithBasicMDRelationCounts($query): Builder
     {
         return $query->withCount([
             'comments',
@@ -654,6 +762,91 @@ class OrderProduct extends Model implements HasTitleAttribute
         // Append attributes unless raw query is requested
         if ($appendAttributes && $action !== 'query') {
             self::appendRecordsBasicCMDAttributes($records);
+        }
+
+        return $records;
+    }
+
+    /**
+     * Build and execute a model query based on request parameters.
+     *
+     * Steps:
+     *  - Apply default relations & counts
+     *  - Apply soft delete scope (if requested)
+     *  - Normalize query params (pagination, sorting, etc.)
+     *  - Apply filters
+     *  - Finalize query with sorting & pagination
+     *  - Append basic attributes (if requested and unless returning raw query)
+     *
+     * @param $action  ('paginate', 'get' or 'query')
+     * @return mixed
+     */
+    public static function queryDDRecordsFromRequest(Request $request, string $action = 'paginate', bool $appendAttributes = false)
+    {
+        $query = self::onlySentToManufacturer()
+            ->withBasicDDRelations()
+            ->withBasicDDRelationCounts();
+
+        // Normalize request parameters
+        self::addDefaultQueryParamsToRequest(
+            $request,
+            'DEFAULT_DD_ORDER_BY',
+            'DEFAULT_DD_ORDER_DIRECTION',
+            'DEFAULT_DD_PER_PAGE'
+        );
+
+        // Apply filters
+        self::filterQueryForRequest($query, $request);
+
+        // Finalize (sorting & pagination)
+        $records = ModelHelper::finalizeQueryForRequest($query, $request, $action);
+
+        // Append attributes unless raw query is requested
+        if ($appendAttributes && $action !== 'query') {
+            self::appendRecordsBasicDDAttributes($records);
+        }
+
+        return $records;
+    }
+
+    /**
+     * Build and execute a model query based on request parameters.
+     *
+     * Steps:
+     *  - Apply default relations & counts
+     *  - Apply soft delete scope (if requested)
+     *  - Normalize query params (pagination, sorting, etc.)
+     *  - Apply filters
+     *  - Finalize query with sorting & pagination
+     *  - Append basic attributes (if requested and unless returning raw query)
+     *
+     * @param $action  ('paginate', 'get' or 'query')
+     * @return mixed
+     */
+    public static function queryMDRecordsFromRequest(Request $request, string $action = 'paginate', bool $appendAttributes = false)
+    {
+        $query = self::onlyProductionIsStarted()
+            ->onlySerializedByManufacturer()
+            ->withBasicMDRelations()
+            ->withBasicMDRelationCounts();
+
+        // Normalize request parameters
+        self::addDefaultQueryParamsToRequest(
+            $request,
+            'DEFAULT_MD_SERIALIZED_BY_MANUFACTURER_ORDER_BY',
+            'DEFAULT_MD_SERIALIZED_BY_MANUFACTURER_ORDER_DIRECTION',
+            'DEFAULT_MD_SERIALIZED_BY_MANUFACTURER_PER_PAGE'
+        );
+
+        // Apply filters
+        self::filterQueryForRequest($query, $request);
+
+        // Finalize (sorting & pagination)
+        $records = ModelHelper::finalizeQueryForRequest($query, $request, $action);
+
+        // Append attributes unless raw query is requested
+        if ($appendAttributes && $action !== 'query') {
+            self::appendRecordsBasicMDAttributes($records);
         }
 
         return $records;
@@ -816,7 +1009,7 @@ class OrderProduct extends Model implements HasTitleAttribute
      */
     function updateByDDFromRequest(DDOrderProductUpdateRequest $request): void
     {
-        $this->fill($request->safe()->all());
+        $this->fill($request->all());
 
         // Validate 'date_of_receiving_print_proof_from_manufacturer' attribute
         if (!$this->new_layout) {
@@ -830,11 +1023,11 @@ class OrderProduct extends Model implements HasTitleAttribute
     }
 
     /**
-     * AJAX request by MSD
+     * AJAX request by MD
      */
-    function updateByMSDFromRequest(MSDOrderProductUpdateRequest $request): void
+    function updateSerializedByManufacturerByMDFromRequest(MDSerializedByManufacturerUpdateRequest $request): void
     {
-        $this->update($request->safe());
+        $this->update($request->all());
 
         // HasMany relations
         $this->storeCommentFromRequest($request);
@@ -978,10 +1171,10 @@ class OrderProduct extends Model implements HasTitleAttribute
 
             ['title' => 'dates.Layout approved', 'key' => 'layout_approved_date', 'width' => 170, 'sortable' => false],
             ['title' => 'dates.Prepayment completion', 'key' => 'production_prepayment_completed_date', 'width' => 216, 'sortable' => false],
-            ['title' => 'dates.Production end', 'key' => 'production_end_date', 'width' => 218, 'sortable' => false],
+            ['title' => 'dates.Production end', 'key' => 'production_end_date', 'width' => 240, 'sortable' => true],
             ['title' => 'dates.Final payment request', 'key' => 'production_final_payment_request_date', 'width' => 236, 'sortable' => false],
             ['title' => 'dates.Final payment completion', 'key' => 'production_final_payment_completed_date', 'width' => 264, 'sortable' => false],
-            ['title' => 'dates.Ready for shipment', 'key' => 'readiness_for_shipment_from_manufacturer_date', 'width' => 160, 'sortable' => false],
+            ['title' => 'dates.Ready for shipment', 'key' => 'readiness_for_shipment_from_manufacturer_date', 'width' => 180, 'sortable' => true],
         ];
 
         foreach ($additionalColumns as $column) {
@@ -1048,6 +1241,108 @@ class OrderProduct extends Model implements HasTitleAttribute
             ['title' => 'dates.Print proof receive', 'key' => 'date_of_receiving_print_proof_from_manufacturer', 'width' => 228, 'sortable' => true],
             ['title' => 'fields.Box article', 'key' => 'box_article', 'width' => 140, 'sortable' => false],
             ['title' => 'dates.Layout approved', 'key' => 'layout_approved_date', 'width' => 188, 'sortable' => true],
+
+            ['title' => 'dates.Date of creation', 'key' => 'created_at', 'width' => 130, 'sortable' => true],
+            ['title' => 'dates.Update date', 'key' => 'updated_at', 'width' => 150, 'sortable' => true],
+        ];
+
+        foreach ($additionalColumns as $column) {
+            array_push($columns, [
+                ...$column,
+                'visible' => 1,
+                'order' => $order++,
+            ]);
+        }
+
+        return $columns;
+    }
+
+    public static function getDDTableHeadersForUser($user): array|null
+    {
+        if (Gate::forUser($user)->denies(Permission::extractAbilityName(Permission::CAN_VIEW_DD_ORDER_PRODUCTS_NAME))) {
+            return null;
+        }
+
+        $order = 1;
+        $columns = array();
+
+        if (Gate::forUser($user)->allows(Permission::extractAbilityName(Permission::CAN_EDIT_DD_ORDER_PRODUCTS_NAME))) {
+            array_push(
+                $columns,
+                ['title' => 'Record', 'key' => 'edit', 'width' => 60, 'sortable' => false, 'visible' => 1, 'order' => $order++],
+            );
+        }
+
+        $additionalColumns = [
+            ['title' => 'ID', 'key' => 'id', 'width' => 62, 'sortable' => true],
+            ['title' => 'fields.Manufacturer', 'key' => 'order_manufacturer_id', 'width' => 140, 'sortable' => false],
+            ['title' => 'fields.Country', 'key' => 'order_country_id', 'width' => 80, 'sortable' => false],
+            ['title' => 'fields.TM Eng', 'key' => 'process_trademark_en', 'width' => 146, 'sortable' => false],
+            ['title' => 'fields.TM Rus', 'key' => 'process_trademark_ru', 'width' => 146, 'sortable' => false],
+            ['title' => 'fields.MAH', 'key' => 'process_marketing_authorization_holder_id', 'width' => 102, 'sortable' => true],
+            ['title' => 'fields.Quantity', 'key' => 'quantity', 'width' => 112, 'sortable' => false],
+            ['title' => 'fields.PO №', 'key' => 'order_name', 'width' => 136, 'sortable' => false],
+            ['title' => 'dates.Sent to BDM', 'key' => 'order_sent_to_bdm_date', 'width' => 142, 'sortable' => false],
+            ['title' => 'dates.Sent to manufacturer', 'key' => 'order_sent_to_manufacturer_date', 'width' => 152, 'sortable' => false],
+
+            ['title' => 'Comments', 'key' => 'comments_count', 'width' => 132, 'sortable' => false],
+            ['title' => 'comments.Last', 'key' => 'last_comment_body', 'width' => 200, 'sortable' => false],
+
+            ['title' => 'fields.Layout status', 'key' => 'new_layout', 'width' => 126, 'sortable' => true],
+            ['title' => 'dates.Layout sent', 'key' => 'date_of_sending_new_layout_to_manufacturer', 'width' => 178, 'sortable' => true],
+            ['title' => 'dates.Print proof receive', 'key' => 'date_of_receiving_print_proof_from_manufacturer', 'width' => 228, 'sortable' => true],
+            ['title' => 'fields.Box article', 'key' => 'box_article', 'width' => 140, 'sortable' => false],
+            ['title' => 'dates.Layout approved', 'key' => 'layout_approved_date', 'width' => 188, 'sortable' => true],
+
+            ['title' => 'dates.Date of creation', 'key' => 'created_at', 'width' => 130, 'sortable' => true],
+            ['title' => 'dates.Update date', 'key' => 'updated_at', 'width' => 150, 'sortable' => true],
+        ];
+
+        foreach ($additionalColumns as $column) {
+            array_push($columns, [
+                ...$column,
+                'visible' => 1,
+                'order' => $order++,
+            ]);
+        }
+
+        return $columns;
+    }
+
+    public static function getMDTableHeadersForUser($user): array|null
+    {
+        if (Gate::forUser($user)->denies(Permission::extractAbilityName(Permission::CAN_VIEW_MD_SERIALIZED_BY_MANUFACTURER_NAME))) {
+            return null;
+        }
+
+        $order = 1;
+        $columns = array();
+
+        if (Gate::forUser($user)->allows(Permission::extractAbilityName(Permission::CAN_EDIT_MD_SERIALIZED_BY_MANUFACTURER_NAME))) {
+            array_push(
+                $columns,
+                ['title' => 'Record', 'key' => 'edit', 'width' => 60, 'sortable' => false, 'visible' => 1, 'order' => $order++],
+            );
+        }
+
+        $additionalColumns = [
+            ['title' => 'ID', 'key' => 'id', 'width' => 62, 'sortable' => true],
+            ['title' => 'Status', 'key' => 'status', 'width' => 144, 'sortable' => false],
+            ['title' => 'fields.Manufacturer', 'key' => 'order_manufacturer_id', 'width' => 140, 'sortable' => false],
+            ['title' => 'fields.Country', 'key' => 'order_country_id', 'width' => 80, 'sortable' => false],
+            ['title' => 'fields.TM Eng', 'key' => 'process_trademark_en', 'width' => 146, 'sortable' => false],
+            ['title' => 'fields.TM Rus', 'key' => 'process_trademark_ru', 'width' => 146, 'sortable' => false],
+            ['title' => 'fields.Quantity', 'key' => 'quantity', 'width' => 112, 'sortable' => false],
+
+            ['title' => 'dates.Production end', 'key' => 'production_end_date', 'width' => 232, 'sortable' => true],
+
+            ['title' => 'dates.Serialization codes request', 'key' => 'serialization_codes_request_date', 'width' => 262, 'sortable' => true],
+            ['title' => 'dates.Serialization codes sent', 'key' => 'serialization_codes_sent_date', 'width' => 268, 'sortable' => true],
+            ['title' => 'dates.Serialization report received', 'key' => 'serialization_report_recieved_date', 'width' => 296, 'sortable' => true],
+            ['title' => 'dates.Report sent to hub', 'key' => 'report_sent_to_hub_date', 'width' => 208, 'sortable' => true],
+
+            ['title' => 'Comments', 'key' => 'comments_count', 'width' => 132, 'sortable' => false],
+            ['title' => 'comments.Last', 'key' => 'last_comment_body', 'width' => 200, 'sortable' => false],
 
             ['title' => 'dates.Date of creation', 'key' => 'created_at', 'width' => 130, 'sortable' => true],
             ['title' => 'dates.Update date', 'key' => 'updated_at', 'width' => 150, 'sortable' => true],

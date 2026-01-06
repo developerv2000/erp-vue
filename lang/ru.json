@@ -8,6 +8,10 @@
     "Multiple records": "Множество записей",
     "History": "История",
 
+    "Manufacturer": "Производитель",
+    "Manufacturers": "Производители",
+    "Factory": "Завод",
+
     "Product": "Продукт",
     "product.About": "О продукте",
     "Products": "Продукты",
@@ -32,6 +36,8 @@
     "departments.PLD": "ДЗЛ",
     "departments.CMD": "ОКП",
     "departments.PRD": "ОПР",
+    "departments.DD": "ОД",
+    "departments.MD": "ОМ",
 
     "pages.Main": "Главная",
     "pages.Trash": "Корзина",
@@ -160,6 +166,7 @@
     "files.Size": "Размер файла",
 
     "properties.New": "Новый",
+    "properties.Without changes": "Без изменений",
     "properties.Read": "Прочитанно",
     "properties.Important": "Важный",
     "properties.Active": "Активный",
@@ -207,6 +214,10 @@
     "dates.Accepted": "Дата принятия",
     "dates.Payment request": "Дата запроса оплаты",
     "dates.Payment": "Дата оплаты",
+    "dates.Serialization codes request": "Дата запроса кодов сериализации",
+    "dates.Serialization codes sent": "Дата отправки кодов сериализации",
+    "dates.Serialization report received": "Дата получения отчета по сериализации",
+    "dates.Report sent to hub": "Дата отправки отчета в Хаб",
 
     "Days": "Дней",
     "days.past": "Дней прошло",
@@ -356,7 +367,9 @@
     "fields.COO": "COO",
     "fields.Declaration for EUR1": "Декларация для EUR1",
     "fields.Layout status": "Статус макета",
+    "fields.Layout approved": "Макет одобрен",
     "fields.Box article": "Артикул бокса",
+    "fields.New layout": "Новый макет",
 
     "fields.Payment type": "Тип оплаты",
     "fields.Pdf": "Pdf",

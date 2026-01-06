@@ -22,7 +22,7 @@ const defaultFilters = {
     updated_at: null,
 
     // Numbers
-    order_id: null,
+    invoiceable_id: null,
     product_id: null,
 
     // Multiple autocompletes
@@ -73,7 +73,7 @@ export const useCMDInvoicesTableStore = defineStore('CMDInvoicesTable', {
             this.filters.id = query.id;
 
             // Normalize filters
-            normalizeNumbersFromQuery(this.filters, query, ['order_id', 'product_id']);
+            normalizeNumbersFromQuery(this.filters, query, ['invoiceable_id', 'product_id']);
             normalizeMultiIDsFromQuery(this.filters, query, ['payment_type_id', 'order_manufacturer_id', 'order_country_id']);
             normalizeDateRangesFromQuery(this.filters, query, ['receive_date', 'sent_for_payment_date', 'created_at', 'updated_at']);
 

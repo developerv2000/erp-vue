@@ -152,7 +152,6 @@ const reloadRequiredDataAndResetForm = () => {
                         :label="t('dates.Receive')"
                         v-model="values.receive_date"
                         :error-messages="errors.receive_date"
-                        value-format="yyyy-MM-dd"
                         required
                     />
                 </v-col>

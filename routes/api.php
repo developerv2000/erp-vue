@@ -109,4 +109,22 @@ Route::middleware('auth:sanctum')->name('api.')->group(function () {
             });
         });
     });
+
+    // DD
+    Route::prefix('/dd')->name('dd.')->group(function () {
+        Route::prefix('/order-products')->name('order-products.')->group(function () {
+            Route::get('/', fn(Request $request) => OrderProduct::queryDDRecordsFromRequest($request, 'paginate', true))
+                ->middleware('can:view-DD-order-products')
+                ->name('get');
+        });
+    });
+
+    // MD
+    Route::prefix('/md')->name('md.')->group(function () {
+        Route::prefix('/serialized-by-manufacturer')->name('serialized-by-manufacturer.')->group(function () {
+            Route::get('/', fn(Request $request) => OrderProduct::queryMDRecordsFromRequest($request, 'paginate', true))
+                ->middleware('can:view-MD-serialized-by-manufacturer')
+                ->name('get');
+        });
+    });
 });

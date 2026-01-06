@@ -107,14 +107,12 @@ const handleTableOptionsUpdate = (options) => {
 
         <template #item.process_trademark_en="{ item }">
             <TogglableThreeLinesLimitedText
-                class="main-table__last-comment"
                 :text="item.process.full_english_product_label"
             />
         </template>
 
         <template #item.process_trademark_ru="{ item }">
             <TogglableThreeLinesLimitedText
-                class="main-table__last-comment"
                 :text="item.process.full_russian_product_label"
             />
         </template>
@@ -123,16 +121,16 @@ const handleTableOptionsUpdate = (options) => {
             {{ item.process.mah.name }}
         </template>
 
-        <template #item.status="{ item }">
-            <TdOrderStatus :status="item.status" />
-        </template>
-
         <template #item.order_currency_id="{ item }">
             {{ item.order.currency?.name }}
         </template>
 
         <template #item.total_price="{ item }">
             {{ item.total_price }}
+        </template>
+
+        <template #item.status="{ item }">
+            <TdOrderStatus :status="item.status" />
         </template>
 
         <template #item.comments_count="{ item }">
@@ -152,6 +150,40 @@ const handleTableOptionsUpdate = (options) => {
 
         <template #item.layout_approved_date="{ item }">
             {{ formatDate(item.layout_approved_date) }}
+        </template>
+
+        <template #item.production_prepayment_completed_date="{ item }">
+            {{
+                formatDate(
+                    item.production_prepayment_invoice?.payment_completed_date
+                )
+            }}
+        </template>
+
+        <template #item.production_end_date="{ item }">
+            {{ formatDate(item.production_end_date) }}
+        </template>
+
+        <template #item.production_final_payment_request_date="{ item }">
+            {{
+                formatDate(
+                    item.production_final_or_full_payment_invoice
+                        ?.sent_for_payment_date
+                )
+            }}
+        </template>
+
+        <template #item.production_final_payment_completed_date="{ item }">
+            {{
+                formatDate(
+                    item.production_final_or_full_payment_invoice
+                        ?.payment_completed_date
+                )
+            }}
+        </template>
+
+        <template #item.readiness_for_shipment_from_manufacturer_date="{ item }">
+            {{ formatDate(item.readiness_for_shipment_from_manufacturer_date) }}
         </template>
     </v-data-table-server>
 </template>

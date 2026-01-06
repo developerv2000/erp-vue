@@ -188,8 +188,6 @@ class PermissionSeeder extends Seeder
         $PRDId = Department::findByName(Department::PRD_NAME)->id;
 
         $PRDPerms = [
-            Permission::CAN_VIEW_PRD_ORDERS_NAME,
-            Permission::CAN_VIEW_PRD_ORDER_PRODUCTS_NAME,
             Permission::CAN_VIEW_PRD_INVOICES_NAME,
 
             Permission::CAN_EDIT_PRD_INVOICES_NAME,
@@ -199,6 +197,48 @@ class PermissionSeeder extends Seeder
             Permission::create([
                 'name' => $PRD,
                 'department_id' => $PRDId,
+            ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | DD permissions
+        |--------------------------------------------------------------------------
+        */
+
+        $DDId = Department::findByName(Department::DD_NAME)->id;
+
+        $DDPerms = [
+            Permission::CAN_VIEW_DD_ORDER_PRODUCTS_NAME,
+
+            Permission::CAN_EDIT_DD_ORDER_PRODUCTS_NAME,
+        ];
+
+        foreach ($DDPerms as $DD) {
+            Permission::create([
+                'name' => $DD,
+                'department_id' => $DDId,
+            ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | MD permissions
+        |--------------------------------------------------------------------------
+        */
+
+        $MDId = Department::findByName(Department::MD_NAME)->id;
+
+        $MDPerms = [
+            Permission::CAN_VIEW_MD_SERIALIZED_BY_MANUFACTURER_NAME,
+
+            Permission::CAN_EDIT_MD_SERIALIZED_BY_MANUFACTURER_NAME,
+        ];
+
+        foreach ($MDPerms as $MD) {
+            Permission::create([
+                'name' => $MD,
+                'department_id' => $MDId,
             ]);
         }
     }

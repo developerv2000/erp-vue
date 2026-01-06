@@ -54,7 +54,7 @@ return new class extends Migration
             $table->timestamp('production_end_date')->nullable(); // action
 
             // Step 7:
-            // MSD part
+            // MD part
             $table->timestamp('serialization_codes_request_date')->nullable();
             $table->timestamp('serialization_codes_sent_date')->nullable();
             $table->timestamp('serialization_report_recieved_date')->nullable();

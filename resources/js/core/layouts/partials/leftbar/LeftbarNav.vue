@@ -4,6 +4,8 @@ import AdministrationNav from "./partials/AdministrationNav.vue";
 import PldNav from "./partials/PldNav.vue";
 import CmdNav from "./partials/CmdNav.vue";
 import PrdNav from "./partials/PrdNav.vue";
+import DdNav from "./partials/DdNav.vue";
+import MdNav from "./partials/MdNav.vue";
 </script>
 
 <template>
@@ -12,6 +14,8 @@ import PrdNav from "./partials/PrdNav.vue";
         <PldNav />
         <CmdNav />
         <PrdNav />
+        <DdNav />
+        <MdNav />
         <AdministrationNav />
     </div>
 </template>

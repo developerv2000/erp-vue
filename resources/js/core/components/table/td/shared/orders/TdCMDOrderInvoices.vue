@@ -53,7 +53,7 @@ const availableInvoiceActions = computed(() =>
     <TdArrowedInertiaLink
         :link="
             route('cmd.invoices.index', {
-                'order_id[]': item.id,
+                'invoiceable_id': item.id,
                 initialize_from_inertia_page: true,
             })
         "

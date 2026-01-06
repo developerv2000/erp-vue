@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\MSD;
+namespace App\Http\Requests\MD;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class MSDOrderProductUpdateRequest extends FormRequest
+class MDSerializedByManufacturerUpdateRequest extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.

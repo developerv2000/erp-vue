@@ -69,8 +69,14 @@ class User extends Authenticatable
     const CMD_ORDER_PRODUCTS_HEADERS_KEY = 'CMD_ORDER_PRODUCTS';
     const CMD_INVOICES_HEADERS_KEY = 'CMD_INVOICES';
 
-    // 3. PRD
+    // 4. PRD
     const PRD_PRODUCTION_TYPE_INVOICES_HEADERS_KEY = 'PRD_PRODUCTION_TYPE_INVOICES';
+
+    // 5. DD
+    const DD_ORDER_PRODUCTS_HEADERS_KEY = 'DD_ORDER_PRODUCTS';
+
+    // 6. MD
+    const MD_SERIALIZED_BY_MANUFACTURER_HEADERS_KEY = 'MD_SERIALIZED_BY_MANUFACTURER';
 
     /*
     |--------------------------------------------------------------------------
@@ -579,6 +585,8 @@ class User extends Authenticatable
         $this->resetPLDTableHeaders($settings);
         $this->resetCMDTableHeaders($settings);
         $this->resetPRDTableHeaders($settings);
+        $this->resetDDTableHeaders($settings);
+        $this->resetMDTableHeaders($settings);
     }
 
     /**
@@ -628,6 +636,12 @@ class User extends Authenticatable
 
             // PRD
             self::PRD_PRODUCTION_TYPE_INVOICES_HEADERS_KEY => Invoice::getPRDProductionTypesTableHeadersForUser($this),
+
+            // DD
+            self::DD_ORDER_PRODUCTS_HEADERS_KEY => OrderProduct::getDDTableHeadersForUser($this),
+
+            // MD
+            self::MD_SERIALIZED_BY_MANUFACTURER_HEADERS_KEY => OrderProduct::getMDTableHeadersForUser($this),
 
             default => throw new InvalidArgumentException("Unknown key: $key"),
         };
@@ -737,6 +751,32 @@ class User extends Authenticatable
         $headersSettings = isset($settings['table_headers']) ? $settings['table_headers'] : [];
 
         $headersSettings[self::PRD_PRODUCTION_TYPE_INVOICES_HEADERS_KEY] = Invoice::getPRDProductionTypesTableHeadersForUser($this);
+
+        $settings['table_headers'] = $headersSettings;
+        $this->settings = $settings;
+        $this->save();
+    }
+
+    public function resetDDTableHeaders($settings): void
+    {
+        $this->refresh();
+        $settings = $this->settings;
+        $headersSettings = isset($settings['table_headers']) ? $settings['table_headers'] : [];
+
+        $headersSettings[self::DD_ORDER_PRODUCTS_HEADERS_KEY] = OrderProduct::getDDTableHeadersForUser($this);
+
+        $settings['table_headers'] = $headersSettings;
+        $this->settings = $settings;
+        $this->save();
+    }
+
+    public function resetMDTableHeaders($settings): void
+    {
+        $this->refresh();
+        $settings = $this->settings;
+        $headersSettings = isset($settings['table_headers']) ? $settings['table_headers'] : [];
+
+        $headersSettings[self::MD_SERIALIZED_BY_MANUFACTURER_HEADERS_KEY] = OrderProduct::getMDTableHeadersForUser($this);
 
         $settings['table_headers'] = $headersSettings;
         $this->settings = $settings;
@@ -940,6 +980,12 @@ class User extends Authenticatable
 
             // PRD
             'prd.invoices.production-types.index' => 'view-PRD-invoices',
+
+            // DD
+            'dd.order-products.index' => 'view-DD-order-products',
+
+            // MD
+            'md.serialized-by-manufacturer.index' => 'view-MD-serialized-by-manufacturer',
         ];
 
         foreach ($homepageRoutes as $routeName => $gate) {

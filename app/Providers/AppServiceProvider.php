@@ -3,8 +3,10 @@
 namespace App\Providers;
 
 use App\Support\GateDefiners\CMDGatesDefiner;
+use App\Support\GateDefiners\DDGatesDefiner;
 use App\Support\GateDefiners\GlobalGatesDefiner;
 use App\Support\GateDefiners\MADGatesDefiner;
+use App\Support\GateDefiners\MDGatesDefiner;
 use App\Support\GateDefiners\NotificationGatesDefiner;
 use App\Support\GateDefiners\PLDGatesDefiner;
 use App\Support\GateDefiners\PRDGatesDefiner;
@@ -35,5 +37,7 @@ class AppServiceProvider extends ServiceProvider
         CMDGatesDefiner::defineAll();
         PLDGatesDefiner::defineAll();
         PRDGatesDefiner::defineAll();
+        DDGatesDefiner::defineAll();
+        MDGatesDefiner::defineAll();
     }
 }

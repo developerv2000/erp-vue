@@ -1,36 +1,60 @@
 export function useFormData() {
-    function objectToFormData(obj, form = new FormData(), namespace = "") {
+    function objectToFormData(
+        obj,
+        form = new FormData(),
+        namespace = ""
+    ) {
         for (const key in obj) {
             if (!Object.prototype.hasOwnProperty.call(obj, key)) continue;
 
             const formKey = namespace ? `${namespace}[${key}]` : key;
             const value = obj[key];
 
-            if (value === null || value === undefined) continue;
+            // undefined → omit
+            if (value === undefined) continue;
 
-            // Handle Files correctly
+            // null → empty string (Laravel → null)
+            if (value === null) {
+                form.append(formKey, "");
+                continue;
+            }
+
             if (value instanceof File) {
                 form.append(formKey, value);
+                continue;
             }
-            // Handle Arrays (recursively if array of objects)
-            else if (Array.isArray(value)) {
+
+            if (value instanceof Date) {
+                form.append(formKey, value.toISOString());
+                continue;
+            }
+
+            if (Array.isArray(value)) {
                 value.forEach((item, index) => {
                     const arrayKey = `${formKey}[${index}]`;
+
+                    if (item === undefined) return;
+
+                    if (item === null) {
+                        form.append(arrayKey, "");
+                        return;
+                    }
+
                     if (typeof item === "object" && !(item instanceof File)) {
-                        objectToFormData(item, form, arrayKey); // recurse
+                        objectToFormData(item, form, arrayKey);
                     } else {
                         form.append(arrayKey, item);
                     }
                 });
+                continue;
             }
-            // Handle nested objects
-            else if (typeof value === "object" && !(value instanceof Date)) {
+
+            if (typeof value === "object") {
                 objectToFormData(value, form, formKey);
+                continue;
             }
-            // Handle primitives and Date
-            else {
-                form.append(formKey, value instanceof Date ? value.toISOString() : value);
-            }
+
+            form.append(formKey, value);
         }
 
         return form;

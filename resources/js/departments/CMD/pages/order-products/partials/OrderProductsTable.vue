@@ -17,6 +17,7 @@ import TableNavigateToPage from "@/core/components/table/misc/TableNavigateToPag
 import TdOrderStatus from "@/core/components/table/td/shared/orders/TdOrderStatus.vue";
 import TdOrderProductEndProduction from "@/core/components/table/td/shared/order-products/TdOrderProductEndProduction.vue";
 import TdOrderProductSetAsReadyForShipmentFromManufacturer from "@/core/components/table/td/shared/order-products/TdOrderProductSetAsReadyForShipmentFromManufacturer.vue";
+import TdOrderProductLayoutStatus from "@/core/components/table/td/shared/order-products/TdOrderProductLayoutStatus.vue";
 
 const { t } = useI18n();
 const { get } = useQueryParams();
@@ -113,14 +114,12 @@ const handleTableOptionsUpdate = (options) => {
 
         <template #item.process_trademark_en="{ item }">
             <TogglableThreeLinesLimitedText
-                class="main-table__last-comment"
                 :text="item.process.full_english_product_label"
             />
         </template>
 
         <template #item.process_trademark_ru="{ item }">
             <TogglableThreeLinesLimitedText
-                class="main-table__last-comment"
                 :text="item.process.full_russian_product_label"
             />
         </template>
@@ -252,6 +251,22 @@ const handleTableOptionsUpdate = (options) => {
                 "
                 :order-id="item.id"
             />
+        </template>
+
+        <template #item.new_layout="{ item }">
+            <TdOrderProductLayoutStatus :new-layout="item.new_layout" />
+        </template>
+
+        <template #item.date_of_sending_new_layout_to_manufacturer="{ item }">
+            {{ formatDate(item.date_of_sending_new_layout_to_manufacturer) }}
+        </template>
+
+        <template
+            #item.date_of_receiving_print_proof_from_manufacturer="{ item }"
+        >
+            {{
+                formatDate(item.date_of_receiving_print_proof_from_manufacturer)
+            }}
         </template>
 
         <template #item.layout_approved_date="{ item }">

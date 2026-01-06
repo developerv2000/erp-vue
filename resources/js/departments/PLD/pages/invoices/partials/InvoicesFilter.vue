@@ -75,14 +75,16 @@ const store = usePLDInvoicesTableStore();
 
         <FilterNumberInput
             :label="t('filter.Order ID')"
-            name="order_id"
-            v-model="store.filters.order_id"
+            name="invoiceable_id"
+            v-model="store.filters.invoiceable_id"
+            :min="1"
         />
 
         <FilterNumberInput
             :label="t('filter.Product ID')"
             name="product_id"
             v-model="store.filters.product_id"
+            :min="1"
         />
 
         <FilterDefaultInputs :store="store" />

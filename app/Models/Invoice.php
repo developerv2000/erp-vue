@@ -532,7 +532,7 @@ class Invoice extends Model implements HasTitleAttribute
     private static function getFilterConfig(): array
     {
         return [
-            'whereEqual' => ['order_id'],
+            'whereEqual' => ['invoiceable_id'],
             'whereIn' => ['id', 'payment_type_id', 'number'],
             'dateRange' => [
                 'receive_date',

@@ -170,32 +170,6 @@ class UserSeeder extends Seeder
 
         /*
         |--------------------------------------------------------------------------
-        | DD users
-        |--------------------------------------------------------------------------
-        */
-
-        // $ddID = Department::findByName(Department::DD_NAME)->id;
-        // $designerRoleID = Role::findByName(Role::DD_DESIGNER_NAME);
-
-        // $designers = [
-        //     ['name' => 'DD Designer', 'email' => 'dd_designer@mail.com', 'photo' => 'dd_designer.png'],
-        // ];
-
-        // // Create DD designers
-        // foreach ($designers as $user) {
-        //     $newUser = User::create([
-        //         'name' => $user['name'],
-        //         'email' => $user['email'],
-        //         'photo' => $user['photo'],
-        //         'department_id' => $ddID,
-        //         'password' => bcrypt($password),
-        //     ]);
-
-        //     $newUser->roles()->attach($designerRoleID);
-        // }
-
-        /*
-        |--------------------------------------------------------------------------
         | PRD users
         |--------------------------------------------------------------------------
         */
@@ -222,29 +196,55 @@ class UserSeeder extends Seeder
 
         /*
         |--------------------------------------------------------------------------
-        | MSD users
+        | DD users
         |--------------------------------------------------------------------------
         */
 
-        // $msdID = Department::findByName(Department::MSD_NAME)->id;
-        // $serializerRoleID = Role::findByName(Role::MSD_SERIALIZER_NAME);
+        $ddID = Department::findByName(Department::DD_NAME)->id;
+        $designerRoleID = Role::findByName(Role::DD_DESIGNER_NAME);
 
-        // $serializers = [
-        //     ['name' => 'Serializer man', 'email' => 'msd_serializer@mail.com', 'photo' => 'msd_serializer.png'],
-        // ];
+        $designers = [
+            ['name' => 'DD Designer', 'email' => 'dd_designer@mail.com', 'photo' => 'dd_designer.png'],
+        ];
 
-        // // Create MSD Serializers
-        // foreach ($serializers as $user) {
-        //     $newUser = User::create([
-        //         'name' => $user['name'],
-        //         'email' => $user['email'],
-        //         'photo' => $user['photo'],
-        //         'department_id' => $msdID,
-        //         'password' => bcrypt($password),
-        //     ]);
+        // Create DD designers
+        foreach ($designers as $user) {
+            $newUser = User::create([
+                'name' => $user['name'],
+                'email' => $user['email'],
+                'photo' => $user['photo'],
+                'department_id' => $ddID,
+                'password' => bcrypt($password),
+            ]);
 
-        //     $newUser->roles()->attach($serializerRoleID);
-        // }
+            $newUser->roles()->attach($designerRoleID);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | MD users
+        |--------------------------------------------------------------------------
+        */
+
+        $mdID = Department::findByName(Department::MD_NAME)->id;
+        $serializerRoleID = Role::findByName(Role::MD_SERIALIZER_NAME);
+
+        $serializers = [
+            ['name' => 'MD Serializer', 'email' => 'md_serializer@mail.com', 'photo' => 'msd_serializer.png'],
+        ];
+
+        // Create MD Serializers
+        foreach ($serializers as $user) {
+            $newUser = User::create([
+                'name' => $user['name'],
+                'email' => $user['email'],
+                'photo' => $user['photo'],
+                'department_id' => $mdID,
+                'password' => bcrypt($password),
+            ]);
+
+            $newUser->roles()->attach($serializerRoleID);
+        }
 
         /*
         |--------------------------------------------------------------------------

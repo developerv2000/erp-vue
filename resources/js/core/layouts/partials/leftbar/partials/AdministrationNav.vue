@@ -51,7 +51,7 @@ const listItems = computed(() => [
 
 <template>
     <v-list v-if="can('administrate')" density="compact" color="primary">
-        <v-list-subheader>{{ $t("Administration") }}</v-list-subheader>
+        <v-list-subheader>{{ t("Administration") }}</v-list-subheader>
 
         <InertiaLinkedListItem
             v-for="(item, index) in listItems"

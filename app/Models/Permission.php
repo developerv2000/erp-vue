@@ -172,6 +172,30 @@ class Permission extends Model
 
     /*
     |--------------------------------------------------------------------------
+    | DD permissions
+    |--------------------------------------------------------------------------
+    */
+
+    // View
+    const CAN_VIEW_DD_ORDER_PRODUCTS_NAME = 'can-view-DD-order-products';
+
+    // Edit
+    const CAN_EDIT_DD_ORDER_PRODUCTS_NAME = 'can-edit-DD-order-products';
+
+    /*
+    |--------------------------------------------------------------------------
+    | MD permissions
+    |--------------------------------------------------------------------------
+    */
+
+    // View
+    const CAN_VIEW_MD_SERIALIZED_BY_MANUFACTURER_NAME = 'can-view-MD-serialized-by-manufacturer';
+
+    // Edit
+    const CAN_EDIT_MD_SERIALIZED_BY_MANUFACTURER_NAME = 'can-edit-MD-serialized-by-manufacturer';
+
+    /*
+    |--------------------------------------------------------------------------
     | Properties
     |--------------------------------------------------------------------------
     */
@@ -430,6 +454,25 @@ class Permission extends Model
             self::CAN_EDIT_PRD_INVOICES_NAME,
 
             self::CAN_RECEIVE_NOTIFICATION_WHEN_INVOICE_IS_SENT_FOR_PAYMENT_BY_CMD,
+        ];
+    }
+
+    public static function getDDDesignerPermissionNames()
+    {
+        return [
+            self::CAN_VIEW_DD_ORDER_PRODUCTS_NAME,
+            self::CAN_EDIT_DD_ORDER_PRODUCTS_NAME,
+
+            self::CAN_RECEIVE_NOTIFICATION_WHEN_ORDER_IS_SENT_TO_MANUFACTURER_BY_CMD,
+        ];
+    }
+
+    public static function getMDSerializerPermissionNames()
+    {
+        return [
+            self::CAN_VIEW_MD_SERIALIZED_BY_MANUFACTURER_NAME,
+
+            self::CAN_EDIT_MD_SERIALIZED_BY_MANUFACTURER_NAME,
         ];
     }
 }

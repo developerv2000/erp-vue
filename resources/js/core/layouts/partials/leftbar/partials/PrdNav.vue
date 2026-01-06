@@ -26,7 +26,7 @@ const invoiceListItems = computed(() => [
         density="compact"
         color="primary"
     >
-        <v-list-subheader>{{ $t("departments.PRD") }}</v-list-subheader>
+        <v-list-subheader>{{ t("departments.PRD") }}</v-list-subheader>
 
         <template v-if="can('view-PRD-invoices')">
             <template v-for="(item, index) in invoiceListItems" :key="index">

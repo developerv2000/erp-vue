@@ -152,7 +152,11 @@ const handleTableOptionsUpdate = (options) => {
             {{ formatDate(item.layout_approved_date) }}
         </template>
 
-        <template #item.production_prepayment_completed_date="{ item }">
+        <template
+            #item.production_prepayment_invoice_payment_completed_date="{
+                item,
+            }"
+        >
             {{
                 formatDate(
                     item.production_prepayment_invoice?.payment_completed_date
@@ -164,7 +168,11 @@ const handleTableOptionsUpdate = (options) => {
             {{ formatDate(item.production_end_date) }}
         </template>
 
-        <template #item.production_final_payment_request_date="{ item }">
+        <template
+            #item.production_final_or_full_payment_invoice_sent_for_payment_date="{
+                item,
+            }"
+        >
             {{
                 formatDate(
                     item.production_final_or_full_payment_invoice
@@ -173,7 +181,11 @@ const handleTableOptionsUpdate = (options) => {
             }}
         </template>
 
-        <template #item.production_final_payment_completed_date="{ item }">
+        <template
+            #item.production_final_or_full_payment_invoice_payment_completed_date="{
+                item,
+            }"
+        >
             {{
                 formatDate(
                     item.production_final_or_full_payment_invoice
@@ -182,7 +194,9 @@ const handleTableOptionsUpdate = (options) => {
             }}
         </template>
 
-        <template #item.readiness_for_shipment_from_manufacturer_date="{ item }">
+        <template
+            #item.readiness_for_shipment_from_manufacturer_date="{ item }"
+        >
             {{ formatDate(item.readiness_for_shipment_from_manufacturer_date) }}
         </template>
     </v-data-table-server>

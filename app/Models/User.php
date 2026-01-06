@@ -708,7 +708,7 @@ class User extends Authenticatable
 
         $headersSettings[self::PLD_ORDERS_HEADERS_KEY] = Order::getPLDTableHeadersForUser($this);
         $headersSettings[self::PLD_ORDER_PRODUCTS_HEADERS_KEY] = OrderProduct::getPLDTableHeadersForUser($this);
-        // $headersSettings[self::PLD_INVOICES_HEADERS_KEY] = Invoice::getPLDTableHeadersForUser($this);
+        $headersSettings[self::PLD_INVOICES_HEADERS_KEY] = Invoice::getPLDTableHeadersForUser($this);
 
         $settings['table_headers'] = $headersSettings;
         $this->settings = $settings;
@@ -937,6 +937,9 @@ class User extends Authenticatable
 
             // CMD
             'cmd.orders.index' => 'view-CMD-orders',
+
+            // PRD
+            'prd.invoices.production-types.index' => 'view-PRD-invoices',
         ];
 
         foreach ($homepageRoutes as $routeName => $gate) {

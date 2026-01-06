@@ -36,9 +36,9 @@ const defaultFilters = {
     order_country_id: [],
 }
 
-const API_URL = route('api.cmd.invoices.get');
+const API_URL = route('api.pld.invoices.get');
 
-export const useCMDInvoicesTableStore = defineStore('CMDInvoicesTable', {
+export const usePLDInvoicesTableStore = defineStore('PLDInvoicesTable', {
     state: () => ({
         records: [],
         loading: false,

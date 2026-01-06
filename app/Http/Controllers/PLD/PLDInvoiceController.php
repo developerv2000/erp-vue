@@ -3,9 +3,40 @@
 namespace App\Http\Controllers\PLD;
 
 use App\Http\Controllers\Controller;
+use App\Models\Country;
+use App\Models\Invoice;
+use App\Models\InvoicePaymentType;
+use App\Models\Manufacturer;
+use App\Models\Order;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class PLDInvoiceController extends Controller
 {
-    //
+    public function index(Request $request)
+    {
+        $getAllTableHeaders = fn() => $request->user()->collectTranslatedTableHeadersByKey(User::PLD_INVOICES_HEADERS_KEY);
+        $getVisibleHeaders = fn() => User::filterOnlyVisibleTableHeaders($getAllTableHeaders());
+
+        return Inertia::render('departments/PLD/pages/invoices/Index', [
+            // Lazy loads. Refetched only on headers update and locale change
+            'allTableHeaders' => $getAllTableHeaders,
+            'tableVisibleHeaders' => $getVisibleHeaders,
+
+            // Lazy loads. Never refetched again
+            'filterDependencies' => fn() => $this->getFilterDependencies(),
+        ]);
+    }
+
+    private function getFilterDependencies(): array
+    {
+        return [
+            'paymentTypes' => InvoicePaymentType::orderBy('id')->get(),
+            'invoiceNumbers' => Invoice::onlyProductionType()->orderBy('number')->get(),
+            'orderNames' => Order::onlyWithName()->orderByName()->pluck('name'),
+            'manufacturers' => Manufacturer::getMinifiedRecordsWithProcessesReadyForOrder(),
+            'countriesOrderedByProcessesCount' => Country::orderByProcessesCount()->get(),
+        ];
+    }
 }

@@ -70,6 +70,12 @@ Route::middleware('auth:sanctum')->name('api.')->group(function () {
                 ->middleware('can:view-PLD-order-products')
                 ->name('get');
         });
+
+        Route::prefix('/invoices')->name('invoices.')->group(function () {
+            Route::get('/', fn(Request $request) => Invoice::queryPLDRecordsFromRequest($request, 'paginate', true))
+                ->middleware('can:view-PLD-invoices')
+                ->name('get');
+        });
     });
 
     // CMD

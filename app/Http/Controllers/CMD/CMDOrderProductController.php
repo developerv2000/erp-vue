@@ -31,15 +31,11 @@ class CMDOrderProductController extends Controller
         ]);
     }
 
-    public function edit(OrderProduct $record)
+    public function edit($record)
     {
-        // Load required relations and append attributes
-        $record->load([
-            'process' => function ($processQuery) {
-                $processQuery->withRelationsForOrderProduct()
-                    ->withOnlySelectsForOrderProduct();
-            },
-        ]);
+        $record = OrderProduct::withBasicCMDRelations()
+            ->withBasicCMDRelationCounts()
+            ->findorfail($record);
 
         $record->appendBasicCMDAttributes();
         $record->append('can_be_prepared_for_shipping_from_manufacturer');

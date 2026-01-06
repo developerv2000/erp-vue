@@ -72,8 +72,12 @@ class CMDInvoiceController extends Controller
         ]);
     }
 
-    public function edit(Request $request, Invoice $record)
+    public function edit(Request $request, $record)
     {
+        $record = Invoice::withBasicCMDRelations()
+            ->withBasicCMDRelationCounts()
+            ->findorfail($record);
+
         $record->appendBasicCMDAttributes();
         $record->append('title'); // Used on generating breadcrumbs
 
@@ -84,6 +88,8 @@ class CMDInvoiceController extends Controller
             // Refetched after record update
             'record' => $record,
             'availableProducts' => $availableProducts,
+
+            // Never refetched again
             'isPrepayment' => $record->paymentType->name == InvoicePaymentType::PREPAYMENT_NAME,
         ]);
     }

@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Models\Invoice;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -14,9 +15,17 @@ class ProductionTypeInvoicePaymentCompleted extends Notification
     /**
      * Create a new notification instance.
      */
-    public function __construct()
+    public function __construct(Invoice $invoice)
     {
-        //
+        // Freeze data at the time of notification creation
+        $this->data = [
+            'type' => class_basename(static::class),
+            'invoice_id' => $invoice->id,
+            'order_name' => $invoice->invoiceable->name,
+            'products_count' => $invoice->products->count(),
+            'order_manufacturer_name' => $invoice->invoiceable->manufacturer->name,
+            'order_country_code' => $invoice->invoiceable->country->code,
+        ];
     }
 
     /**
@@ -26,18 +35,7 @@ class ProductionTypeInvoicePaymentCompleted extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
-    }
-
-    /**
-     * Get the mail representation of the notification.
-     */
-    public function toMail(object $notifiable): MailMessage
-    {
-        return (new MailMessage)
-            ->line('The introduction to the notification.')
-            ->action('Notification Action', url('/'))
-            ->line('Thank you for using our application!');
+        return ['database'];
     }
 
     /**
@@ -47,8 +45,6 @@ class ProductionTypeInvoicePaymentCompleted extends Notification
      */
     public function toArray(object $notifiable): array
     {
-        return [
-            //
-        ];
+        return $this->data;
     }
 }

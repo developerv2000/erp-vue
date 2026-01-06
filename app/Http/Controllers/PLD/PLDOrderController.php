@@ -59,8 +59,12 @@ class PLDOrderController extends Controller
         ]);
     }
 
-    public function edit(Order $record)
+    public function edit($record)
     {
+        $record = Order::withBasicPLDRelations()
+            ->withBasicPLDRelationCounts()
+            ->findOrFail($record);
+
         $record->appendBasicPLDAttributes();
         $record->append('title'); // Used on generating breadcrumbs
 

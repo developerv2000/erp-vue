@@ -32,9 +32,13 @@ class PRDInvoiceProductionTypeController extends Controller
         ]);
     }
 
-    public function edit(Request $request, Invoice $record)
+    public function edit(Request $request, $record)
     {
-        $record->appendBasicPRDAttributes();
+        $record = Invoice::withBasicPRDProductionTypesRelations()
+            ->withBasicPRDProductionTypesRelationCounts()
+            ->findorfail($record);
+            
+        $record->appendBasicPRDProductionTypesAttributes();
         $record->append('title'); // Used on generating breadcrumbs
 
         return Inertia::render('departments/PRD/pages/invoices/production-types/Edit', [

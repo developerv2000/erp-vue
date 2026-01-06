@@ -3,7 +3,7 @@ import { ref, computed } from "vue";
 import { usePage, router } from "@inertiajs/vue3";
 import { useI18n } from "vue-i18n";
 import { Form, useForm } from "vee-validate";
-import { object, mixed, date, array } from "yup";
+import { object, mixed, date, string } from "yup";
 import { useVeeFormFields } from "@/core/composables/useVeeFormFields";
 import { useFormData } from "@/core/composables/useFormData";
 import { useMessagesStore } from "@/core/stores/messages";
@@ -18,6 +18,7 @@ import FormUpdateAndRedirectBack from "@/core/components/form/buttons/FormUpdate
 import FormUpdateWithourRedirect from "@/core/components/form/buttons/FormUpdateWithourRedirect.vue";
 import DefaultDateInput from "@/core/components/form/inputs/DefaultDateInput.vue";
 import DefaultFileInput from "@/core/components/form/inputs/DefaultFileInput.vue";
+import DefaultTextField from "@/core/components/form/inputs/DefaultTextField.vue";
 
 // Dependencies
 const { t } = useI18n();
@@ -32,16 +33,19 @@ const redirectBack = ref(false);
 
 // Yup schema
 const schema = object({
-    receive_date: date().required(),
-    pdf_file: mixed().nullable(),
-    products: array().required().min(1),
+    payment_request_date_by_financier: date().nullable(),
+    payment_date: date().nullable(),
+    number: string().nullable(),
+    payment_confirmation_document: mixed().nullable(),
 });
 
 // Backend-driven values (reactive to record)
 const baseInitialValues = computed(() => ({
-    receive_date: record.value.receive_date,
-    pdf_file: null,
-    products: record.value.products.map((p) => p.id),
+    payment_request_date_by_financier:
+        record.value.payment_request_date_by_financier,
+    payment_date: record.value.payment_date,
+    number: record.value.number,
+    payment_confirmation_document: null,
 }));
 
 // Always-reset values
@@ -72,7 +76,9 @@ const submit = handleSubmit((values) => {
 
     axios
         .post(
-            route("cmd.invoices.update", { record: record.value.id }),
+            route("prd.invoices.production-types.update", {
+                record: record.value.id,
+            }),
             formData
         )
         .then(() => {
@@ -116,21 +122,37 @@ const reloadRequiredDataAndResetForm = () => {
             <DefaultTitle>{{ t("Invoice") }}</DefaultTitle>
 
             <v-row>
-                <v-col>
+                <v-col cols="6">
                     <DefaultDateInput
-                        :label="t('dates.Receive')"
-                        v-model="values.receive_date"
-                        :error-messages="errors.receive_date"
-                        required
+                        :label="t('dates.Payment request')"
+                        v-model="values.payment_request_date_by_financier"
+                        :error-messages="
+                            errors.payment_request_date_by_financier
+                        "
                     />
                 </v-col>
 
-                <v-col>
+                <v-col cols="6">
+                    <DefaultTextField
+                        :label="t('fields.Invoie №')"
+                        v-model="values.number"
+                        :error-messages="errors.number"
+                    />
+                </v-col>
+
+                <v-col cols="6">
+                    <DefaultDateInput
+                        :label="t('dates.Payment')"
+                        v-model="values.payment_date"
+                        :error-messages="errors.payment_date"
+                    />
+                </v-col>
+
+                <v-col cols="6">
                     <DefaultFileInput
-                        :label="t('fields.Pdf')"
-                        v-model="values.pdf_file"
-                        :error-messages="errors.pdf_file"
-                        required
+                        :label="t('fields.Swift')"
+                        v-model="values.payment_confirmation_document"
+                        :error-messages="errors.payment_confirmation_document"
                     />
                 </v-col>
             </v-row>
@@ -142,13 +164,12 @@ const reloadRequiredDataAndResetForm = () => {
 
             <div>
                 <v-checkbox-btn
-                    v-for="product in page.props.availableProducts"
+                    v-for="product in record.products"
                     :key="product.id"
-                    v-model="values.products"
-                    :value="product.id"
                     :label="product.process.full_english_product_label"
-                    :disabled="page.props.isPrepayment"
+                    :model-value="true"
                     color="primary"
+                    disabled
                 >
                 </v-checkbox-btn>
             </div>

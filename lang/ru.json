@@ -152,6 +152,7 @@
     "notifications.Order confirmed": "Данный заказ был подтверждён",
     "notifications.Order sent to manufacturer": "Данный заказ был отправлен заводу",
     "notifications.New invoice for payment received": "Получен новый инвойс для оплаты",
+    "notifications.Invoice payment completed": "Оплата данного инвойса завершена",
 
     "files.Generating": "Генерация файла",
     "files.Download started": "Загрузка началась",

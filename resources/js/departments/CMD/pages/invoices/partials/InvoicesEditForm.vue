@@ -99,7 +99,7 @@ const submit = handleSubmit((values) => {
 
 const reloadRequiredDataAndResetForm = () => {
     router.reload({
-        only: ["record"],
+        only: ["record", "availableProducts"],
         onSuccess: () => {
             resetForm({
                 values: mergedInitialValues.value,

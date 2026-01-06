@@ -63,7 +63,7 @@ class Permission extends Model
     const CAN_RECEIVE_NOTIFICATION_WHEN_INVOICE_IS_SENT_FOR_PAYMENT_BY_CMD = 'can-receive-notification-when-invoice-is-sent-for-payment-by-CMD';
 
     // PLD and CMD permissions
-    const CAN_RECEIVE_NOTIFICATION_WHEN_INVOICE_PAYMENT_IS_COMPLETED_BY_RPD = 'can-receive-notification-when-invoice-payment-is-completed-by-PRD';
+    const CAN_RECEIVE_NOTIFICATION_WHEN_PRODUCTION_TYPE_INVOICE_PAYMENT_IS_COMPLETED_BY_RPD = 'can-receive-notification-when-production-type-invoice-payment-is-completed-by-PRD';
 
     /*
     |--------------------------------------------------------------------------
@@ -398,7 +398,7 @@ class Permission extends Model
 
             self::CAN_RECEIVE_NOTIFICATION_WHEN_ORDER_IS_SENT_TO_CMD_BY_PLD,
             self::CAN_RECEIVE_NOTIFICATION_WHEN_ORDER_IS_CONFIRMED_BY_PLD,
-            self::CAN_RECEIVE_NOTIFICATION_WHEN_INVOICE_PAYMENT_IS_COMPLETED_BY_RPD,
+            self::CAN_RECEIVE_NOTIFICATION_WHEN_PRODUCTION_TYPE_INVOICE_PAYMENT_IS_COMPLETED_BY_RPD,
         ];
     }
 
@@ -418,7 +418,7 @@ class Permission extends Model
 
             self::CAN_RECEIVE_NOTIFICATION_WHEN_ORDER_IS_SENT_TO_MANUFACTURER_BY_CMD,
             self::CAN_RECEIVE_NOTIFICATION_WHEN_INVOICE_IS_SENT_FOR_PAYMENT_BY_CMD,
-            self::CAN_RECEIVE_NOTIFICATION_WHEN_INVOICE_PAYMENT_IS_COMPLETED_BY_RPD,
+            self::CAN_RECEIVE_NOTIFICATION_WHEN_PRODUCTION_TYPE_INVOICE_PAYMENT_IS_COMPLETED_BY_RPD,
         ];
     }
 

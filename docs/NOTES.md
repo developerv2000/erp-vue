@@ -26,5 +26,5 @@
 etc functions
 - Add middlewares for storage routes!!!!!!!
 - Fix EnsureAtxExists for Products
-- Refactor "receive-notification-when-invoice-payment-is-completed-by-PRD" permission. Separate for each types
 - Refactor PermissionSeeder by separating notification permissions
+- Check all AJAX route middlewares

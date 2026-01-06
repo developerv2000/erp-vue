@@ -142,6 +142,7 @@
     "notifications.Order confirmed": "Below order has been confirmed",
     "notifications.Order sent to manufacturer": "Below order has been sent to manufacturer",
     "notifications.New invoice for payment received": "New invoice for payment received",
+    "notifications.Invoice payment completed": "Below Invoice payment completed",
 
     "files.Generating": "Generating file",
     "files.Download started": "Download started",

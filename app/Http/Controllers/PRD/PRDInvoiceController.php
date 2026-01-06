@@ -30,7 +30,7 @@ class PRDInvoiceController extends Controller
         $record->completePaymentByPRD();
 
         // Return refetched updated record
-        $record = $this->getRecordByType($record->paymentType, $record->id);
+        $record = $this->getRecordByType($record->type, $record->id);
 
         return $record;
     }

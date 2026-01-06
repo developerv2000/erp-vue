@@ -15,6 +15,7 @@ import TogglableThreeLinesLimitedText from "@/core/components/misc/TogglableThre
 import TdRecordCommentsLink from "@/core/components/table/td/TdRecordCommentsLink.vue";
 import TableNavigateToPage from "@/core/components/table/misc/TableNavigateToPage.vue";
 import TdInvoiceAccept from "@/core/components/table/td/shared/invoices/TdInvoiceAccept.vue";
+import TdInvoiceCompletePayment from "@/core/components/table/td/shared/invoices/TdInvoiceCompletePayment.vue";
 
 const { t } = useI18n();
 const { get } = useQueryParams();
@@ -90,7 +91,9 @@ const generateProductsList = (products) => {
 
         <!-- Item slots -->
         <template #item.edit="{ item }">
-            <TdEditButton :link="route('cmd.invoices.edit', item.id)" />
+            <TdEditButton
+                :link="route('prd.invoices.production-types.edit', item.id)"
+            />
         </template>
 
         <template #item.receive_date="{ item }">
@@ -105,8 +108,12 @@ const generateProductsList = (products) => {
             {{ formatDate(item.sent_for_payment_date) }}
         </template>
 
-        <template #item.payment_completed_date="{ item }">
-            {{ formatDate(item.payment_completed_date) }}
+        <template #item.accepted_by_financier_date="{ item }">
+            <template v-if="item.is_accepted_by_financier">
+                {{ formatDate(item.accepted_by_financier_date) }}
+            </template>
+
+            <TdInvoiceAccept v-else :invoice-id="item.id" />
         </template>
 
         <template #item.pdf_file="{ item }">
@@ -116,16 +123,7 @@ const generateProductsList = (products) => {
         </template>
 
         <template #item.order_title="{ item }">
-            <TdInertiaLink
-                :link="
-                    route('cmd.orders.index', {
-                        'id[]': item.invoiceable_id,
-                        initialize_from_inertia_page: true,
-                    })
-                "
-            >
-                {{ item.invoiceable.title }}
-            </TdInertiaLink>
+            {{ item.invoiceable.title }}
         </template>
 
         <template #item.order_manufacturer_name="{ item }">
@@ -142,20 +140,23 @@ const generateProductsList = (products) => {
             {{ item.invoiceable.country.code }}
         </template>
 
-        <template #item.accepted_by_financier_date="{ item }">
-            <template v-if="item.is_accepted_by_financier">
-                {{ formatDate(item.accepted_by_financier_date) }}
-            </template>
-
-            <TdInvoiceAccept v-else :invoice-id="item.id" />
-        </template>
-
         <template #item.payment_request_date_by_financier="{ item }">
             {{ formatDate(item.payment_request_date_by_financier) }}
         </template>
 
         <template #item.payment_date="{ item }">
             {{ formatDate(item.payment_date) }}
+        </template>
+
+        <template #item.payment_completed_date="{ item }">
+            <template v-if="item.payment_is_completed">
+                {{ formatDate(item.payment_completed_date) }}
+            </template>
+
+            <TdInvoiceCompletePayment
+                v-else-if="item.can_complete_payment"
+                :invoice-id="item.id"
+            />
         </template>
 
         <template #item.number="{ item }">

@@ -123,6 +123,8 @@ class Invoice extends Model implements HasTitleAttribute
             'pdf_file_url',
             'is_sent_for_payment',
             'is_accepted_by_financier',
+            'payment_confirmation_document_url',
+            'payment_is_completed',
         ]);
 
         $this->invoiceable->append([
@@ -146,6 +148,9 @@ class Invoice extends Model implements HasTitleAttribute
             'pdf_file_url',
             'is_sent_for_payment',
             'is_accepted_by_financier',
+            'payment_confirmation_document_url',
+            'payment_is_completed',
+            'can_complete_payment',
         ]);
 
         $this->invoiceable->append([
@@ -168,6 +173,12 @@ class Invoice extends Model implements HasTitleAttribute
     public function getPaymentIsCompletedAttribute(): bool
     {
         return !is_null($this->payment_completed_date);
+    }
+
+    public function getCanCompletePaymentAttribute(): bool
+    {
+        return !is_null($this->payment_date)
+            && !is_null($this->payment_confirmation_document);
     }
 
     public function getPdfFileUrlAttribute(): string
@@ -208,6 +219,7 @@ class Invoice extends Model implements HasTitleAttribute
         return $query->with([
             'type',
             'paymentType',
+            'lastComment',
 
             'invoiceable' => function ($orderQuery) {
                 $orderQuery->with([ // ->withBasicRelations not used because of redundant relations
@@ -245,6 +257,7 @@ class Invoice extends Model implements HasTitleAttribute
         return $query->with([
             'type',
             'paymentType',
+            'lastComment',
 
             'invoiceable' => function ($orderQuery) {
                 $orderQuery->with([ // ->withBasicRelations not used because of redundant relations
@@ -486,6 +499,9 @@ class Invoice extends Model implements HasTitleAttribute
             $record->products()->attach($selectedProducts);
         }
 
+        // HasMany relations
+        $record->storeCommentFromRequest($request);
+
         // Upload PDF file
         $record->uploadFile('pdf_file', self::getPdfFilesFolderPath());
     }
@@ -502,6 +518,9 @@ class Invoice extends Model implements HasTitleAttribute
             $selectedProducts = $request->input('products', []);
             $this->products()->sync($selectedProducts);
         }
+
+        // HasMany relations
+        $this->storeCommentFromRequest($request);
 
         // Upload PDF file
         $this->uploadFile('pdf_file', self::getPdfFilesFolderPath());
@@ -520,6 +539,9 @@ class Invoice extends Model implements HasTitleAttribute
             $this->save();
         }
 
+        // HasMany relations
+        $this->storeCommentFromRequest($request);
+
         // Upload SWIFT file
         $this->uploadFile('payment_confirmation_document', self::getPaymentConfirmationDocumentsFolderPath());
     }
@@ -537,7 +559,7 @@ class Invoice extends Model implements HasTitleAttribute
 
     public static function getPaymentConfirmationDocumentsFolderPath(): string
     {
-        return storage_path(self::STORAGE_FILES_PATH . '/' . self::PDF_FILES_FOLDER_NAME);
+        return storage_path(self::STORAGE_FILES_PATH . '/' . self::PAYMENT_CONFIRMATION_DOCUMENTS_FOLDER_NAME);
     }
 
     /*
@@ -589,7 +611,7 @@ class Invoice extends Model implements HasTitleAttribute
             switch ($this->type_id) {
                 case InvoiceType::PRODUCTION_TYPE_ID:
                     $notificationClass = ProductionTypeInvoicePaymentCompleted::class;
-                    $permissionName = 'receive-notification-when-invoice-payment-is-completed-by-PRD';
+                    $permissionName = 'receive-notification-when-production-type-invoice-payment-is-completed-by-PRD';
                     break;
             }
 

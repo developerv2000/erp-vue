@@ -169,7 +169,7 @@ class PermissionSeeder extends Seeder
 
             Permission::CAN_RECEIVE_NOTIFICATION_WHEN_ORDER_IS_SENT_TO_MANUFACTURER_BY_CMD, // shared
             Permission::CAN_RECEIVE_NOTIFICATION_WHEN_INVOICE_IS_SENT_FOR_PAYMENT_BY_CMD, // shared
-            Permission::CAN_RECEIVE_NOTIFICATION_WHEN_INVOICE_PAYMENT_IS_COMPLETED_BY_RPD, // shared
+            Permission::CAN_RECEIVE_NOTIFICATION_WHEN_PRODUCTION_TYPE_INVOICE_PAYMENT_IS_COMPLETED_BY_RPD, // shared
         ];
 
         foreach ($notificationPerms as $perm) {

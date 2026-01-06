@@ -109,8 +109,8 @@ const generateProductsList = (products) => {
             <TdInvoiceSentForPayment v-else :invoice-id="item.id" />
         </template>
 
-        <template #item.payment_completed_date="{ item }">
-            {{ formatDate(item.payment_completed_date) }}
+        <template #item.accepted_by_financier_date="{ item }">
+            {{ formatDate(item.accepted_by_financier_date) }}
         </template>
 
         <template #item.pdf_file="{ item }">
@@ -146,16 +146,16 @@ const generateProductsList = (products) => {
             {{ item.invoiceable.country.code }}
         </template>
 
-        <template #item.accepted_by_financier_date="{ item }">
-            {{ formatDate(item.accepted_by_financier_date) }}
-        </template>
-
         <template #item.payment_request_date_by_financier="{ item }">
             {{ formatDate(item.payment_request_date_by_financier) }}
         </template>
 
         <template #item.payment_date="{ item }">
             {{ formatDate(item.payment_date) }}
+        </template>
+
+        <template #item.payment_completed_date="{ item }">
+            {{ formatDate(item.payment_completed_date) }}
         </template>
 
         <template #item.number="{ item }">

@@ -40,7 +40,7 @@ const schema = computed(() => {
 
     // After production start inputs
     if (record.value?.production_is_started) {
-        base.production_status = string();
+        base.production_status = string().nullable();
     }
 
     // Preparing for shipment from manufacturer inputs

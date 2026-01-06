@@ -11,13 +11,17 @@ const page = usePage();
 const { t } = useI18n();
 
 const title = computed(
-    () => t("pages.Invoices") + " — " + page.props.record.title
+    () => t("pages.Production") + " — " + page.props.record.title
 );
 
 const breadcrumbs = computed(() => [
     {
         title: t("pages.Invoices"),
-        link: route("cmd.invoices.index"),
+    },
+
+    {
+        title: t("pages.Production"),
+        link: route("prd.invoices.production-types.index"),
     },
 
     {

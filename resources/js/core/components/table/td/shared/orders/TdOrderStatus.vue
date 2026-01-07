@@ -5,19 +5,20 @@ defineProps({
 </script>
 
 <template>
-    <span
-        class="text-caption font-weight-medium"
+    <div
+        class="text-caption py-1 px-2 rounded"
         :class="{
-            'text-grey': status == 'Created',
-            'text-amber': status == 'Sent to BDM',
-            'text-deep-orange': status == 'Sent to confirmation',
-            'text-green': status == 'Confirmed',
-            'text-blue': status == 'Sent to manufacturer',
-            'text-indigo': status == 'Production started',
-            'text-purple': status == 'Production is ended',
-            'text-pink': status == 'Ready for shipment from manufacturer',
+            'bg-grey': status == 'Created',
+            'bg-amber': status == 'Sent to BDM',
+            'bg-deep-orange': status == 'Sent to confirmation',
+            'bg-green': status == 'Confirmed',
+            'bg-blue': status == 'Sent to manufacturer',
+            'bg-indigo': status == 'Production started',
+            'bg-purple': status == 'Production is ended',
+            'bg-pink': status == 'Ready for shipment from manufacturer',
         }"
+        style="line-height: 1.2;"
     >
         {{ status }}
-    </span>
+    </div>
 </template>

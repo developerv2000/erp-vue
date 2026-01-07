@@ -3,7 +3,7 @@ import { ref, computed } from "vue";
 import { usePage, router } from "@inertiajs/vue3";
 import { useI18n } from "vue-i18n";
 import { Form, useForm } from "vee-validate";
-import { object, string, number, array } from "yup";
+import { object, string, number, array, mixed } from "yup";
 import { useVeeFormFields } from "@/core/composables/useVeeFormFields";
 import { useFormData } from "@/core/composables/useFormData";
 import { useMessagesStore } from "@/core/stores/messages";
@@ -18,6 +18,7 @@ import FormResetButton from "@/core/components/form/buttons/FormResetButton.vue"
 import FormUpdateAndRedirectBack from "@/core/components/form/buttons/FormUpdateAndRedirectBack.vue";
 import FormUpdateWithourRedirect from "@/core/components/form/buttons/FormUpdateWithourRedirect.vue";
 import DefaultNumberInput from "@/core/components/form/inputs/DefaultNumberInput.vue";
+import DefaultFileInput from "@/core/components/form/inputs/DefaultFileInput.vue";
 
 // Dependencies
 const { t } = useI18n();
@@ -34,6 +35,7 @@ const schema = computed(() => {
     const base = {
         name: string().required(),
         currency_id: number().required(),
+        pdf_file: mixed().nullable(),
 
         products: array().of(
             object({
@@ -56,6 +58,7 @@ const baseInitialValues = computed(() => ({
     name: record.value.name,
     currency_id:
         record.value.currency_id ?? page.props.defaultSelectedCurrencyID,
+    pdf_file: null,
 
     products: record.value.products.map((p) => ({
         id: p.id,
@@ -65,9 +68,7 @@ const baseInitialValues = computed(() => ({
         quantity: p.quantity,
         price: Number(p.price ?? p.process.agreed_price),
 
-        production_status: p.production_is_started
-            ? p.production_status
-            : null,
+        production_status: p.production_is_started ? p.production_status : null,
     })),
 
     expected_dispatch_date: record.value.is_sent_to_manufacturer
@@ -158,6 +159,16 @@ const reloadRequiredDataAndResetForm = () => {
                         :items="page.props.currencies"
                         v-model="values.currency_id"
                         :error-messages="errors.currency_id"
+                        required
+                    />
+                </v-col>
+
+                <v-col>
+                    <DefaultFileInput
+                        :label="t('fields.Pdf')"
+                        v-model="values.pdf_file"
+                        :error-messages="errors.pdf_file"
+                        accept=".pdf"
                         required
                     />
                 </v-col>

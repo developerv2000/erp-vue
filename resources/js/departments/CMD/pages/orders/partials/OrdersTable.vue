@@ -1,6 +1,6 @@
 <script setup>
 import { computed, onMounted } from "vue";
-import { usePage, } from "@inertiajs/vue3";
+import { usePage } from "@inertiajs/vue3";
 import useQueryParams from "@/core/composables/useQueryParams";
 import { useCMDOrdersTableStore } from "@/departments/CMD/stores/orders";
 import { useI18n } from "vue-i18n";
@@ -160,6 +160,12 @@ const paymentTypesByName = computed(() =>
 
         <template #item.currency_id="{ item }">
             {{ item.currency?.name }}
+        </template>
+
+        <template #item.pdf_file="{ item }">
+            <a class="text-primary" :href="item.pdf_file_url" target="_blank">
+                {{ item.pdf_file }}
+            </a>
         </template>
 
         <template #item.sent_to_confirmation_date="{ item }">

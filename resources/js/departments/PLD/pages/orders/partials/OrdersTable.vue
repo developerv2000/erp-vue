@@ -145,6 +145,12 @@ const handleTableOptionsUpdate = (options) => {
             {{ item.name }}
         </template>
 
+        <template #item.pdf_file="{ item }">
+            <a class="text-primary" :href="item.pdf_file_url" target="_blank">
+                {{ item.pdf_file }}
+            </a>
+        </template>
+
         <template #item.purchase_date="{ item }">
             {{ formatDate(item.purchase_date) }}
         </template>

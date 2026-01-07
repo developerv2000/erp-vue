@@ -28,6 +28,11 @@ Route::middleware('auth', 'auth.session')->group(function () {
             Route::post('/{model}/download/{filename}', 'download')->name('download');
         });
 
+    // Private storage route for accessing order files
+    Route::get('/orders/files/{path}', [PrivateStorageController::class, 'getOrderFile'])
+        ->where('path', '.*')
+        ->name('orders.files');
+
     // Private storage route for accessing order product files
     Route::get('/order-products/files/{path}', [PrivateStorageController::class, 'getOrderProductFile'])
         ->where('path', '.*')

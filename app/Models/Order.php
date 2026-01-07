@@ -17,6 +17,7 @@ use App\Support\Traits\Model\GetsMinifiedRecordsWithName;
 use App\Support\Traits\Model\HasComments;
 use App\Support\Traits\Model\HasModelNamespaceAttributes;
 use App\Support\Traits\Model\ScopesOrderingByName;
+use App\Support\Traits\Model\UploadsFile;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -29,12 +30,17 @@ class Order extends Model implements HasTitleAttribute
     use AddsDefaultQueryParamsToRequest;
     use GetsMinifiedRecordsWithName;
     use ScopesOrderingByName;
+    use UploadsFile;
 
     /*
     |--------------------------------------------------------------------------
     | Constants
     |--------------------------------------------------------------------------
     */
+
+    // Storage files
+    const STORAGE_FILES_PATH = 'app/private/orders';
+    const PDF_FILES_FOLDER_NAME = 'pdf-files';
 
     // PLD
     const DEFAULT_PLD_ORDER_BY = 'id';
@@ -136,6 +142,7 @@ class Order extends Model implements HasTitleAttribute
             'status',
             'is_sent_to_bdm',
             'is_sent_to_confirmation',
+            'pdf_file_url',
             'is_confirmed',
             'is_sent_to_manufacturer',
         ]);
@@ -155,6 +162,7 @@ class Order extends Model implements HasTitleAttribute
             'status',
             'is_sent_to_confirmation',
             'can_be_sent_for_confirmation',
+            'pdf_file_url',
             'is_confirmed',
             'is_sent_to_manufacturer',
             'production_is_started',
@@ -177,7 +185,8 @@ class Order extends Model implements HasTitleAttribute
 
     public function getCanBeSentForConfirmationAttribute(): bool
     {
-        return !is_null($this->name);
+        return !is_null($this->name)
+            && !is_null($this->pdf_file);
     }
 
     public function getIsConfirmedAttribute(): bool
@@ -193,6 +202,13 @@ class Order extends Model implements HasTitleAttribute
     public function getProductionIsStartedAttribute(): bool
     {
         return !is_null($this->production_start_date);
+    }
+
+    public function getPdfFileUrlAttribute(): string
+    {
+        return route('orders.files', [
+            'path' => self::PDF_FILES_FOLDER_NAME . '/' . $this->pdf_file,
+        ]);
     }
 
     /**
@@ -332,7 +348,7 @@ class Order extends Model implements HasTitleAttribute
                 $product->delete();
             }
 
-            foreach ($record->invoices as $invoice) {
+            foreach ($record->productionInvoices as $invoice) {
                 $invoice->delete();
             }
         });
@@ -421,11 +437,6 @@ class Order extends Model implements HasTitleAttribute
     public function scopeOnlySentToManufacturer($query): Builder
     {
         return $query->whereNotNull('sent_to_manufacturer_date');
-    }
-
-    public function scopeOnlyProductionIsStarted($query): Builder
-    {
-        return $query->whereNotNull('production_start_date');
     }
 
     public function scopeOnlyWithName($query): Builder
@@ -719,9 +730,6 @@ class Order extends Model implements HasTitleAttribute
             ]);
         }
 
-        // HasMany relations
-        $this->storeCommentFromRequest($request);
-
         // Update products
         foreach ($request->products as $product) {
             $orderProduct = $this->products()->findOrFail($product['id']);
@@ -731,6 +739,23 @@ class Order extends Model implements HasTitleAttribute
                 'production_status' => isset($product['production_status']) ? $product['production_status'] : null,
             ]);
         }
+
+        // HasMany relations
+        $this->storeCommentFromRequest($request);
+
+        // Upload PDF file
+        $this->uploadFile('pdf_file', self::getPdfFilesFolderPath());
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Storage paths
+    |--------------------------------------------------------------------------
+    */
+
+    public static function getPdfFilesFolderPath(): string
+    {
+        return storage_path(self::STORAGE_FILES_PATH . '/' . self::PDF_FILES_FOLDER_NAME);
     }
 
     /*
@@ -851,6 +876,7 @@ class Order extends Model implements HasTitleAttribute
             ['title' => 'dates.Sent to BDM', 'key' => 'sent_to_bdm_date', 'width' => 160, 'sortable' => true],
 
             ['title' => 'fields.PO №', 'key' => 'name', 'width' => 136, 'sortable' => true],
+            ['title' => 'fields.Pdf', 'key' => 'pdf_file', 'width' => 144, 'sortable' => false],
             ['title' => 'dates.PO', 'key' => 'purchase_date', 'width' => 120, 'sortable' => true],
             ['title' => 'dates.Confirmation', 'key' => 'confirmation_date', 'width' => 172, 'sortable' => true],
             ['title' => 'dates.Sent to manufacturer', 'key' => 'sent_to_manufacturer_date', 'width' => 168, 'sortable' => true],
@@ -896,6 +922,7 @@ class Order extends Model implements HasTitleAttribute
             ['title' => 'dates.Sent to BDM', 'key' => 'sent_to_bdm_date', 'width' => 160, 'sortable' => true],
 
             ['title' => 'fields.PO №', 'key' => 'name', 'width' => 136, 'sortable' => true],
+            ['title' => 'fields.Pdf', 'key' => 'pdf_file', 'width' => 144, 'sortable' => false],
             ['title' => 'dates.PO', 'key' => 'purchase_date', 'width' => 120, 'sortable' => true],
             ['title' => 'fields.Currency', 'key' => 'currency_id', 'width' => 86, 'sortable' => true],
             ['title' => 'dates.Sent to confirmation', 'key' => 'sent_to_confirmation_date', 'width' => 244, 'sortable' => true],

@@ -34,6 +34,7 @@ return new class extends Migration
             // Step 2:
             // CMD part
             $table->string('name')->nullable();
+            $table->string('pdf_file')->nullable();
             $table->date('purchase_date')->nullable(); // auto filled when attribute 'name' filled
 
             $table->unsignedTinyInteger('currency_id')

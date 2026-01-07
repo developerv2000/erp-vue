@@ -641,11 +641,9 @@ class OrderProduct extends Model implements HasTitleAttribute
         });
     }
 
-    public function scopeOnlyProductionIsStarted($query)
+    public function scopeOnlyProductionIsEnded($query)
     {
-        return $query->whereHas('order', function ($orderQuery) {
-            $orderQuery->onlyProductionIsStarted();
-        });
+        return $query->whereNotNull('production_end_date');
     }
 
     public function scopeOnlyReadyForShipmentFromManufacturer($query)
@@ -825,7 +823,7 @@ class OrderProduct extends Model implements HasTitleAttribute
      */
     public static function queryMDRecordsFromRequest(Request $request, string $action = 'paginate', bool $appendAttributes = false)
     {
-        $query = self::onlyProductionIsStarted()
+        $query = self::onlyProductionIsEnded()
             ->onlySerializedByManufacturer()
             ->withBasicMDRelations()
             ->withBasicMDRelationCounts();

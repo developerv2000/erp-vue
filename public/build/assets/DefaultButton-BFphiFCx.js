@@ -1,0 +1,1 @@
+import{bD as a,c as r,o,w as n,e as c,ay as l,T as _,b as e,C as u}from"./app-Clvn7mZt.js";const i={class:"text-none"},h={__name:"DefaultButton",setup(p){const t=a();return(s,d)=>(o(),r(u,_({color:"primary",variant:"flat",height:e(t).size?"":"40",rounded:"lg"},e(t)),{default:n(()=>[c("span",i,[l(s.$slots,"default")])]),_:3},16,["height"]))}};export{h as _};

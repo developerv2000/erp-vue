@@ -48,18 +48,19 @@ class Atx extends Model
     */
 
     /**
-     * Create or update ATX for product on product store or update.
+     * Create or update ATX for product on Product store or update.
      */
-    public static function syncAtxWithProductOnProductStoreOrUpdate(Request $request)
+    public static function syncWithProduct($data)
     {
         return self::updateOrCreate(
             [
-                'inn_id' => $request->input('inn_id'),
-                'form_id' => $request->input('form_id'),
+                'inn_id' => $data['inn_id'],
+                'form_id' => $data['form_id'],
             ],
+
             [
-                'name' => $request->input('atx_name'),
-                'short_name' => $request->input('atx_short_name'),
+                'name' => $data['atx_name'],
+                'short_name' => $data['atx_short_name'],
             ]
         );
     }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\MAD;
 
+use App\Models\Process;
 use App\Models\ProcessStatus;
 use App\Models\Product;
 use Illuminate\Foundation\Http\FormRequest;
@@ -79,29 +80,52 @@ class ProcessUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
-        $product = Product::findOrFail($this->product_id);
+        $record = Process::withTrashed()
+            ->findOrFail($this->route('record'));
 
         return [
-            'product_form_id' => [
-                Rule::unique('products', 'form_id')
-                    ->ignore($product->id)
-                    ->where(function ($query) use ($product) {
-                        $query->where('manufacturer_id', $product->manufacturer_id)
-                            ->where('inn_id', $product->inn_id)
-                            ->where('form_id', $this->product_form_id)
-                            ->where('dosage', $this->product_dosage)
-                            ->where('pack', $this->product_pack)
-                            ->where('moq', $this->product_moq)
-                            ->where('shelf_life_id', $this->product_shelf_life_id);
-                    }),
-            ],
+            'country_id' => [
+                Rule::unique(Process::class)
+                    ->ignore($record->id)
+                    ->where('product_id', $record->product_id)
+                    // ->where('country_id', $this->country_id) // already included
+                    ->where('marketing_authorization_holder_id', $this->marketing_authorization_holder_id)
+            ]
         ];
+    }
+
+    /**
+     * Validate uniqueness of related product.
+     *
+     * IMPORTANT: Must be synced with ProductUpdateRequest!
+     */
+    public function validateProductUniqueness($product)
+    {
+        $this->validate(
+            [
+                'product_form_id' => [
+                    Rule::unique('products', 'form_id')
+                        ->ignore($product->id)
+                        // ->where('form_id', $this->product_form_id) // already included
+                        ->where('manufacturer_id', $product->manufacturer_id)
+                        ->where('inn_id', $product->inn_id)
+                        ->where('dosage', $this->product_dosage)
+                        ->where('pack', $this->product_pack)
+                        ->where('moq', $this->product_moq)
+                        ->where('shelf_life_id', $this->product_shelf_life_id)
+                ],
+            ],
+
+            [
+                'product_form_id.unique' => trans('validation.custom.ivp.unique_on_edit'),
+            ]
+        );
     }
 
     public function messages(): array
     {
         return [
-            'product_form_id.unique' => trans('validation.custom.ivp.unique'),
+            'country_id.unique' => trans('validation.custom.vps.unique_on_edit'),
         ];
     }
 }

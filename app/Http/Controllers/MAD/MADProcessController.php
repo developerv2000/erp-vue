@@ -24,6 +24,7 @@ use App\Support\SmartFilters\MAD\ProcessesSmartFilter;
 use App\Support\Traits\Controller\DestroysModelRecords;
 use App\Support\Traits\Controller\RestoresModelRecords;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
@@ -130,13 +131,17 @@ class MADProcessController extends Controller
      */
     public function store(ProcessStoreRequest $request)
     {
-        // Store multiple records
-        Process::storeMultipleRecordsByMADFromRequest($request);
+        DB::transaction(function () use ($request) {
+            // Validate related product uniqueness and sync updates
+            $product = Product::findOrFail($request->input('product_id'));
+            $request->validateProductUniqueness($product);
+            $product->syncOnRelatedProcessCreateOrEdit($request);
 
-        // Sync related product updates
-        Product::findOrFail($request->input('product_id'))->updateOnRelatedProcessCreateOrEdit($request);
+            // Store one or multiple processes
+            Process::storeMultipleRecordsByMADFromRequest($request);
+        });
 
-        // Return success response
+         // Transaction committed successfully
         return response()->json([
             'success' => true,
         ]);
@@ -190,14 +195,18 @@ class MADProcessController extends Controller
      */
     public function update(ProcessUpdateRequest $request, $record)
     {
-        // Update record
-        $fetchedRecord = Process::withTrashed()->findOrFail($record);
-        $fetchedRecord->updateByMADFromRequest($request);
+        DB::transaction(function () use ($request, $record) {
+            // Validate related product uniqueness and sync updates
+            $product = Product::findOrFail($request->input('product_id'));
+            $request->validateProductUniqueness($product);
+            $product->syncOnRelatedProcessCreateOrEdit($request);
 
-        // Sync related product updates
-        Product::findOrFail($request->input('product_id'))->updateOnRelatedProcessCreateOrEdit($request);
+            // Update record
+            $fetchedRecord = Process::withTrashed()->findOrFail($record);
+            $fetchedRecord->updateByMADFromRequest($request);
+        });
 
-        // Return success response
+         // Transaction committed successfully
         return response()->json([
             'success' => true,
         ]);

@@ -872,7 +872,7 @@ class Order extends Model implements HasTitleAttribute
             ['title' => 'Products', 'key' => 'products_count', 'width' => 100, 'sortable' => false],
             ['title' => 'Comments', 'key' => 'comments_count', 'width' => 132, 'sortable' => false],
             ['title' => 'comments.Last', 'key' => 'last_comment_body', 'width' => 200, 'sortable' => false],
-            ['title' => 'Status', 'key' => 'status', 'width' => 142, 'sortable' => false],
+            ['title' => 'Status', 'key' => 'status', 'width' => 152, 'sortable' => false],
             ['title' => 'dates.Sent to BDM', 'key' => 'sent_to_bdm_date', 'width' => 160, 'sortable' => true],
 
             ['title' => 'fields.PO №', 'key' => 'name', 'width' => 136, 'sortable' => true],
@@ -918,7 +918,7 @@ class Order extends Model implements HasTitleAttribute
             ['title' => 'Products', 'key' => 'products_count', 'width' => 100, 'sortable' => false],
             ['title' => 'Comments', 'key' => 'comments_count', 'width' => 132, 'sortable' => false],
             ['title' => 'comments.Last', 'key' => 'last_comment_body', 'width' => 200, 'sortable' => false],
-            ['title' => 'Status', 'key' => 'status', 'width' => 142, 'sortable' => false],
+            ['title' => 'Status', 'key' => 'status', 'width' => 152, 'sortable' => false],
             ['title' => 'dates.Sent to BDM', 'key' => 'sent_to_bdm_date', 'width' => 160, 'sortable' => true],
 
             ['title' => 'fields.PO №', 'key' => 'name', 'width' => 136, 'sortable' => true],

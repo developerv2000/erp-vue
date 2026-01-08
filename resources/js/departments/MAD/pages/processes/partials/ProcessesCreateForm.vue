@@ -269,12 +269,13 @@ const reloadUpdatedDataAndResetForm = () => {
                 </v-col>
 
                 <v-col cols="4">
+                    <!-- Important: errors.country_id -->
                     <DefaultAutocomplete
                         :label="t('fields.Search country')"
                         item-title="code"
                         :items="page.props.countriesOrderedByProcessesCount"
                         v-model="values.country_ids"
-                        :error-messages="errors.country_ids"
+                        :error-messages="errors.country_id"
                         multiple
                         required
                     />

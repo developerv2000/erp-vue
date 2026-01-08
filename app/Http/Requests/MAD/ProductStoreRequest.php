@@ -15,25 +15,41 @@ class ProductStoreRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'inn_id' => [
-                Rule::unique(Product::class)->where(function ($query) {
-                    $query->where('manufacturer_id', $this->manufacturer_id)
-                        ->where('inn_id', $this->inn_id)
-                        ->where('form_id', $this->form_id)
-                        ->where('dosage', $this->dosage)
-                        ->where('pack', $this->pack)
-                        ->where('moq', $this->moq)
-                        ->where('shelf_life_id', $this->shelf_life_id);
-                }),
-            ],
-        ];
+        // Rules are handled dynamically per record
+        return [];
     }
 
-    public function messages(): array
+    /**
+     * Validate uniqueness of record based on business attributes.
+     *
+     * IMPORTANT: Must be synced with ProductUpdateRequest,
+     * ProcessCreateRequest and ProcessUpdateRequest
+     */
+    public function validateUniquenessOfRecord()
     {
-        return [
-            'inn_id.unique' => trans('validation.custom.ivp.unique'),
-        ];
+        $this->validate(
+            [
+                'inn_id' =>
+                [
+                    Rule::unique(Product::class)->where(function ($query) {
+                        $query->where('manufacturer_id', $this->manufacturer_id)
+                            // ->where('inn_id', $this->inn_id) // already included
+                            ->where('form_id', $this->form_id)
+                            ->where('dosage', $this->dosage)
+                            ->where('pack', $this->pack)
+                            ->where('moq', $this->moq)
+                            ->where('shelf_life_id', $this->shelf_life_id);
+                    }),
+                ],
+            ],
+
+            [
+                'inn_id.unique' => trans('validation.custom.ivp.unique_on_create', [
+                    'dosage' => $this->dosage,
+                    'pack' => $this->pack,
+                    'moq' => $this->moq,
+                ]),
+            ]
+        );
     }
 }

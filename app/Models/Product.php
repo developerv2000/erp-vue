@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\ValidationException;
 
 class Product extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, ExportsRecordsAsExcel, ExportsProductSelection
 {
@@ -483,48 +484,37 @@ class Product extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
     */
 
     /**
-     * Create multiple instances of the model from the request data.
+     * Create multiple Product records from request data.
      *
-     * AJAX request.
-     *
-     * This method iterates over each products,
-     * validates request for uniqueness,
-     * and creates new instances on validation success.
+     * - Iterates over provided products
+     * - Validates uniqueness per product
+     * - Creates Product records
+     * - Syncs relations (zones, comments, attachments)
      */
-    public static function storeMultipleRecordsByMADFromRequest(Request $request, Atx $atx): void
+    public static function storeMultipleRecordsByMADFromRequest(ProductStoreRequest $request, Atx $atx): void
     {
-        // Merge the 'atx_id' into the request
+        // Add ATX reference to the request once
         $request->merge([
             'atx_id' => $atx->id,
         ]);
 
-        // Extract products from the request
+        // Extract products array from request
         $products = $request->input('products', []);
 
         // Iterate over each products
         foreach ($products as $product) {
-            // Merge the product attributes into the request
-            $mergedRequest = $request->merge([
+            // Merge current product-specific attributes into request
+            $request->merge([
                 'dosage' => $product['dosage'],
                 'pack' => isset($product['pack']) ? $product['pack'] : null,
                 'moq' => isset($product['moq']) ? $product['moq'] : null,
             ]);
 
-            // Create a ProductStoreRequest instance from the merged request
-            $formRequest = ProductStoreRequest::createFrom($mergedRequest);
+            // Validate product uniqueness before creation
+            $request->validateUniquenessOfRecord();
 
-            // Create a validator instance
-            $validator = app('validator')->make(
-                $formRequest->all(),
-                $formRequest->rules(),
-                $formRequest->messages()
-            );
-
-            // Perform validation
-            $validator->validate();
-
-            // Create an instance using the merged request data
-            $record = self::create($mergedRequest->all());
+            // Create an instance using the product data
+            $record = self::create($request->all());
 
             // BelongsToMany relations
             $record->zones()->attach($request->input('zones'));
@@ -532,7 +522,7 @@ class Product extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
             // HasMany relations
             $record->storeCommentFromRequest($request);
 
-            // Upload attachments if there is only one product
+            // Upload attachments only if a single product is created
             if (count($products) === 1) {
                 $record->storeAttachmentsFromRequest($request);
             }
@@ -596,7 +586,7 @@ class Product extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
     /**
      * Update self attributes on related process 'create' or 'edit'
      */
-    public function updateOnRelatedProcessCreateOrEdit($request)
+    public function syncOnRelatedProcessCreateOrEdit($request)
     {
         // Global attributes
         $this->form_id = $request->input('product_form_id');

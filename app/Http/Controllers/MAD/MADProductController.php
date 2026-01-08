@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\MAD;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\MAD\ProductStoreRequest;
 use App\Http\Requests\MAD\ProductUpdateRequest;
 use App\Models\Atx;
 use App\Models\Country;
@@ -20,6 +21,7 @@ use App\Support\SmartFilters\MAD\ProductsSmartFilter;
 use App\Support\Traits\Controller\DestroysModelRecords;
 use App\Support\Traits\Controller\RestoresModelRecords;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class MADProductController extends Controller
@@ -113,15 +115,22 @@ class MADProductController extends Controller
     /**
      * AJAX request
      */
-    public function store(Request $request)
+    public function store(ProductStoreRequest $request)
     {
-        // Sync ATX
-        $atx = Atx::syncAtxWithProductOnProductStoreOrUpdate($request);
+        DB::transaction(function () use ($request) {
+            // Create or update ATX related to the product
+            $atx = Atx::syncWithProduct($request->only([
+                'inn_id',
+                'form_id',
+                'atx_name',
+                'atx_short_name',
+            ]));
 
-        // Store multiple records
-        Product::storeMultipleRecordsByMADFromRequest($request, $atx);
+            // Store one or multiple products linked to ATX
+            Product::storeMultipleRecordsByMADFromRequest($request, $atx);
+        });
 
-        // Return success response
+        // Transaction committed successfully
         return response()->json([
             'success' => true,
         ]);
@@ -168,13 +177,20 @@ class MADProductController extends Controller
      */
     public function update(ProductUpdateRequest $request, $record)
     {
-        // Sync ATX
-        $atx = Atx::syncAtxWithProductOnProductStoreOrUpdate($request);
+        DB::transaction(function () use ($request, $record) {
+            // Create or update ATX related to the product
+            $atx = Atx::syncWithProduct($request->only([
+                'inn_id',
+                'form_id',
+                'atx_name',
+                'atx_short_name',
+            ]));
 
-        // Update record
-        $fetchedRecord = Product::withTrashed()->findOrFail($record);
-        $fetchedRecord->updateByMADFromRequest($request, $atx);
+            $fetchedRecord = Product::withTrashed()->findOrFail($record);
+            $fetchedRecord->updateByMADFromRequest($request, $atx);
+        });
 
+        // Transaction committed successfully
         return response()->json([
             'success' => true,
         ]);

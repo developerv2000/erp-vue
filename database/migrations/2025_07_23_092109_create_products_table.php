@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->unsignedInteger('id')->autoIncrement();
+
+            // Product attributes
             $table->string('brand')->nullable();
             $table->string('dosage', 300)->nullable();
             $table->string('pack')->nullable();
@@ -25,6 +27,7 @@ return new class extends Migration
             $table->boolean('registered_in_eu')->default(0);
             $table->boolean('sold_in_eu')->default(0);
 
+            // Foreign keys
             $table->unsignedInteger('manufacturer_id')
                 ->index()
                 ->foreign()
@@ -61,6 +64,17 @@ return new class extends Migration
                 ->foreign()
                 ->references('id')
                 ->on('product_shelf_lives');
+
+            // Business-level uniqueness constraint
+            $table->unique([
+                'manufacturer_id',
+                'inn_id',
+                'form_id',
+                'shelf_life_id',
+                'dosage',
+                'pack',
+                'moq',
+            ], 'products_unique_business_key');
 
             $table->timestamps();
             $table->softDeletes();

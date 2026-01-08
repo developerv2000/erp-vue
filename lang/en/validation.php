@@ -184,11 +184,13 @@ return [
 
         // MAD
         'ivp' => [
-            'unique' => 'Product with a given manufacturer, IMN, form, dosage, pack, moq and shelf life already exists.',
+            'unique_on_create' => 'Below product already exists: dosage: :dosage, pack: :pack, MOQ: :moq.',
+            'unique_on_edit' => 'Product with a given manufacturer, IMN, form, dosage, pack, moq and shelf life already exists.',
         ],
 
         'vps' => [
-            'unique' => 'Product with a given manufacturer, IMN, form, dosage, pack, moq, shelf life, search country and MAH already exists.',
+            'unique_on_create' => 'Process for the given country already exists: :country.',
+            'unique_on_edit' => 'Process with a given product, search country and MAH already exists.',
         ],
 
         'process_status_history' => [

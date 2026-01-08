@@ -98,6 +98,16 @@ return new class extends Migration
             // Order part
             $table->timestamp('readiness_for_order_date')->nullable(); // action
 
+            // Business-level uniqueness constraint
+            $table->unique(
+                [
+                    'product_id',
+                    'country_id',
+                    'marketing_authorization_holder_id',
+                ],
+                'processes_business_unique'
+            );
+
             // Timestamps
             $table->timestamps();
             $table->softDeletes();

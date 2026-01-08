@@ -1,0 +1,1 @@
+import{_ as t}from"./_plugin-vue_export-helper-DlAUqK2U.js";import{c as a,o,w as r,ay as s,bH as c}from"./app-DOf95tBZ.js";const n={};function f(e,l){return o(),a(c,{class:"pa-6",rounded:"lg"},{default:r(()=>[s(e.$slots,"default")]),_:3})}const p=t(n,[["render",f]]);export{p as D};

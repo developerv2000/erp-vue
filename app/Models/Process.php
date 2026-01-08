@@ -1325,11 +1325,19 @@ class Process extends Model implements
         $countries = $request->input('countries');
 
         foreach ($countries as $country) {
-            // Merge 'country_id' and 'forecasts 1-3' into the request array
-            $mergedData = $request->merge([...$country])->all();
+            // Merge current process-specific attributes into request
+            $request->merge([
+                'country_id' => $country['country_id'],
+                'forecast_year_1' => isset($country['forecast_year_1']) ? $country['forecast_year_1'] : null,
+                'forecast_year_2' => isset($country['forecast_year_2']) ? $country['forecast_year_2'] : null,
+                'forecast_year_3' => isset($country['forecast_year_3']) ? $country['forecast_year_3'] : null,
+            ]);
 
-            // Create a new instance of the model
-            $record = self::create($mergedData);
+            // Validate process uniqueness before creation
+            $request->validateUniquenessOfRecord();
+
+            // Create an instance using the process data
+            $record = self::create($request->all());
 
             // BelongsToMany relations
             $record->clinicalTrialCountries()->attach($request->input('clinical_trial_country_ids'));

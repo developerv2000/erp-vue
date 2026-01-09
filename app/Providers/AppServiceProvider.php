@@ -10,6 +10,7 @@ use App\Support\GateDefiners\MDGatesDefiner;
 use App\Support\GateDefiners\NotificationGatesDefiner;
 use App\Support\GateDefiners\PLDGatesDefiner;
 use App\Support\GateDefiners\PRDGatesDefiner;
+use App\Support\GateDefiners\StorageGatesDefiner;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 
@@ -33,6 +34,7 @@ class AppServiceProvider extends ServiceProvider
         // Gate definers
         GlobalGatesDefiner::defineAll();
         NotificationGatesDefiner::defineAll();
+        StorageGatesDefiner::defineAll();
         MADGatesDefiner::defineAll();
         CMDGatesDefiner::defineAll();
         PLDGatesDefiner::defineAll();

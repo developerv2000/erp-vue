@@ -7,6 +7,7 @@ import { object, string, number, array, date } from "yup";
 import { useVeeFormFields } from "@/core/composables/useVeeFormFields";
 import { useFormData } from "@/core/composables/useFormData";
 import { useMessagesStore } from "@/core/stores/messages";
+import { useDateFormatter } from "@/core/composables/useDateFormatter";
 import axios from "axios";
 
 import DefaultSheet from "@/core/components/containers/DefaultSheet.vue";
@@ -21,7 +22,6 @@ import DefaultNumberInput from "@/core/components/form/inputs/DefaultNumberInput
 import FormActionsContainer from "@/core/components/form/containers/FormActionsContainer.vue";
 import FormResetButton from "@/core/components/form/buttons/FormResetButton.vue";
 import ProcessesCreateCountriesBlock from "./ProcessesCreateCountriesBlock.vue";
-import { removeDateTimezonesForQuery } from "@/core/scripts/queryHelper";
 import FormDuplicateAndRedirectBack from "@/core/components/form/buttons/FormDuplicateAndRedirectBack.vue";
 
 // Dependencies
@@ -29,6 +29,7 @@ const { t } = useI18n();
 const { objectToFormData } = useFormData();
 const page = usePage();
 const messages = useMessagesStore();
+const { removeDateTimezonesFromFormData } = useDateFormatter();
 
 const loading = ref(false);
 const record = page.props.record;
@@ -223,9 +224,10 @@ watch(
 
 // Submit handler
 const submit = handleSubmit((values) => {
-    loading.value = true;
-    removeDateTimezonesForQuery(values, ["created_at"]);
     const formData = objectToFormData(values);
+    removeDateTimezonesFromFormData(formData);
+
+    loading.value = true;
 
     axios
         .post(route("mad.processes.store"), formData)

@@ -1,1 +1,0 @@
-import{u as s,c,o,b as t,as as a,be as l}from"./app-DOf95tBZ.js";import{H as p}from"./mdi-BiCQTzTv.js";const d={__name:"FullscreenListItem",setup(u){const{t:n}=s(),r=()=>{const e=document.querySelector(".default-table-wrapper");l(e)};return(e,i)=>(o(),c(a,{title:t(n)("actions.Fullscreen"),"prepend-icon":t(p),onClick:r},null,8,["title","prepend-icon"]))}};export{d as _};

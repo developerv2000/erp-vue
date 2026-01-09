@@ -56,14 +56,29 @@ class Permission extends Model
     const CAN_RECEIVE_NOTIFICATION_WHEN_ORDER_IS_SENT_TO_CMD_BY_PLD = 'can-receive-notification-when-order-is-sent-to-CMD-by-PLD';
     const CAN_RECEIVE_NOTIFICATION_WHEN_ORDER_IS_CONFIRMED_BY_PLD = 'can-receive-notification-when-order-is-confirmed-by-PLD';
 
-    // PLD and DD permissions
+    // PLD and DD
     const CAN_RECEIVE_NOTIFICATION_WHEN_ORDER_IS_SENT_TO_MANUFACTURER_BY_CMD = 'can-receive-notification-when-order-is-sent-to-manufacturer-by-CMD';
 
-    // PLD and PRD permissions
+    // PLD and PRD
     const CAN_RECEIVE_NOTIFICATION_WHEN_INVOICE_IS_SENT_FOR_PAYMENT_BY_CMD = 'can-receive-notification-when-invoice-is-sent-for-payment-by-CMD';
 
-    // PLD and CMD permissions
+    // PLD and CMD
     const CAN_RECEIVE_NOTIFICATION_WHEN_PRODUCTION_TYPE_INVOICE_PAYMENT_IS_COMPLETED_BY_RPD = 'can-receive-notification-when-production-type-invoice-payment-is-completed-by-PRD';
+
+    /*
+    |--------------------------------------------------------------------------
+    | Global storage permissions
+    |--------------------------------------------------------------------------
+    */
+
+    // PLD and CMD
+    const CAN_VIEW_STORAGE_ORDER_FILES_NAME = 'can-view-storage-order-files';
+
+    // PLD and CMD
+    const CAN_VIEW_STORAGE_ORDER_PRODUCT_FILES_NAME = 'can-view-storage-order-product-files';
+
+    // PLD, CMD and PRD
+    const CAN_VIEW_STORAGE_INVOICE_FILES_NAME = 'can-view-storage-invoice-files';
 
     /*
     |--------------------------------------------------------------------------
@@ -107,19 +122,19 @@ class Permission extends Model
     const CAN_NOT_EDIT_MAD_ASP_NAME = 'can`t-edit-MAD-ASP';
     const CAN_NOT_EDIT_MAD_MISC_NAME = 'can`t-edit-MAD-Misc';
 
-    // Other MAD permissions
+    // Other MAD permissions:
 
-    // KVPP
+    // 1. KVPP
     const CAN_VIEW_MAD_KVPP_MATCHING_PROCESSES_NAME = 'can-view-MAD-KVPP-matching-processes';
 
-    // KPI
+    // 2. KPI
     const CAN_VIEW_KPI_OF_ALL_ANALYSTS = 'can-view-MAD-KPI-of-all-analysts';
     const CAN_VIEW_KPI_EXTENDED_VERSION_NAME = 'can-view-MAD-extended-KPI-version';
 
-    // ASP
+    // 3. ASP
     const CAN_CONTROL_MAD_ASP_PROCESSES = 'can-control-MAD-ASP-processes';
 
-    // VPS
+    // 4. VPS
     const CAN_VIEW_MAD_VPS_OF_ALL_ANALYSTS_NAME = 'can-view-MAD-VPS-of-all-analysts';
     const CAN_EDIT_MAD_VPS_OF_ALL_ANALYSTS_NAME = 'can-edit-MAD-VPS-of-all-analysts';
     const CAN_EDIT_MAD_VPS_STATUS_HISTORY_NAME = 'can-edit-MAD-VPS-status-history';
@@ -420,6 +435,10 @@ class Permission extends Model
             self::CAN_EDIT_CMD_ORDER_PRODUCTS_NAME,
             self::CAN_EDIT_CMD_INVOICES_NAME,
 
+            self::CAN_VIEW_STORAGE_ORDER_FILES_NAME,
+            self::CAN_VIEW_STORAGE_ORDER_PRODUCT_FILES_NAME,
+            self::CAN_VIEW_STORAGE_INVOICE_FILES_NAME,
+
             self::CAN_RECEIVE_NOTIFICATION_WHEN_ORDER_IS_SENT_TO_CMD_BY_PLD,
             self::CAN_RECEIVE_NOTIFICATION_WHEN_ORDER_IS_CONFIRMED_BY_PLD,
             self::CAN_RECEIVE_NOTIFICATION_WHEN_PRODUCTION_TYPE_INVOICE_PAYMENT_IS_COMPLETED_BY_RPD,
@@ -437,9 +456,12 @@ class Permission extends Model
             self::CAN_EDIT_PLD_ORDERS_NAME,
             self::CAN_EDIT_PLD_ORDER_PRODUCTS_NAME,
 
+            self::CAN_VIEW_STORAGE_ORDER_FILES_NAME,
+            self::CAN_VIEW_STORAGE_ORDER_PRODUCT_FILES_NAME,
+            self::CAN_VIEW_STORAGE_INVOICE_FILES_NAME,
+
             self::CAN_RECEIVE_NOTIFICATION_WHEN_MAD_VPS_IS_MARKED_AS_READY_FOR_ORDER,
             self::CAN_RECEIVE_NOTIFICATION_WHEN_ORDER_IS_SENT_FOR_CONFIRMATION_BY_CMD,
-
             self::CAN_RECEIVE_NOTIFICATION_WHEN_ORDER_IS_SENT_TO_MANUFACTURER_BY_CMD,
             self::CAN_RECEIVE_NOTIFICATION_WHEN_INVOICE_IS_SENT_FOR_PAYMENT_BY_CMD,
             self::CAN_RECEIVE_NOTIFICATION_WHEN_PRODUCTION_TYPE_INVOICE_PAYMENT_IS_COMPLETED_BY_RPD,
@@ -452,6 +474,8 @@ class Permission extends Model
             self::CAN_VIEW_PRD_INVOICES_NAME,
 
             self::CAN_EDIT_PRD_INVOICES_NAME,
+
+            self::CAN_VIEW_STORAGE_INVOICE_FILES_NAME,
 
             self::CAN_RECEIVE_NOTIFICATION_WHEN_INVOICE_IS_SENT_FOR_PAYMENT_BY_CMD,
         ];

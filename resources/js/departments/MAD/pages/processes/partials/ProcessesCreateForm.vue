@@ -7,6 +7,7 @@ import { object, string, number, array, date } from "yup";
 import { useVeeFormFields } from "@/core/composables/useVeeFormFields";
 import { useFormData } from "@/core/composables/useFormData";
 import { useMessagesStore } from "@/core/stores/messages";
+import { useDateFormatter } from "@/core/composables/useDateFormatter";
 import axios from "axios";
 
 import DefaultSheet from "@/core/components/containers/DefaultSheet.vue";
@@ -24,13 +25,13 @@ import FormStoreAndRedirectBack from "@/core/components/form/buttons/FormStoreAn
 import FormStoreAndReset from "@/core/components/form/buttons/FormStoreAndReset.vue";
 import FormStoreWithoutReseting from "@/core/components/form/buttons/FormStoreWithoutReseting.vue";
 import ProcessesCreateCountriesBlock from "./ProcessesCreateCountriesBlock.vue";
-import { removeDateTimezonesForQuery } from "@/core/scripts/queryHelper";
 
 // Dependencies
 const { t } = useI18n();
 const { objectToFormData } = useFormData();
 const page = usePage();
 const messages = useMessagesStore();
+const { removeDateTimezonesFromFormData } = useDateFormatter();
 
 const loading = ref(false);
 const redirectBack = ref(false);
@@ -59,9 +60,18 @@ const schema = computed(() => {
         countries: array().of(
             object({
                 country_id: number().required(),
-                forecast_year_1:  statusStage.value >= 2 ? number().required() : number().nullable(),
-                forecast_year_2: statusStage.value >= 2 ? number().required() : number().nullable(),
-                forecast_year_3: statusStage.value >= 2 ? number().required() : number().nullable(),
+                forecast_year_1:
+                    statusStage.value >= 2
+                        ? number().required()
+                        : number().nullable(),
+                forecast_year_2:
+                    statusStage.value >= 2
+                        ? number().required()
+                        : number().nullable(),
+                forecast_year_3:
+                    statusStage.value >= 2
+                        ? number().required()
+                        : number().nullable(),
             })
         ),
     };
@@ -206,9 +216,10 @@ watch(
 
 // Submit handler
 const submit = handleSubmit((values) => {
-    loading.value = true;
-    removeDateTimezonesForQuery(values, ["created_at"]);
     const formData = objectToFormData(values);
+    removeDateTimezonesFromFormData(formData);
+
+    loading.value = true;
 
     axios
         .post(route("mad.processes.store"), formData)

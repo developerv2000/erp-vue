@@ -104,6 +104,7 @@ return new class extends Migration
                     'product_id',
                     'country_id',
                     'marketing_authorization_holder_id',
+                    'trademark_en',
                 ],
                 'processes_business_unique'
             );

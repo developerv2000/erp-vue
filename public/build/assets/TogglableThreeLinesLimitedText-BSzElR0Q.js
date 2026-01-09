@@ -1,1 +1,0 @@
-import{f as t,o as i,e as n}from"./app-DOf95tBZ.js";const s={class:"max-lines-limited-text three-lines-limited-text","data-on-click":"toggle-text-max-lines"},o=["innerHTML"],c={__name:"TogglableThreeLinesLimitedText",props:{text:String},setup(e){return(a,l)=>(i(),t("div",s,[n("div",{innerHTML:e.text},null,8,o)]))}};export{c as _};

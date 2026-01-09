@@ -31,15 +31,18 @@ Route::middleware('auth', 'auth.session')->group(function () {
     // Private storage route for accessing order files
     Route::get('/orders/files/{path}', [PrivateStorageController::class, 'getOrderFile'])
         ->where('path', '.*')
+        ->middleware('can:view-storage-order-files')
         ->name('orders.files');
 
     // Private storage route for accessing order product files
     Route::get('/order-products/files/{path}', [PrivateStorageController::class, 'getOrderProductFile'])
         ->where('path', '.*')
+        ->middleware('can:view-storage-order-product-files')
         ->name('order-products.files');
 
     // Private storage route for accessing invoice files
     Route::get('/invoices/files/{path}', [PrivateStorageController::class, 'getInvoiceFile'])
         ->where('path', '.*')
+        ->middleware('can:view-storage-invoice-files')
         ->name('invoices.files');
 });

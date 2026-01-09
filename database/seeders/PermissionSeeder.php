@@ -11,6 +11,8 @@ class PermissionSeeder extends Seeder
 {
     /**
      * Run the database seeds.
+     *
+     * IMPORTANT: Must be added consequently valid to sync with server permissions!
      */
     public function run(): void
     {
@@ -20,7 +22,7 @@ class PermissionSeeder extends Seeder
         |--------------------------------------------------------------------------
         */
 
-        $globalPerms = [
+        $permissions = [
             Permission::CAN_DELETE_FROM_TRASH_NAME,
             Permission::CAN_EDIT_COMMENTS_NAME,
             Permission::CAN_EXPORT_RECORDS_AS_EXCEL_NAME,
@@ -28,9 +30,9 @@ class PermissionSeeder extends Seeder
             Permission::CAN_EXPORT_UNLIMITED_RECORDS_AS_EXCEL_NAME,
         ];
 
-        foreach ($globalPerms as $perm) {
+        foreach ($permissions as $name) {
             Permission::create([
-                'name' => $perm,
+                'name' => $name,
                 'global' => true,
             ]);
         }
@@ -41,9 +43,9 @@ class PermissionSeeder extends Seeder
         |--------------------------------------------------------------------------
         */
 
-        $MADId = Department::findByName(Department::MAD_NAME)->id;
+        $departmentID = Department::findByName(Department::MAD_NAME)->id;
 
-        $MADPerms = [
+        $permissions = [
             Permission::CAN_VIEW_MAD_EPP_NAME,
             Permission::CAN_VIEW_MAD_KVPP_NAME,
             Permission::CAN_VIEW_MAD_IVP_NAME,
@@ -92,20 +94,26 @@ class PermissionSeeder extends Seeder
             Permission::CAN_MARK_MAD_VPS_AS_READY_FOR_ORDER,
         ];
 
-        foreach ($MADPerms as $perm) {
+        foreach ($permissions as $name) {
             Permission::create([
-                'name' => $perm,
-                'department_id' => $MADId,
+                'name' => $name,
+                'department_id' => $departmentID,
             ]);
         }
 
-        $notificationPerms = [
+        /*
+        |--------------------------------------------------------------------------
+        | Notification permissions
+        |--------------------------------------------------------------------------
+        */
+
+        $notificationPermissions = [
             Permission::CAN_RECEIVE_NOTIFICATION_ON_MAD_VPS_CONTRACT,
         ];
 
-        foreach ($notificationPerms as $perm) {
+        foreach ($notificationPermissions as $name) {
             Permission::create([
-                'name' => $perm,
+                'name' => $name,
                 'global' => true,
             ]);
         }
@@ -116,9 +124,9 @@ class PermissionSeeder extends Seeder
         |--------------------------------------------------------------------------
         */
 
-        $CMDId = Department::findByName(Department::CMD_NAME)->id;
+        $departmentID = Department::findByName(Department::CMD_NAME)->id;
 
-        $CMDPerms = [
+        $permissions = [
             Permission::CAN_VIEW_CMD_ORDERS_NAME,
             Permission::CAN_VIEW_CMD_ORDER_PRODUCTS_NAME,
             Permission::CAN_VIEW_CMD_INVOICES_NAME,
@@ -126,55 +134,29 @@ class PermissionSeeder extends Seeder
             Permission::CAN_EDIT_CMD_ORDERS_NAME,
             Permission::CAN_EDIT_CMD_ORDER_PRODUCTS_NAME,
             Permission::CAN_EDIT_CMD_INVOICES_NAME,
-
-            Permission::CAN_RECEIVE_NOTIFICATION_WHEN_ORDER_IS_SENT_TO_CMD_BY_PLD,
-            Permission::CAN_RECEIVE_NOTIFICATION_WHEN_ORDER_IS_CONFIRMED_BY_PLD,
         ];
 
-        foreach ($CMDPerms as $perm) {
+        foreach ($permissions as $name) {
             Permission::create([
-                'name' => $perm,
-                'department_id' => $CMDId,
+                'name' => $name,
+                'department_id' => $departmentID,
             ]);
         }
 
         /*
         |--------------------------------------------------------------------------
-        | PLD permissions
+        | Notification permissions
         |--------------------------------------------------------------------------
         */
 
-        $PLDId = Department::findByName(Department::PLD_NAME)->id;
-
-        $PLDPerms = [
-            Permission::CAN_VIEW_PLD_READY_FOR_ORDER_PROCESSES_NAME,
-            Permission::CAN_VIEW_PLD_ORDERS_NAME,
-            Permission::CAN_VIEW_PLD_ORDER_PRODUCTS_NAME,
-            Permission::CAN_VIEW_PLD_INVOICES_NAME,
-
-            Permission::CAN_EDIT_PLD_ORDERS_NAME,
-            Permission::CAN_EDIT_PLD_ORDER_PRODUCTS_NAME,
+        $notificationPermissions = [
+            Permission::CAN_RECEIVE_NOTIFICATION_WHEN_ORDER_IS_SENT_TO_CMD_BY_PLD,
+            Permission::CAN_RECEIVE_NOTIFICATION_WHEN_ORDER_IS_CONFIRMED_BY_PLD,
         ];
 
-        foreach ($PLDPerms as $PLD) {
+        foreach ($notificationPermissions as $name) {
             Permission::create([
-                'name' => $PLD,
-                'department_id' => $PLDId,
-            ]);
-        }
-
-        $notificationPerms = [
-            Permission::CAN_RECEIVE_NOTIFICATION_WHEN_MAD_VPS_IS_MARKED_AS_READY_FOR_ORDER,
-            Permission::CAN_RECEIVE_NOTIFICATION_WHEN_ORDER_IS_SENT_FOR_CONFIRMATION_BY_CMD,
-
-            Permission::CAN_RECEIVE_NOTIFICATION_WHEN_ORDER_IS_SENT_TO_MANUFACTURER_BY_CMD, // shared
-            Permission::CAN_RECEIVE_NOTIFICATION_WHEN_INVOICE_IS_SENT_FOR_PAYMENT_BY_CMD, // shared
-            Permission::CAN_RECEIVE_NOTIFICATION_WHEN_PRODUCTION_TYPE_INVOICE_PAYMENT_IS_COMPLETED_BY_RPD, // shared
-        ];
-
-        foreach ($notificationPerms as $perm) {
-            Permission::create([
-                'name' => $perm,
+                'name' => $name,
                 'global' => true,
             ]);
         }
@@ -185,18 +167,65 @@ class PermissionSeeder extends Seeder
         |--------------------------------------------------------------------------
         */
 
-        $PRDId = Department::findByName(Department::PRD_NAME)->id;
+        $departmentID = Department::findByName(Department::PLD_NAME)->id;
 
-        $PRDPerms = [
+        $permissions = [
+            Permission::CAN_VIEW_PLD_READY_FOR_ORDER_PROCESSES_NAME,
+            Permission::CAN_VIEW_PLD_ORDERS_NAME,
+            Permission::CAN_VIEW_PLD_ORDER_PRODUCTS_NAME,
+            Permission::CAN_VIEW_PLD_INVOICES_NAME,
+
+            Permission::CAN_EDIT_PLD_ORDERS_NAME,
+            Permission::CAN_EDIT_PLD_ORDER_PRODUCTS_NAME,
+        ];
+
+        foreach ($permissions as $name) {
+            Permission::create([
+                'name' => $name,
+                'department_id' => $departmentID,
+            ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Notification permissions
+        |--------------------------------------------------------------------------
+        */
+
+        $notificationPermissions = [
+            Permission::CAN_RECEIVE_NOTIFICATION_WHEN_MAD_VPS_IS_MARKED_AS_READY_FOR_ORDER,
+            Permission::CAN_RECEIVE_NOTIFICATION_WHEN_ORDER_IS_SENT_FOR_CONFIRMATION_BY_CMD,
+
+            Permission::CAN_RECEIVE_NOTIFICATION_WHEN_ORDER_IS_SENT_TO_MANUFACTURER_BY_CMD,
+            Permission::CAN_RECEIVE_NOTIFICATION_WHEN_INVOICE_IS_SENT_FOR_PAYMENT_BY_CMD,
+            Permission::CAN_RECEIVE_NOTIFICATION_WHEN_PRODUCTION_TYPE_INVOICE_PAYMENT_IS_COMPLETED_BY_RPD,
+        ];
+
+        foreach ($notificationPermissions as $name) {
+            Permission::create([
+                'name' => $name,
+                'global' => true,
+            ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | PRD permissions
+        |--------------------------------------------------------------------------
+        */
+
+        $departmentID = Department::findByName(Department::PRD_NAME)->id;
+
+        $permissions = [
             Permission::CAN_VIEW_PRD_INVOICES_NAME,
 
             Permission::CAN_EDIT_PRD_INVOICES_NAME,
         ];
 
-        foreach ($PRDPerms as $PRD) {
+        foreach ($permissions as $name) {
             Permission::create([
-                'name' => $PRD,
-                'department_id' => $PRDId,
+                'name' => $name,
+                'department_id' => $departmentID,
             ]);
         }
 
@@ -206,18 +235,18 @@ class PermissionSeeder extends Seeder
         |--------------------------------------------------------------------------
         */
 
-        $DDId = Department::findByName(Department::DD_NAME)->id;
+        $departmentID = Department::findByName(Department::DD_NAME)->id;
 
-        $DDPerms = [
+        $permissions = [
             Permission::CAN_VIEW_DD_ORDER_PRODUCTS_NAME,
 
             Permission::CAN_EDIT_DD_ORDER_PRODUCTS_NAME,
         ];
 
-        foreach ($DDPerms as $DD) {
+        foreach ($permissions as $name) {
             Permission::create([
-                'name' => $DD,
-                'department_id' => $DDId,
+                'name' => $name,
+                'department_id' => $departmentID,
             ]);
         }
 
@@ -227,18 +256,37 @@ class PermissionSeeder extends Seeder
         |--------------------------------------------------------------------------
         */
 
-        $MDId = Department::findByName(Department::MD_NAME)->id;
+        $departmentID = Department::findByName(Department::MD_NAME)->id;
 
-        $MDPerms = [
+        $permissions = [
             Permission::CAN_VIEW_MD_SERIALIZED_BY_MANUFACTURER_NAME,
 
             Permission::CAN_EDIT_MD_SERIALIZED_BY_MANUFACTURER_NAME,
         ];
 
-        foreach ($MDPerms as $MD) {
+        foreach ($permissions as $name) {
             Permission::create([
-                'name' => $MD,
-                'department_id' => $MDId,
+                'name' => $name,
+                'department_id' => $departmentID,
+            ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Storage permissions
+        |--------------------------------------------------------------------------
+        */
+
+        $storagePermissions = [
+            Permission::CAN_VIEW_STORAGE_ORDER_FILES_NAME,
+            Permission::CAN_VIEW_STORAGE_ORDER_PRODUCT_FILES_NAME,
+            Permission::CAN_VIEW_STORAGE_INVOICE_FILES_NAME,
+        ];
+
+        foreach ($storagePermissions as $name) {
+            Permission::create([
+                'name' => $name,
+                'global' => true,
             ]);
         }
     }

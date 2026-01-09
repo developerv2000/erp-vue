@@ -13,18 +13,13 @@
 - order_priority => days_past_since_last_activity
 
 ## Misc
-- Permissions fully updated. Reattach users direct permission manually
 - Fix uploading attachments for multiple "Products" create
-- Fix moving to the top FilterBooleanAutocomplete when selected "false" value
 - User model, fix 'productSearches relation/count' after adding 'ProductSearch'
 - Add :return typos for controller functions
 - Refactor Products 'getMatchedProductSearchesAttribute()'
 - Refactor MAD KPI addActiveManufacturersCountsForMonths() when country_id is filled
 - Use request()->safe() for PLD/CMD and other requests instead of request->all
-- removeDateTimezonesFromFormData from MAD part
 - Optimize Orders/OrderProduct scopeWithBasicPLDRelations/scopeWithBasicPLDRelationCounts/appendBasicPLDAttributes
 etc functions
-- Add middlewares for storage routes!!!!!!!
 - Fix EnsureAtxExists for Products
-- Refactor PermissionSeeder by separating notification permissions
 - Check all AJAX route middlewares

@@ -97,7 +97,8 @@ class ProcessStoreRequest extends FormRequest
                     Rule::unique(Process::class)->where(function ($query) {
                         $query->where('product_id', $this->product_id)
                             // ->where('country_id', $this->country_id) // already included
-                            ->where('marketing_authorization_holder_id', $this->marketing_authorization_holder_id);
+                            ->where('marketing_authorization_holder_id', $this->marketing_authorization_holder_id)
+                            ->where('trademark_en', $this->trademark_en);
                     }),
                 ],
             ],

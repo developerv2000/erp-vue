@@ -90,7 +90,15 @@ class ProcessUpdateRequest extends FormRequest
                     ->where('product_id', $record->product_id)
                     // ->where('country_id', $this->country_id) // already included
                     ->where('marketing_authorization_holder_id', $this->marketing_authorization_holder_id)
+                    ->where('trademark_en', $this->trademark_en)
             ]
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'country_id.unique' => trans('validation.custom.vps.unique_on_edit'),
         ];
     }
 
@@ -120,12 +128,5 @@ class ProcessUpdateRequest extends FormRequest
                 'product_form_id.unique' => trans('validation.custom.ivp.unique_on_edit'),
             ]
         );
-    }
-
-    public function messages(): array
-    {
-        return [
-            'country_id.unique' => trans('validation.custom.vps.unique_on_edit'),
-        ];
     }
 }

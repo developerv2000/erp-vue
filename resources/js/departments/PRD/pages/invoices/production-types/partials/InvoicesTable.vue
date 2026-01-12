@@ -16,6 +16,7 @@ import TdRecordCommentsLink from "@/core/components/table/td/TdRecordCommentsLin
 import TableNavigateToPage from "@/core/components/table/misc/TableNavigateToPage.vue";
 import TdInvoiceAccept from "@/core/components/table/td/shared/invoices/TdInvoiceAccept.vue";
 import TdInvoiceCompletePayment from "@/core/components/table/td/shared/invoices/TdInvoiceCompletePayment.vue";
+import TdInvoicePaymentType from "@/core/components/table/td/shared/invoices/TdInvoicePaymentType.vue";
 
 const { t } = useI18n();
 const { get } = useQueryParams();
@@ -101,7 +102,7 @@ const generateProductsList = (products) => {
         </template>
 
         <template #item.payment_type_id="{ item }">
-            {{ item.payment_type.name }}
+            <TdInvoicePaymentType :type="item.payment_type.name" />
         </template>
 
         <template #item.sent_for_payment_date="{ item }">

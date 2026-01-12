@@ -9,10 +9,13 @@ Route::prefix('prd')->name('prd.')->middleware('auth', 'auth.session')->group(fu
     // Invoices
     Route::prefix('/invoices')->name('invoices.')->group(function () {
         // General actions
-        Route::controller(PRDInvoiceController::class)->group(function () {
-            Route::post('/accept/{record}', 'accept')->name('accept');  // AJAX request
-            Route::post('/complete-payment/{record}', 'completePayment')->name('complete-payment');  // AJAX request
-        });
+        Route::controller(PRDInvoiceController::class)
+            ->middleware('can:edit-PRD-invoices')
+            ->group(function () {
+                // AJAX requests
+                Route::post('/accept/{record}', 'accept')->name('accept');
+                Route::post('/complete-payment/{record}', 'completePayment')->name('complete-payment');
+            });
 
         // Production types
         Route::prefix('/production-types')

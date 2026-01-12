@@ -42,11 +42,12 @@ Route::prefix('mad')->name('mad.')->middleware('auth', 'auth.session')->group(fu
             'can:edit-MAD-IVP'
         );
 
+        // AJAX requests
         Route::middleware('can:edit-MAD-IVP')->group(function () {
-            // AJAX request on products.create for uniqness
+            // On products.create for uniqness
             Route::post('/get-similar-records', 'getSimilarRecordsForRequest')->name('get-similar-records');
 
-            // AJAX request on products.create
+            // On products.create
             Route::post('/get-matched-atx', 'getMatchedATXForRequest')->name('get-matched-atx');
         });
     });

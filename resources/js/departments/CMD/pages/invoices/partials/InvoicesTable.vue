@@ -15,6 +15,7 @@ import TogglableThreeLinesLimitedText from "@/core/components/misc/TogglableThre
 import TdRecordCommentsLink from "@/core/components/table/td/TdRecordCommentsLink.vue";
 import TableNavigateToPage from "@/core/components/table/misc/TableNavigateToPage.vue";
 import TdInvoiceSentForPayment from "@/core/components/table/td/shared/invoices/TdInvoiceSentForPayment.vue";
+import TdInvoicePaymentType from "@/core/components/table/td/shared/invoices/TdInvoicePaymentType.vue";
 
 const { t } = useI18n();
 const { get } = useQueryParams();
@@ -98,7 +99,7 @@ const generateProductsList = (products) => {
         </template>
 
         <template #item.payment_type_id="{ item }">
-            {{ item.payment_type.name }}
+            <TdInvoicePaymentType :type="item.payment_type.name" />
         </template>
 
         <template #item.sent_for_payment_date="{ item }">

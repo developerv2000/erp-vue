@@ -19,7 +19,7 @@ class GlobalGatesDefiner
         });
 
         // Administrate
-        Gate::define('administrate', fn($user) => $user->isAnyAdministrator());
+        Gate::define('administrate', fn(User $user) => $user->isAnyAdministrator());
 
         /*
         |--------------------------------------------------------------------------

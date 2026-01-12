@@ -40,8 +40,10 @@ Route::middleware('auth', 'auth.session')->group(function () {
     Route::prefix('comments')->controller(CommentController::class)->name('comments.')->group(function () {
         Route::get('/view-model-comments/{commentable_type}/{commentable_id}', 'viewModelComments')->name('view-model-comments');
 
+        Route::post('/store', 'store')->name('store');
+
         CRUDRouteGenerator::defineDefaultRoutesOnly(
-            ['store', 'update', 'destroy'],
+            ['update', 'destroy'],
             'id',
             null,
             'can:edit-comments'

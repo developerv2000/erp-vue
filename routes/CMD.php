@@ -16,10 +16,11 @@ Route::prefix('cmd')->name('cmd.')->middleware('auth', 'auth.session')->group(fu
             'can:edit-CMD-orders'
         );
 
+        // AJAX requests
         Route::middleware('can:edit-CMD-orders')->group(function () {
-            Route::post('/sent-to-confirmation/{record}', 'sentToConfirmation')->name('sent-to-confirmation');  // AJAX request
-            Route::post('/sent-to-manufacturer/{record}', 'sentToManufacturer')->name('sent-to-manufacturer');  // AJAX request
-            Route::post('/start-production/{record}', 'startProduction')->name('start-production');  // AJAX request
+            Route::post('/sent-to-confirmation/{record}', 'sentToConfirmation')->name('sent-to-confirmation');
+            Route::post('/sent-to-manufacturer/{record}', 'sentToManufacturer')->name('sent-to-manufacturer');
+            Route::post('/start-production/{record}', 'startProduction')->name('start-production');
         });
     });
 
@@ -32,9 +33,12 @@ Route::prefix('cmd')->name('cmd.')->middleware('auth', 'auth.session')->group(fu
             'can:edit-CMD-order-products'
         );
 
-        Route::post('/end-production/{record}', 'endProduction')->name('end-production');  // AJAX request
-        Route::post('/set-as-ready-for-shipment-from-manufacturer/{record}', 'setAsReadyForShipmentFromManufacturer')
-            ->name('set-as-ready-for-shipment-from-manufacturer');  // AJAX request
+        // AJAX requests
+        Route::middleware('can:edit-CMD-order-products')->group(function () {
+            Route::post('/end-production/{record}', 'endProduction')->name('end-production');
+            Route::post('/set-as-ready-for-shipment-from-manufacturer/{record}', 'setAsReadyForShipmentFromManufacturer')
+                ->name('set-as-ready-for-shipment-from-manufacturer');
+        });
     });
 
     // Invoices
@@ -46,6 +50,9 @@ Route::prefix('cmd')->name('cmd.')->middleware('auth', 'auth.session')->group(fu
             'can:edit-CMD-invoices'
         );
 
-        Route::post('/send-for-payment/{record}', 'sendForPayment')->name('send-for-payment');  // AJAX request
+        // AJAX requests
+        Route::middleware('can:edit-CMD-invoices')->group(function () {
+            Route::post('/send-for-payment/{record}', 'sendForPayment')->name('send-for-payment');
+        });
     });
 });

@@ -135,7 +135,10 @@ const handleTableOptionsUpdate = (options) => {
         </template>
 
         <template #item.new_layout="{ item }">
-            <TdOrderProductLayoutStatus :new-layout="item.new_layout" />
+            <TdOrderProductLayoutStatus
+                v-if="item.layout_approved_date"
+                :new-layout="item.new_layout"
+            />
         </template>
 
         <template #item.date_of_sending_new_layout_to_manufacturer="{ item }">

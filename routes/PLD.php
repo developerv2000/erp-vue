@@ -26,9 +26,10 @@ Route::prefix('pld')->name('pld.')->middleware('auth', 'auth.session')->group(fu
             'can:edit-PLD-orders'
         );
 
+        // AJAX requests
         Route::middleware('can:edit-PLD-orders')->group(function () {
-            Route::post('/sent-to-bdm/{record}', 'sentToBDM')->name('sent-to-bdm');  // AJAX request
-            Route::post('/confirm/{record}', 'confirm')->name('confirm');  // AJAX request
+            Route::post('/sent-to-bdm/{record}', 'sentToBDM')->name('sent-to-bdm');
+            Route::post('/confirm/{record}', 'confirm')->name('confirm');
         });
     });
 
@@ -45,13 +46,12 @@ Route::prefix('pld')->name('pld.')->middleware('auth', 'auth.session')->group(fu
     // Invoices
     Route::get('/invoices', [PLDInvoiceController::class, 'index'])->name('invoices.index')->middleware('can:view-PLD-invoices');
 
-    // Helpers
+    // Helpers:
+    // AJAX requests
     Route::prefix('/orders')->controller(PLDHelperController::class)->middleware('can:edit-PLD-orders')->group(function () {
-        // AJAX request on orders.create
         Route::get('/ready-for-order-processes-of-manufacturer', 'getReadyForOrderProcessesOfManufacturer')
             ->name('get-ready-for-order-processes-of-manufacturer');
 
-        // AJAX request on orders.create
         Route::get('/process-with-it-similar-records-for-order', 'getProcessWithItSimilarRecordsForOrder')
             ->name('get-process-with-it-similar-records-for-order');
     });

@@ -21,5 +21,3 @@
 - Use request()->safe() for PLD/CMD and other requests instead of request->all
 - Optimize Orders/OrderProduct scopeWithBasicPLDRelations/scopeWithBasicPLDRelationCounts/appendBasicPLDAttributes
 etc functions
-- Fix EnsureAtxExists for Products
-- Check all AJAX route middlewares

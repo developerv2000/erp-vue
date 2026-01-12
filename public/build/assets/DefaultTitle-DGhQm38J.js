@@ -1,1 +1,0 @@
-import{f as a,o,ay as r,az as l}from"./app-B9LPjWSD.js";const m={__name:"DefaultTitle",props:{color:{type:String,default:"secondary"},marginBottom:{type:[String,Number],default:"4"}},setup(t){return(e,s)=>(o(),a("h6",{class:l(`text-h6 mb-${t.marginBottom} text-${t.color}`)},[r(e.$slots,"default")],2))}};export{m as _};

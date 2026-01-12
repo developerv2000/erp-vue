@@ -1,0 +1,1 @@
+import{f as a,o as s,a as t,e as o,V as r,t as c}from"./app-CQVFqoTu.js";const n={class:"d-flex ga-3"},i={class:"text-body-2"},m={__name:"TdAva",props:{user:Object},setup(e){return(l,_)=>(s(),a("div",n,[t(r,{image:e.user.photo_url,size:"32"},null,8,["image"]),o("p",i,c(e.user.name),1)]))}};export{m as _};

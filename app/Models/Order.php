@@ -337,12 +337,6 @@ class Order extends Model implements HasTitleAttribute
 
     protected static function booted(): void
     {
-        static::updated(function ($record) {
-            foreach ($record->products as $product) {
-                $product->syncCurrencyWithRelatedProcess();
-            }
-        });
-
         static::deleting(function ($record) {
             foreach ($record->products as $product) {
                 $product->delete();
@@ -714,6 +708,10 @@ class Order extends Model implements HasTitleAttribute
 
         // HasMany relations
         $this->storeCommentFromRequest($request);
+
+        // Sync orders currency with related products process,
+        // because orders 'currency_id' can be updated by PLD
+        $this->syncCurrencyWithRelatedProductsProcess();
     }
 
     /**
@@ -745,6 +743,55 @@ class Order extends Model implements HasTitleAttribute
 
         // Upload PDF file
         $this->uploadFile('pdf_file', self::getPdfFilesFolderPath());
+
+        // Sync orders currency with related products process,
+        // because orders 'currency_id' can be updated by CMD
+        $this->syncCurrencyWithRelatedProductsProcess();
+
+        // Sync products price with related process,
+        $this->syncProductsPriceWithRelatedProcess();
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Synchronizations
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Synchronize products' process currency with the order currency.
+     *
+     * Used after updating the order by PLD or CMD.
+     * Refreshes the model to ensure relations are not stale.
+     */
+    public function syncCurrencyWithRelatedProductsProcess(): void
+    {
+        if ($this->currency_id === null) {
+            return;
+        }
+
+        // Refresh the current model instance and eager-load relations
+        $this->refresh()->load('products.process');
+
+        foreach ($this->products as $product) {
+            $process = $product->process;
+
+            if (
+                $process !== null &&
+                $process->currency_id !== $this->currency_id
+            ) {
+                $process->update([
+                    'currency_id' => $this->currency_id,
+                ]);
+            }
+        }
+    }
+
+    public function syncProductsPriceWithRelatedProcess(): void
+    {
+        foreach ($this->products as $product) {
+            $product->syncPriceWithRelatedProcess();
+        }
     }
 
     /*

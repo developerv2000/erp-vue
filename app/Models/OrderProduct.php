@@ -460,14 +460,6 @@ class OrderProduct extends Model implements HasTitleAttribute
 
     protected static function booted(): void
     {
-        static::created(function ($record) {
-            $record->syncPriceWithRelatedProcess();
-        });
-
-        static::updated(function ($record) {
-            $record->syncPriceWithRelatedProcess();
-        });
-
         static::deleting(function ($record) {
             // Detach 'productionInvoices'
             $record->productionInvoices()->detach();
@@ -999,6 +991,9 @@ class OrderProduct extends Model implements HasTitleAttribute
         $this->uploadFile('coa_file', self::getCoaFileFolderPath());
         $this->uploadFile('coo_file', self::getCooFileFolderPath());
         $this->uploadFile('declaration_for_europe_file', self::getDeclarationForEuropeFileFolderPath());
+
+        // Sync price
+        $this->syncPriceWithRelatedProcess();
     }
 
     /**
@@ -1098,29 +1093,15 @@ class OrderProduct extends Model implements HasTitleAttribute
      * Sync the price of the related Process with this model.
      * If the price differs, it updates the 'increased_price' field.
      *
-     * Used in models created/updated events.
+     * Used when updating Order and OrderProduct models by CMD.
      */
     public function syncPriceWithRelatedProcess(): void
     {
-        if ($this->price && ($this->process->agreed_price != $this->price)) {
+        if (!$this->price) return;
+
+        if ($this->price != $this->process->agreed_price) {
             $this->process->update([
                 'increased_price' => $this->price
-            ]);
-        }
-    }
-
-    /**
-     * Sync the currency of the related Process with this model.
-     *
-     * Used in related 'Order' models updated event!
-     */
-    public function syncCurrencyWithRelatedProcess(): void
-    {
-        $this->refresh();
-
-        if ($this->order->currency_id && ($this->process->currency_id != $this->order->currency_id)) {
-            $this->process->update([
-                'currency_id' => $this->order->currency_id,
             ]);
         }
     }

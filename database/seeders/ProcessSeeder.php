@@ -8,7 +8,6 @@ use App\Models\MarketingAuthorizationHolder;
 use App\Models\Process;
 use App\Models\ProcessResponsiblePerson;
 use App\Models\ProcessStatus;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class ProcessSeeder extends Seeder

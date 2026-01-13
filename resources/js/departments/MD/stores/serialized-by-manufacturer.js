@@ -57,7 +57,7 @@ export const useMDSerializedByManufacturerTableStore = defineStore('MDSerialized
     }),
 
     actions: {
-        ...createRecordActions(this),
+        ...createRecordActions(),
         initFromInertiaPage(page) {
             this.records = [];
             const query = page.props.query;

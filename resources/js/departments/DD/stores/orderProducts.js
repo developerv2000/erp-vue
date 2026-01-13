@@ -61,7 +61,7 @@ export const useDDOrderProductsTableStore = defineStore('DDOrderProductsTable', 
     }),
 
     actions: {
-        ...createRecordActions(this),
+        ...createRecordActions(),
         initFromInertiaPage(page) {
             this.records = [];
             const query = page.props.query;

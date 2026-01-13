@@ -8,7 +8,6 @@ use App\Models\ManufacturerCategory;
 use App\Models\ProductClass;
 use App\Models\User;
 use App\Models\Zone;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class ManufacturerSeeder extends Seeder

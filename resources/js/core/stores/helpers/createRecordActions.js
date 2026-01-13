@@ -1,4 +1,4 @@
-export function createRecordActions(store) {
+export function createRecordActions() {
     return {
         /**
          * Update or insert a record in the store's records array.

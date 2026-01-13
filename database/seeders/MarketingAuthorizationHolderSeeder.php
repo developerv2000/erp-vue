@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\MarketingAuthorizationHolder;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class MarketingAuthorizationHolderSeeder extends Seeder

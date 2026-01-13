@@ -59,7 +59,7 @@ export const useCMDOrderProductsTableStore = defineStore('CMDOrderProductsTable'
     }),
 
     actions: {
-        ...createRecordActions(this),
+        ...createRecordActions(),
         initFromInertiaPage(page) {
             this.records = [];
             const query = page.props.query;

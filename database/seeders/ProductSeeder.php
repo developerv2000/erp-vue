@@ -7,7 +7,6 @@ use App\Models\ProductClass;
 use App\Models\ProductForm;
 use App\Models\ProductShelfLife;
 use App\Models\Zone;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class ProductSeeder extends Seeder

@@ -1,4 +1,3 @@
-```javascript
 <script setup>
 import { useAttrs, computed } from "vue";
 import { extensions, imageExtension } from "@/core/boot/vuetify-tiptap";

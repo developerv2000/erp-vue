@@ -3,7 +3,6 @@ import { onMounted } from "vue";
 import { usePage } from "@inertiajs/vue3";
 import useQueryParams from "@/core/composables/useQueryParams";
 import { useDDOrderProductsTableStore } from "@/departments/DD/stores/orderProducts";
-import { useI18n } from "vue-i18n";
 import { useDateFormatter } from "@/core/composables/useDateFormatter";
 import { DEFAULT_PER_PAGE_OPTIONS } from "@/core/scripts/constants";
 
@@ -15,7 +14,6 @@ import TdRecordCommentsLink from "@/core/components/table/td/TdRecordCommentsLin
 import TableNavigateToPage from "@/core/components/table/misc/TableNavigateToPage.vue";
 import TdOrderProductLayoutStatus from "@/core/components/table/td/shared/order-products/TdOrderProductLayoutStatus.vue";
 
-const { t } = useI18n();
 const { get } = useQueryParams();
 const page = usePage();
 const store = useDDOrderProductsTableStore();

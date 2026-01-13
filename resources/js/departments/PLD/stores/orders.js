@@ -56,7 +56,7 @@ export const usePLDOrdersTableStore = defineStore('PLDOrdersTable', {
     }),
 
     actions: {
-        ...createRecordActions(this),
+        ...createRecordActions(),
         initFromInertiaPage(page) {
             this.records = [];
             const query = page.props.query;

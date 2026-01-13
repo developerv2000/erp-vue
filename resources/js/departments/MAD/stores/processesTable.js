@@ -90,7 +90,7 @@ export const useMADProcessesTableStore = defineStore('MADProcessesTable', {
     }),
 
     actions: {
-        ...createRecordActions(this),
+        ...createRecordActions(),
         detectCurrentPage() {
             this.isTrashPage = route().current('*.trash'); // Used to differ index/trash pages
         },

@@ -7,7 +7,6 @@ import { object, number, mixed, string } from "yup";
 import { useVeeFormFields } from "@/core/composables/useVeeFormFields";
 import { useFormData } from "@/core/composables/useFormData";
 import { useMessagesStore } from "@/core/stores/messages";
-import { useGlobalStore } from "@/core/stores/global";
 
 import DefaultSheet from "@/core/components/containers/DefaultSheet.vue";
 import DefaultTitle from "@/core/components/titles/DefaultTitle.vue";
@@ -26,7 +25,6 @@ const { t } = useI18n();
 const { objectToFormData } = useFormData();
 const page = usePage();
 const messages = useMessagesStore();
-const globalStore = useGlobalStore();
 
 const record = computed(() => page.props.record);
 const loading = ref(false);

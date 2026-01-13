@@ -55,7 +55,7 @@ export const usePLDInvoicesTableStore = defineStore('PLDInvoicesTable', {
     }),
 
     actions: {
-        ...createRecordActions(this),
+        ...createRecordActions(),
         initFromInertiaPage(page) {
             this.records = [];
             const query = page.props.query;

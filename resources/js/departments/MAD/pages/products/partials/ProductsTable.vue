@@ -9,7 +9,6 @@ import { formatPrice } from "@/core/scripts/utilities";
 import { DEFAULT_PER_PAGE_OPTIONS } from "@/core/scripts/constants";
 
 import ProductsTableTop from "./ProductsTableTop.vue";
-import InertiaLink from "@/core/components/inertia/InertiaLink.vue";
 import TableDefaultSkeleton from "@/core/components/table/misc/TableDefaultSkeleton.vue";
 import TdEditButton from "@/core/components/table/td/TdEditButton.vue";
 import TdManufacturerCategory from "@/core/components/table/td/MAD/manufacturers/TdManufacturerCategory.vue";

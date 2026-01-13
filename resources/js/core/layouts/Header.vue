@@ -4,7 +4,6 @@ import LocalesMenu from "./partials/header/LocalesMenu.vue";
 import ProfileMenu from "./partials/header/ProfileMenu.vue";
 import LeftbarToggler from "./partials/header/LeftbarToggler.vue";
 import NotificationsLink from "./partials/header/NotificationsLink.vue";
-import { mdiBellOutline } from "@mdi/js";
 
 defineProps({
     title: {

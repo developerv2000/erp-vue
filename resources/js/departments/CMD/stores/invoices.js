@@ -55,7 +55,7 @@ export const useCMDInvoicesTableStore = defineStore('CMDInvoicesTable', {
     }),
 
     actions: {
-        ...createRecordActions(this),
+        ...createRecordActions(),
         initFromInertiaPage(page) {
             this.records = [];
             const query = page.props.query;

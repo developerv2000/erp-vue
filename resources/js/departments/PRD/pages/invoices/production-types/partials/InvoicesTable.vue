@@ -3,14 +3,12 @@ import { onMounted } from "vue";
 import { usePage } from "@inertiajs/vue3";
 import useQueryParams from "@/core/composables/useQueryParams";
 import { usePRDProductionTypeInvoicesStore } from "@/departments/PRD/stores/productionTypeInvoices";
-import { useI18n } from "vue-i18n";
 import { useDateFormatter } from "@/core/composables/useDateFormatter";
 import { DEFAULT_PER_PAGE_OPTIONS } from "@/core/scripts/constants";
 
 import InvoicesTableTop from "./InvoicesTableTop.vue";
 import TableDefaultSkeleton from "@/core/components/table/misc/TableDefaultSkeleton.vue";
 import TdEditButton from "@/core/components/table/td/TdEditButton.vue";
-import TdInertiaLink from "@/core/components/table/td/TdInertiaLink.vue";
 import TogglableThreeLinesLimitedText from "@/core/components/misc/TogglableThreeLinesLimitedText.vue";
 import TdRecordCommentsLink from "@/core/components/table/td/TdRecordCommentsLink.vue";
 import TableNavigateToPage from "@/core/components/table/misc/TableNavigateToPage.vue";
@@ -18,7 +16,6 @@ import TdInvoiceAccept from "@/core/components/table/td/shared/invoices/TdInvoic
 import TdInvoiceCompletePayment from "@/core/components/table/td/shared/invoices/TdInvoiceCompletePayment.vue";
 import TdInvoicePaymentType from "@/core/components/table/td/shared/invoices/TdInvoicePaymentType.vue";
 
-const { t } = useI18n();
 const { get } = useQueryParams();
 const page = usePage();
 const store = usePRDProductionTypeInvoicesStore();

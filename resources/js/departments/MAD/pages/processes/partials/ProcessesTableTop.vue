@@ -4,7 +4,6 @@ import { useMADProcessesTableStore } from "@/departments/MAD/stores/processesTab
 import useAuth from "@/core/composables/useAuth";
 
 import DefaultTableToolbar from "@/core/components/table/toolbar/DefaultTableToolbar.vue";
-import NewRecordButton from "@/core/components/table/toolbar/actions/NewRecordButton.vue";
 import DeleteSelectedButton from "@/core/components/table/toolbar/actions/DeleteSelectedButton.vue";
 import PermanentDeleteSelectedButton from "@/core/components/table/toolbar/actions/PermanentDeleteSelectedButton.vue";
 import RestoreSelectedButton from "@/core/components/table/toolbar/actions/RestoreSelectedButton.vue";

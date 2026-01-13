@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { router } from '@inertiajs/vue3'
 import axios from 'axios';
-import { cleanQueryParams, normalizeNumbersFromQuery, normalizeDateRangesFromQuery, normalizeDateRangesToQueryFormat, normalizeMultiIDsFromQuery, normalizeSingleIDsFromQuery } from '@/core/scripts/queryHelper';
+import { cleanQueryParams, normalizeDateRangesFromQuery, normalizeDateRangesToQueryFormat, normalizeMultiIDsFromQuery } from '@/core/scripts/queryHelper';
 
 const defaultPaginationOptions = {
     page: 1,

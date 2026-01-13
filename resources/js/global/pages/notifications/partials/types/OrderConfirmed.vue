@@ -14,7 +14,7 @@ const { t } = useI18n();
         {{ t("notifications.Order confirmed") }}:
 
         <InertiaLink
-            class="text-primary"z
+            class="text-primary"
             :link="
                 route('cmd.orders.index', {
                     'id[]': data.order_id,

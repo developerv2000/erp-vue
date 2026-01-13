@@ -114,10 +114,8 @@ class ProcessStatusHistory extends Model
      * Close status history by updating the 'end_date' and calculating the 'duration_days'.
      *
      * Called when process status is being changed.
-     *
-     * @return void
      */
-    public function close()
+    public function close(): void
     {
         $this->update([
             'end_date' => now(),

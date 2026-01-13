@@ -517,7 +517,7 @@ class User extends Authenticatable
         ];
     }
 
-    public static function filterNotificationsQueryForRequest($query, $request)
+    public static function filterNotificationsQueryForRequest($query, $request): Builder
     {
         // Apply unread filter
         if ($request->filled('unread')) {

@@ -43,7 +43,7 @@ class Attachment extends Model
     |--------------------------------------------------------------------------
     */
 
-    protected static function booted()
+    protected static function booted(): void
     {
         static::creating(function ($record) {
             $record->created_at = now();
@@ -62,10 +62,8 @@ class Attachment extends Model
 
     /**
      * Delete the file associated with the attachment from storage.
-     *
-     * @return void
      */
-    public function deleteFileFromStorage()
+    public function deleteFileFromStorage(): void
     {
         $disk = Storage::disk('local');
         $path = 'attachments/' . $this->folder . '/' . $this->filename;

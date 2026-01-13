@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection as SupportCollection;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 
@@ -334,7 +335,7 @@ class Product extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
     }
 
     //  Implement method declared in ExportsProductSelection Interface.
-    public function scopeWithRelationsForProductSelection($query)
+    public function scopeWithRelationsForProductSelection($query): Builder
     {
         // Select only required fields
         return $query
@@ -559,7 +560,7 @@ class Product extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
     /**
      * Used on products.edit page
      */
-    public function ensureAtxExists()
+    public function ensureAtxExists(): void
     {
         if (!$this->atx) {
             $atx = Atx::create([
@@ -578,7 +579,7 @@ class Product extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
     }
 
     // Used on filters
-    public static function getAllUniqueBrands()
+    public static function getAllUniqueBrands(): SupportCollection
     {
         return self::whereNotNull('brand')->distinct()->pluck('brand');
     }
@@ -586,7 +587,7 @@ class Product extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
     /**
      * Update self attributes on related process 'create' or 'edit'
      */
-    public function syncOnRelatedProcessCreateOrEdit($request)
+    public function syncOnRelatedProcessCreateOrEdit($request): void
     {
         // Global attributes
         $this->form_id = $request->input('product_form_id');
@@ -626,7 +627,7 @@ class Product extends Model implements HasTitleAttribute, GeneratesBreadcrumbs, 
         return $similarRecords;
     }
 
-    public static function getMADTableHeadersForUser($user): array|null
+    public static function getMADTableHeadersForUser($user): ?array
     {
         if (Gate::forUser($user)->denies(Permission::extractAbilityName(Permission::CAN_VIEW_MAD_IVP_NAME))) {
             return null;

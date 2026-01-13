@@ -8,9 +8,15 @@ use App\Support\Helpers\FileHelper;
 use App\Support\Helpers\GeneralHelper;
 use App\Support\Traits\Model\CalculatesMADASPQuarterAndYearCounts;
 use App\Support\Traits\Model\Commentable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
+/**
+ * OLD VERSION !!!!!!!!!!!!!!
+ *
+ * REQUIRES UPDATE !!!!!!!!!!!!!!
+ */
 class MadAsp extends BaseModel implements HasTitle
 {
     use Commentable;
@@ -98,14 +104,14 @@ class MadAsp extends BaseModel implements HasTitle
     |--------------------------------------------------------------------------
     */
 
-    public function scopeWithBasicRelations($query)
+    public function scopeWithBasicRelations($query): Builder
     {
         return $query->with([
             'lastComment',
         ]);
     }
 
-    public function scopeWithBasicRelationCounts($query)
+    public function scopeWithBasicRelationCounts($query): Builder
     {
         return $query->withCount([
             'comments',

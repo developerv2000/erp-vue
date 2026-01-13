@@ -32,7 +32,7 @@ class OrderSentToManufacturer extends Notification
      *
      * @return array<int, string>
      */
-    public function via(object $notifiable): array
+    public function via(): array
     {
         return ['database'];
     }
@@ -42,7 +42,7 @@ class OrderSentToManufacturer extends Notification
      *
      * @return array<string, mixed>
      */
-    public function toArray(object $notifiable): array
+    public function toArray(): array
     {
         return $this->data;
     }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Gate;
 
@@ -73,7 +74,7 @@ class ProcessStatus extends Model
      * 1. In mad.processes.edit to set "comment" as required, when status changes to "stopped".
      * 2. When recalculating "days_past_since_last_activity" attribute of process.
      */
-    public function getIsStoppedStatusAttribute()
+    public function getIsStoppedStatusAttribute(): bool
     {
         return in_array($this->id, self::STOPED_IDS);
     }
@@ -86,10 +87,8 @@ class ProcessStatus extends Model
 
     /**
      * Get all records restricted by permissions
-     *
-     * @return Illuminate\Database\Eloquent\Collection
      */
-    public static function getAllRestrictedByPermissions()
+    public static function getAllRestrictedByPermissions(): Collection
     {
         $records = self::query();
 
@@ -105,7 +104,7 @@ class ProcessStatus extends Model
         return $records;
     }
 
-    public static function getSelectedIDByDefault()
+    public static function getSelectedIDByDefault(): int
     {
         return self::where('name', 'Вб')->value('id');
     }
@@ -115,7 +114,7 @@ class ProcessStatus extends Model
      *
      * Used in handling processes 'order_priority' attribute.
      */
-    public function hasDeadline()
+    public function hasDeadline(): bool
     {
         return in_array($this->id, self::IDS_WITH_DEADLINE);
     }

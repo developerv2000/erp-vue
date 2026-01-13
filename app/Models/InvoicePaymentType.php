@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class InvoicePaymentType extends Model
@@ -46,7 +47,7 @@ class InvoicePaymentType extends Model
     |--------------------------------------------------------------------------
     */
 
-    public function scopeWithoutFinalPayment($query)
+    public function scopeWithoutFinalPayment($query): Builder
     {
         return $query->where('id', '!=', self::FINAL_PAYMENT_ID);
     }
@@ -57,17 +58,17 @@ class InvoicePaymentType extends Model
     |--------------------------------------------------------------------------
     */
 
-    public function isPrepayment()
+    public function isPrepayment(): bool
     {
         return $this->name == self::PREPAYMENT_NAME;
     }
 
-    public function isFinalPayment()
+    public function isFinalPayment(): bool
     {
         return $this->name == self::FINAL_PAYMENT_NAME;
     }
 
-    public function isFullPayment()
+    public function isFullPayment(): bool
     {
         return $this->name == self::FULL_PAYMENT_NAME;
     }

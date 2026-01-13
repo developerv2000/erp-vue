@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Request;
 
 class Atx extends Model
 {
@@ -50,7 +49,7 @@ class Atx extends Model
     /**
      * Create or update ATX for product on Product store or update.
      */
-    public static function syncWithProduct($data)
+    public static function syncWithProduct($data): Atx
     {
         return self::updateOrCreate(
             [

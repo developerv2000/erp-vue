@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 
 class ProcessGeneralStatus extends Model
 {
@@ -36,7 +37,7 @@ class ProcessGeneralStatus extends Model
      *
      * Used on process filtering
      */
-    public static function getUniqueNamesForAnalysts()
+    public static function getUniqueNamesForAnalysts(): Collection
     {
         return self::orderBy('id', 'asc')
             ->pluck('name_for_analysts')

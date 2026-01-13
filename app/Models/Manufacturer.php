@@ -235,7 +235,7 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
         ]);
     }
 
-    public function scopeOnlyRecordsWithProcessesReadyForOrder($query)
+    public function scopeOnlyRecordsWithProcessesReadyForOrder($query): Builder
     {
         return $query->whereHas('processes', function ($processesQuery) {
             $processesQuery->whereNotNull('readiness_for_order_date');
@@ -475,7 +475,7 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
      * associated processes with status history starting in the specified month and year
      * and have stage <= 5.
      */
-    public static function applyHasActiveProcessesForMonthFilter($query, $request)
+    public static function applyHasActiveProcessesForMonthFilter($query, $request): Builder
     {
         if ($request->filled('has_active_processes_for_specific_month')) {
             return $query->whereHas('processes.statusHistory', function ($historyQuery) use ($request) {
@@ -487,6 +487,8 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
                     });
             });
         }
+
+        return $query;
     }
 
     /*
@@ -567,7 +569,7 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
     |--------------------------------------------------------------------------
     */
 
-    public static function getMinifiedRecordsWithProcessesReadyForOrder()
+    public static function getMinifiedRecordsWithProcessesReadyForOrder(): Collection
     {
         return self::onlyRecordsWithProcessesReadyForOrder()
             ->minifiedRecordsWithName()
@@ -606,7 +608,7 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
         $this->updateQuietly(['updated_at' => now()]);
     }
 
-    public static function getMADTableHeadersForUser($user): array|null
+    public static function getMADTableHeadersForUser($user): ?array
     {
         if (Gate::forUser($user)->denies(Permission::extractAbilityName(Permission::CAN_VIEW_MAD_EPP_NAME))) {
             return null;

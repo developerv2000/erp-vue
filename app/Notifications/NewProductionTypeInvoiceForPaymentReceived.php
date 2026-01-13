@@ -4,8 +4,6 @@ namespace App\Notifications;
 
 use App\Models\Invoice;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class NewProductionTypeInvoiceForPaymentReceived extends Notification
@@ -33,7 +31,7 @@ class NewProductionTypeInvoiceForPaymentReceived extends Notification
      *
      * @return array<int, string>
      */
-    public function via(object $notifiable): array
+    public function via(): array
     {
         return ['database'];
     }
@@ -43,7 +41,7 @@ class NewProductionTypeInvoiceForPaymentReceived extends Notification
      *
      * @return array<string, mixed>
      */
-    public function toArray(object $notifiable): array
+    public function toArray(): array
     {
         return $this->data;
     }

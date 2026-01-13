@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Support\Traits\Model\GetsMinifiedRecordsWithName;
 use App\Support\Traits\Model\ScopesOrderingByName;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class ProductForm extends Model
@@ -84,7 +85,7 @@ class ProductForm extends Model
     |--------------------------------------------------------------------------
     */
 
-    public function getParentNameAttribute()
+    public function getParentNameAttribute(): string
     {
         return $this->parent ? $this->parent->name : $this->name;
     }
@@ -95,7 +96,7 @@ class ProductForm extends Model
     |--------------------------------------------------------------------------
     */
 
-    public function scopeOnlyParents()
+    public function scopeOnlyParents(): Builder
     {
         return self::whereNull('parent_id');
     }

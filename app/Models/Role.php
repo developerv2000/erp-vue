@@ -94,7 +94,7 @@ class Role extends Model
     |--------------------------------------------------------------------------
     */
 
-    public function scopeWithBasicRelations($query)
+    public function scopeWithBasicRelations($query): Builder
     {
         return $query->with([
             'department',
@@ -102,7 +102,7 @@ class Role extends Model
         ]);
     }
 
-    public function scopeWithBasicRelationCounts($query)
+    public function scopeWithBasicRelationCounts($query): Builder
     {
         return $query->withCount([
             'users',

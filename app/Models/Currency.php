@@ -43,12 +43,12 @@ class Currency extends Model
     |--------------------------------------------------------------------------
     */
 
-    public static function getDefaultIdValueForMADProcesses()
+    public static function getDefaultIdValueForMADProcesses(): int
     {
         return self::where('name', 'USD')->value('id');
     }
 
-    public static function getDefaultIdValueForOrders()
+    public static function getDefaultIdValueForOrders(): int
     {
         return self::where('name', 'USD')->value('id');
     }
@@ -57,10 +57,8 @@ class Currency extends Model
      * Update all currencies 'usd_ratio' using an external API.
      *
      * Executed by scheduler daily.
-     *
-     * @return void
      */
-    public static function updateAllUSDRatios()
+    public static function updateAllUSDRatios(): void
     {
         self::where('name', '!=', 'USD')->each(function ($record) {
             $response = Http::get(self::EXCHANGE_RATE_API_URL . $record->name);

@@ -14,6 +14,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Gate;
 
+/**
+ * OLD VERSION !!!!!!!!!!!!!!
+ *
+ * REQUIRES UPDATE !!!!!!!!!!!!!!
+ */
 class ProductSearch extends Model
 {
     /** @use HasFactory<\Database\Factories\ProductSearchFactory> */

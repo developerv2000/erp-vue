@@ -255,7 +255,7 @@ class OrderProduct extends Model implements HasTitleAttribute
         return !is_null($this->layout_approved_date);
     }
 
-    public function getTotalPriceAttribute()
+    public function getTotalPriceAttribute(): float
     {
         $total = $this->quantity * $this->price;
 
@@ -403,7 +403,7 @@ class OrderProduct extends Model implements HasTitleAttribute
      * Required loaded relations:
      * - productionInvoices
      */
-    public function getProductionPrepaymentInvoiceAttribute()
+    public function getProductionPrepaymentInvoiceAttribute(): ?Invoice
     {
         return $this->productionInvoices
             ->where('payment_type_id', InvoicePaymentType::PREPAYMENT_ID)
@@ -414,7 +414,7 @@ class OrderProduct extends Model implements HasTitleAttribute
      * Required loaded relations:
      * - productionInvoices
      */
-    public function getProductionFinalOrFullPaymentInvoiceAttribute()
+    public function getProductionFinalOrFullPaymentInvoiceAttribute(): ?Invoice
     {
         return $this->productionInvoices
             ->whereIn('payment_type_id', [
@@ -480,7 +480,7 @@ class OrderProduct extends Model implements HasTitleAttribute
     |--------------------------------------------------------------------------
     */
 
-    public function scopeWithBasicPLDRelations($query)
+    public function scopeWithBasicPLDRelations($query): Builder
     {
         return $query->with([
             'lastComment',
@@ -522,7 +522,7 @@ class OrderProduct extends Model implements HasTitleAttribute
         ]);
     }
 
-    public function scopeWithBasicCMDRelations($query)
+    public function scopeWithBasicCMDRelations($query): Builder
     {
         return $query->with([
             'lastComment',
@@ -562,7 +562,7 @@ class OrderProduct extends Model implements HasTitleAttribute
         ]);
     }
 
-    public function scopeWithBasicDDRelations($query)
+    public function scopeWithBasicDDRelations($query): Builder
     {
         return $query->with([
             'lastComment',
@@ -594,7 +594,7 @@ class OrderProduct extends Model implements HasTitleAttribute
         ]);
     }
 
-    public function scopeWithBasicMDRelations($query)
+    public function scopeWithBasicMDRelations($query): Builder
     {
         return $query->with([
             'lastComment',
@@ -626,38 +626,38 @@ class OrderProduct extends Model implements HasTitleAttribute
         ]);
     }
 
-    public function scopeOnlySentToBdm($query)
+    public function scopeOnlySentToBdm($query): Builder
     {
         return $query->whereHas('order', function ($orderQuery) {
             $orderQuery->onlySentToBdm();
         });
     }
 
-    public function scopeOnlySentToManufacturer($query)
+    public function scopeOnlySentToManufacturer($query): Builder
     {
         return $query->whereHas('order', function ($orderQuery) {
             $orderQuery->onlySentToManufacturer();
         });
     }
 
-    public function scopeOnlyProductionIsEnded($query)
+    public function scopeOnlyProductionIsEnded($query): Builder
     {
         return $query->whereNotNull('production_end_date');
     }
 
-    public function scopeOnlyReadyForShipmentFromManufacturer($query)
+    public function scopeOnlyReadyForShipmentFromManufacturer($query): Builder
     {
         return $query->whereNotNull('readiness_for_shipment_from_manufacturer_date');
     }
 
-    public function scopeOnlyWithInvoicesSentForPayment($query)
+    public function scopeOnlyWithInvoicesSentForPayment($query): Builder
     {
         return $query->whereHas('order', function ($orderQuery) {
             $orderQuery->onlyWithInvoicesSentForPayment();
         });
     }
 
-    public function scopeOnlySerializedByManufacturer($query)
+    public function scopeOnlySerializedByManufacturer($query): Builder
     {
         $serializationTypeId = SerializationType::findByName(SerializationType::BY_MANUFACTURER_TYPE_NAME)->id;
 
@@ -1131,7 +1131,7 @@ class OrderProduct extends Model implements HasTitleAttribute
     |--------------------------------------------------------------------------
     */
 
-    public static function getPLDTableHeadersForUser($user): array|null
+    public static function getPLDTableHeadersForUser($user): ?array
     {
         if (Gate::forUser($user)->denies(Permission::extractAbilityName(Permission::CAN_VIEW_PLD_ORDER_PRODUCTS_NAME))) {
             return null;
@@ -1185,7 +1185,7 @@ class OrderProduct extends Model implements HasTitleAttribute
         return $columns;
     }
 
-    public static function getCMDTableHeadersForUser($user): array|null
+    public static function getCMDTableHeadersForUser($user): ?array
     {
         if (Gate::forUser($user)->denies(Permission::extractAbilityName(Permission::CAN_VIEW_CMD_ORDER_PRODUCTS_NAME))) {
             return null;
@@ -1254,7 +1254,7 @@ class OrderProduct extends Model implements HasTitleAttribute
         return $columns;
     }
 
-    public static function getDDTableHeadersForUser($user): array|null
+    public static function getDDTableHeadersForUser($user): ?array
     {
         if (Gate::forUser($user)->denies(Permission::extractAbilityName(Permission::CAN_VIEW_DD_ORDER_PRODUCTS_NAME))) {
             return null;
@@ -1306,7 +1306,7 @@ class OrderProduct extends Model implements HasTitleAttribute
         return $columns;
     }
 
-    public static function getMDTableHeadersForUser($user): array|null
+    public static function getMDTableHeadersForUser($user): ?array
     {
         if (Gate::forUser($user)->denies(Permission::extractAbilityName(Permission::CAN_VIEW_MD_SERIALIZED_BY_MANUFACTURER_NAME))) {
             return null;

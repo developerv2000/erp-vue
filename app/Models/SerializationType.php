@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Support\Traits\Model\FindsRecordByName;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class SerializationType extends Model
@@ -45,7 +46,7 @@ class SerializationType extends Model
     |--------------------------------------------------------------------------
     */
 
-    public function scopeDefaultOrdered($query)
+    public function scopeDefaultOrdered($query): Builder
     {
         return $query->orderBy('id', 'asc');
     }

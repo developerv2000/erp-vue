@@ -10,7 +10,7 @@ class GeneralHelper
     /**
      * Get plain text from string without HTML tags.
      */
-    public static function getPlainTextFromStr($string)
+    public static function getPlainTextFromStr($string): string
     {
         if (empty($string)) {
             return '';

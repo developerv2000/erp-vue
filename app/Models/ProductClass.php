@@ -41,7 +41,7 @@ class ProductClass extends Model
     */
 
     // Get default selected id, on products.create page
-    public static function getSelectedIDByDefault()
+    public static function getSelectedIDByDefault(): int
     {
         return self::where('name', 'ЛС')->value('id');
     }

@@ -353,22 +353,22 @@ class Invoice extends Model implements HasTitleAttribute
         ]);
     }
 
-    public function scopeOnlyProductionType($query)
+    public function scopeOnlyProductionType($query): Builder
     {
         return $query->where('type_id', InvoiceType::PRODUCTION_TYPE_ID);
     }
 
-    public function scopeOnlyDeliveryToWarehouseType($query)
+    public function scopeOnlyDeliveryToWarehouseType($query): Builder
     {
         return $query->where('type_id', InvoiceType::DELIVERY_TO_WAREHOUSE_TYPE_ID);
     }
 
-    public function scopeOnlyExportType($query)
+    public function scopeOnlyExportType($query): Builder
     {
         return $query->where('type_id', InvoiceType::EXPORT_TYPE_ID);
     }
 
-    public function scopeOnlySentForPayment($query)
+    public function scopeOnlySentForPayment($query): Builder
     {
         return $query->whereNotNull('sent_for_payment_date');
     }
@@ -580,7 +580,7 @@ class Invoice extends Model implements HasTitleAttribute
     /**
      * AJAX request by CMD
      */
-    public static function storeProductionTypeByCMDFromRequest(CMDInvoiceStoreProductionTypeRequest $request)
+    public static function storeProductionTypeByCMDFromRequest(CMDInvoiceStoreProductionTypeRequest $request): void
     {
         $order = Order::findorfail($request->input('order_id'));
 
@@ -613,7 +613,7 @@ class Invoice extends Model implements HasTitleAttribute
     /**
      * AJAX request by CMD
      */
-    public function updateProductionTypeByCMDFromRequest(CMDInvoiceUpdateProductionTypeRequest $request)
+    public function updateProductionTypeByCMDFromRequest(CMDInvoiceUpdateProductionTypeRequest $request): void
     {
         $this->update($request->all());
 
@@ -633,7 +633,7 @@ class Invoice extends Model implements HasTitleAttribute
     /**
      * AJAX request by PRD
      */
-    public function updateProductionTypeByPRDFromRequest(PRDInvoiceUpdateProductionTypeRequest $request)
+    public function updateProductionTypeByPRDFromRequest(PRDInvoiceUpdateProductionTypeRequest $request): void
     {
         $this->update($request->all());
 
@@ -730,7 +730,7 @@ class Invoice extends Model implements HasTitleAttribute
     |--------------------------------------------------------------------------
     */
 
-    public static function getCMDTableHeadersForUser($user): array|null
+    public static function getCMDTableHeadersForUser($user): ?array
     {
         if (Gate::forUser($user)->denies(Permission::extractAbilityName(Permission::CAN_VIEW_CMD_INVOICES_NAME))) {
             return null;
@@ -783,7 +783,7 @@ class Invoice extends Model implements HasTitleAttribute
         return $columns;
     }
 
-    public static function getPRDProductionTypesTableHeadersForUser($user): array|null
+    public static function getPRDProductionTypesTableHeadersForUser($user): ?array
     {
         if (Gate::forUser($user)->denies(Permission::extractAbilityName(Permission::CAN_VIEW_PRD_INVOICES_NAME))) {
             return null;
@@ -836,7 +836,7 @@ class Invoice extends Model implements HasTitleAttribute
         return $columns;
     }
 
-    public static function getPLDTableHeadersForUser($user): array|null
+    public static function getPLDTableHeadersForUser($user): ?array
     {
         if (Gate::forUser($user)->denies(Permission::extractAbilityName(Permission::CAN_VIEW_PLD_INVOICES_NAME))) {
             return null;

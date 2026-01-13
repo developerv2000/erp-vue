@@ -35,12 +35,12 @@ class ProductSearchStatus extends Model
     |--------------------------------------------------------------------------
     */
 
-    public static function getDefaultSelectedIDValue()
+    public static function getDefaultSelectedIDValue(): int
     {
         return self::where('name', 'Поиск')->value('id');
     }
 
-    public static function getCanceledStatusID()
+    public static function getCanceledStatusID(): int
     {
         return self::where('name', 'Отменено')->value('id');
     }

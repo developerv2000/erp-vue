@@ -244,7 +244,7 @@ class Permission extends Model
     |--------------------------------------------------------------------------
     */
 
-    public function scopeWithBasicRelations($query)
+    public function scopeWithBasicRelations($query): Builder
     {
         return $query->with([
             'department',
@@ -252,7 +252,7 @@ class Permission extends Model
         ]);
     }
 
-    public function scopeWithBasicRelationCounts($query)
+    public function scopeWithBasicRelationCounts($query): Builder
     {
         return $query->withCount([
             'users',
@@ -349,7 +349,7 @@ class Permission extends Model
             : $permission;
     }
 
-    public static function getMADGuestPermissionNames()
+    public static function getMADGuestPermissionNames(): array
     {
         return [
             // Only view
@@ -359,7 +359,7 @@ class Permission extends Model
         ];
     }
 
-    public static function getMADInternPermissionNames()
+    public static function getMADInternPermissionNames(): array
     {
         return [
             // View and edit only EPP and IVP
@@ -371,7 +371,7 @@ class Permission extends Model
         ];
     }
 
-    public static function getMADModeratorPermissionNames()
+    public static function getMADModeratorPermissionNames(): array
     {
         $guestPermissions = self::getMADInternPermissionNames();
 
@@ -395,7 +395,7 @@ class Permission extends Model
         ]);
     }
 
-    public static function getMADAdministratorPermissionNames()
+    public static function getMADAdministratorPermissionNames(): array
     {
         $moderatorPermissions = self::getMADModeratorPermissionNames();
 
@@ -424,7 +424,7 @@ class Permission extends Model
         ]);
     }
 
-    public static function getCMDBDMPermissionNames()
+    public static function getCMDBDMPermissionNames(): array
     {
         return [
             self::CAN_VIEW_CMD_ORDERS_NAME,
@@ -445,7 +445,7 @@ class Permission extends Model
         ];
     }
 
-    public static function getPLDLogisticianPermissionNames()
+    public static function getPLDLogisticianPermissionNames(): array
     {
         return [
             self::CAN_VIEW_PLD_READY_FOR_ORDER_PROCESSES_NAME,
@@ -468,7 +468,7 @@ class Permission extends Model
         ];
     }
 
-    public static function getPRDFinancierPermissionNames()
+    public static function getPRDFinancierPermissionNames(): array
     {
         return [
             self::CAN_VIEW_PRD_INVOICES_NAME,
@@ -481,7 +481,7 @@ class Permission extends Model
         ];
     }
 
-    public static function getDDDesignerPermissionNames()
+    public static function getDDDesignerPermissionNames(): array
     {
         return [
             self::CAN_VIEW_DD_ORDER_PRODUCTS_NAME,
@@ -491,7 +491,7 @@ class Permission extends Model
         ];
     }
 
-    public static function getMDSerializerPermissionNames()
+    public static function getMDSerializerPermissionNames(): array
     {
         return [
             self::CAN_VIEW_MD_SERIALIZED_BY_MANUFACTURER_NAME,

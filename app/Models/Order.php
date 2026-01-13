@@ -847,7 +847,7 @@ class Order extends Model implements HasTitleAttribute
     |--------------------------------------------------------------------------
     */
 
-    public static function getPLDTableHeadersForUser($user): array|null
+    public static function getPLDTableHeadersForUser($user): ?array
     {
         if (Gate::forUser($user)->denies(Permission::extractAbilityName(Permission::CAN_VIEW_PLD_ORDERS_NAME))) {
             return null;
@@ -893,7 +893,7 @@ class Order extends Model implements HasTitleAttribute
         return $columns;
     }
 
-    public static function getCMDTableHeadersForUser($user): array|null
+    public static function getCMDTableHeadersForUser($user): ?array
     {
         if (Gate::forUser($user)->denies(Permission::extractAbilityName(Permission::CAN_VIEW_CMD_ORDERS_NAME))) {
             return null;

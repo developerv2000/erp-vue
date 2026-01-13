@@ -2,6 +2,8 @@
 
 namespace App\Support\Contracts\Model;
 
+use Illuminate\Database\Eloquent\Builder;
+
 /**
  * Interface for models that require tracking usage counts.
  *
@@ -11,16 +13,11 @@ interface TracksUsageCount
 {
     /**
      * Scope: Eagerly load all related model counts for optimization.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeWithRelatedUsageCounts($query);
+    public function scopeWithRelatedUsageCounts($query): Builder;
 
     /**
      * Get the total usage count by summing all related model references.
-     *
-     * @return int
      */
-    public function getUsageCountAttribute();
+    public function getUsageCountAttribute(): int;
 }

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Support\Helpers\GeneralHelper;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 class Comment extends Model
@@ -79,7 +80,7 @@ class Comment extends Model
      *
      * Used on displaying last comment.
      */
-    public function getPlainTextAttribute()
+    public function getPlainTextAttribute(): string
     {
         return GeneralHelper::getPlainTextFromStr($this->body);
     }
@@ -93,7 +94,7 @@ class Comment extends Model
     /**
      * Used in comments.index page
      */
-    public static function loadMinifiedUsersOfRecords($comments)
+    public static function loadMinifiedUsersOfRecords(Collection $comments): Collection
     {
         return $comments->load(['user' => function ($query) {
             $query->select('id', 'name', 'photo')

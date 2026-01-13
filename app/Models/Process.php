@@ -212,7 +212,7 @@ class Process extends Model implements
         $this->append([]);
     }
 
-    public function getDeadlineStatusAttribute()
+    public function getDeadlineStatusAttribute(): string
     {
         if ($this->days_past_since_last_activity == -1) {
             return self::DEADLINE_STOPPED_STATUS_NAME;
@@ -312,7 +312,7 @@ class Process extends Model implements
     /**
      * CHeck whether process can be added to ASP (СПГ) as contracted
      */
-    public function getIsReadyForAspContractAttribute()
+    public function getIsReadyForAspContractAttribute(): bool
     {
         return $this->status->generalStatus->stage >= 5;
     }
@@ -320,7 +320,7 @@ class Process extends Model implements
     /**
      * CHeck whether process can be added to ASP (СПГ) as registered
      */
-    public function getIsReadyForAspRegistrationAttribute()
+    public function getIsReadyForAspRegistrationAttribute(): bool
     {
         return $this->status->generalStatus->stage >= 7;
     }
@@ -349,7 +349,7 @@ class Process extends Model implements
     /**
      * Used on order pages.
      */
-    public function getFullEnglishProductLabelAttribute()
+    public function getFullEnglishProductLabelAttribute(): string
     {
         return collect([
             $this->trademark_en,
@@ -364,7 +364,7 @@ class Process extends Model implements
     /**
      * Used on order pages.
      */
-    public function getFullEnglishProductLabelWithIdAttribute()
+    public function getFullEnglishProductLabelWithIdAttribute(): string
     {
         return collect([
             $this->trademark_en,
@@ -380,7 +380,7 @@ class Process extends Model implements
     /**
      * Used on order pages.
      */
-    public function getFullRussianProductLabelAttribute()
+    public function getFullRussianProductLabelAttribute(): string
     {
         return collect([
             $this->trademark_ru,
@@ -395,7 +395,7 @@ class Process extends Model implements
     /**
      * Used on order pages.
      */
-    public function getMahNameWithIdAttribute()
+    public function getMahNameWithIdAttribute(): string
     {
         return $this->mah->name . ' — #' . $this->id;
     }
@@ -681,7 +681,7 @@ class Process extends Model implements
         ]);
     }
 
-    public function scopeWithRelationsForOrderProduct($query)
+    public function scopeWithRelationsForOrderProduct($query): Builder
     {
         return $query->with([
             'searchCountry',
@@ -703,7 +703,7 @@ class Process extends Model implements
         ]);
     }
 
-    public function scopeWithOnlySelectsForOrderProduct($query)
+    public function scopeWithOnlySelectsForOrderProduct($query): Builder
     {
         return $query->select(
             'processes.id',
@@ -858,7 +858,7 @@ class Process extends Model implements
     }
 
     // Implement method declared in ExportsProductSelection Interface
-    public function scopeWithRelationsForProductSelection($query)
+    public function scopeWithRelationsForProductSelection($query): Builder
     {
         return $query->with([
             'product' => function ($productQuery) {
@@ -1180,9 +1180,9 @@ class Process extends Model implements
     /**
      * Filter only processes which have specific deadline status
      */
-    public static function applyDeadlineStatusFilter($query, $request)
+    public static function applyDeadlineStatusFilter($query, $request): Builder
     {
-        if (!$request->filled('deadline_status')) return;
+        if (!$request->filled('deadline_status')) return $query;
 
         switch ($request->input('deadline_status')) {
             case self::DEADLINE_STOPPED_STATUS_NAME:
@@ -1203,6 +1203,9 @@ class Process extends Model implements
             case self::DEADLINE_EXPIRED_STATUS_NAME:
                 return $query->where('days_past_since_last_activity', '>', ProcessStatus::MAX_PROCESS_ACTIVITY_DELAY_DAYS);
                 break;
+
+            default:
+                return $query;
         }
     }
 
@@ -1387,7 +1390,7 @@ class Process extends Model implements
      * This method ensures that the 'forecast_year_1_update_date' is set appropriately
      * whenever the 'forecast_year_1' attribute is modified during the saving event.
      */
-    private function handleForecastUpdateDate()
+    private function handleForecastUpdateDate(): void
     {
         // forecast_year_1 is available from stage 2
         if ($this->isDirty('forecast_year_1') && $this->forecast_year_1) {
@@ -1401,7 +1404,7 @@ class Process extends Model implements
      * This method ensures that the 'increased_price_date' is set appropriately
      * whenever the 'increased_price' attribute is modified during the saving event.
      */
-    private function handleIncreasedPriceDate()
+    private function handleIncreasedPriceDate(): void
     {
         // The 'increased_price' attribute is relevant starting from stage 4
         // If 'increased_price' is not set, clear the 'increased_price_date' attribute
@@ -1421,7 +1424,7 @@ class Process extends Model implements
      * attribute whenever the 'responsible_person_id' attribute is modified during
      * the updating event.
      */
-    private function handleResponsiblePersonUpdateDate()
+    private function handleResponsiblePersonUpdateDate(): void
     {
         // Set the timestamp to the current date when the model is created
         if ($this->isDirty('responsible_person_id')) {
@@ -1444,7 +1447,7 @@ class Process extends Model implements
      *
      * Used during updating event of the model.
      */
-    private function updateStatusHistory()
+    private function updateStatusHistory(): void
     {
         // Check if the 'status_id' attribute has been modified
         if ($this->isDirty('status_id')) {
@@ -1468,7 +1471,7 @@ class Process extends Model implements
      *
      * @param string|null $startDate Optional start date for the status history.
      */
-    private function addStatusHistoryForCurrentStatus($startDate = null)
+    private function addStatusHistoryForCurrentStatus($startDate = null): void
     {
         // If no start date is provided, use the current timestamp.
         $startDate = $startDate ?? now();
@@ -1621,7 +1624,7 @@ class Process extends Model implements
      *
      * Used in processes.edit & processes.duplicate pages.
      */
-    public function ensureAuthUserHasAccessToProcess($request)
+    public function ensureAuthUserHasAccessToProcess($request): void
     {
         $userID = $request->user()->id;
 
@@ -1749,8 +1752,6 @@ class Process extends Model implements
      * based on the status history of each record. It clones the general statuses to
      * avoid modifying the original collection, calculates the start and end dates,
      * duration days, and duration days ratio for each general status.
-     *
-     * @return void
      */
     public function addGeneralStatusPeriods($generalStatuses = null): void
     {
@@ -1799,7 +1800,7 @@ class Process extends Model implements
         $this->general_statuses_with_periods = $generalStatuses;
     }
 
-    public static function getMADTableHeadersForUser($user): array|null
+    public static function getMADTableHeadersForUser($user): ?array
     {
         if (Gate::forUser($user)->denies(Permission::extractAbilityName(Permission::CAN_VIEW_MAD_VPS_NAME))) {
             return null;

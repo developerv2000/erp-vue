@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Support\Traits\Model\ScopesOrderingByName;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class Country extends Model
@@ -60,7 +61,7 @@ class Country extends Model
     |--------------------------------------------------------------------------
     */
 
-    public function scopeOrderByProcessesCount($query)
+    public function scopeOrderByProcessesCount($query): Builder
     {
         return $query->orderBy('database_processes_count', 'desc');
     }

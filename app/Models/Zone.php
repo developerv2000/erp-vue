@@ -43,7 +43,7 @@ class Zone extends Model
     */
 
     // Get default selected ids, on related models create form
-    public static function getSelectedIDsByDefault()
+    public static function getSelectedIDsByDefault(): array
     {
         $names = ['II'];
 

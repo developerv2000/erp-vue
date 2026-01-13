@@ -5,14 +5,13 @@ namespace App\Http\Controllers\PRD;
 use App\Http\Controllers\Controller;
 use App\Models\Invoice;
 use App\Models\InvoiceType;
-use Illuminate\Http\Request;
 
 class PRDInvoiceController extends Controller
 {
     /**
      * AJAX request
      */
-    public function accept(Invoice $record)
+    public function accept(Invoice $record): Invoice
     {
         $record->acceptByPRD();
 
@@ -25,7 +24,7 @@ class PRDInvoiceController extends Controller
     /**
      * AJAX request
      */
-    public function completePayment(Invoice $record)
+    public function completePayment(Invoice $record): Invoice
     {
         $record->completePaymentByPRD();
 
@@ -35,18 +34,22 @@ class PRDInvoiceController extends Controller
         return $record;
     }
 
-    private function getRecordByType(InvoiceType $invoiceType, $id)
+    private function getRecordByType(InvoiceType $invoiceType, int $id): Invoice
     {
-        switch ($invoiceType->id) {
-            case InvoiceType::PRODUCTION_TYPE_ID:
-                $record = Invoice::withBasicPRDProductionTypesRelations()
-                    ->withBasicPRDProductionTypesRelationCounts()
-                    ->findOrFail($id);
+        return match ($invoiceType->id) {
+            InvoiceType::PRODUCTION_TYPE_ID => $this->getProductionTypeInvoice($id),
+            default => abort(404),
+        };
+    }
 
-                $record->appendBasicPRDProductionTypesAttributes();
+    private function getProductionTypeInvoice(int $id): Invoice
+    {
+        $record = Invoice::withBasicPRDProductionTypesRelations()
+            ->withBasicPRDProductionTypesRelationCounts()
+            ->findOrFail($id);
 
-                return $record;
-                break;
-        }
+        $record->appendBasicPRDProductionTypesAttributes();
+
+        return $record;
     }
 }

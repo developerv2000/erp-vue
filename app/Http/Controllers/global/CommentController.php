@@ -8,17 +8,19 @@ use App\Models\User;
 use App\Support\Helpers\ModelHelper;
 use App\Support\Traits\Controller\DestroysModelRecords;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class CommentController extends Controller
 {
-    use DestroysModelRecords; // AJAX request
+    use DestroysModelRecords;
 
     // used in multiple destroy trait
     public static $model = Comment::class;
 
-    public function viewModelComments(Request $request)
+    public function viewModelComments(Request $request): Response
     {
         // Retrieve record with comments eagerly loaded and appended title
         $model = ModelHelper::addFullNamespaceToModelBasename(
@@ -54,7 +56,7 @@ class CommentController extends Controller
     /**
      * Ajax request
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         $model = $request->input('commentable_type');
         $recordID = $request->input('commentable_id');
@@ -76,7 +78,7 @@ class CommentController extends Controller
     /**
      * Ajax request
      */
-    public function update(Request $request, Comment $record)
+    public function update(Request $request, Comment $record): JsonResponse
     {
         $record->update($request->only('body'));
 

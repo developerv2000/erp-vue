@@ -10,10 +10,11 @@ use App\Support\Helpers\ControllerHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class RoleController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         return Inertia::render('administration/pages/roles/Index', [
             // Refetched only on locale change

@@ -23,10 +23,12 @@ use App\Support\Helpers\ControllerHelper;
 use App\Support\SmartFilters\MAD\ProcessesSmartFilter;
 use App\Support\Traits\Controller\DestroysModelRecords;
 use App\Support\Traits\Controller\RestoresModelRecords;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class MADProcessController extends Controller
 {
@@ -36,7 +38,7 @@ class MADProcessController extends Controller
     // Required for DestroysModelRecords and RestoresModelRecords traits
     public static $model = Process::class;
 
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         $getAllTableHeaders = fn() => $request->user()->collectTranslatedTableHeadersByKey(User::MAD_VPS_HEADERS_KEY);
         $getVisibleHeaders = fn() => User::filterOnlyVisibleTableHeaders($getAllTableHeaders());
@@ -54,7 +56,7 @@ class MADProcessController extends Controller
         ]);
     }
 
-    public function trash(Request $request)
+    public function trash(Request $request): Response
     {
         $getAllTableHeaders = fn() => ControllerHelper::prependTrashPageTableHeaders(
             $request->user()->collectTranslatedTableHeadersByKey(User::MAD_VPS_HEADERS_KEY)
@@ -74,7 +76,7 @@ class MADProcessController extends Controller
         ]);
     }
 
-    public function create(Request $request)
+    public function create(Request $request): Response
     {
         return Inertia::render('departments/MAD/pages/processes/Create', [
             // Refetched after creating without redirect
@@ -101,7 +103,7 @@ class MADProcessController extends Controller
      *
      * AJAX "mad.processes.store" route is also used for duplication, almost the same as creation!
      */
-    public function duplicate(Request $request, $record)
+    public function duplicate(Request $request, $record): Response
     {
         // Secure route
         $fetchedRecord = Process::withBasicRelations()->findOrFail($record);
@@ -129,7 +131,7 @@ class MADProcessController extends Controller
     /**
      * AJAX request
      */
-    public function store(ProcessStoreRequest $request)
+    public function store(ProcessStoreRequest $request): JsonResponse
     {
         DB::transaction(function () use ($request) {
             // Validate related product uniqueness and sync updates
@@ -150,7 +152,7 @@ class MADProcessController extends Controller
     /**
      * Route model binding is not used, because trashed records can also be edited
      */
-    public function edit($record)
+    public function edit($record): Response
     {
         $fetchedRecord = Process::withTrashed()
             ->withBasicRelations()
@@ -193,7 +195,7 @@ class MADProcessController extends Controller
      *
      * Route model binding is not used, because trashed records can also be edited
      */
-    public function update(ProcessUpdateRequest $request, $record)
+    public function update(ProcessUpdateRequest $request, $record): JsonResponse
     {
         DB::transaction(function () use ($request, $record) {
             // Validate related product uniqueness and sync updates
@@ -215,7 +217,7 @@ class MADProcessController extends Controller
     /**
      * AJAX request
      */
-    public function updateContractedInAspValue(Request $request)
+    public function updateContractedInAspValue(Request $request): Process
     {
         $record = Process::withTrashed()
             ->with('status.generalStatus') // Required for 'is_ready_for_asp_contract' attribute
@@ -247,7 +249,7 @@ class MADProcessController extends Controller
     /**
      * AJAX request
      */
-    public function updateRegisteredInAspValue(Request $request)
+    public function updateRegisteredInAspValue(Request $request): Process
     {
         $record = Process::withTrashed()
             ->with('status.generalStatus') // Required for 'is_ready_for_asp_registration' attribute
@@ -279,7 +281,7 @@ class MADProcessController extends Controller
     /**
      * AJAX request
      */
-    public function updateReadyForOrderValue(Request $request)
+    public function updateReadyForOrderValue(Request $request): Process
     {
         $record = Process::withTrashed()
             ->with('status.generalStatus') // Required for 'can_be_marked_as_ready_for_order' attribute

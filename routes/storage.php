@@ -9,7 +9,7 @@ Route::middleware('auth', 'auth.session')->group(function () {
     // Attachment management routes
     Route::prefix('attachments')->controller(AttachmentController::class)->name('attachments.')->group(function () {
         Route::get('/view-model-attachments/{attachable_type}/{attachable_id}', 'viewModelAttachments')
-            ->name('view-model-attachments');
+            ->name('view-model-attachments'); // Secured by gates in controller
 
         Route::get('/show/{record}', 'show')->name('show');
         Route::post('/destroy', 'destroy')->name('destroy');

@@ -8,20 +8,21 @@ use App\Models\Process;
 use App\Models\ProcessGeneralStatus;
 use App\Support\Helpers\GeneralHelper;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
 class MADKPIService
 {
-    protected object $request;
+    protected Request $request;
     protected int $year;
     protected Collection $months;
     protected Collection $countries;
     protected Collection $generalStatuses;
     protected bool $entendedVersion;
 
-    public function __construct($request)
+    public function __construct(Request $request)
     {
         $this->request = $request;
     }
@@ -34,7 +35,7 @@ class MADKPIService
      * IMPORTANT: Special queries and links used for stages 5(Кк) and 7(НПР).
      * No differences for for stages 5(Кк) and 7(НПР) between MINIFIED and EXTENDED versions.
      */
-    public function getKPI()
+    public function getKPI(): array
     {
         $this->resolveDependencies();
 
@@ -70,7 +71,7 @@ class MADKPIService
     |--------------------------------------------------------------------------
     */
 
-    protected function resolveDependencies()
+    protected function resolveDependencies(): void
     {
         $this->resolveRequest();
         $this->resolveYear();
@@ -80,7 +81,7 @@ class MADKPIService
         $this->resolveGeneralStatuses();
     }
 
-    protected function resolveRequest()
+    protected function resolveRequest(): void
     {
         $user = auth()->user();
 
@@ -90,12 +91,12 @@ class MADKPIService
         }
     }
 
-    protected function resolveYear()
+    protected function resolveYear(): void
     {
         $this->year = $this->request->input('year', date('Y'));
     }
 
-    protected function resolveMonths()
+    protected function resolveMonths(): void
     {
         $this->months = GeneralHelper::collectCalendarMonths();
 
@@ -104,7 +105,7 @@ class MADKPIService
         }
     }
 
-    protected function resolveCountries()
+    protected function resolveCountries(): void
     {
         $this->countries = Country::orderByProcessesCount()
             // Get only requested countries when 'country_id' is filled
@@ -118,7 +119,7 @@ class MADKPIService
             ->get();
     }
 
-    protected function resolveExtendedVersion()
+    protected function resolveExtendedVersion(): void
     {
         // Restrict by permission
         $this->entendedVersion = false;
@@ -128,7 +129,7 @@ class MADKPIService
         }
     }
 
-    protected function resolveGeneralStatuses()
+    protected function resolveGeneralStatuses(): void
     {
         $this->generalStatuses = ProcessGeneralStatus::when(!$this->entendedVersion, function ($query) {
             $query->where('stage', '<=', 5);
@@ -143,7 +144,7 @@ class MADKPIService
     |--------------------------------------------------------------------------
     */
 
-    protected function calculateAllGeneralStatusProcessCounts()
+    protected function calculateAllGeneralStatusProcessCounts(): void
     {
         $this->addCurrentProcessCountsForGeneralStatusMonths();
         $this->addMaximumProcessCountsForGeneralStatusMonths();
@@ -156,7 +157,7 @@ class MADKPIService
      * Iterates through general statuses and months to add 'current_processes_count' for each month of statuses.
      * IMPORTANT: Special queries used for stages 5(Кк) and 7(НПР).
      */
-    protected function addCurrentProcessCountsForGeneralStatusMonths()
+    protected function addCurrentProcessCountsForGeneralStatusMonths(): void
     {
         foreach ($this->generalStatuses as $status) {
             foreach ($this->months as $month) {
@@ -201,7 +202,7 @@ class MADKPIService
      * Iterates through general statuses and months to add 'maximum_processes_count' for each month of statuses.
      * Special queries are used for 5(Кк) and 7(НПР) stages.
      */
-    protected function addMaximumProcessCountsForGeneralStatusMonths()
+    protected function addMaximumProcessCountsForGeneralStatusMonths(): void
     {
         foreach ($this->generalStatuses as $status) {
             foreach ($this->months as $month) {
@@ -237,7 +238,7 @@ class MADKPIService
     /**
      * Add 'year_current_processes_count' and 'year_maximum_processes_count' for each general status.
      */
-    protected function addYearProcessesCountForGeneralStatuses()
+    protected function addYearProcessesCountForGeneralStatuses(): void
     {
         foreach ($this->generalStatuses as $status) {
             $sumOfCurrentProcesses = 0;
@@ -259,7 +260,7 @@ class MADKPIService
     |--------------------------------------------------------------------------
     */
 
-    protected function addAllGeneralStatusProcessCountLinks()
+    protected function addAllGeneralStatusProcessCountLinks(): void
     {
         $this->addCurrentProcessCountLinksForGeneralStatusMonths();
         $this->addMaximumProcessCountLinksForGeneralStatusMonths();
@@ -268,7 +269,7 @@ class MADKPIService
     /**
      * Add 'current_processes_link' for each month of general statuses.
      */
-    protected function addCurrentProcessCountLinksForGeneralStatusMonths()
+    protected function addCurrentProcessCountLinksForGeneralStatusMonths(): void
     {
         // Get required filter query parameters from request
         $filterQueryParams = $this->getFilterQueryParamsForProcessesIndexPage();
@@ -311,7 +312,7 @@ class MADKPIService
     /**
      * Add 'maximum_processes_link' for each month of general statuses.
      */
-    protected function addMaximumProcessCountLinksForGeneralStatusMonths()
+    protected function addMaximumProcessCountLinksForGeneralStatusMonths(): void
     {
         // Get required filter query parameters from request
         $filterQueryParams = $this->getFilterQueryParamsForProcessesIndexPage();
@@ -359,7 +360,7 @@ class MADKPIService
     /**
      * Add 'sum_of_all_current_process_count' and 'sum_of_all_maximum_process_count' for each month.
      */
-    protected function addSumOfAllProcessesCountsForMonths()
+    protected function addSumOfAllProcessesCountsForMonths(): void
     {
         foreach ($this->months as $month) {
             $sumOfCurrentProcesses = 0;
@@ -378,7 +379,7 @@ class MADKPIService
     /**
      * Add 'active_manufacturers_count' for each month.
      */
-    protected function addActiveManufacturersCountsForMonths()
+    protected function addActiveManufacturersCountsForMonths(): void
     {
         // Validate request params
         $validatedRequest = $this->getValidatedRequestForManufacturerIndexPage();
@@ -401,7 +402,7 @@ class MADKPIService
     /**
      * Add 'active_manufacturers_link' for each month
      */
-    protected function addActiveManufacturersLinksForMonths()
+    protected function addActiveManufacturersLinksForMonths(): void
     {
         // Get vaidated filter query parameters from request
         $filterQueryParams = [
@@ -428,7 +429,7 @@ class MADKPIService
     |--------------------------------------------------------------------------
     */
 
-    protected function addProcessCountsForGeneralStatusesOfCountries()
+    protected function addProcessCountsForGeneralStatusesOfCountries(): void
     {
         // Pluck month ids for filtering
         $monthIDs = $this->months->pluck('id')->toArray();
@@ -473,7 +474,7 @@ class MADKPIService
     /**
      * Add 'year_processes_count' for each country
      */
-    protected function addYearProcessesCountsForCountries()
+    protected function addYearProcessesCountsForCountries(): void
     {
         foreach ($this->countries as $country) {
             $sum = 0;
@@ -491,7 +492,7 @@ class MADKPIService
      *
      * Used on 'map' type chart, when clicking specific country!
      */
-    protected function addKPILinksForCountries()
+    protected function addKPILinksForCountries(): void
     {
         // Get required filter query parameters from request
         $filterQueryParams = $this->request->except(['country_id']);
@@ -650,7 +651,7 @@ class MADKPIService
         ];
     }
 
-    protected function getValidatedRequestForManufacturerIndexPage()
+    protected function getValidatedRequestForManufacturerIndexPage(): Request
     {
         $request = $this->request->duplicate();
 

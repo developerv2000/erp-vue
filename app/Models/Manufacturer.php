@@ -15,6 +15,7 @@ use App\Support\Traits\Model\HasAttachments;
 use App\Support\Traits\Model\HasComments;
 use App\Support\Traits\Model\HasModelNamespaceAttributes;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -573,7 +574,7 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
             ->get();
     }
 
-    public function getReadyForOrderProcessesOfCountry($countryId, $appendFullEnglishProductLabelWithId = false)
+    public function getReadyForOrderProcessesOfCountry($countryId, $appendFullEnglishProductLabelWithId = false): Collection
     {
         $processes = $this->processes()
             ->onlyReadyForOrder()

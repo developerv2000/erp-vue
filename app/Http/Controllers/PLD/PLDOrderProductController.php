@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\PLD;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\PLD\PLDOrderProductStoreRequest;
 use App\Http\Requests\PLD\PLDOrderProductUpdateRequest;
 use App\Models\Country;
 use App\Models\Manufacturer;
@@ -14,8 +13,10 @@ use App\Models\Process;
 use App\Models\SerializationType;
 use App\Models\User;
 use App\Support\Traits\Controller\DestroysModelRecords;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class PLDOrderProductController extends Controller
 {
@@ -24,7 +25,7 @@ class PLDOrderProductController extends Controller
     // Required for DestroysModelRecords trait
     public static $model = OrderProduct::class;
 
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         $getAllTableHeaders = fn() => $request->user()->collectTranslatedTableHeadersByKey(User::PLD_ORDER_PRODUCTS_HEADERS_KEY);
         $getVisibleHeaders = fn() => User::filterOnlyVisibleTableHeaders($getAllTableHeaders());
@@ -39,7 +40,7 @@ class PLDOrderProductController extends Controller
         ]);
     }
 
-    public function edit($record)
+    public function edit($record): Response
     {
         $record = OrderProduct::withBasicPLDRelations()
             ->withBasicPLDRelationCounts()
@@ -69,7 +70,7 @@ class PLDOrderProductController extends Controller
     /**
      * AJAX request
      */
-    public function update(PLDOrderProductUpdateRequest $request, OrderProduct $record)
+    public function update(PLDOrderProductUpdateRequest $request, OrderProduct $record): JsonResponse
     {
         $record->updateByPLDFromRequest($request);
 

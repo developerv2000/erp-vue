@@ -6,16 +6,18 @@ use App\Http\Controllers\Controller;
 use App\Support\Contracts\Model\PreparesFetchedRecordsForExport;
 use App\Support\Helpers\FileHelper;
 use App\Support\Helpers\ModelHelper;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ExcelStorageController extends Controller
 {
     /**
      * Generate Excel file for the given model.
      */
-    public function generate(Request $request, string $model)
+    public function generate(Request $request, string $model): JsonResponse
     {
         $modelClass = $this->resolveModelClass($model);
         $query = $modelClass::queryRecordsForExportFromRequest($request);
@@ -43,7 +45,7 @@ class ExcelStorageController extends Controller
     /**
      * Download previously generated Excel file.
      */
-    public function download(Request $request, string $model, string $filename)
+    public function download(string $model, string $filename): BinaryFileResponse
     {
         $modelClass = $this->resolveModelClass($model);
         $filePath = storage_path($modelClass::STORAGE_PATH_FOR_EXPORTING_EXCEL_FILES . '/' . $filename);
@@ -94,7 +96,7 @@ class ExcelStorageController extends Controller
     /**
      * Save Excel file to storage and return filename.
      */
-    private function saveExcelFile($modelClass, $spreadsheet)
+    private function saveExcelFile($modelClass, $spreadsheet): string
     {
         $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
         $filename = date('Y-m-d H-i-s') . '.xlsx';

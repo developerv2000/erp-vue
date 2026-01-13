@@ -9,8 +9,10 @@ use App\Models\ProcessStatus;
 use App\Models\ProcessStatusHistory;
 use App\Support\Helpers\ControllerHelper;
 use App\Support\Traits\Controller\DestroysModelRecords;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class MADProcessStatusHistoryController extends Controller
 {
@@ -19,7 +21,7 @@ class MADProcessStatusHistoryController extends Controller
     // Required for DestroysModelRecords trait
     public static $model = ProcessStatusHistory::class;
 
-    public function index($process)
+    public function index($process): Response
     {
         $process = Process::withRelationsForHistoryPage()
             ->findOrFail($process)
@@ -42,7 +44,7 @@ class MADProcessStatusHistoryController extends Controller
     /**
      * Ajax request
      */
-    public function update(ProcessStatusHistoryUpdateRequest $request, $record)
+    public function update(ProcessStatusHistoryUpdateRequest $request, $record): JsonResponse
     {
         $record = ProcessStatusHistory::find($record);
         $record->updateByMADFromRequest($request);

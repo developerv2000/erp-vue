@@ -5,6 +5,7 @@ namespace App\Http\Controllers\PLD;
 use App\Http\Controllers\Controller;
 use App\Models\Manufacturer;
 use App\Models\Process;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 
 class PLDHelperController extends Controller
@@ -15,7 +16,7 @@ class PLDHelperController extends Controller
      * Used on 'pld.orders.create' page to fetch 'ready for order processes'
      * of the selected manufacturer and country.
      */
-    public function getReadyForOrderProcessesOfManufacturer(Request $request)
+    public function getReadyForOrderProcessesOfManufacturer(Request $request): Collection
     {
         $manufacturer = Manufacturer::findOrFail($request->input('manufacturer_id'));
         $countryId = $request->input('country_id');
@@ -29,7 +30,7 @@ class PLDHelperController extends Controller
      * Used on 'pld.orders.create' and 'pld.order-products.edit' pages to fetch 'MAH options'
      * of the selected manufacturer and country and Trademark EN.
      */
-    public function getProcessWithItSimilarRecordsForOrder(Request $request)
+    public function getProcessWithItSimilarRecordsForOrder(Request $request): Collection
     {
         $process = Process::findOrFail($request->input('process_id'));
 

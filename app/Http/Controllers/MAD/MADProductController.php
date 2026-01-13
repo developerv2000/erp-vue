@@ -20,9 +20,12 @@ use App\Support\Helpers\ControllerHelper;
 use App\Support\SmartFilters\MAD\ProductsSmartFilter;
 use App\Support\Traits\Controller\DestroysModelRecords;
 use App\Support\Traits\Controller\RestoresModelRecords;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class MADProductController extends Controller
 {
@@ -32,7 +35,7 @@ class MADProductController extends Controller
     // Required for DestroysModelRecords and RestoresModelRecords traits
     public static $model = Product::class;
 
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         $getAllTableHeaders = fn() => $request->user()->collectTranslatedTableHeadersByKey(User::MAD_IVP_HEADERS_KEY);
         $getVisibleHeaders = fn() => User::filterOnlyVisibleTableHeaders($getAllTableHeaders());
@@ -50,7 +53,7 @@ class MADProductController extends Controller
         ]);
     }
 
-    public function trash(Request $request)
+    public function trash(Request $request): Response
     {
         $getAllTableHeaders = fn() => ControllerHelper::prependTrashPageTableHeaders(
             $request->user()->collectTranslatedTableHeadersByKey(User::MAD_IVP_HEADERS_KEY)
@@ -70,7 +73,7 @@ class MADProductController extends Controller
         ]);
     }
 
-    public function create()
+    public function create(): Response
     {
         // No lazy loads required, because AJAX request is used on store
         return Inertia::render('departments/MAD/pages/products/Create', [
@@ -95,7 +98,7 @@ class MADProductController extends Controller
      *
      * Used on AJAX requests to retrieve similar records, on the products create form.
      */
-    public function getSimilarRecordsForRequest(Request $request)
+    public function getSimilarRecordsForRequest(Request $request): Collection
     {
         return Product::getSimilarRecordsForRequest($request);
     }
@@ -103,7 +106,7 @@ class MADProductController extends Controller
     /**
      * AJAX request on products.create
      */
-    public function getMatchedATXForRequest(Request $request)
+    public function getMatchedATXForRequest(Request $request): ?Atx
     {
         $atx = Atx::where('inn_id', $request->input('inn_id'))
             ->where('form_id', $request->input('form_id'))
@@ -115,7 +118,7 @@ class MADProductController extends Controller
     /**
      * AJAX request
      */
-    public function store(ProductStoreRequest $request)
+    public function store(ProductStoreRequest $request): JsonResponse
     {
         DB::transaction(function () use ($request) {
             // Create or update ATX related to the product
@@ -139,7 +142,7 @@ class MADProductController extends Controller
     /**
      * Route model binding is not used, because trashed records can also be edited
      */
-    public function edit($record)
+    public function edit($record): Response
     {
         $fetchedRecord = Product::withTrashed()
             ->withBasicRelations()
@@ -175,7 +178,7 @@ class MADProductController extends Controller
      *
      * Route model binding is not used, because trashed records can also be edited
      */
-    public function update(ProductUpdateRequest $request, $record)
+    public function update(ProductUpdateRequest $request, $record): JsonResponse
     {
         DB::transaction(function () use ($request, $record) {
             // Create or update ATX related to the product

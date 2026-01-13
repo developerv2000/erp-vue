@@ -1727,7 +1727,7 @@ class Process extends Model implements
     /**
      * Get self with all its similar records for order.
      */
-    public function getSelfWithSimilarRecordsForOrder($appendMAHNameWithID = false)
+    public function getSelfWithSimilarRecordsForOrder($appendMAHNameWithID = false): Collection
     {
         $processes = self::onlyReadyForOrder()
             ->where('product_id', $this->product_id)

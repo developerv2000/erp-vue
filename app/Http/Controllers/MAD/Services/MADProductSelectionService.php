@@ -5,10 +5,13 @@ namespace App\Http\Controllers\MAD\Services;
 use App\Models\ProductSearchStatus;
 use App\Support\Helpers\FileHelper;
 use App\Support\Helpers\ModelHelper;
+use Illuminate\Support\Collection;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class MADProductSelectionService
 {
@@ -84,14 +87,14 @@ class MADProductSelectionService
         $this->storagePath = $this->resolveStoragePath($model);
     }
 
-    public function generateExcel()
+    public function generateExcel(): string
     {
         $spreadsheet = $this->buildSpreadsheet();
 
         return $this->saveSpreadsheet($spreadsheet);
     }
 
-    public function downloadExcel(string $filename)
+    public function downloadExcel(string $filename): BinaryFileResponse
     {
         $file = $this->storagePath . '/' . $filename;
 
@@ -133,7 +136,7 @@ class MADProductSelectionService
         return storage_path(self::GENERATED_EXCEL_FILES_PATH . '/' . $model);
     }
 
-    protected function buildSpreadsheet()
+    protected function buildSpreadsheet(): Spreadsheet
     {
         $templatePath = storage_path(self::EXCEL_TEMPLATE_FILE_PATH);
         $spreadsheet = IOFactory::load($templatePath);
@@ -155,7 +158,7 @@ class MADProductSelectionService
         return $spreadsheet;
     }
 
-    protected function collectRecords()
+    protected function collectRecords(): Collection
     {
         $query = $this->modelClass::queryRecordsForProductSelection(request());
 
@@ -178,7 +181,7 @@ class MADProductSelectionService
      * Insert into sheet 'additional country subtitles'
      * after 'default country subtitles' and return countries array.
      */
-    protected function resolveCountries($records, $sheet)
+    protected function resolveCountries($records, $sheet): array
     {
         // Get countries
         $countries = [
@@ -195,7 +198,7 @@ class MADProductSelectionService
         return $countries;
     }
 
-    protected function getAdditionalCountries($records)
+    protected function getAdditionalCountries($records): array
     {
         // 1. Collect unique additional countries from records
 
@@ -219,7 +222,7 @@ class MADProductSelectionService
     /**
      * Requires refactoring!
      */
-    protected function insertAdditionalCountrySubtitlesIntoSheet($sheet, $additionalCountries)
+    protected function insertAdditionalCountrySubtitlesIntoSheet($sheet, $additionalCountries): void
     {
         // Exit if no additional countries
         if (count($additionalCountries) == 0) {
@@ -264,7 +267,7 @@ class MADProductSelectionService
         }
     }
 
-    protected function insertAdditionalForecastTitlesIntoSheet($sheet, $additionalCountries)
+    protected function insertAdditionalForecastTitlesIntoSheet($sheet, $additionalCountries): void
     {
         // Highlight new country forecasts
         $highlightCells = [];
@@ -311,11 +314,11 @@ class MADProductSelectionService
         $this->applyBatchStyles($sheet, $highlightCells, $this->additionalInsertedCellStyle);
     }
 
-    protected function detectLastForecastNumericIndexOfDefaultCountries($additionalCountries)
+    protected function detectLastForecastNumericIndexOfDefaultCountries($additionalCountries): ?int
     {
         // Exit if no additional countries
         if (count($additionalCountries) == 0) {
-            return;
+            return null;
         }
 
         // Index before inserting additional countries
@@ -327,7 +330,7 @@ class MADProductSelectionService
         return $numericIndexAfter;
     }
 
-    protected function insertRecordsIntoSheet($sheet, $records, $countries)
+    protected function insertRecordsIntoSheet($sheet, $records, $countries): void
     {
         match ($this->model) {
             'Product' => $this->insertProductRecordsIntoSheet($sheet, $records, $countries),
@@ -335,7 +338,7 @@ class MADProductSelectionService
         };
     }
 
-    protected function saveSpreadsheet($spreadsheet)
+    protected function saveSpreadsheet($spreadsheet): string
     {
         $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
 
@@ -352,7 +355,7 @@ class MADProductSelectionService
     /**
      * Remove row 4 instead of row 5 because new records are inserted from row 5.
      */
-    protected function removeRedundantRow($sheet, $records)
+    protected function removeRedundantRow($sheet, $records): void
     {
         if ($records->count()) {
             $sheet->removeRow(self::START_INSERTING_RECORDS_FROM_ROW - 1);
@@ -370,7 +373,7 @@ class MADProductSelectionService
      *
      * Append only active searches, skipping "canceled" ones.
      */
-    protected function appendActiveProductSearches($records)
+    protected function appendActiveProductSearches($records): void
     {
         $canceledStatusID = ProductSearchStatus::getCanceledStatusID();
 
@@ -381,7 +384,7 @@ class MADProductSelectionService
         });
     }
 
-    protected function insertProductRecordsIntoSheet($sheet, $records, $countries)
+    protected function insertProductRecordsIntoSheet($sheet, $records, $countries): void
     {
         $row = self::START_INSERTING_RECORDS_FROM_ROW;
         $recordsCounter = 1;
@@ -444,7 +447,7 @@ class MADProductSelectionService
     /**
      * Optimized, can be more refactored and optimized!
      */
-    protected function insertProcessRecordsIntoSheet($sheet, $records, $countries)
+    protected function insertProcessRecordsIntoSheet($sheet, $records, $countries): void
     {
         $row = self::START_INSERTING_RECORDS_FROM_ROW;
         $recordsCounter = 1;
@@ -535,7 +538,7 @@ class MADProductSelectionService
         $this->removeRedundantRow($sheet, $records);
     }
 
-    protected function getFirstForecastColumnIndexForCountry($countryIndex, $allCountriesCount)
+    protected function getFirstForecastColumnIndexForCountry($countryIndex, $allCountriesCount): int
     {
         return Coordinate::columnIndexFromString(self::FIRST_DEFAULT_COUNTRY_COLUMN_SUBTITLE_LETTER)
             + $allCountriesCount

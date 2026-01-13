@@ -9,12 +9,14 @@ use App\Models\Manufacturer;
 use App\Models\OrderProduct;
 use App\Models\Process;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class MDSerializedByManufacturerController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         $getAllTableHeaders = fn() => $request->user()
             ->collectTranslatedTableHeadersByKey(User::MD_SERIALIZED_BY_MANUFACTURER_HEADERS_KEY);
@@ -31,7 +33,7 @@ class MDSerializedByManufacturerController extends Controller
         ]);
     }
 
-    public function edit($record)
+    public function edit($record): Response
     {
         $record = OrderProduct::withBasicMDRelations()
             ->withBasicMDRelationCounts()
@@ -49,7 +51,7 @@ class MDSerializedByManufacturerController extends Controller
     /**
      * AJAX request
      */
-    public function update(MDSerializedByManufacturerUpdateRequest $request, OrderProduct $record)
+    public function update(MDSerializedByManufacturerUpdateRequest $request, OrderProduct $record): JsonResponse
     {
         $record->updateSerializedByManufacturerByMDFromRequest($request);
 

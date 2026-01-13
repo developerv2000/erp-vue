@@ -10,12 +10,14 @@ use App\Models\InvoicePaymentType;
 use App\Models\Manufacturer;
 use App\Models\Order;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class CMDOrderController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         $getAllTableHeaders = fn() => $request->user()->collectTranslatedTableHeadersByKey(User::CMD_ORDERS_HEADERS_KEY);
         $getVisibleHeaders = fn() => User::filterOnlyVisibleTableHeaders($getAllTableHeaders());
@@ -31,7 +33,7 @@ class CMDOrderController extends Controller
         ]);
     }
 
-    public function edit(Order $record)
+    public function edit(Order $record): Response
     {
         $record->appendBasicCMDAttributes();
         $record->append('title'); // Used on generating breadcrumbs
@@ -73,7 +75,7 @@ class CMDOrderController extends Controller
     /**
      * AJAX request
      */
-    public function update(CMDOrderUpdateRequest $request, Order $record)
+    public function update(CMDOrderUpdateRequest $request, Order $record): JsonResponse
     {
         $record->updateByCMDFromRequest($request);
 
@@ -85,7 +87,7 @@ class CMDOrderController extends Controller
     /**
      * AJAX request
      */
-    public function sentToConfirmation(Order $record)
+    public function sentToConfirmation(Order $record): Order
     {
         $record->sendToConfirmation();
 
@@ -102,7 +104,7 @@ class CMDOrderController extends Controller
     /**
      * AJAX request
      */
-    public function sentToManufacturer(Order $record)
+    public function sentToManufacturer(Order $record): Order
     {
         $record->sendToManufacturer();
 
@@ -119,7 +121,7 @@ class CMDOrderController extends Controller
     /**
      * AJAX request
      */
-    public function startProduction(Order $record)
+    public function startProduction(Order $record): Order
     {
         $record->startProduction();
 

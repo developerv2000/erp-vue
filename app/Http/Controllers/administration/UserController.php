@@ -14,9 +14,10 @@ use App\Models\Role;
 use App\Models\User;
 use App\Support\Helpers\ControllerHelper;
 use App\Support\Traits\Controller\DestroysModelRecords;
-use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class UserController extends Controller
 {
@@ -25,7 +26,7 @@ class UserController extends Controller
     // Required for DestroysModelRecords trait
     public static $model = User::class;
 
-    public function index(Request $request)
+    public function index(): Response
     {
         return Inertia::render('administration/pages/users/Index', [
             // Refetched only on locale change
@@ -36,7 +37,7 @@ class UserController extends Controller
         ]);
     }
 
-    public function create()
+    public function create(): Response
     {
         // No lazy loads required, because AJAX request is used on store
         return Inertia::render('administration/pages/users/Create', [
@@ -50,7 +51,7 @@ class UserController extends Controller
     /**
      * AJAX request
      */
-    public function store(UserStoreRequest $request)
+    public function store(UserStoreRequest $request): JsonResponse
     {
         User::storeByAdminFromRequest($request);
 
@@ -59,7 +60,7 @@ class UserController extends Controller
         ]);
     }
 
-    public function edit(User $record)
+    public function edit(User $record): Response
     {
         $record->load([
             'roles',
@@ -85,7 +86,7 @@ class UserController extends Controller
     /**
      * AJAX request
      */
-    public function update(UserUpdateRequest $request, User $record)
+    public function update(UserUpdateRequest $request, User $record): JsonResponse
     {
         $record->updateByAdminFromRequest($request);
 
@@ -97,7 +98,7 @@ class UserController extends Controller
     /**
      * AJAX request
      */
-    public function updatePassword(UserPasswordUpdateRequest $request, User $record)
+    public function updatePassword(UserPasswordUpdateRequest $request, User $record): JsonResponse
     {
         $record->updatePasswordByAdmin($request);
         $redirectToLoginPage = $record->id == auth()->user()->id; // Redirect to login page if own password was updated
@@ -111,7 +112,7 @@ class UserController extends Controller
     /**
      * AJAX request
      */
-    public function transferRecords(UserTransferRecordsRequest $request, User $record)
+    public function transferRecords(UserTransferRecordsRequest $request, User $record): JsonResponse
     {
         $record->transferRecordsByAdmin($request);
 

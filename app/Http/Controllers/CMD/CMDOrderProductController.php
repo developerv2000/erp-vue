@@ -11,12 +11,14 @@ use App\Models\Order;
 use App\Models\OrderProduct;
 use App\Models\Process;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class CMDOrderProductController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         $getAllTableHeaders = fn() => $request->user()->collectTranslatedTableHeadersByKey(User::CMD_ORDER_PRODUCTS_HEADERS_KEY);
         $getVisibleHeaders = fn() => User::filterOnlyVisibleTableHeaders($getAllTableHeaders());
@@ -31,7 +33,7 @@ class CMDOrderProductController extends Controller
         ]);
     }
 
-    public function edit($record)
+    public function edit($record): Response
     {
         $record = OrderProduct::withBasicCMDRelations()
             ->withBasicCMDRelationCounts()
@@ -50,7 +52,7 @@ class CMDOrderProductController extends Controller
     /**
      * AJAX request
      */
-    public function update(CMDOrderProductUpdateRequest $request, OrderProduct $record)
+    public function update(CMDOrderProductUpdateRequest $request, OrderProduct $record): JsonResponse
     {
         $record->updateByCMDFromRequest($request);
 
@@ -62,7 +64,7 @@ class CMDOrderProductController extends Controller
     /**
      * AJAX request
      */
-    public function endProduction(OrderProduct $record)
+    public function endProduction(OrderProduct $record): OrderProduct
     {
         $record->endProduction();
 
@@ -79,7 +81,7 @@ class CMDOrderProductController extends Controller
     /**
      * AJAX request
      */
-    public function setAsReadyForShipmentFromManufacturer(OrderProduct $record)
+    public function setAsReadyForShipmentFromManufacturer(OrderProduct $record): OrderProduct
     {
         $record->setAsReadyForShipmentFromManufacturer();
 

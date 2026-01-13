@@ -9,10 +9,11 @@ use App\Models\User;
 use App\Support\Helpers\GeneralHelper;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class MADKPIController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         $service = new MADKPIService($request);
 

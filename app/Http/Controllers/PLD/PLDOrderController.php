@@ -12,8 +12,10 @@ use App\Models\Order;
 use App\Models\SerializationType;
 use App\Models\User;
 use App\Support\Traits\Controller\DestroysModelRecords;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class PLDOrderController extends Controller
 {
@@ -22,7 +24,7 @@ class PLDOrderController extends Controller
     // Required for DestroysModelRecords trait
     public static $model = Order::class;
 
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         $getAllTableHeaders = fn() => $request->user()->collectTranslatedTableHeadersByKey(User::PLD_ORDERS_HEADERS_KEY);
         $getVisibleHeaders = fn() => User::filterOnlyVisibleTableHeaders($getAllTableHeaders());
@@ -37,7 +39,7 @@ class PLDOrderController extends Controller
         ]);
     }
 
-    public function create()
+    public function create(): Response
     {
         // No lazy loads required, because AJAX request is used on store
         return Inertia::render('departments/PLD/pages/orders/Create', [
@@ -50,7 +52,7 @@ class PLDOrderController extends Controller
     /**
      * AJAX request
      */
-    public function store(PLDOrderStoreRequest $request)
+    public function store(PLDOrderStoreRequest $request): JsonResponse
     {
         Order::storeByPLDFromRequest($request);
 
@@ -59,7 +61,7 @@ class PLDOrderController extends Controller
         ]);
     }
 
-    public function edit($record)
+    public function edit($record): Response
     {
         $record = Order::withBasicPLDRelations()
             ->withBasicPLDRelationCounts()
@@ -82,7 +84,7 @@ class PLDOrderController extends Controller
     /**
      * AJAX request
      */
-    public function update(PLDOrderUpdateRequest $request, Order $record)
+    public function update(PLDOrderUpdateRequest $request, Order $record): JsonResponse
     {
         $record->updateByPLDFromRequest($request);
 
@@ -94,7 +96,7 @@ class PLDOrderController extends Controller
     /**
      * AJAX request
      */
-    public function sentToBDM(Order $record)
+    public function sentToBDM(Order $record): Order
     {
         $record->sendToBdm();
 
@@ -111,7 +113,7 @@ class PLDOrderController extends Controller
     /**
      * AJAX request
      */
-    public function confirm(Order $record)
+    public function confirm(Order $record): Order
     {
         $record->confirm();
 

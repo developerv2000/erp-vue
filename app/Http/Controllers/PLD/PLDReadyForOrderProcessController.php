@@ -11,13 +11,13 @@ use App\Models\Process;
 use App\Models\ProductForm;
 use App\Models\User;
 use App\Support\Helpers\ControllerHelper;
-use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class PLDReadyForOrderProcessController extends Controller
 {
-    public function index(Request $request)
+    public function index(): Response
     {
         return Inertia::render('departments/PLD/pages/ready-for-order-processes/Index', [
             // Refetched only on locale change

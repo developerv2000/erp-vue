@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\global;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class SettingController extends Controller
 {
-    public function updateByKey(Request $request)
+    public function updateByKey(Request $request): JsonResponse
     {
         $key = $request->route('key');
         $value = $request->route('value', null);
@@ -20,7 +21,7 @@ class SettingController extends Controller
 
         // Check if the key is available
         if (!in_array($key, $availableKeys) || !$value) {
-            return false;
+            abort(404);
         }
 
         auth()->user()->updateSetting($key, $value);
@@ -33,7 +34,7 @@ class SettingController extends Controller
     /**
      * Update table headers including orders, widths, and visibility.
      */
-    public function updateTableHeaders(Request $request, $key)
+    public function updateTableHeaders(Request $request, $key): JsonResponse
     {
         $user = $request->user();
         $settings = $user->settings ?? [];
@@ -72,7 +73,7 @@ class SettingController extends Controller
     /**
      * Reset table headers including orders, widths, and visibility.
      */
-    public function resetTableHeaders(Request $request, $key)
+    public function resetTableHeaders($key): JsonResponse
     {
         auth()->user()->resetTableHeadersByKey($key);
 

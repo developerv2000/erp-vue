@@ -7,13 +7,14 @@ use App\Http\Requests\global\ProfilePasswordUpdateRequest;
 use App\Http\Requests\global\ProfilePersonalDataUpdateRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Inertia\Response;
 
 class ProfileController extends Controller
 {
     /**
      * Display the user's profile form.
      */
-    public function edit(Request $request)
+    public function edit(Request $request): Response
     {
         return inertia('global/pages/profile/Edit', [
             // Refetched after 'updatePersonalData' and 'updatePassword'

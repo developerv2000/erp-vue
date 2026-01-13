@@ -13,6 +13,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use Inertia\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AttachmentController extends Controller
 {
@@ -21,7 +23,7 @@ class AttachmentController extends Controller
     // Required for DestroysModelRecords trait
     public static $model = Attachment::class;
 
-    public function viewModelAttachments(Request $request)
+    public function viewModelAttachments(Request $request): Response
     {
         // Secure request
         $this->authorizeGates($request->route('attachable_type'));
@@ -55,7 +57,7 @@ class AttachmentController extends Controller
         ]);
     }
 
-    public function show(Attachment $record)
+    public function show(Attachment $record): StreamedResponse
     {
         $disk = Storage::disk('local');
         $path = 'attachments/' . $record->folder . '/' . $record->filename;
@@ -74,18 +76,16 @@ class AttachmentController extends Controller
         ]);
     }
 
-    private function authorizeGates($modelBaseName)
+    /**
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     */
+    private function authorizeGates($modelBaseName): void
     {
-        switch ($modelBaseName) {
-            case 'Manufacturer':
-                Gate::authorize('edit-MAD-EPP');
-                break;
-            case 'Product':
-                Gate::authorize('edit-MAD-IVP');
-                break;
-            default:
-                abort(404);
-        }
+        match ($modelBaseName) {
+            'Manufacturer' => Gate::authorize('view-MAD-EPP'),
+            'Product' => Gate::authorize('view-MAD-IVP'),
+            default => abort(404),
+        };
     }
 
     private function getAllTableHeadersTranslated(): Collection

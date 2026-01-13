@@ -16,8 +16,11 @@ use App\Support\Helpers\ControllerHelper;
 use App\Support\SmartFilters\MAD\ManufacturersSmartFilter;
 use App\Support\Traits\Controller\DestroysModelRecords;
 use App\Support\Traits\Controller\RestoresModelRecords;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Js;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class MADManufacturerController extends Controller
 {
@@ -27,7 +30,7 @@ class MADManufacturerController extends Controller
     // Required for DestroysModelRecords and RestoresModelRecords traits
     public static $model = Manufacturer::class;
 
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         $getAllTableHeaders = fn() => $request->user()->collectTranslatedTableHeadersByKey(User::MAD_EPP_HEADERS_KEY);
         $getVisibleHeaders = fn() => User::filterOnlyVisibleTableHeaders($getAllTableHeaders());
@@ -45,7 +48,7 @@ class MADManufacturerController extends Controller
         ]);
     }
 
-    public function trash(Request $request)
+    public function trash(Request $request): Response
     {
         $getAllTableHeaders = fn() => ControllerHelper::prependTrashPageTableHeaders(
             $request->user()->collectTranslatedTableHeadersByKey(User::MAD_EPP_HEADERS_KEY)
@@ -65,7 +68,7 @@ class MADManufacturerController extends Controller
         ]);
     }
 
-    public function create()
+    public function create(): Response
     {
         // No lazy loads required, because AJAX request is used on store
         return Inertia::render('departments/MAD/pages/manufacturers/Create', [
@@ -83,7 +86,7 @@ class MADManufacturerController extends Controller
     /**
      * AJAX request
      */
-    public function store(ManufacturerStoreRequest $request)
+    public function store(ManufacturerStoreRequest $request): JsonResponse
     {
         Manufacturer::storeByMADFromRequest($request);
 
@@ -95,7 +98,7 @@ class MADManufacturerController extends Controller
     /**
      * Route model binding is not used, because trashed records can also be edited
      */
-    public function edit($record)
+    public function edit($record): Response
     {
         $fetchedRecord = Manufacturer::withTrashed()
             ->withBasicRelations()
@@ -125,7 +128,7 @@ class MADManufacturerController extends Controller
      *
      * Route model binding is not used, because trashed records can also be edited
      */
-    public function update(ManufacturerUpdateRequest $request, $record)
+    public function update(ManufacturerUpdateRequest $request, $record): JsonResponse
     {
         $fetchedRecord = Manufacturer::withTrashed()->findOrFail($record);
         $fetchedRecord->updateByMADFromRequest($request);

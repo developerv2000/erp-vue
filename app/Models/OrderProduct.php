@@ -6,7 +6,6 @@ use App\Http\Requests\CMD\CMDOrderProductUpdateRequest;
 use App\Http\Requests\DD\DDOrderProductUpdateRequest;
 use App\Http\Requests\MD\MDOrderProductUpdateRequest;
 use App\Http\Requests\MD\MDSerializedByManufacturerUpdateRequest;
-use App\Http\Requests\PLD\PLDOrderProductStoreRequest;
 use App\Http\Requests\PLD\PLDOrderProductUpdateRequest;
 use App\Support\Contracts\Model\HasTitleAttribute;
 use App\Support\Helpers\ModelHelper;

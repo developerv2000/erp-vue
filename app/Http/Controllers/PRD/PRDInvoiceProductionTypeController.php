@@ -10,12 +10,14 @@ use App\Models\InvoicePaymentType;
 use App\Models\Manufacturer;
 use App\Models\Order;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class PRDInvoiceProductionTypeController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         $getAllTableHeaders =
             fn() => $request->user()->collectTranslatedTableHeadersByKey(User::PRD_PRODUCTION_TYPE_INVOICES_HEADERS_KEY);
@@ -32,12 +34,12 @@ class PRDInvoiceProductionTypeController extends Controller
         ]);
     }
 
-    public function edit(Request $request, $record)
+    public function edit($record): Response
     {
         $record = Invoice::withBasicPRDProductionTypesRelations()
             ->withBasicPRDProductionTypesRelationCounts()
             ->findorfail($record);
-            
+
         $record->appendBasicPRDProductionTypesAttributes();
         $record->append('title'); // Used on generating breadcrumbs
 
@@ -50,7 +52,7 @@ class PRDInvoiceProductionTypeController extends Controller
     /**
      * AJAX request
      */
-    public function update(PRDInvoiceUpdateProductionTypeRequest $request, Invoice $record)
+    public function update(PRDInvoiceUpdateProductionTypeRequest $request, Invoice $record): JsonResponse
     {
         $record->updateProductionTypeByPRDFromRequest($request);
 

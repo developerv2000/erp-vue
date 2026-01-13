@@ -4,14 +4,15 @@ namespace App\Http\Controllers\MAD;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\MAD\Services\MADProductSelectionService;
-use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class MADProductSelectionController extends Controller
 {
     /**
      * Generate Excel file for the given model.
      */
-    public function generate(Request $request, string $model)
+    public function generate(string $model): JsonResponse
     {
         $service = new MADProductSelectionService($model);
         $filename = $service->generateExcel();
@@ -24,7 +25,7 @@ class MADProductSelectionController extends Controller
     /**
      * Download previously generated Excel file.
      */
-    public function download(Request $request, string $model, string $filename)
+    public function download(string $model, string $filename): BinaryFileResponse
     {
         $service = new MADProductSelectionService($model);
 

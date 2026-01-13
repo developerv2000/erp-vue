@@ -8,10 +8,11 @@ use App\Support\Helpers\ControllerHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class DepartmentController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         return Inertia::render('administration/pages/departments/Index', [
             // Lazy loads. Refetched only on locale change

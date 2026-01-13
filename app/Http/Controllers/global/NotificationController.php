@@ -4,13 +4,15 @@ namespace App\Http\Controllers\global;
 
 use App\Http\Controllers\Controller;
 use App\Support\Helpers\ControllerHelper;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class NotificationController extends Controller
 {
-    public function index(Request $request)
+    public function index(): Response
     {
         return Inertia::render('global/pages/notifications/Index', [
             // Lazy loads. Refetched only on locale change
@@ -31,14 +33,14 @@ class NotificationController extends Controller
         return $headers;
     }
 
-    public function getUnreadCount(Request $request)
+    public function getUnreadCount(): JsonResponse
     {
-         return response()->json([
+        return response()->json([
             'count' => auth()->user()->unreadNotifications()->count(),
         ]);
     }
 
-    public function markAsRead(Request $request)
+    public function markAsRead(Request $request): JsonResponse
     {
         $ids = $request->input('ids', []);
 
@@ -55,20 +57,18 @@ class NotificationController extends Controller
         ]);
     }
 
-    public function destroy(Request $request)
+    public function destroy(Request $request): JsonResponse
     {
         $ids = $request->input('ids', []);
 
-        foreach ($ids as $id) {
-            $notification = $request->user()->notifications()->find($id);
-
-            if ($notification) {
-                $notification->delete();
-            }
-        }
+        // Delete only notifications that belong to the authenticated user
+        $deletedCount = $request->user()
+            ->notifications()
+            ->whereIn('id', $ids)
+            ->delete();
 
         return response()->json([
-            'count' => count($ids),
+            'count' => $deletedCount,
         ]);
     }
 }

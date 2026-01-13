@@ -11,12 +11,14 @@ use App\Models\Order;
 use App\Models\OrderProduct;
 use App\Models\Process;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class DDOrderProductController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         $getAllTableHeaders = fn() => $request->user()->collectTranslatedTableHeadersByKey(User::DD_ORDER_PRODUCTS_HEADERS_KEY);
         $getVisibleHeaders = fn() => User::filterOnlyVisibleTableHeaders($getAllTableHeaders());
@@ -31,7 +33,7 @@ class DDOrderProductController extends Controller
         ]);
     }
 
-    public function edit($record)
+    public function edit($record): Response
     {
         $record = OrderProduct::withBasicDDRelations()
             ->withBasicDDRelationCounts()
@@ -49,7 +51,7 @@ class DDOrderProductController extends Controller
     /**
      * AJAX request
      */
-    public function update(DDOrderProductUpdateRequest $request, OrderProduct $record)
+    public function update(DDOrderProductUpdateRequest $request, OrderProduct $record): JsonResponse
     {
         $record->updateByDDFromRequest($request);
 

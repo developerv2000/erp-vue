@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\global;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class PrivateStorageController extends Controller
 {
-    public function getOrderFile(Request $request, $path)
+    public function getOrderFile($path): BinaryFileResponse
     {
         $fullPath = storage_path('app/private/orders/' . $path);
 
@@ -19,7 +19,7 @@ class PrivateStorageController extends Controller
         return response()->file($fullPath);
     }
 
-    public function getOrderProductFile(Request $request, $path)
+    public function getOrderProductFile($path): BinaryFileResponse
     {
         $fullPath = storage_path('app/private/order-products/' . $path);
 
@@ -31,7 +31,7 @@ class PrivateStorageController extends Controller
         return response()->file($fullPath);
     }
 
-    public function getInvoiceFile(Request $request, $path)
+    public function getInvoiceFile($path): BinaryFileResponse
     {
         $fullPath = storage_path('app/private/invoices/' . $path);
 

@@ -13,8 +13,11 @@ use App\Models\Order;
 use App\Models\OrderProduct;
 use App\Models\User;
 use App\Support\Traits\Controller\DestroysModelRecords;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class CMDInvoiceController extends Controller
 {
@@ -23,7 +26,7 @@ class CMDInvoiceController extends Controller
     // Required for DestroysModelRecords trait
     public static $model = Invoice::class;
 
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         $getAllTableHeaders = fn() => $request->user()->collectTranslatedTableHeadersByKey(User::CMD_INVOICES_HEADERS_KEY);
         $getVisibleHeaders = fn() => User::filterOnlyVisibleTableHeaders($getAllTableHeaders());
@@ -38,7 +41,7 @@ class CMDInvoiceController extends Controller
         ]);
     }
 
-    public function create(Request $request)
+    public function create(Request $request): Response
     {
         // Check if user can attach any production invoice
         $order = Order::findOrFail($request->input('order_id'));
@@ -63,7 +66,7 @@ class CMDInvoiceController extends Controller
     /**
      * AJAX request
      */
-    public function store(CMDInvoiceStoreProductionTypeRequest $request)
+    public function store(CMDInvoiceStoreProductionTypeRequest $request): JsonResponse
     {
         Invoice::storeProductionTypeByCMDFromRequest($request);
 
@@ -72,7 +75,7 @@ class CMDInvoiceController extends Controller
         ]);
     }
 
-    public function edit(Request $request, $record)
+    public function edit($record): Response
     {
         $record = Invoice::withBasicCMDRelations()
             ->withBasicCMDRelationCounts()
@@ -97,7 +100,7 @@ class CMDInvoiceController extends Controller
     /**
      * AJAX request
      */
-    public function update(CMDInvoiceUpdateProductionTypeRequest $request, Invoice $record)
+    public function update(CMDInvoiceUpdateProductionTypeRequest $request, Invoice $record): JsonResponse
     {
         $record->updateProductionTypeByCMDFromRequest($request);
 
@@ -106,7 +109,7 @@ class CMDInvoiceController extends Controller
         ]);
     }
 
-    private function getAvailableProductsForInvoiceOnCreate(Order $order, InvoicePaymentType $paymentType)
+    private function getAvailableProductsForInvoiceOnCreate(Order $order, InvoicePaymentType $paymentType): Collection
     {
         $products = match ($paymentType->name) {
             // Display all products as 'readonly' for invoice of PREPAYMENT type
@@ -133,7 +136,7 @@ class CMDInvoiceController extends Controller
         return $products->values();
     }
 
-    private function getAvailableProductsForInvoiceOnEdit(Invoice $invoice)
+    private function getAvailableProductsForInvoiceOnEdit(Invoice $invoice): Collection
     {
         $products = match ($invoice->paymentType->name) {
             // Display all products as 'readonly' for invoice of PREPAYMENT type
@@ -161,7 +164,7 @@ class CMDInvoiceController extends Controller
     /**
      * AJAX request
      */
-    public function sendForPayment(Invoice $record)
+    public function sendForPayment(Invoice $record): Invoice
     {
         $record->sendProductionTypeForPaymentByCMD();
 

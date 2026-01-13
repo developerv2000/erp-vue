@@ -4,11 +4,13 @@ namespace App\Http\Controllers\global;
 
 use App\Http\Controllers\Controller;
 use App\Support\Helpers\FileHelper;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class MainController extends Controller
 {
-    public function redirectToHomePage(Request $request)
+    public function redirectToHomePage(Request $request): RedirectResponse
     {
         $homePage = $request->user()->detectHomeRouteName();
 
@@ -18,7 +20,7 @@ class MainController extends Controller
     /**
      * API request
      */
-    public function uploadWysiwygImage(Request $request)
+    public function uploadWysiwygImage(Request $request): JsonResponse
     {
         $request->validate([
             'image' => 'required|image|mimes:jpeg,png,gif,webp|max:5120', // 5MB max

@@ -2,6 +2,7 @@
 
 namespace App\Support\Traits\Controller;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 /**
@@ -22,7 +23,7 @@ trait DestroysModelRecords
      * If the 'force_delete' parameter is provided, the records will be force deleted.
      * Otherwise, they will be soft deleted.
      */
-    public function destroy(Request $request)
+    public function destroy(Request $request): JsonResponse
     {
         // Extract id or ids from request as array to delete through loop
         $ids = (array) ($request->input('id') ?: $request->input('ids'));

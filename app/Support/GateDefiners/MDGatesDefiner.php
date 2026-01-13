@@ -3,18 +3,15 @@
 namespace App\Support\GateDefiners;
 
 use App\Models\Permission;
-use App\Support\GateDefiners\Helpers\GatesDefiner;
 
-class MDGatesDefiner
+class MDGatesDefiner extends GateDefiner
 {
-    public static function defineAll()
+    protected static function permissions(): array
     {
-        $permission = [
+        return [
             Permission::CAN_VIEW_MD_SERIALIZED_BY_MANUFACTURER_NAME,
 
             Permission::CAN_EDIT_MD_SERIALIZED_BY_MANUFACTURER_NAME,
         ];
-
-        GatesDefiner::definePermissionBasedGates($permission);
     }
 }

@@ -3,18 +3,15 @@
 namespace App\Support\GateDefiners;
 
 use App\Models\Permission;
-use App\Support\GateDefiners\Helpers\GatesDefiner;
 
-class DDGatesDefiner
+class DDGatesDefiner extends GateDefiner
 {
-    public static function defineAll()
+    protected static function permissions(): array
     {
-        $permission = [
+        return [
             Permission::CAN_VIEW_DD_ORDER_PRODUCTS_NAME,
 
             Permission::CAN_EDIT_DD_ORDER_PRODUCTS_NAME,
         ];
-
-        GatesDefiner::definePermissionBasedGates($permission);
     }
 }

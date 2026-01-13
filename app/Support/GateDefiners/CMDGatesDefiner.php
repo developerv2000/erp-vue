@@ -3,13 +3,12 @@
 namespace App\Support\GateDefiners;
 
 use App\Models\Permission;
-use App\Support\GateDefiners\Helpers\GatesDefiner;
 
-class CMDGatesDefiner
+class CMDGatesDefiner extends GateDefiner
 {
-    public static function defineAll()
+    protected static function permissions(): array
     {
-        $permission = [
+        return [
             Permission::CAN_VIEW_CMD_ORDERS_NAME,
             Permission::CAN_VIEW_CMD_ORDER_PRODUCTS_NAME,
             Permission::CAN_VIEW_CMD_INVOICES_NAME,
@@ -18,7 +17,5 @@ class CMDGatesDefiner
             Permission::CAN_EDIT_CMD_ORDER_PRODUCTS_NAME,
             Permission::CAN_EDIT_CMD_INVOICES_NAME,
         ];
-
-        GatesDefiner::definePermissionBasedGates($permission);
     }
 }

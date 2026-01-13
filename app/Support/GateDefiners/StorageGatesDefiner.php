@@ -3,18 +3,15 @@
 namespace App\Support\GateDefiners;
 
 use App\Models\Permission;
-use App\Support\GateDefiners\Helpers\GatesDefiner;
 
-class StorageGatesDefiner
+class StorageGatesDefiner extends GateDefiner
 {
-    public static function defineAll()
+    protected static function permissions(): array
     {
-        $permission = [
+        return [
             Permission::CAN_VIEW_STORAGE_ORDER_FILES_NAME,
             Permission::CAN_VIEW_STORAGE_ORDER_PRODUCT_FILES_NAME,
             Permission::CAN_VIEW_STORAGE_INVOICE_FILES_NAME,
         ];
-
-        GatesDefiner::definePermissionBasedGates($permission);
     }
 }

@@ -3,18 +3,15 @@
 namespace App\Support\GateDefiners;
 
 use App\Models\Permission;
-use App\Support\GateDefiners\Helpers\GatesDefiner;
 
-class PRDGatesDefiner
+class PRDGatesDefiner extends GateDefiner
 {
-    public static function defineAll()
+    protected static function permissions(): array
     {
-        $permission = [
+        return [
             Permission::CAN_VIEW_PRD_INVOICES_NAME,
 
             Permission::CAN_EDIT_PRD_INVOICES_NAME,
         ];
-
-        GatesDefiner::definePermissionBasedGates($permission);
     }
 }

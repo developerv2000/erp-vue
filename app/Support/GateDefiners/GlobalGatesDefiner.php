@@ -15,6 +15,15 @@ class GlobalGatesDefiner extends GateDefiner
             Permission::CAN_EDIT_COMMENTS_NAME,
             Permission::CAN_EXPORT_RECORDS_AS_EXCEL_NAME,
             Permission::CAN_EXPORT_UNLIMITED_RECORDS_AS_EXCEL_NAME,
+
+            // Import gates
+            Permission::CAN_VIEW_IMPORT_PRODUCTS_NAME,
+            Permission::CAN_VIEW_IMPORT_SHIPMENTS_NAME,
+            Permission::CAN_VIEW_IMPORT_INVOICES_NAME,
+
+            Permission::CAN_EDIT_IMPORT_PRODUCTS_NAME,
+            Permission::CAN_EDIT_IMPORT_SHIPMENTS_NAME,
+            Permission::CAN_EDIT_IMPORT_INVOICES_NAME,
         ];
     }
 

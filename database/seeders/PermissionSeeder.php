@@ -288,5 +288,28 @@ class PermissionSeeder extends Seeder
                 'global' => true,
             ]);
         }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Global import permissions
+        |--------------------------------------------------------------------------
+        */
+
+        $permissions = [
+            Permission::CAN_VIEW_IMPORT_PRODUCTS_NAME,
+            Permission::CAN_VIEW_IMPORT_SHIPMENTS_NAME,
+            Permission::CAN_VIEW_IMPORT_INVOICES_NAME,
+
+            Permission::CAN_EDIT_IMPORT_PRODUCTS_NAME,
+            Permission::CAN_EDIT_IMPORT_SHIPMENTS_NAME,
+            Permission::CAN_EDIT_IMPORT_INVOICES_NAME,
+        ];
+
+        foreach ($permissions as $name) {
+            Permission::create([
+                'name' => $name,
+                'global' => true,
+            ]);
+        }
     }
 }

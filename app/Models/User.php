@@ -78,6 +78,11 @@ class User extends Authenticatable
     // 6. MD
     const MD_SERIALIZED_BY_MANUFACTURER_HEADERS_KEY = 'MD_SERIALIZED_BY_MANUFACTURER';
 
+    // 7. MD
+    const IMPORT_PRODUCTS_HEADERS_KEY = 'IMPORT_PRODUCTS';
+    const IMPORT_SHIPMENTS_HEADERS_KEY = 'IMPORT_SHIPMENTS';
+    const IMPORT_INVOICES_HEADERS_KEY = 'IMPORT_INVOICES';
+
     /*
     |--------------------------------------------------------------------------
     | Properties
@@ -517,7 +522,7 @@ class User extends Authenticatable
         ];
     }
 
-    public static function filterNotificationsQueryForRequest($query, $request): Builder
+    public static function filterNotificationsQueryForRequest($query, $request)
     {
         // Apply unread filter
         if ($request->filled('unread')) {
@@ -587,6 +592,7 @@ class User extends Authenticatable
         $this->resetPRDTableHeaders($settings);
         $this->resetDDTableHeaders($settings);
         $this->resetMDTableHeaders($settings);
+        $this->resetImportTableHeaders($settings);
     }
 
     /**
@@ -642,6 +648,11 @@ class User extends Authenticatable
 
             // MD
             self::MD_SERIALIZED_BY_MANUFACTURER_HEADERS_KEY => OrderProduct::getMDTableHeadersForUser($this),
+
+            // Import
+            self::IMPORT_PRODUCTS_HEADERS_KEY => OrderProduct::getImportTableHeadersForUser($this),
+            self::IMPORT_SHIPMENTS_HEADERS_KEY => Shipment::getImportTableHeadersForUser($this),
+            self::IMPORT_INVOICES_HEADERS_KEY => Invoice::getImportTableHeadersForUser($this),
 
             default => throw new InvalidArgumentException("Unknown key: $key"),
         };
@@ -777,6 +788,21 @@ class User extends Authenticatable
         $headersSettings = isset($settings['table_headers']) ? $settings['table_headers'] : [];
 
         $headersSettings[self::MD_SERIALIZED_BY_MANUFACTURER_HEADERS_KEY] = OrderProduct::getMDTableHeadersForUser($this);
+
+        $settings['table_headers'] = $headersSettings;
+        $this->settings = $settings;
+        $this->save();
+    }
+
+    public function resetImportTableHeaders($settings): void
+    {
+        $this->refresh();
+        $settings = $this->settings;
+        $headersSettings = isset($settings['table_headers']) ? $settings['table_headers'] : [];
+
+        // $headersSettings[self::IMPORT_PRODUCTS_HEADERS_KEY] = OrderProduct::getImportTableHeadersForUser($this);
+        // $headersSettings[self::IMPORT_SHIPMENTS_HEADERS_KEY] = Shipment::getImportTableHeadersForUser($this);
+        // $headersSettings[self::IMPORT_INVOICES_HEADERS_KEY] = Invoice::getImportTableHeadersForUser($this);
 
         $settings['table_headers'] = $headersSettings;
         $this->settings = $settings;
@@ -986,6 +1012,9 @@ class User extends Authenticatable
 
             // MD
             'md.serialized-by-manufacturer.index' => 'view-MD-serialized-by-manufacturer',
+
+            // Import
+            'import.products.index' => 'view-import-products',
         ];
 
         foreach ($homepageRoutes as $routeName => $gate) {

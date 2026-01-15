@@ -41,6 +41,9 @@ class DatabaseSeeder extends Seeder
             SerializationTypeSeeder::class,
             InvoiceTypeSeeder::class,
             InvoicePaymentTypeSeeder::class,
+            OrderSeeder::class,
+            TransportationMethodSeeder::class,
+            ShipmentDestinationSeeder::class,
         ]);
     }
 }

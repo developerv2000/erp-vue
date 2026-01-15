@@ -68,6 +68,17 @@ return new class extends Migration
             $table->string('declaration_for_europe_file')->nullable();
             $table->timestamp('readiness_for_shipment_from_manufacturer_date')->nullable(); // action
 
+            // Step 9:
+            // ELD part
+            $table->unsignedMediumInteger('produced_by_manufacturer_quantity')->nullable();
+
+            $table->unsignedMediumInteger('shipment_from_manufacturer_id')
+                ->index()
+                ->foreign()
+                ->references('id')
+                ->on('shipments')
+                ->nullable();
+
             // Timestamps
             $table->timestamps();
         });

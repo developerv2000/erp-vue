@@ -251,25 +251,25 @@ class UserSeeder extends Seeder
         |--------------------------------------------------------------------------
         */
 
-        // $eldID = Department::findByName(Department::ELD_NAME)->id;
-        // $logisticianRoleID = Role::findByName(Role::ELD_LOGISTICIAN_NAME);
+        $eldID = Department::findByName(Department::ELD_NAME)->id;
+        $logisticianRoleID = Role::findByName(Role::ELD_LOGISTICIAN_NAME);
 
-        // $logisticians = [
-        //     ['name' => 'Europe logistic', 'email' => 'eld_logistician@mail.com', 'photo' => 'eld_logistician.png'],
-        // ];
+        $logisticians = [
+            ['name' => 'Europe logistic', 'email' => 'eld_logistician@mail.com', 'photo' => 'eld_logistician.png'],
+        ];
 
-        // // Create ELD Logisticians
-        // foreach ($logisticians as $user) {
-        //     $newUser = User::create([
-        //         'name' => $user['name'],
-        //         'email' => $user['email'],
-        //         'photo' => $user['photo'],
-        //         'department_id' => $eldID,
-        //         'password' => bcrypt($password),
-        //     ]);
+        // Create ELD Logisticians
+        foreach ($logisticians as $user) {
+            $newUser = User::create([
+                'name' => $user['name'],
+                'email' => $user['email'],
+                'photo' => $user['photo'],
+                'department_id' => $eldID,
+                'password' => bcrypt($password),
+            ]);
 
-        //     $newUser->roles()->attach($logisticianRoleID);
-        // }
+            $newUser->roles()->attach($logisticianRoleID);
+        }
 
         /*
         |--------------------------------------------------------------------------

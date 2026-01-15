@@ -30,6 +30,7 @@
     "Roles": "Роли",
     "Permissions": "Разрешения",
     "Administration": "Администрация",
+    "Import": "Импорт",
     "Department": "Отдел",
     "Departments": "Отделы",
     "departments.MAD": "ОАП",
@@ -60,6 +61,7 @@
     "pages.Products": "Продукты",
     "pages.Invoices": "Инвойсы",
     "pages.Production": "Производство",
+    "pages.Shipments": "Отгрузки",
 
     "actions.Logout": "Выйти",
     "actions.Create": "Создать",

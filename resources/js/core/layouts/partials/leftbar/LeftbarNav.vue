@@ -6,6 +6,7 @@ import CmdNav from "./partials/CmdNav.vue";
 import PrdNav from "./partials/PrdNav.vue";
 import DdNav from "./partials/DdNav.vue";
 import MdNav from "./partials/MdNav.vue";
+import ImportNav from "./partials/ImportNav.vue";
 </script>
 
 <template>
@@ -16,6 +17,7 @@ import MdNav from "./partials/MdNav.vue";
         <PrdNav />
         <DdNav />
         <MdNav />
+        <ImportNav />
         <AdministrationNav />
     </div>
 </template>

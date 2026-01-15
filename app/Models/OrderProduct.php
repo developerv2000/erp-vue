@@ -145,6 +145,11 @@ class OrderProduct extends Model implements HasTitleAttribute
         return $this->belongsTo(SerializationType::class);
     }
 
+    public function shipmentFromManufacturer()
+    {
+        return $this->belongsTo(Shipment::class, 'shipment_from_manufacturer_id');
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Additional attributes & appends

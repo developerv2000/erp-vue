@@ -30,6 +30,7 @@
     "Roles": "Roles",
     "Permissions": "Permissions",
     "Administration": "Administration",
+    "Import": "Import",
     "Department": "Department",
     "Departments": "Departments",
     "departments.MAD": "MAD",
@@ -60,6 +61,7 @@
     "pages.Products": "Products",
     "pages.Invoices": "Invoices",
     "pages.Production": "Production",
+    "pages.Shipments": "Shipments",
 
     "actions.Logout": "Logout",
     "actions.Add": "Add",

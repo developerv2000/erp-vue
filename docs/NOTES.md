@@ -21,3 +21,4 @@
 - Use request()->safe() for PLD/CMD and other requests instead of request->all
 - Optimize Orders/OrderProduct scopeWithBasicPLDRelations/scopeWithBasicPLDRelationCounts/appendBasicPLDAttributes
 etc functions
+- Add 'loadMissing' relations for all models 'append' functions, as added in Shipment model.

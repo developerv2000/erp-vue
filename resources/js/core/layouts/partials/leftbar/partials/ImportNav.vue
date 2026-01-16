@@ -4,7 +4,7 @@ import { useI18n } from "vue-i18n";
 import InertiaLinkedListItem from "@/core/components/inertia/InertiaLinkedListItem.vue";
 import useAuth from "@/core/composables/useAuth";
 
-import { mdiPackageVariantClosed, mdiPillMultiple, mdiScriptOutline } from "@mdi/js";
+import { mdiTruckOutline, mdiPillMultiple, mdiScriptOutline } from "@mdi/js";
 
 const { t } = useI18n();
 const { can, canAny } = useAuth();
@@ -25,7 +25,7 @@ const listItems = computed(() => [
         routeParams: null,
         activeOnRoutes: "import.shipments.*",
         permission: "view-import-shipments",
-        prependIcon: mdiPackageVariantClosed,
+        prependIcon: mdiTruckOutline,
     },
 
     {

@@ -9,18 +9,13 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('import')->name('import.')->middleware('auth', 'auth.session')->group(function () {
     // Products
     Route::prefix('/products')->controller(ImportProductController::class)->name('products.')->group(function () {
-        CRUDRouteGenerator::defineDefaultRoutesOnly(
-            ['index', 'edit', 'update'],
-            'id',
-            'can:view-import-products',
-            'can:edit-import-products'
-        );
+        Route::get('/', 'index')->name('index')->middleware('can:view-import-products');
     });
 
     // Shipments
     Route::prefix('/shipments')->controller(ImportShipmentController::class)->name('shipments.')->group(function () {
         CRUDRouteGenerator::defineDefaultRoutesOnly(
-            ['index', 'create', 'store', 'edit', 'update'],
+            ['index', 'create', 'store', 'edit', 'update', 'destroy'],
             'id',
             'can:view-import-shipments',
             'can:edit-import-shipments'

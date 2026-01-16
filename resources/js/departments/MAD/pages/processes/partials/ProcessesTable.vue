@@ -257,6 +257,13 @@ function handleTableOptionsUpdate(options) {
             {{ formatPrice(item.forecast_year_3) }}
         </template>
 
+        <template #item.clinical_trial_year="{ item }">
+            <TogglableThreeLinesLimitedText
+                v-if="item.clinical_trial_year"
+                :text="item.clinical_trial_year"
+            />
+        </template>
+
         <template #item.clinical_trial_countries_name="{ item }">
             {{ item.clinical_trial_countries.map((obj) => obj.name).join(" ") }}
         </template>

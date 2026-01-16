@@ -69,6 +69,12 @@ class OrderProduct extends Model implements HasTitleAttribute
     const DEFAULT_MD_SERIALIZED_BY_MANUFACTURER_ORDER_DIRECTION = 'asc';
     const DEFAULT_MD_SERIALIZED_BY_MANUFACTURER_PER_PAGE = 50;
 
+    // Import
+    const DEFAULT_IMPORT_ORDER_BY = 'id';
+    // const DEFAULT_IMPORT_ORDER_BY = 'readiness_for_shipment_from_manufacturer_date';
+    const DEFAULT_IMPORT_ORDER_DIRECTION = 'asc';
+    const DEFAULT_IMPORT_PER_PAGE = 50;
+
     // Statuses
     const STATUS_PRODUCTION_IS_ENDED_NAME = 'Production is ended';
     const STATUS_IS_READY_FOR_SHIPMENT_FROM_MANUFACTURER_NAME = 'Ready for shipment from manufacturer';
@@ -623,6 +629,41 @@ class OrderProduct extends Model implements HasTitleAttribute
         ]);
     }
 
+    public function scopeWithBasicImportRelations($query): Builder
+    {
+        return $query->with([
+            'lastComment',
+
+            'order' => function ($orderQuery) {
+                $orderQuery->with([ // $orderQuery->withBasicRelations() not used because of redundant 'lastComment'
+                    'country',
+                    'currency',
+
+                    'manufacturer' => function ($manufacturersQuery) {
+                        $manufacturersQuery->select(
+                            'manufacturers.id',
+                            'manufacturers.name',
+                        );
+                    },
+
+                    'products', // Maybe required when detecting 'status' of the order/product
+                ]);
+            },
+
+            'process' => function ($processQuery) {
+                $processQuery->withRelationsForOrderProduct()
+                    ->withOnlySelectsForOrderProduct();
+            },
+        ]);
+    }
+
+    public function scopeWithBasicImportRelationCounts($query): Builder
+    {
+        return $query->withCount([
+            'comments',
+        ]);
+    }
+
     public function scopeOnlySentToBdm($query): Builder
     {
         return $query->whereHas('order', function ($orderQuery) {
@@ -841,6 +882,48 @@ class OrderProduct extends Model implements HasTitleAttribute
         // Append attributes unless raw query is requested
         if ($appendAttributes && $action !== 'query') {
             self::appendRecordsBasicMDAttributes($records);
+        }
+
+        return $records;
+    }
+
+    /**
+     * Build and execute a model query based on request parameters.
+     *
+     * Steps:
+     *  - Apply default relations & counts
+     *  - Apply soft delete scope (if requested)
+     *  - Normalize query params (pagination, sorting, etc.)
+     *  - Apply filters
+     *  - Finalize query with sorting & pagination
+     *  - Append basic attributes (if requested and unless returning raw query)
+     *
+     * @param $action  ('paginate', 'get' or 'query')
+     * @return mixed
+     */
+    public static function queryImportRecordsFromRequest(Request $request, string $action = 'paginate', bool $appendAttributes = false)
+    {
+        $query = self::onlyReadyForShipmentFromManufacturer()
+            ->withBasicCMDRelations()
+            ->withBasicCMDRelationCounts();
+
+        // Normalize request parameters
+        self::addDefaultQueryParamsToRequest(
+            $request,
+            'DEFAULT_CMD_ORDER_BY',
+            'DEFAULT_CMD_ORDER_DIRECTION',
+            'DEFAULT_CMD_PER_PAGE'
+        );
+
+        // Apply filters
+        self::filterQueryForRequest($query, $request);
+
+        // Finalize (sorting & pagination)
+        $records = ModelHelper::finalizeQueryForRequest($query, $request, $action);
+
+        // Append attributes unless raw query is requested
+        if ($appendAttributes && $action !== 'query') {
+            self::appendRecordsBasicCMDAttributes($records);
         }
 
         return $records;
@@ -1326,6 +1409,66 @@ class OrderProduct extends Model implements HasTitleAttribute
 
             ['title' => 'Comments', 'key' => 'comments_count', 'width' => 132, 'sortable' => false],
             ['title' => 'comments.Last', 'key' => 'last_comment_body', 'width' => 200, 'sortable' => false],
+
+            ['title' => 'dates.Date of creation', 'key' => 'created_at', 'width' => 130, 'sortable' => true],
+            ['title' => 'dates.Update date', 'key' => 'updated_at', 'width' => 150, 'sortable' => true],
+        ];
+
+        foreach ($additionalColumns as $column) {
+            array_push($columns, [
+                ...$column,
+                'visible' => 1,
+                'order' => $order++,
+            ]);
+        }
+
+        return $columns;
+    }
+
+    public static function getImportTableHeadersForUser($user): ?array
+    {
+        if (Gate::forUser($user)->denies(Permission::extractAbilityName(Permission::CAN_VIEW_IMPORT_PRODUCTS_NAME))) {
+            return null;
+        }
+
+        $order = 1;
+        $columns = array();
+
+        $additionalColumns = [
+            ['title' => 'ID', 'key' => 'id', 'width' => 62, 'sortable' => true],
+            ['title' => 'fields.Manufacturer', 'key' => 'order_manufacturer_id', 'width' => 140, 'sortable' => false],
+            ['title' => 'fields.Country', 'key' => 'order_country_id', 'width' => 80, 'sortable' => false],
+            ['title' => 'Order', 'key' => 'order_id', 'width' => 120, 'sortable' => true],
+            ['title' => 'fields.TM Eng', 'key' => 'process_trademark_en', 'width' => 146, 'sortable' => false],
+            ['title' => 'fields.TM Rus', 'key' => 'process_trademark_ru', 'width' => 146, 'sortable' => false],
+            ['title' => 'fields.MAH', 'key' => 'process_marketing_authorization_holder_id', 'width' => 102, 'sortable' => true],
+            ['title' => 'fields.Quantity', 'key' => 'quantity', 'width' => 112, 'sortable' => false],
+            ['title' => 'Status', 'key' => 'status', 'width' => 142, 'sortable' => false],
+
+            ['title' => 'Comments', 'key' => 'comments_count', 'width' => 132, 'sortable' => false],
+            ['title' => 'comments.Last', 'key' => 'last_comment_body', 'width' => 200, 'sortable' => false],
+
+            ['title' => 'fields.PO №', 'key' => 'order_name', 'width' => 136, 'sortable' => false],
+            ['title' => 'dates.PO', 'key' => 'order_purchase_date', 'width' => 120, 'sortable' => false],
+            ['title' => 'fields.Packing list', 'key' => 'packing_list_file', 'width' => 152, 'sortable' => false],
+            ['title' => 'fields.COA', 'key' => 'coa_file', 'width' => 152, 'sortable' => false],
+            ['title' => 'fields.COO', 'key' => 'coo_file', 'width' => 152, 'sortable' => false],
+            ['title' => 'fields.Declaration for EUR1', 'key' => 'declaration_for_europe_file', 'width' => 160, 'sortable' => false],
+            ['title' => 'dates.Ready for shipment', 'key' => 'readiness_for_shipment_from_manufacturer_date', 'width' => 160, 'sortable' => true],
+
+            ['title' => 'Shipment', 'key' => 'shipment_from_manufacturer_id', 'width' => 160, 'sortable' => true],
+            ['title' => 'fields.Transportation method', 'key' => 'shipment_transportation_method_id', 'width' => 160, 'sortable' => false],
+            ['title' => 'fields.Destination', 'key' => 'shipment_destination_id', 'width' => 160, 'sortable' => false],
+            ['title' => 'fields.Pallets', 'key' => 'shipment_pallets_quantity', 'width' => 160, 'sortable' => false],
+            ['title' => 'fields.Volume', 'key' => 'shipment_volume', 'width' => 160, 'sortable' => false],
+            ['title' => 'dates.Transportation request', 'key' => 'shipment_transportation_requested_at', 'width' => 160, 'sortable' => false],
+            ['title' => 'fields.Forwarder', 'key' => 'shipment_forwarder', 'width' => 160, 'sortable' => false],
+            ['title' => 'fields.Price', 'key' => 'shipment_price', 'width' => 70, 'sortable' => false],
+            ['title' => 'fields.Currency', 'key' => 'shipment_currency_id', 'width' => 84, 'sortable' => false],
+            ['title' => 'dates.Rate approved', 'key' => 'shipment_rate_approved_at', 'width' => 160, 'sortable' => false],
+            ['title' => 'dates.Confirmed', 'key' => 'shipment_confirmed_at', 'width' => 160, 'sortable' => false],
+            ['title' => 'dates.Completed', 'key' => 'shipment_completed_at', 'width' => 160, 'sortable' => false],
+            ['title' => 'dates.Arrived at warehouse', 'key' => 'shipment_arrived_at_warehouse', 'width' => 160, 'sortable' => false],
 
             ['title' => 'dates.Date of creation', 'key' => 'created_at', 'width' => 130, 'sortable' => true],
             ['title' => 'dates.Update date', 'key' => 'updated_at', 'width' => 150, 'sortable' => true],

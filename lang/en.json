@@ -7,6 +7,7 @@
     "Records": "Records",
     "Multiple records": "Multiple records",
     "History": "History",
+    "Shipment": "Shipment",
 
     "Manufacturer": "Manufacturer",
     "Manufacturers": "Manufacturers",
@@ -103,6 +104,7 @@
     "actions.Add prepayment": "Add prepayment",
     "actions.Add final payment": "Add final payment",
     "actions.Add full payment": "Add full payment",
+    "actions.Start shipment": "Start shipment",
 
     "forms.Personal data": "Personal data",
     "forms.Password update": "Password update",
@@ -210,6 +212,11 @@
     "dates.Serialization codes sent": "Serialization codes sent date",
     "dates.Serialization report received": "Serialization report received date",
     "dates.Report sent to hub": "Report sent to hub date",
+    "dates.Transportation request": "Transportation request date",
+    "dates.Rate approved": "Rate approved date",
+    "dates.Confirmed": "Confirmed date",
+    "dates.Completed": "Completed date",
+    "dates.Arrived at warehouse": "Arrived at warehouse date",
 
     "Days": "Days",
     "days.past": "Days past",
@@ -377,6 +384,12 @@
     "fields.Pdf": "Pdf",
     "fields.Invoie №": "Invoie №",
     "fields.Swift": "Swift",
+
+    "fields.Transportation method": "Transportation method",
+    "fields.Destination": "Destination",
+    "fields.Pallets": "Pallets",
+    "fields.Volume": "Volume",
+    "fields.Forwarder": "Forwarder",
 
     "AAAAAAAAAAAAAA": "AAAAAAAAAAAAAA",
 

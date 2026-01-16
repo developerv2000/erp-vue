@@ -7,6 +7,7 @@
     "Records": "Записи",
     "Multiple records": "Множество записей",
     "History": "История",
+    "Shipment": "Отгрузка",
 
     "Manufacturer": "Производитель",
     "Manufacturers": "Производители",
@@ -103,6 +104,7 @@
     "actions.Add prepayment": "Добавить предоплату",
     "actions.Add final payment": "Добавить финальную оплату",
     "actions.Add full payment": "Добавить полную оплату",
+    "actions.Start shipment": "Начать отгрузку",
 
     "forms.Personal data": "Персональные данные",
     "forms.Password update": "Обновить пароль",
@@ -220,6 +222,11 @@
     "dates.Serialization codes sent": "Дата отправки кодов сериализации",
     "dates.Serialization report received": "Дата получения отчета по сериализации",
     "dates.Report sent to hub": "Дата отправки отчета в Хаб",
+    "dates.Transportation request": "Дата запроса транспортировки",
+    "dates.Rate approved": "Дата одобрения ставки",
+    "dates.Confirmed": "Дата подтверждения",
+    "dates.Completed": "Дата завершения",
+    "dates.Arrived at warehouse": "Дата прибытия на склад",
 
     "Days": "Дней",
     "days.past": "Дней прошло",
@@ -377,6 +384,12 @@
     "fields.Pdf": "Pdf",
     "fields.Invoie №": "№ инвойса",
     "fields.Swift": "Swift",
+
+    "fields.Transportation method": "Метод доставки",
+    "fields.Destination": "Место назначения",
+    "fields.Pallets": "Паллеты",
+    "fields.Volume": "Объем",
+    "fields.Forwarder": "Перевозчик",
 
     "AAAAAAAAAAAAAA": "AAAAAAAAAAAAAA",
 

@@ -221,7 +221,6 @@ class Permission extends Model
     const CAN_VIEW_IMPORT_INVOICES_NAME = 'can-view-import-invoices';
 
     // Edit
-    const CAN_EDIT_IMPORT_PRODUCTS_NAME = 'can-edit-import-products';
     const CAN_EDIT_IMPORT_SHIPMENTS_NAME = 'can-edit-import-shipments';
     const CAN_EDIT_IMPORT_INVOICES_NAME = 'can-edit-import-invoices';
 
@@ -523,7 +522,6 @@ class Permission extends Model
             self::CAN_VIEW_IMPORT_SHIPMENTS_NAME,
             self::CAN_VIEW_IMPORT_INVOICES_NAME,
 
-            self::CAN_EDIT_IMPORT_PRODUCTS_NAME,
             self::CAN_EDIT_IMPORT_SHIPMENTS_NAME,
             self::CAN_EDIT_IMPORT_INVOICES_NAME,
         ];

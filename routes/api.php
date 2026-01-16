@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\OrderProduct;
 use App\Models\Process;
 use App\Models\Product;
+use App\Models\Shipment;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -124,6 +125,21 @@ Route::middleware('auth:sanctum')->name('api.')->group(function () {
         Route::prefix('/serialized-by-manufacturer')->name('serialized-by-manufacturer.')->group(function () {
             Route::get('/', fn(Request $request) => OrderProduct::queryMDRecordsFromRequest($request, 'paginate', true))
                 ->middleware('can:view-MD-serialized-by-manufacturer')
+                ->name('get');
+        });
+    });
+
+    // import
+    Route::prefix('/import')->name('import.')->group(function () {
+        Route::prefix('/products')->name('products.')->group(function () {
+            Route::get('/', fn(Request $request) => OrderProduct::queryImportRecordsFromRequest($request, 'paginate', true))
+                ->middleware('can:view-import-products')
+                ->name('get');
+        });
+
+        Route::prefix('/shipments')->name('shipments.')->group(function () {
+            Route::get('/', fn(Request $request) => Shipment::queryImportRecordsFromRequest($request, 'paginate', true))
+                ->middleware('can:view-import-shipments')
                 ->name('get');
         });
     });

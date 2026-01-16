@@ -800,8 +800,8 @@ class User extends Authenticatable
         $settings = $this->settings;
         $headersSettings = isset($settings['table_headers']) ? $settings['table_headers'] : [];
 
-        // $headersSettings[self::IMPORT_PRODUCTS_HEADERS_KEY] = OrderProduct::getImportTableHeadersForUser($this);
-        // $headersSettings[self::IMPORT_SHIPMENTS_HEADERS_KEY] = Shipment::getImportTableHeadersForUser($this);
+        $headersSettings[self::IMPORT_PRODUCTS_HEADERS_KEY] = OrderProduct::getImportTableHeadersForUser($this);
+        $headersSettings[self::IMPORT_SHIPMENTS_HEADERS_KEY] = Shipment::getImportTableHeadersForUser($this);
         // $headersSettings[self::IMPORT_INVOICES_HEADERS_KEY] = Invoice::getImportTableHeadersForUser($this);
 
         $settings['table_headers'] = $headersSettings;

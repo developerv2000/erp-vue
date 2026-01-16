@@ -4,7 +4,10 @@ namespace App\Models;
 
 use App\Http\Requests\import\ImportProductStoreRequest;
 use App\Http\Requests\import\ImportProductUpdateRequest;
+use App\Http\Requests\ImportShipmentStoreRequest;
+use App\Http\Requests\ImportShipmentUpdateRequest;
 use App\Support\Contracts\Model\HasTitleAttribute;
+use App\Support\Helpers\ModelHelper;
 use App\Support\Helpers\QueryFilterHelper;
 use App\Support\Traits\Model\AddsDefaultQueryParamsToRequest;
 use App\Support\Traits\Model\HasComments;
@@ -245,9 +248,6 @@ class Shipment extends Model implements HasTitleAttribute
         // Apply base filters using helper
         $query = QueryFilterHelper::applyFilters($query, $request, self::getFilterConfig());
 
-        // Additional filters
-        self::applyStatusFilter($query, $request);
-
         return $query;
     }
 
@@ -276,7 +276,7 @@ class Shipment extends Model implements HasTitleAttribute
      *
      * Primarily done by ELD!
      */
-    public function storeFromImportPageRequest(ImportProductStoreRequest $request): void
+    public function storeFromImportPageRequest(ImportShipmentStoreRequest $request): void
     {
         $record = self::create($request->all());
 
@@ -289,7 +289,7 @@ class Shipment extends Model implements HasTitleAttribute
      *
      * Primarily done by ELD!
      */
-    public function updateFromImportPageRequest(ImportProductUpdateRequest $request): void
+    public function updateFromImportPageRequest(ImportShipmentUpdateRequest $request): void
     {
         $this->update($request->all());
 
@@ -337,14 +337,14 @@ class Shipment extends Model implements HasTitleAttribute
 
     public static function getImportTableHeadersForUser($user): ?array
     {
-        if (Gate::forUser($user)->denies(Permission::extractAbilityName(Permission::CAN_VIEW_IMPORT_PRODUCTS_NAME))) {
+        if (Gate::forUser($user)->denies(Permission::extractAbilityName(Permission::CAN_VIEW_IMPORT_SHIPMENTS_NAME))) {
             return null;
         }
 
         $order = 1;
         $columns = array();
 
-        if (Gate::forUser($user)->allows(Permission::extractAbilityName(Permission::CAN_EDIT_IMPORT_PRODUCTS_NAME))) {
+        if (Gate::forUser($user)->allows(Permission::extractAbilityName(Permission::CAN_EDIT_IMPORT_SHIPMENTS_NAME))) {
             array_push(
                 $columns,
                 ['title' => 'Record', 'key' => 'edit', 'width' => 60, 'sortable' => false, 'visible' => 1, 'order' => $order++],
@@ -352,30 +352,23 @@ class Shipment extends Model implements HasTitleAttribute
         }
 
         $additionalColumns = [
-            ['title' => 'fields.Manufacturer', 'key' => 'order_manufacturer_id', 'width' => 140, 'sortable' => false],
-            ['title' => 'fields.Country', 'key' => 'order_country_id', 'width' => 80, 'sortable' => false],
-            ['title' => 'Order', 'key' => 'order_id', 'width' => 120, 'sortable' => true],
-            ['title' => 'fields.TM Eng', 'key' => 'process_trademark_en', 'width' => 146, 'sortable' => false],
-            ['title' => 'fields.TM Rus', 'key' => 'process_trademark_ru', 'width' => 146, 'sortable' => false],
-            ['title' => 'fields.MAH', 'key' => 'process_marketing_authorization_holder_id', 'width' => 102, 'sortable' => true],
-            ['title' => 'fields.Quantity', 'key' => 'quantity', 'width' => 112, 'sortable' => false],
+            ['title' => 'ID', 'key' => 'id', 'width' => 62, 'sortable' => true],
+            ['title' => 'fields.Manufacturer', 'key' => 'manufacturer_id', 'width' => 140, 'sortable' => true],
+            ['title' => 'fields.Transportation method', 'key' => 'transportation_method_id', 'width' => 144, 'sortable' => true],
+            ['title' => 'fields.Destination', 'key' => 'destination_id', 'width' => 160, 'sortable' => true],
+            ['title' => 'fields.Pallets', 'key' => 'pallets_quantity', 'width' => 80, 'sortable' => false],
+            ['title' => 'fields.Volume', 'key' => 'volume', 'width' => 72, 'sortable' => false],
+            ['title' => 'dates.Transportation request', 'key' => 'transportation_requested_at', 'width' => 244, 'sortable' => true],
+            ['title' => 'fields.Forwarder', 'key' => 'forwarder', 'width' => 116, 'sortable' => false],
             ['title' => 'fields.Price', 'key' => 'price', 'width' => 70, 'sortable' => false],
-            ['title' => 'fields.Currency', 'key' => 'order_currency_id', 'width' => 84, 'sortable' => false],
-            ['title' => 'fields.Total price', 'key' => 'total_price', 'width' => 132, 'sortable' => false],
-            ['title' => 'Status', 'key' => 'status', 'width' => 142, 'sortable' => false],
+            ['title' => 'fields.Currency', 'key' => 'currency_id', 'width' => 84, 'sortable' => true],
+            ['title' => 'dates.Rate approved', 'key' => 'rate_approved_at', 'width' => 184, 'sortable' => true],
+            ['title' => 'dates.Confirmed', 'key' => 'confirmed_at', 'width' => 172, 'sortable' => true],
+            ['title' => 'dates.Completed', 'key' => 'completed_at', 'width' => 156, 'sortable' => true],
+            ['title' => 'dates.Arrived at warehouse', 'key' => 'arrived_at_warehouse', 'width' => 188, 'sortable' => true],
 
-            ['title' => 'Comments', 'key' => 'comments_count', 'width' => 132, 'sortable' => false],
-            ['title' => 'comments.Last', 'key' => 'last_comment_body', 'width' => 200, 'sortable' => false],
-
-            ['title' => 'fields.Serialization type', 'key' => 'serialization_type_id', 'width' => 156, 'sortable' => true],
-            ['title' => 'fields.Production status', 'key' => 'production_status', 'width' => 160, 'sortable' => false],
-
-            ['title' => 'dates.Layout approved', 'key' => 'layout_approved_date', 'width' => 170, 'sortable' => false],
-            ['title' => 'dates.Prepayment completion', 'key' => 'production_prepayment_invoice_payment_completed_date', 'width' => 216, 'sortable' => false],
-            ['title' => 'dates.Production end', 'key' => 'production_end_date', 'width' => 240, 'sortable' => true],
-            ['title' => 'dates.Final payment request', 'key' => 'production_final_or_full_payment_invoice_sent_for_payment_date', 'width' => 236, 'sortable' => false], // Not 'payment_request_date_by_financier'
-            ['title' => 'dates.Final payment completion', 'key' => 'production_final_or_full_payment_invoice_payment_completed_date', 'width' => 264, 'sortable' => false],
-            ['title' => 'dates.Ready for shipment', 'key' => 'readiness_for_shipment_from_manufacturer_date', 'width' => 180, 'sortable' => true],
+            ['title' => 'dates.Date of creation', 'key' => 'created_at', 'width' => 130, 'sortable' => true],
+            ['title' => 'dates.Update date', 'key' => 'updated_at', 'width' => 150, 'sortable' => true],
         ];
 
         foreach ($additionalColumns as $column) {

@@ -1115,7 +1115,12 @@ class OrderProduct extends Model implements HasTitleAttribute
      */
     public function updateByCMDFromRequest(CMDOrderProductUpdateRequest $request): void
     {
-        $this->update($request->all());
+        $this->update($request->except([ // exclude nullable files
+            'packing_list_file',
+            'coa_file',
+            'coo_file',
+            'declaration_for_europe_file',
+        ]));
 
         // HasMany relations
         $this->storeCommentFromRequest($request);

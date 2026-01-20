@@ -65,7 +65,7 @@ class Shipment extends Model implements HasTitleAttribute
 
     public function manufacturer()
     {
-        return $this->belongsTo(Manufacturer::class);
+        return $this->belongsTo(Manufacturer::class)->withTrashed();
     }
 
     public function products()
@@ -333,10 +333,22 @@ class Shipment extends Model implements HasTitleAttribute
      */
     public function updateFromImportPageRequest(ImportShipmentUpdateRequest $request): void
     {
-        $this->update($request->all());
+        DB::transaction(function () use ($request) {
+            // Update shipment
+            $this->update($request->except([ // exclude nullable files
+                'packing_list_file',
+            ]));
 
-        // HasMany relations
-        $this->storeCommentFromRequest($request);
+            // Update products in shipment
+            foreach ($request->array('products', []) as $productData) {
+                $product = $this->products()->findOrFail($productData['id']);
+                $product->produced_by_manufacturer_quantity = $productData['produced_by_manufacturer_quantity'];
+                $product->save();
+            }
+
+            // HasMany relations
+            $this->storeCommentFromRequest($request);
+        });
     }
 
     /*

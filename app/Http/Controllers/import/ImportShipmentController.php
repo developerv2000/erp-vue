@@ -74,11 +74,10 @@ class ImportShipmentController extends Controller
 
     public function edit($record): Response
     {
-        $record = Order::withBasicPLDRelations()
-            ->withBasicPLDRelationCounts()
+        $record = Shipment::withBasicImportRelations()
             ->findOrFail($record);
 
-        $record->appendBasicPLDAttributes();
+        $record->appendBasicImportAttributes();
         $record->append('title'); // Used on generating breadcrumbs
 
         return Inertia::render('sections/import/pages/shipments/Edit', [

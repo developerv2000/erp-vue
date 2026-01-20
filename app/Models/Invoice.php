@@ -615,7 +615,9 @@ class Invoice extends Model implements HasTitleAttribute
      */
     public function updateProductionTypeByCMDFromRequest(CMDInvoiceUpdateProductionTypeRequest $request): void
     {
-        $this->update($request->all());
+        $this->update($request->except([ // exclude nullable files
+            'pdf_file',
+        ]));
 
         // Sycn products for non-prepayment invoices
         if ($this->payment_type_id != InvoicePaymentType::PREPAYMENT_ID) {
@@ -635,7 +637,9 @@ class Invoice extends Model implements HasTitleAttribute
      */
     public function updateProductionTypeByPRDFromRequest(PRDInvoiceUpdateProductionTypeRequest $request): void
     {
-        $this->update($request->all());
+        $this->update($request->except([ // exclude nullable files
+            'payment_confirmation_document',
+        ]));
 
         // Validate 'accepted_by_financier_date' attribute
         if (!$this->is_accepted_by_financier) {

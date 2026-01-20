@@ -719,7 +719,9 @@ class Order extends Model implements HasTitleAttribute
      */
     public function updateByCMDFromRequest(CMDOrderUpdateRequest $request): void
     {
-        $this->update($request->all());
+        $this->update($request->except([ // exclude nullable files
+            'pdf_file'
+        ]));
 
         // Update 'purchase_date'
         if (is_null($this->purchase_date)) {

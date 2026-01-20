@@ -126,6 +126,11 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
         return $this->hasMany(Meeting::class);
     }
 
+    public function shipments()
+    {
+        return $this->hasMany(Shipment::class);
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Additional attributes & appends

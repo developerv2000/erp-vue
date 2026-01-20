@@ -1,0 +1,1 @@
+function s(){return{updateRecord(i){if(!i||!i.id)return;const e=this.records.findIndex(r=>r.id===i.id);e!==-1?this.records[e]=i:this.records.unshift(i)},updateRecords(i=[]){i.forEach(this.updateRecord)},removeRecord(i){const e=this.records.findIndex(r=>r.id===i);e!==-1&&this.records.splice(e,1)}}}export{s as c};

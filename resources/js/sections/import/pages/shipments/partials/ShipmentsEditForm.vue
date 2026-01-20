@@ -51,7 +51,7 @@ const schema = object({
         .of(
             object({
                 id: number().required(),
-                produced_by_manufacturer_quantity: number().nullable(),
+                produced_by_manufacturer_quantity: number().required(),
             })
         )
         .min(1),

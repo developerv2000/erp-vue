@@ -167,6 +167,14 @@ class Shipment extends Model implements HasTitleAttribute
     |--------------------------------------------------------------------------
     */
 
+    public function scopeWithOnlySelectsForDetectingOrderStatus($query): Builder
+    {
+        return $query->select([
+            'id',
+            'arrived_at_warehouse',
+        ]);
+    }
+
     public function scopeWithBasicImportRelations($query): Builder
     {
         return $query->with([
@@ -314,7 +322,9 @@ class Shipment extends Model implements HasTitleAttribute
             foreach ($selectedProducts as $selected) {
                 $product = $databaseProducts->where('id', $selected['id'])->first();
                 $product->shipment_from_manufacturer_id = $shipment->id;
-                $product->produced_by_manufacturer_quantity = $selected['produced_by_manufacturer_quantity'];
+                $product->produced_by_manufacturer_quantity = isset($selected['produced_by_manufacturer_quantity'])
+                    ? $selected['produced_by_manufacturer_quantity']
+                    : null;
                 $product->save();
             }
 

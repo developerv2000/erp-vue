@@ -157,6 +157,7 @@ const updateMAHOptions = async (field, processId) => {
                             :label="t('fields.Quantity')"
                             v-model="field.value.quantity"
                             :min="0"
+                            required
                         />
                     </v-col>
 

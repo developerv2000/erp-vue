@@ -90,16 +90,7 @@ const handleTableOptionsUpdate = (options) => {
         </template>
 
         <template #item.order_id="{ item }">
-            <TdInertiaLink
-                :link="
-                    route('cmd.orders.index', {
-                        'id[]': item.order.id,
-                        initialize_from_inertia_page: true,
-                    })
-                "
-            >
-                {{ item.order.title }}
-            </TdInertiaLink>
+            {{ item.order.title }}
         </template>
 
         <template #item.process_trademark_en="{ item }">
@@ -259,7 +250,9 @@ const handleTableOptionsUpdate = (options) => {
 
         <template #item.shipment_arrived_at_warehouse="{ item }">
             {{
-                formatDate(item.shipment_from_manufacturer?.arrived_at_warehouse)
+                formatDate(
+                    item.shipment_from_manufacturer?.arrived_at_warehouse
+                )
             }}
         </template>
 

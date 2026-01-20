@@ -16,6 +16,7 @@ defineProps({
             'bg-indigo': status == 'Production started',
             'bg-purple': status == 'Production is ended',
             'bg-pink': status == 'Ready for shipment from manufacturer',
+            'bg-lime-lighten-4': status == 'Arrived at warehouse',
         }"
         style="line-height: 1.2;"
     >

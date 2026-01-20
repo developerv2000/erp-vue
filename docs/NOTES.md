@@ -26,3 +26,6 @@ etc functions
 - IMPORTANT: Optimize Process model events. Move most funtions into update/create from request functions
 and also Manufacturer models saving event!
 - Create 'removeRedundantAtxes' php artisan function
+- Optimize loading relations and selecting only required attributes when detecting Order 
+and OrderProduct models statuses (like OrderProduct::scopeWithOnlySelectsForDetectingStatus)
+- Add 'arrived at warehouse filter' for Order and OrderProduct

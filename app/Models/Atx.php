@@ -59,7 +59,7 @@ class Atx extends Model
 
             [
                 'name' => $data['atx_name'],
-                'short_name' => $data['atx_short_name'],
+                'short_name' => isset($data['atx_short_name']) ? $data['atx_short_name'] : null,
             ]
         );
     }

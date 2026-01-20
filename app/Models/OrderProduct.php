@@ -79,6 +79,7 @@ class OrderProduct extends Model implements HasTitleAttribute
     // Statuses
     const STATUS_PRODUCTION_IS_ENDED_NAME = 'Production is ended';
     const STATUS_IS_READY_FOR_SHIPMENT_FROM_MANUFACTURER_NAME = 'Ready for shipment from manufacturer';
+    const STATUS_ARRIVED_AT_WAREHOUSE_NAME = 'Arrived at warehouse';
 
     // Serialization statuses
     const SERIALIZATION_STATUS_SERIALIZATION_CODES_REQUESTED_NAME = 'Serialization codes requested';
@@ -317,6 +318,16 @@ class OrderProduct extends Model implements HasTitleAttribute
     }
 
     /**
+     * Required loaded relations:
+     * - products.shipmentFromManufacturer
+     */
+    public function getArrivedAtWarehouseAttribute(): bool
+    {
+        return $this->shipmentFromManufacturer
+            && $this->shipmentFromManufacturer->has_arrived_at_warehouse;
+    }
+
+    /**
      * Used on "cmd.order-products.edit" page
      * to display additional inputs
      */
@@ -342,9 +353,17 @@ class OrderProduct extends Model implements HasTitleAttribute
         return !is_null($this->readiness_for_shipment_from_manufacturer_date);
     }
 
+    /**
+     * HEAVY OPERATION!
+     *
+     * MAKE SURE ALL USED RELATIONS ARE LOADED BEFORE CALLING THIS METHOD
+     */
     public function getStatusAttribute(): string
     {
         return match (true) {
+            $this->arrived_at_warehouse
+            => self::STATUS_ARRIVED_AT_WAREHOUSE_NAME,
+
             $this->is_ready_for_shipment_from_manufacturer
             => self::STATUS_IS_READY_FOR_SHIPMENT_FROM_MANUFACTURER_NAME,
 
@@ -525,7 +544,7 @@ class OrderProduct extends Model implements HasTitleAttribute
             'productionInvoices', // Required when detecting 'payment_completed_date' of invoices
 
             'order' => function ($orderQuery) {
-                $orderQuery->with([ // $orderQuery->withBasicRelations() not used because of redundant/extra relations
+                $orderQuery->with([
                     'country',
                     'currency',
 
@@ -540,13 +559,17 @@ class OrderProduct extends Model implements HasTitleAttribute
                             ]);
                     },
 
-                    'products', // Maybe required when detecting 'status' of the order/product
+                    'products.shipmentFromManufacturer', // Required when detecting 'status' of Order/Product
                 ]);
             },
 
             'process' => function ($processQuery) {
                 $processQuery->withRelationsForOrderProduct()
                     ->withOnlySelectsForOrderProduct();
+            },
+
+            'shipmentFromManufacturer' => function ($shipmentQuery) { // Required when detecting 'status' of Product
+                $shipmentQuery->withOnlySelectsForDetectingOrderStatus();
             },
         ]);
     }
@@ -565,7 +588,7 @@ class OrderProduct extends Model implements HasTitleAttribute
             'serializationType',
 
             'order' => function ($orderQuery) {
-                $orderQuery->with([ // $orderQuery->withBasicRelations() not used because of redundant 'lastComment'
+                $orderQuery->with([
                     'country',
                     'currency',
 
@@ -580,13 +603,17 @@ class OrderProduct extends Model implements HasTitleAttribute
                             ]);
                     },
 
-                    'products', // Maybe required when detecting 'status' of the order/product
+                    'products.shipmentFromManufacturer', // Required when detecting 'status' of Order/Product
                 ]);
             },
 
             'process' => function ($processQuery) {
                 $processQuery->withRelationsForOrderProduct()
                     ->withOnlySelectsForOrderProduct();
+            },
+
+            'shipmentFromManufacturer' => function ($shipmentQuery) { // Required when detecting 'status' of Product
+                $shipmentQuery->withOnlySelectsForDetectingOrderStatus();
             },
         ]);
     }
@@ -604,7 +631,7 @@ class OrderProduct extends Model implements HasTitleAttribute
             'lastComment',
 
             'order' => function ($orderQuery) {
-                $orderQuery->with([ // $orderQuery->withBasicRelations() not used because of redundant relations
+                $orderQuery->with([
                     'country',
 
                     'manufacturer' => function ($manufacturersQuery) {
@@ -636,7 +663,7 @@ class OrderProduct extends Model implements HasTitleAttribute
             'lastComment',
 
             'order' => function ($orderQuery) {
-                $orderQuery->with([ // $orderQuery->withBasicRelations() not used because of redundant relations
+                $orderQuery->with([
                     'country',
 
                     'manufacturer' => function ($manufacturersQuery) {
@@ -668,7 +695,7 @@ class OrderProduct extends Model implements HasTitleAttribute
             'lastComment',
 
             'order' => function ($orderQuery) {
-                $orderQuery->with([ // $orderQuery->withBasicRelations() not used because of redundant 'lastComment'
+                $orderQuery->with([
                     'country',
                     'currency',
 
@@ -679,7 +706,7 @@ class OrderProduct extends Model implements HasTitleAttribute
                         );
                     },
 
-                    'products', // Maybe required when detecting 'status' of the order/product
+                    'products.shipmentFromManufacturer', // Required when detecting 'status' of Order/Product
                 ]);
             },
 
@@ -688,7 +715,7 @@ class OrderProduct extends Model implements HasTitleAttribute
                     ->withOnlySelectsForOrderProduct();
             },
 
-            'shipmentFromManufacturer' => function ($shipmentQuery) {
+            'shipmentFromManufacturer' => function ($shipmentQuery) { // Also required when detecting 'status' of Product
                 $shipmentQuery->with([
                     'transportationMethod',
                     'destination',
@@ -1542,6 +1569,7 @@ class OrderProduct extends Model implements HasTitleAttribute
             ['title' => 'fields.Volume', 'key' => 'shipment_volume', 'width' => 72, 'sortable' => false],
             ['title' => 'dates.Transportation request', 'key' => 'shipment_transportation_requested_at', 'width' => 228, 'sortable' => false],
             ['title' => 'fields.Forwarder', 'key' => 'shipment_forwarder', 'width' => 116, 'sortable' => false],
+            ['title' => 'fields.Produced quantity', 'key' => 'produced_by_manufacturer_quantity', 'width' => 220, 'sortable' => true],
             ['title' => 'fields.Price', 'key' => 'shipment_price', 'width' => 70, 'sortable' => false],
             ['title' => 'fields.Currency', 'key' => 'shipment_currency_id', 'width' => 84, 'sortable' => false],
             ['title' => 'dates.Rate approved', 'key' => 'shipment_rate_approved_at', 'width' => 172, 'sortable' => false],

@@ -1,7 +1,7 @@
 <script setup>
 import { usePage } from "@inertiajs/vue3";
 import { useI18n } from "vue-i18n";
-import { useCMDOrderProductsTableStore } from "@/departments/CMD/stores/orderProducts";
+import { useImportProductsTableStore } from "@/sections/import/stores/products";
 
 import StoreBindedFilter from "@/core/components/filters/StoreBindedFilter.vue";
 import FilterAutocomplete from "@/core/components/filters/inputs/FilterAutocomplete.vue";
@@ -10,7 +10,7 @@ import FilterNumberInput from "@/core/components/filters/inputs/FilterNumberInpu
 
 const { t } = useI18n();
 const page = usePage();
-const store = useCMDOrderProductsTableStore();
+const store = useImportProductsTableStore();
 </script>
 
 <template>
@@ -84,6 +84,13 @@ const store = useCMDOrderProductsTableStore();
             :label="t('filter.Order ID')"
             name="order_id"
             v-model="store.filters.order_id"
+            :min="1"
+        />
+
+        <FilterNumberInput
+            :label="t('filter.Shipment ID')"
+            name="shipment_from_manufacturer_id"
+            v-model="store.filters.shipment_from_manufacturer_id"
             :min="1"
         />
 

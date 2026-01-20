@@ -20,6 +20,15 @@ Route::prefix('import')->name('import.')->middleware('auth', 'auth.session')->gr
             'can:view-import-shipments',
             'can:edit-import-shipments'
         );
+
+        // AJAX requests
+        Route::middleware('can:edit-import-shipments')->group(function () {
+            Route::get('/ready-without-shipment-from-manufacturer-products/{manufacturer_id}', 'getReadyWithoutShipmentFromManufacturerProducts')
+                ->name('get-ready-without-shipment-from-manufacturer-products');
+
+            Route::post('/complete/{record}', 'complete')->name('complete');
+            Route::post('/arrive-at-warehouse/{record}', 'arriveAtWarehouse')->name('arrive-at-warehouse');
+        });
     });
 
     // Invoices

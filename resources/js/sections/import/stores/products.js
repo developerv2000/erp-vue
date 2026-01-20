@@ -21,6 +21,7 @@ const defaultFilters = {
 
     // Numbers
     order_id: null,
+    shipment_from_manufacturer_id: null,
 
     // Singular autocompletes
     status: null,
@@ -79,7 +80,7 @@ export const useImportProductsTableStore = defineStore('ImportProductsTable', {
             this.filters.id = query.id;
 
             // Normalize filters
-            normalizeNumbersFromQuery(this.filters, query, ['order_id']);
+            normalizeNumbersFromQuery(this.filters, query, ['order_id', 'shipment_from_manufacturer_id']);
             normalizeSingleIDsFromQuery(this.filters, query, ['order_manufacturer_bdm_user_id']);
             normalizeMultiIDsFromQuery(this.filters, query, ['order_manufacturer_id ', 'process_country_id', 'process_marketing_authorization_holder_id']);
             normalizeDateRangesFromQuery(this.filters, query, ['created_at', 'updated_at']);

@@ -70,14 +70,14 @@ return new class extends Migration
 
             // Step 9:
             // ELD part
-            $table->unsignedMediumInteger('produced_by_manufacturer_quantity')->nullable();
-
             $table->unsignedMediumInteger('shipment_from_manufacturer_id')
                 ->index()
                 ->foreign()
                 ->references('id')
                 ->on('shipments')
                 ->nullable();
+
+            $table->unsignedMediumInteger('produced_by_manufacturer_quantity')->nullable();
 
             // Timestamps
             $table->timestamps();

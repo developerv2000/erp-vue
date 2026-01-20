@@ -168,14 +168,7 @@ const submit = handleSubmit((values) => {
         </DefaultSheet>
 
         <FormActionsContainer>
-            <FormResetButton
-                @click="
-                    similarRecords = undefined;
-                    matchedATX = undefined;
-                    resetForm();
-                "
-                :loading="loading"
-            />
+            <FormResetButton @click="resetForm" :loading="loading" />
 
             <FormStoreWithoutReseting
                 @click="

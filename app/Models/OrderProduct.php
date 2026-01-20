@@ -15,6 +15,7 @@ use App\Support\Traits\Model\HasComments;
 use App\Support\Traits\Model\HasModelNamespaceAttributes;
 use App\Support\Traits\Model\UploadsFile;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -258,6 +259,38 @@ class OrderProduct extends Model implements HasTitleAttribute
         $this->process->append([
             'full_english_product_label',
             'full_russian_product_label',
+        ]);
+    }
+
+    public static function appendRecordsBasicImportAttributes($records): void
+    {
+        foreach ($records as $record) {
+            $record->appendBasicImportAttributes();
+        }
+    }
+
+    public function appendBasicImportAttributes(): void
+    {
+        $this->append([
+            'base_model_class',
+            'status',
+            'packing_list_file_url',
+            'coa_file_url',
+            'coo_file_url',
+            'declaration_for_europe_file_url',
+        ]);
+
+        $this->order->append([
+            'title',
+        ]);
+
+        $this->process->append([
+            'full_english_product_label',
+            'full_russian_product_label',
+        ]);
+
+        $this->shipmentFromManufacturer?->append([
+            'title',
         ]);
     }
 
@@ -654,6 +687,14 @@ class OrderProduct extends Model implements HasTitleAttribute
                 $processQuery->withRelationsForOrderProduct()
                     ->withOnlySelectsForOrderProduct();
             },
+
+            'shipmentFromManufacturer' => function ($shipmentQuery) {
+                $shipmentQuery->with([
+                    'transportationMethod',
+                    'destination',
+                    'currency',
+                ]);
+            },
         ]);
     }
 
@@ -686,6 +727,11 @@ class OrderProduct extends Model implements HasTitleAttribute
     public function scopeOnlyReadyForShipmentFromManufacturer($query): Builder
     {
         return $query->whereNotNull('readiness_for_shipment_from_manufacturer_date');
+    }
+
+    public function scopeOnlyWithoutShipmentFromManufacturer($query): Builder
+    {
+        return $query->whereNull('shipment_from_manufacturer_id');
     }
 
     public function scopeOnlyWithInvoicesSentForPayment($query): Builder
@@ -904,15 +950,15 @@ class OrderProduct extends Model implements HasTitleAttribute
     public static function queryImportRecordsFromRequest(Request $request, string $action = 'paginate', bool $appendAttributes = false)
     {
         $query = self::onlyReadyForShipmentFromManufacturer()
-            ->withBasicCMDRelations()
-            ->withBasicCMDRelationCounts();
+            ->withBasicImportRelations()
+            ->withBasicImportRelationCounts();
 
         // Normalize request parameters
         self::addDefaultQueryParamsToRequest(
             $request,
-            'DEFAULT_CMD_ORDER_BY',
-            'DEFAULT_CMD_ORDER_DIRECTION',
-            'DEFAULT_CMD_PER_PAGE'
+            'DEFAULT_IMPORT_ORDER_BY',
+            'DEFAULT_IMPORT_ORDER_DIRECTION',
+            'DEFAULT_IMPORT_PER_PAGE'
         );
 
         // Apply filters
@@ -923,7 +969,7 @@ class OrderProduct extends Model implements HasTitleAttribute
 
         // Append attributes unless raw query is requested
         if ($appendAttributes && $action !== 'query') {
-            self::appendRecordsBasicCMDAttributes($records);
+            self::appendRecordsBasicImportAttributes($records);
         }
 
         return $records;
@@ -949,7 +995,7 @@ class OrderProduct extends Model implements HasTitleAttribute
     private static function getFilterConfig(): array
     {
         return [
-            'whereEqual' => ['process_id', 'new_layout', 'order_id'],
+            'whereEqual' => ['process_id', 'new_layout', 'order_id', 'shipment_from_manufacturer_id'],
             'whereIn' => ['id'],
             'dateRange' => [
                 'date_of_sending_new_layout_to_manufacturer',
@@ -1192,6 +1238,34 @@ class OrderProduct extends Model implements HasTitleAttribute
                 'increased_price' => $this->price
             ]);
         }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Misc
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Used on AJAX requests from import.shipments.create route
+     */
+    public static function getReadyWithoutShipmentFromManufacturerRecords($manufacturerId, $appendFullEnglishProductLabel = false): Collection
+    {
+        $records = self::onlyReadyForShipmentFromManufacturer()
+            ->onlyWithoutShipmentFromManufacturer()
+            ->withBasicImportRelations()
+            ->whereHas('order', function ($orderQuery) use ($manufacturerId) {
+                $orderQuery->where('manufacturer_id', $manufacturerId);
+            })
+            ->get();
+
+        if ($appendFullEnglishProductLabel) {
+            foreach ($records as $record) {
+                $record->process->append('full_english_product_label');
+            }
+        }
+
+        return $records;
     }
 
     /*
@@ -1454,21 +1528,21 @@ class OrderProduct extends Model implements HasTitleAttribute
             ['title' => 'fields.COA', 'key' => 'coa_file', 'width' => 152, 'sortable' => false],
             ['title' => 'fields.COO', 'key' => 'coo_file', 'width' => 152, 'sortable' => false],
             ['title' => 'fields.Declaration for EUR1', 'key' => 'declaration_for_europe_file', 'width' => 160, 'sortable' => false],
-            ['title' => 'dates.Ready for shipment', 'key' => 'readiness_for_shipment_from_manufacturer_date', 'width' => 160, 'sortable' => true],
+            ['title' => 'dates.Ready for shipment', 'key' => 'readiness_for_shipment_from_manufacturer_date', 'width' => 144, 'sortable' => true],
 
             ['title' => 'Shipment', 'key' => 'shipment_from_manufacturer_id', 'width' => 160, 'sortable' => true],
-            ['title' => 'fields.Transportation method', 'key' => 'shipment_transportation_method_id', 'width' => 160, 'sortable' => false],
-            ['title' => 'fields.Destination', 'key' => 'shipment_destination_id', 'width' => 160, 'sortable' => false],
-            ['title' => 'fields.Pallets', 'key' => 'shipment_pallets_quantity', 'width' => 160, 'sortable' => false],
-            ['title' => 'fields.Volume', 'key' => 'shipment_volume', 'width' => 160, 'sortable' => false],
-            ['title' => 'dates.Transportation request', 'key' => 'shipment_transportation_requested_at', 'width' => 160, 'sortable' => false],
-            ['title' => 'fields.Forwarder', 'key' => 'shipment_forwarder', 'width' => 160, 'sortable' => false],
+            ['title' => 'fields.Transportation method', 'key' => 'shipment_transportation_method_id', 'width' => 128, 'sortable' => false],
+            ['title' => 'fields.Destination', 'key' => 'shipment_destination_id', 'width' => 144, 'sortable' => false],
+            ['title' => 'fields.Pallets', 'key' => 'shipment_pallets_quantity', 'width' => 80, 'sortable' => false],
+            ['title' => 'fields.Volume', 'key' => 'shipment_volume', 'width' => 72, 'sortable' => false],
+            ['title' => 'dates.Transportation request', 'key' => 'shipment_transportation_requested_at', 'width' => 228, 'sortable' => false],
+            ['title' => 'fields.Forwarder', 'key' => 'shipment_forwarder', 'width' => 116, 'sortable' => false],
             ['title' => 'fields.Price', 'key' => 'shipment_price', 'width' => 70, 'sortable' => false],
             ['title' => 'fields.Currency', 'key' => 'shipment_currency_id', 'width' => 84, 'sortable' => false],
-            ['title' => 'dates.Rate approved', 'key' => 'shipment_rate_approved_at', 'width' => 160, 'sortable' => false],
-            ['title' => 'dates.Confirmed', 'key' => 'shipment_confirmed_at', 'width' => 160, 'sortable' => false],
-            ['title' => 'dates.Completed', 'key' => 'shipment_completed_at', 'width' => 160, 'sortable' => false],
-            ['title' => 'dates.Arrived at warehouse', 'key' => 'shipment_arrived_at_warehouse', 'width' => 160, 'sortable' => false],
+            ['title' => 'dates.Rate approved', 'key' => 'shipment_rate_approved_at', 'width' => 172, 'sortable' => false],
+            ['title' => 'dates.Confirmed', 'key' => 'shipment_confirmed_at', 'width' => 158, 'sortable' => false],
+            ['title' => 'dates.Completed', 'key' => 'shipment_completed_at', 'width' => 140, 'sortable' => false],
+            ['title' => 'dates.Arrived at warehouse', 'key' => 'shipment_arrived_at_warehouse', 'width' => 180, 'sortable' => false],
 
             ['title' => 'dates.Date of creation', 'key' => 'created_at', 'width' => 130, 'sortable' => true],
             ['title' => 'dates.Update date', 'key' => 'updated_at', 'width' => 150, 'sortable' => true],

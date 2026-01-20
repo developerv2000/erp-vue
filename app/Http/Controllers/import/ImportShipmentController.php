@@ -7,11 +7,13 @@ use App\Http\Requests\ImportShipmentStoreRequest;
 use App\Http\Requests\ImportShipmentUpdateRequest;
 use App\Models\Currency;
 use App\Models\Manufacturer;
+use App\Models\OrderProduct;
 use App\Models\Shipment;
 use App\Models\ShipmentDestination;
 use App\Models\TransportationMethod;
 use App\Models\User;
 use App\Support\Traits\Controller\DestroysModelRecords;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -62,6 +64,14 @@ class ImportShipmentController extends Controller
         ]);
     }
 
+    /**
+     * AJAX request
+     */
+    public function getReadyWithoutShipmentFromManufacturerProducts(Request $request): Collection
+    {
+        return OrderProduct::getReadyWithoutShipmentFromManufacturerRecords($request->manufacturer_id, appendFullEnglishProductLabel: true);
+    }
+
     public function edit($record): Response
     {
         $record = Order::withBasicPLDRelations()
@@ -102,7 +112,7 @@ class ImportShipmentController extends Controller
         $record->complete();
 
         // Return refetched updated record
-        $record = Shipment::withBasicImportDRelations()
+        $record = Shipment::withBasicImportRelations()
             ->withBasicImportRelationCounts()
             ->findOrFail($record->id);
 
@@ -119,7 +129,7 @@ class ImportShipmentController extends Controller
         $record->arriveAtWarehouse();
 
         // Return refetched updated record
-        $record = Shipment::withBasicImportDRelations()
+        $record = Shipment::withBasicImportRelations()
             ->withBasicImportRelationCounts()
             ->findOrFail($record->id);
 

@@ -12,9 +12,11 @@ use App\Support\Helpers\QueryFilterHelper;
 use App\Support\Traits\Model\AddsDefaultQueryParamsToRequest;
 use App\Support\Traits\Model\HasComments;
 use App\Support\Traits\Model\HasModelNamespaceAttributes;
+use App\Support\Traits\Model\UploadsFile;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
 class Shipment extends Model implements HasTitleAttribute
@@ -22,12 +24,17 @@ class Shipment extends Model implements HasTitleAttribute
     use HasComments;
     use HasModelNamespaceAttributes;
     use AddsDefaultQueryParamsToRequest;
+    use UploadsFile;
 
     /*
     |--------------------------------------------------------------------------
     | Constants
     |--------------------------------------------------------------------------
     */
+
+    // Storage files
+    const STORAGE_FILES_PATH = 'app/private/shipments';
+    const PACKING_LIST_FILE_FOLDER_NAME = 'packing-lists';
 
     // Import
     const DEFAULT_IMPORT_ORDER_BY = 'id';
@@ -55,6 +62,11 @@ class Shipment extends Model implements HasTitleAttribute
     | Relations
     |--------------------------------------------------------------------------
     */
+
+    public function manufacturer()
+    {
+        return $this->belongsTo(Manufacturer::class);
+    }
 
     public function products()
     {
@@ -93,9 +105,10 @@ class Shipment extends Model implements HasTitleAttribute
     {
         $this->append([
             'base_model_class',
+            'packing_list_file_url',
             'confirmed',
             'completed',
-            'arrived_at_warehouse',
+            'has_arrived_at_warehouse',
         ]);
 
         $this->loadMissing('products.process');
@@ -118,9 +131,17 @@ class Shipment extends Model implements HasTitleAttribute
         return !is_null($this->completed_at);
     }
 
-    public function getArrivedAtWarehouseAttribute(): bool
+    // Avoid duplicate 'arrived_at_warehouse' attribute
+    public function getHasArrivedAtWarehouseAttribute(): bool
     {
         return !is_null($this->arrived_at_warehouse);
+    }
+
+    public function getPackingListFileUrlAttribute(): string
+    {
+        return route('shipments.files', [
+            'path' => self::PACKING_LIST_FILE_FOLDER_NAME . '/' . $this->packing_list_file,
+        ]);
     }
 
     /*
@@ -134,6 +155,7 @@ class Shipment extends Model implements HasTitleAttribute
         static::deleting(function ($record) {
             foreach ($record->products as $product) {
                 $product->shipment_from_manufacturer_id = null;
+                $product->produced_by_manufacturer_quantity = null;
                 $product->save();
             }
         });
@@ -175,6 +197,7 @@ class Shipment extends Model implements HasTitleAttribute
     {
         return $query->withCount([
             'comments',
+            'products',
         ]);
     }
 
@@ -276,12 +299,31 @@ class Shipment extends Model implements HasTitleAttribute
      *
      * Primarily done by ELD!
      */
-    public function storeFromImportPageRequest(ImportShipmentStoreRequest $request): void
+    public static function storeFromImportPageRequest(ImportShipmentStoreRequest $request): void
     {
-        $record = self::create($request->all());
+        DB::transaction(function () use ($request) {
+            // Create shipment
+            $shipment = self::create($request->all());
 
-        // HasMany relations
-        $record->storeCommentFromRequest($request);
+            // Add products to shipment
+            $selectedProducts = collect($request->array('products', []))
+                ->where('checked', true);
+
+            $databaseProducts = OrderProduct::whereIn('id', $selectedProducts->pluck('id'))->get();
+
+            foreach ($selectedProducts as $selected) {
+                $product = $databaseProducts->where('id', $selected['id'])->first();
+                $product->shipment_from_manufacturer_id = $shipment->id;
+                $product->produced_by_manufacturer_quantity = $selected['produced_by_manufacturer_quantity'];
+                $product->save();
+            }
+
+            // HasMany relations
+            $shipment->storeCommentFromRequest($request);
+
+            // Upload files
+            $shipment->uploadFile('packing_list_file', self::getPackingListFileFolderPath());
+        });
     }
 
     /**
@@ -331,6 +373,17 @@ class Shipment extends Model implements HasTitleAttribute
 
     /*
     |--------------------------------------------------------------------------
+    | Storage paths
+    |--------------------------------------------------------------------------
+    */
+
+    public static function getPackingListFileFolderPath(): string
+    {
+        return storage_path(self::STORAGE_FILES_PATH . '/' . self::PACKING_LIST_FILE_FOLDER_NAME);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Table headers
     |--------------------------------------------------------------------------
     */
@@ -354,6 +407,8 @@ class Shipment extends Model implements HasTitleAttribute
         $additionalColumns = [
             ['title' => 'ID', 'key' => 'id', 'width' => 62, 'sortable' => true],
             ['title' => 'fields.Manufacturer', 'key' => 'manufacturer_id', 'width' => 140, 'sortable' => true],
+            ['title' => 'fields.Packing list', 'key' => 'packing_list_file', 'width' => 152, 'sortable' => false],
+            ['title' => 'Products', 'key' => 'products_count', 'width' => 100, 'sortable' => false],
             ['title' => 'fields.Transportation method', 'key' => 'transportation_method_id', 'width' => 144, 'sortable' => true],
             ['title' => 'fields.Destination', 'key' => 'destination_id', 'width' => 160, 'sortable' => true],
             ['title' => 'fields.Pallets', 'key' => 'pallets_quantity', 'width' => 80, 'sortable' => false],
@@ -366,6 +421,9 @@ class Shipment extends Model implements HasTitleAttribute
             ['title' => 'dates.Confirmed', 'key' => 'confirmed_at', 'width' => 172, 'sortable' => true],
             ['title' => 'dates.Completed', 'key' => 'completed_at', 'width' => 156, 'sortable' => true],
             ['title' => 'dates.Arrived at warehouse', 'key' => 'arrived_at_warehouse', 'width' => 188, 'sortable' => true],
+
+            ['title' => 'Comments', 'key' => 'comments_count', 'width' => 132, 'sortable' => false],
+            ['title' => 'comments.Last', 'key' => 'last_comment_body', 'width' => 200, 'sortable' => false],
 
             ['title' => 'dates.Date of creation', 'key' => 'created_at', 'width' => 130, 'sortable' => true],
             ['title' => 'dates.Update date', 'key' => 'updated_at', 'width' => 150, 'sortable' => true],

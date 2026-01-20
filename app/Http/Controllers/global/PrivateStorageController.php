@@ -42,4 +42,16 @@ class PrivateStorageController extends Controller
 
         return response()->file($fullPath);
     }
+
+    public function getShipmentFile($path): BinaryFileResponse
+    {
+        $fullPath = storage_path('app/private/shipments/' . $path);
+
+        // Check if the file exists
+        if (!file_exists($fullPath)) {
+            abort(403);
+        }
+
+        return response()->file($fullPath);
+    }
 }

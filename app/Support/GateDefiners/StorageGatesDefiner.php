@@ -12,6 +12,7 @@ class StorageGatesDefiner extends GateDefiner
             Permission::CAN_VIEW_STORAGE_ORDER_FILES_NAME,
             Permission::CAN_VIEW_STORAGE_ORDER_PRODUCT_FILES_NAME,
             Permission::CAN_VIEW_STORAGE_INVOICE_FILES_NAME,
+            Permission::CAN_VIEW_STORAGE_SHIPMENT_FILES_NAME,
         ];
     }
 }

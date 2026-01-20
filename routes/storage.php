@@ -45,4 +45,10 @@ Route::middleware('auth', 'auth.session')->group(function () {
         ->where('path', '.*')
         ->middleware('can:view-storage-invoice-files')
         ->name('invoices.files');
+
+    // Private storage route for accessing Shipment files
+    Route::get('/shipments/files/{path}', [PrivateStorageController::class, 'getShipmentFile'])
+        ->where('path', '.*')
+        ->middleware('can:view-storage-shipment-files')
+        ->name('shipments.files');
 });

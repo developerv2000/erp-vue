@@ -20,19 +20,19 @@ return new class extends Migration
                 ->references('id')
                 ->on('manufacturers');
 
+            $table->string('packing_list_file')->nullable();
+
             $table->unsignedTinyInteger('transportation_method_id') // 'Auto', 'Air' or 'Sea'
                 ->index()
                 ->foreign()
                 ->references('id')
-                ->on('transportation_methods')
-                ->nullable();
+                ->on('transportation_methods');
 
             $table->unsignedTinyInteger('destination_id') // 'Riga' or 'Destination country'
                 ->index()
                 ->foreign()
                 ->references('id')
-                ->on('shipment_destinations')
-                ->nullable();
+                ->on('shipment_destinations');
 
             $table->unsignedMediumInteger('pallets_quantity')->nullable();
             $table->unsignedMediumInteger('volume')->nullable();

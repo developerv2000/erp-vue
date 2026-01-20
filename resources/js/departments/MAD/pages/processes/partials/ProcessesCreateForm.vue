@@ -541,7 +541,7 @@ const reloadUpdatedDataAndResetForm = () => {
 
         <!-- Actions -->
         <FormActionsContainer>
-            <FormResetButton @click="resetForm()" :loading="loading" />
+            <FormResetButton @click="resetForm" :loading="loading" />
 
             <FormStoreWithoutReseting
                 @click="

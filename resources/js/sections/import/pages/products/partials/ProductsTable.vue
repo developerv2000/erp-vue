@@ -195,6 +195,74 @@ const handleTableOptionsUpdate = (options) => {
             {{ formatDate(item.readiness_for_shipment_from_manufacturer_date) }}
         </template>
 
+        <template #item.shipment_from_manufacturer_id="{ item }">
+            <TdInertiaLink
+                v-if="item.shipment_from_manufacturer_id"
+                :link="
+                    route('import.shipments.index', {
+                        'id[]': item.shipment_from_manufacturer_id,
+                        initialize_from_inertia_page: true,
+                    })
+                "
+            >
+                {{ item.shipment_from_manufacturer.title }}
+            </TdInertiaLink>
+        </template>
+
+        <template #item.shipment_transportation_method_id="{ item }">
+            {{ item.shipment_from_manufacturer?.transportation_method.name }}
+        </template>
+
+        <template #item.shipment_destination_id="{ item }">
+            {{ item.shipment_from_manufacturer?.destination.name }}
+        </template>
+
+        <template #item.shipment_pallets_quantity="{ item }">
+            {{ item.shipment_from_manufacturer?.pallets_quantity }}
+        </template>
+
+        <template #item.shipment_volume="{ item }">
+            {{ item.shipment_from_manufacturer?.volume }}
+        </template>
+
+        <template #item.shipment_transportation_requested_at="{ item }">
+            {{
+                formatDate(
+                    item.shipment_from_manufacturer?.transportation_requested_at
+                )
+            }}
+        </template>
+
+        <template #item.shipment_forwarder="{ item }">
+            {{ item.shipment_from_manufacturer?.forwarder }}
+        </template>
+
+        <template #item.shipment_price="{ item }">
+            {{ item.shipment_from_manufacturer?.price }}
+        </template>
+
+        <template #item.shipment_currency_id="{ item }">
+            {{ item.shipment_from_manufacturer?.currency.name }}
+        </template>
+
+        <template #item.shipment_rate_approved_at="{ item }">
+            {{ formatDate(item.shipment_from_manufacturer?.rate_approved_at) }}
+        </template>
+
+        <template #item.shipment_confirmed_at="{ item }">
+            {{ formatDate(item.shipment_from_manufacturer?.confirmed_at) }}
+        </template>
+
+        <template #item.shipment_completed_at="{ item }">
+            {{ formatDate(item.shipment_from_manufacturer?.completed_at) }}
+        </template>
+
+        <template #item.shipment_arrived_at_warehouse="{ item }">
+            {{
+                formatDate(item.shipment_from_manufacturer?.arrived_at_warehouse)
+            }}
+        </template>
+
         <template #item.created_at="{ item }">
             {{ formatDate(item.created_at) }}
         </template>

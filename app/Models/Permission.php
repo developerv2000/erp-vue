@@ -80,6 +80,9 @@ class Permission extends Model
     // PLD, CMD and PRD
     const CAN_VIEW_STORAGE_INVOICE_FILES_NAME = 'can-view-storage-invoice-files';
 
+    // PLD and ELD
+    const CAN_VIEW_STORAGE_SHIPMENT_FILES_NAME = 'can-view-storage-shipment-files';
+
     /*
     |--------------------------------------------------------------------------
     | MAD permissions
@@ -474,6 +477,7 @@ class Permission extends Model
             self::CAN_VIEW_STORAGE_ORDER_FILES_NAME,
             self::CAN_VIEW_STORAGE_ORDER_PRODUCT_FILES_NAME,
             self::CAN_VIEW_STORAGE_INVOICE_FILES_NAME,
+            self::CAN_VIEW_STORAGE_SHIPMENT_FILES_NAME,
 
             self::CAN_RECEIVE_NOTIFICATION_WHEN_MAD_VPS_IS_MARKED_AS_READY_FOR_ORDER,
             self::CAN_RECEIVE_NOTIFICATION_WHEN_ORDER_IS_SENT_FOR_CONFIRMATION_BY_CMD,
@@ -524,6 +528,8 @@ class Permission extends Model
 
             self::CAN_EDIT_IMPORT_SHIPMENTS_NAME,
             self::CAN_EDIT_IMPORT_INVOICES_NAME,
+
+            self::CAN_VIEW_STORAGE_SHIPMENT_FILES_NAME,
         ];
     }
 }

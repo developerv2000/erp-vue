@@ -4,6 +4,7 @@ namespace App\Support\Traits\Controller;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Trait DestroysModelRecords
@@ -28,24 +29,26 @@ trait DestroysModelRecords
         // Extract id or ids from request as array to delete through loop
         $ids = (array) ($request->input('id') ?: $request->input('ids'));
 
-        if ($request->input('force_delete')) {
-            foreach ($ids as $id) {
-                // Check if model exists before force deleting
-                $record = static::$model::withTrashed()->find($id);
-                if ($record) {
-                    $record->forceDelete();
+        DB::transaction(function () use ($ids, $request) {
+            if ($request->input('force_delete')) {
+                foreach ($ids as $id) {
+                    // Check if model exists before force deleting
+                    $record = static::$model::withTrashed()->find($id);
+                    if ($record) {
+                        $record->forceDelete();
+                    }
+                }
+            } else {
+                // Soft delete or trash records
+                foreach ($ids as $id) {
+                    // Check if model exists before soft deleting
+                    $record = static::$model::find($id);
+                    if ($record) {
+                        $record->delete();
+                    }
                 }
             }
-        } else {
-            // Soft delete or trash records
-            foreach ($ids as $id) {
-                // Check if model exists before soft deleting
-                $record = static::$model::find($id);
-                if ($record) {
-                    $record->delete();
-                }
-            }
-        }
+        });
 
         return response()->json([
             'count' => count($ids),

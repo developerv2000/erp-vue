@@ -23,3 +23,6 @@
 etc functions
 - Add 'loadMissing' relations for all models 'append' functions, as added in Shipment model.
 - NO EDIT/UPDATE for import.products. Remove redundant request/permissions if not required!
+- IMPORTANT: Optimize Process model events. Move most funtions into update/create from request functions
+and also Manufacturer models saving event!
+- Create 'removeRedundantAtxes' php artisan function

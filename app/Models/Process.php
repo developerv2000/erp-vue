@@ -449,6 +449,10 @@ class Process extends Model implements
             foreach ($record->statusHistory as $history) {
                 $history->delete();
             }
+
+            foreach ($record->orderProducts as $product) {
+                $product->delete();
+            }
         });
     }
 

@@ -126,6 +126,11 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
         return $this->hasMany(Meeting::class);
     }
 
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
     public function shipments()
     {
         return $this->hasMany(Shipment::class);
@@ -203,6 +208,14 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
 
             foreach ($record->meetings()->withTrashed()->get() as $meeting) {
                 $meeting->forceDelete();
+            }
+
+            foreach ($record->orders as $order) {
+                $order->delete();
+            }
+
+            foreach ($record->shipments as $shipment) {
+                $shipment->delete();
             }
         });
     }

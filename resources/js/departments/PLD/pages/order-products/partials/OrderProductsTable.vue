@@ -146,6 +146,16 @@ const handleTableOptionsUpdate = (options) => {
             {{ item.serialization_type.name }}
         </template>
 
+        <template #item.production_status="{ item }">
+            <div
+                :class="{
+                    'text-green': item.is_ready_for_shipment_from_manufacturer,
+                }"
+            >
+                {{ item.production_status }}
+            </div>
+        </template>
+
         <template #item.layout_approved_date="{ item }">
             {{ formatDate(item.layout_approved_date) }}
         </template>

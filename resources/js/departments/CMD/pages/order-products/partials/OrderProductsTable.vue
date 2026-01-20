@@ -177,6 +177,16 @@ const handleTableOptionsUpdate = (options) => {
             {{ formatDate(item.order.production_start_date) }}
         </template>
 
+        <template #item.production_status="{ item }">
+            <TogglableThreeLinesLimitedText
+                :class="{
+                    'text-green-darken-2':
+                        item.is_ready_for_shipment_from_manufacturer,
+                }"
+                :text="item.production_status"
+            />
+        </template>
+
         <template #item.production_end_date="{ item }">
             <template v-if="item.production_is_ended">
                 {{ formatDate(item.production_end_date) }}

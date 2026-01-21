@@ -315,7 +315,7 @@ class Shipment extends Model implements HasTitleAttribute
 
             // Add products to shipment
             $selectedProducts = collect($request->array('products', []))
-                ->where('checked', true);
+                ->where('checked', "true");
 
             $databaseProducts = OrderProduct::whereIn('id', $selectedProducts->pluck('id'))->get();
 

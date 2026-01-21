@@ -1,1 +1,0 @@
-import{y as e}from"./app-CMSjNDK4.js";const s=e("processStatusHistory",{state:()=>({selected:[],editDialog:!1,activeRecord:void 0}),actions:{resetState(){this.selected=[],this.editDialog=!1,this.activeRecord=void 0}}});export{s as u};

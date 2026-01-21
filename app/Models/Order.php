@@ -241,6 +241,19 @@ class Order extends Model implements HasTitleAttribute
      * Required loaded relations:
      * - products.shipmentFromManufacturer
      */
+    public function getAllProductsShipmentFromManufacturerStartedAttribute(): bool
+    {
+        if ($this->products->isEmpty()) {
+            return false;
+        }
+
+        return $this->products->every(fn($product) => $product->shipment_from_manufacturer_started);
+    }
+
+    /**
+     * Required loaded relations:
+     * - products.shipmentFromManufacturer
+     */
     public function getAllProductsArrivedAtWarehouseAttribute(): bool
     {
         if ($this->products->isEmpty()) {
@@ -253,13 +266,16 @@ class Order extends Model implements HasTitleAttribute
     /**
      * HEAVY OPERATION!
      *
-     * MAKE SURE ALL USED RELATIONS ARE LOADED BEFORE CALLING THIS METHOD
+     * MAKE SURE ALL USED RELATIONS ARE LOADED BEFORE CALLING THIS METHOD!
      */
     public function getStatusAttribute(): string
     {
         return match (true) {
             $this->all_products_arrived_at_warehouse
             => OrderProduct::STATUS_ARRIVED_AT_WAREHOUSE_NAME,
+
+            $this->all_products_shipment_from_manufacturer_started
+            => OrderProduct::STATUS_SHIPMENT_FROM_MANUFACTURER_STARTED_NAME,
 
             $this->all_products_are_ready_for_shipment_from_manufacturer
             => OrderProduct::STATUS_IS_READY_FOR_SHIPMENT_FROM_MANUFACTURER_NAME,

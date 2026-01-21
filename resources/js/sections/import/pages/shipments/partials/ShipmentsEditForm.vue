@@ -74,7 +74,7 @@ const baseInitialValues = computed(() => ({
         id: product.id,
         label: product.process.full_english_product_label,
         produced_by_manufacturer_quantity:
-            product.produced_by_manufacturer_quantity,
+            Number(product.produced_by_manufacturer_quantity),
     })),
 }));
 

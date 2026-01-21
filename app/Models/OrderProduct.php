@@ -79,6 +79,7 @@ class OrderProduct extends Model implements HasTitleAttribute
     // Statuses
     const STATUS_PRODUCTION_IS_ENDED_NAME = 'Production is ended';
     const STATUS_IS_READY_FOR_SHIPMENT_FROM_MANUFACTURER_NAME = 'Ready for shipment from manufacturer';
+    const STATUS_SHIPMENT_FROM_MANUFACTURER_STARTED_NAME = 'Shipment from manufacturer started';
     const STATUS_ARRIVED_AT_WAREHOUSE_NAME = 'Arrived at warehouse';
 
     // Serialization statuses
@@ -318,16 +319,6 @@ class OrderProduct extends Model implements HasTitleAttribute
     }
 
     /**
-     * Required loaded relations:
-     * - products.shipmentFromManufacturer
-     */
-    public function getArrivedAtWarehouseAttribute(): bool
-    {
-        return $this->shipmentFromManufacturer
-            && $this->shipmentFromManufacturer->has_arrived_at_warehouse;
-    }
-
-    /**
      * Used on "cmd.order-products.edit" page
      * to display additional inputs
      */
@@ -354,15 +345,37 @@ class OrderProduct extends Model implements HasTitleAttribute
     }
 
     /**
+     * Required loaded relations:
+     * - products.shipmentFromManufacturer
+     */
+    public function getShipmentFromManufacturerStartedAttribute(): bool
+    {
+        return !is_null($this->shipmentFromManufacturer);
+    }
+
+    /**
+     * Required loaded relations:
+     * - products.shipmentFromManufacturer
+     */
+    public function getArrivedAtWarehouseAttribute(): bool
+    {
+        return $this->shipmentFromManufacturer
+            && $this->shipmentFromManufacturer->has_arrived_at_warehouse;
+    }
+
+    /**
      * HEAVY OPERATION!
      *
-     * MAKE SURE ALL USED RELATIONS ARE LOADED BEFORE CALLING THIS METHOD
+     * MAKE SURE ALL USED RELATIONS ARE LOADED BEFORE CALLING THIS METHOD!
      */
     public function getStatusAttribute(): string
     {
         return match (true) {
             $this->arrived_at_warehouse
             => self::STATUS_ARRIVED_AT_WAREHOUSE_NAME,
+
+            $this->shipment_from_manufacturer_started
+            => self::STATUS_SHIPMENT_FROM_MANUFACTURER_STARTED_NAME,
 
             $this->is_ready_for_shipment_from_manufacturer
             => self::STATUS_IS_READY_FOR_SHIPMENT_FROM_MANUFACTURER_NAME,

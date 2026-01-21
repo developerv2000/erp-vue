@@ -567,7 +567,7 @@ class Order extends Model implements HasTitleAttribute
         );
 
         // Apply filters
-        self::filterQueryForRequest($query, $request);
+        self::filterQueryForRequest($query, $request, applyPermissionsFilter: true);
 
         // Finalize (sorting & pagination)
         $records = ModelHelper::finalizeQueryForRequest($query, $request, $action);
@@ -586,12 +586,16 @@ class Order extends Model implements HasTitleAttribute
     |--------------------------------------------------------------------------
     */
 
-    public static function filterQueryForRequest($query, $request): Builder
+    public static function filterQueryForRequest($query, $request, $applyPermissionsFilter = false): Builder
     {
         // Apply base filters using helper
         $query = QueryFilterHelper::applyFilters($query, $request, self::getFilterConfig());
 
         // Additional filters
+        if ($applyPermissionsFilter) {
+            self::applyPermissionsFilter($query);
+        }
+
         self::applyStatusFilter($query, $request);
 
         return $query;
@@ -619,18 +623,19 @@ class Order extends Model implements HasTitleAttribute
         ];
     }
 
-    public static function getFilterStatusOptions(): array
+    /**
+     * Filter the query based on user permissions.
+     */
+    public static function applyPermissionsFilter($query): Builder
     {
-        return [
-            self::STATUS_CREATED_NAME,
-            self::STATUS_IS_SENT_TO_BDM_NAME,
-            self::STATUS_IS_SENT_TO_CONFIRMATION_NAME,
-            self::STATUS_IS_CONFIRMED_NAME,
-            self::STATUS_IS_SENT_TO_MANUFACTURER_NAME,
-            self::STATUS_PRODUCTION_IS_STARTED_NAME,
-            OrderProduct::STATUS_PRODUCTION_IS_ENDED_NAME,
-            OrderProduct::STATUS_IS_READY_FOR_SHIPMENT_FROM_MANUFACTURER_NAME,
-        ];
+        // Apply filters only if the user is restricted from viewing all BDM order records
+        if (Gate::denies('view-CMD-orders-of-all-BDMs')) {
+            $query->whereHas('manufacturer', function ($manufacturersQuery) {
+                $manufacturersQuery->where('bdm_user_id', auth()->user()->id);
+            });
+        }
+
+        return $query;
     }
 
     /**
@@ -698,6 +703,20 @@ class Order extends Model implements HasTitleAttribute
 
             default => null,
         };
+    }
+
+    public static function getFilterStatusOptions(): array
+    {
+        return [
+            self::STATUS_CREATED_NAME,
+            self::STATUS_IS_SENT_TO_BDM_NAME,
+            self::STATUS_IS_SENT_TO_CONFIRMATION_NAME,
+            self::STATUS_IS_CONFIRMED_NAME,
+            self::STATUS_IS_SENT_TO_MANUFACTURER_NAME,
+            self::STATUS_PRODUCTION_IS_STARTED_NAME,
+            OrderProduct::STATUS_PRODUCTION_IS_ENDED_NAME,
+            OrderProduct::STATUS_IS_READY_FOR_SHIPMENT_FROM_MANUFACTURER_NAME,
+        ];
     }
 
     /*

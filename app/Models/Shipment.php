@@ -358,6 +358,9 @@ class Shipment extends Model implements HasTitleAttribute
 
             // HasMany relations
             $this->storeCommentFromRequest($request);
+
+            // Upload files
+            $this->uploadFile('packing_list_file', self::getPackingListFileFolderPath());
         });
     }
 

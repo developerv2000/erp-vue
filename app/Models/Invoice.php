@@ -419,7 +419,7 @@ class Invoice extends Model implements HasTitleAttribute
         );
 
         // Apply filters
-        self::filterQueryForRequest($query, $request);
+        self::filterQueryForRequest($query, $request, applyPermissionsFilter: true);
 
         // Finalize (sorting & pagination)
         $records = ModelHelper::finalizeQueryForRequest($query, $request, $action);
@@ -521,10 +521,15 @@ class Invoice extends Model implements HasTitleAttribute
     |--------------------------------------------------------------------------
     */
 
-    public static function filterQueryForRequest($query, $request): Builder
+    public static function filterQueryForRequest($query, $request, $applyPermissionsFilter = false): Builder
     {
         // Apply base filters using helper
         $query = QueryFilterHelper::applyFilters($query, $request, self::getFilterConfig());
+
+        // Additional filters
+        if ($applyPermissionsFilter) {
+            self::applyPermissionsFilter($query);
+        }
 
         return $query;
     }
@@ -569,6 +574,21 @@ class Invoice extends Model implements HasTitleAttribute
                 ],
             ],
         ];
+    }
+
+    /**
+     * Filter the query based on user permissions.
+     */
+    public static function applyPermissionsFilter($query): Builder
+    {
+        // Apply filters only if the user is restricted from viewing all BDM order records
+        if (Gate::denies('view-CMD-orders-of-all-BDMs')) {
+            $query->whereHas('invoiceable.manufacturer', function ($manufacturersQuery) {
+                $manufacturersQuery->where('bdm_user_id', auth()->user()->id);
+            });
+        }
+
+        return $query;
     }
 
     /*

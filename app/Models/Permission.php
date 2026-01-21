@@ -176,6 +176,10 @@ class Permission extends Model
     const CAN_EDIT_CMD_ORDER_PRODUCTS_NAME = 'can-edit-CMD-order-products';
     const CAN_EDIT_CMD_INVOICES_NAME = 'can-edit-CMD-invoices';
 
+    // Other CMD permissions:
+    const CAN_VIEW_CMD_ORDERS_OF_ALL_BDMS_NAME = 'can-view-CMD-orders-of-all-BDMs'; // includes orders, products and invoices
+    const CAN_EDIT_CMD_ORDERS_OF_ALL_BDMS_NAME = 'can-edit-CMD-orders-of-all-BDMs'; // includes orders, products and invoices
+
     /*
     |--------------------------------------------------------------------------
     | PRD permissions

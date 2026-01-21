@@ -13,7 +13,7 @@ Route::prefix('cmd')->name('cmd.')->middleware('auth', 'auth.session')->group(fu
             ['index', 'edit', 'update'],
             'id',
             'can:view-CMD-orders',
-            'can:edit-CMD-orders'
+            'can:edit-current-CMD-order'
         );
 
         // AJAX requests
@@ -30,7 +30,7 @@ Route::prefix('cmd')->name('cmd.')->middleware('auth', 'auth.session')->group(fu
             ['index', 'edit', 'update'],
             'id',
             'can:view-CMD-order-products',
-            'can:edit-CMD-order-products'
+            'can:edit-current-CMD-order-product'
         );
 
         // AJAX requests
@@ -47,7 +47,7 @@ Route::prefix('cmd')->name('cmd.')->middleware('auth', 'auth.session')->group(fu
             ['index', 'create', 'store', 'edit', 'update', 'destroy'],
             'id',
             'can:view-CMD-invoices',
-            'can:edit-CMD-invoices'
+            'can:edit-current-CMD-invoice'
         );
 
         // AJAX requests

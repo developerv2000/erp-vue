@@ -35,6 +35,7 @@ class CMDOrderController extends Controller
 
     public function edit(Order $record): Response
     {
+        // Order::withBasicCMDRelations::find($record) is not used because we need to load other relations
         $record->appendBasicCMDAttributes();
         $record->append('title'); // Used on generating breadcrumbs
 
@@ -54,7 +55,7 @@ class CMDOrderController extends Controller
             }
         ]);
 
-        // Append additional attributes
+        // Append additional product attributes
         foreach ($record->products as $product) {
             $product->append('production_is_started');
             $product->lastComment?->append('plain_text');

@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Http\Requests\CMD\CMDOrderProductUpdateRequest;
 use App\Http\Requests\DD\DDOrderProductUpdateRequest;
-use App\Http\Requests\MD\MDOrderProductUpdateRequest;
 use App\Http\Requests\MD\MDSerializedByManufacturerUpdateRequest;
 use App\Http\Requests\PLD\PLDOrderProductUpdateRequest;
 use App\Support\Contracts\Model\HasTitleAttribute;
@@ -875,7 +874,7 @@ class OrderProduct extends Model implements HasTitleAttribute
         );
 
         // Apply filters
-        self::filterQueryForRequest($query, $request);
+        self::filterQueryForRequest($query, $request, applyPermissionsFilter: true);
 
         // Finalize (sorting & pagination)
         $records = ModelHelper::finalizeQueryForRequest($query, $request, $action);
@@ -1021,12 +1020,16 @@ class OrderProduct extends Model implements HasTitleAttribute
     |--------------------------------------------------------------------------
     */
 
-    public static function filterQueryForRequest($query, $request): Builder
+    public static function filterQueryForRequest($query, $request, $applyPermissionsFilter = false): Builder
     {
         // Apply base filters using helper
         $query = QueryFilterHelper::applyFilters($query, $request, self::getFilterConfig());
 
         // Additional filters
+        if ($applyPermissionsFilter) {
+            self::applyPermissionsFilter($query);
+        }
+
         self::applyStatusFilter($query, $request);
 
         return $query;
@@ -1091,6 +1094,21 @@ class OrderProduct extends Model implements HasTitleAttribute
                 ],
             ],
         ];
+    }
+
+    /**
+     * Filter the query based on user permissions.
+     */
+    public static function applyPermissionsFilter($query): Builder
+    {
+        // Apply filters only if the user is restricted from viewing all BDM order records
+        if (Gate::denies('view-CMD-orders-of-all-BDMs')) {
+            $query->whereHas('order.manufacturer', function ($manufacturersQuery) {
+                $manufacturersQuery->where('bdm_user_id', auth()->user()->id);
+            });
+        }
+
+        return $query;
     }
 
     /**

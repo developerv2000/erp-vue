@@ -36,8 +36,13 @@ Route::prefix('import')->name('import.')->middleware('auth', 'auth.session')->gr
         CRUDRouteGenerator::defineDefaultRoutesOnly(
             ['index', 'create', 'store', 'edit', 'update'],
             'id',
-            'can:view-ELD-invoices',
-            'can:edit-ELD-invoices'
+            'can:view-import-invoices',
+            'can:edit-import-invoices'
         );
+
+        // AJAX requests
+        Route::middleware('can:edit-import-invoices')->group(function () {
+            Route::post('/send-for-payment/{record}', 'sendForPayment')->name('send-for-payment');
+        });
     });
 });

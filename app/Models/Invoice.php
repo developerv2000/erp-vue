@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Http\Requests\CMD\CMDInvoiceStoreProductionTypeRequest;
 use App\Http\Requests\CMD\CMDInvoiceUpdateProductionTypeRequest;
+use App\Http\Requests\import\ImportInvoiceStoreRequest;
+use App\Http\Requests\import\ImportInvoiceUpdateRequest;
 use App\Http\Requests\PRD\PRDInvoiceUpdateProductionTypeRequest;
 use App\Notifications\NewProductionTypeInvoiceForPaymentReceived;
 use App\Notifications\ProductionTypeInvoicePaymentCompleted;
@@ -79,6 +81,9 @@ class Invoice extends Model implements HasTitleAttribute
      * Get the parent invoiceable model.
      *
      * This defines a polymorphic relationship where a invoice can belong to any model.
+     *
+     * ProductionType invoices belong to 'Order' model and can have many attached 'Products'.
+     * ImportType invoices belong to 'Shipment' model.
      */
     public function invoiceable()
     {
@@ -358,9 +363,9 @@ class Invoice extends Model implements HasTitleAttribute
         return $query->where('type_id', InvoiceType::PRODUCTION_TYPE_ID);
     }
 
-    public function scopeOnlyDeliveryToWarehouseType($query): Builder
+    public function scopeOnlyImportType($query): Builder
     {
-        return $query->where('type_id', InvoiceType::DELIVERY_TO_WAREHOUSE_TYPE_ID);
+        return $query->where('type_id', InvoiceType::IMPORT_TYPE_ID);
     }
 
     public function scopeOnlyExportType($query): Builder
@@ -572,6 +577,12 @@ class Invoice extends Model implements HasTitleAttribute
                     'relationName' => 'invoiceable',
                     'relationAttribute' => 'orders.country_id',
                 ],
+
+                [
+                    'inputName' => 'shipment_manufacturer_id',
+                    'relationName' => 'invoiceable',
+                    'relationAttribute' => 'shipments.manufacturer_id',
+                ],
             ],
         ];
     }
@@ -674,6 +685,32 @@ class Invoice extends Model implements HasTitleAttribute
         $this->uploadFile('payment_confirmation_document', self::getPaymentConfirmationDocumentsFolderPath());
     }
 
+    /**
+     * AJAX request by ELD
+     */
+    public static function storeImportTypeByELDFromRequest(ImportInvoiceStoreRequest $request): void
+    {
+        $shipment = Shipment::findorfail($request->input('shipment_id'));
+
+        // Create invoice
+        $record = $shipment->importInvoice()->create([
+            ...$request->all(),
+            'type_id' => InvoiceType::IMPORT_TYPE_ID,
+            'payment_type_id' => InvoicePaymentType::FULL_PAYMENT_ID,
+        ]);
+
+        // HasMany relations
+        $record->storeCommentFromRequest($request);
+
+        // Upload PDF file
+        $record->uploadFile('pdf_file', self::getPdfFilesFolderPath());
+    }
+
+    /**
+     * AJAX request by ELD
+     */
+    public static function updateImportTypeByELDFromRequest(ImportInvoiceUpdateRequest $request): void {}
+
     /*
     |--------------------------------------------------------------------------
     | Storage paths
@@ -709,6 +746,22 @@ class Invoice extends Model implements HasTitleAttribute
 
             $notification = new NewProductionTypeInvoiceForPaymentReceived($this);
             User::notifyUsersBasedOnPermission($notification, 'receive-notification-when-invoice-is-sent-for-payment-by-CMD');
+        }
+    }
+
+    /**
+     * AJAX request
+     *
+     * Send 'Import' type to PRD by ELD
+     */
+    public function sendImportTypeForPaymentByELD(): void
+    {
+        if (!$this->is_sent_for_payment) {
+            $this->sent_for_payment_date = now();
+            $this->save();
+
+            // $notification = new NewProductionTypeInvoiceForPaymentReceived($this);
+            // User::notifyUsersBasedOnPermission($notification, 'receive-notification-when-invoice-is-sent-for-payment-by-CMD');
         }
     }
 
@@ -881,6 +934,56 @@ class Invoice extends Model implements HasTitleAttribute
             ['title' => 'fields.Manufacturer', 'key' => 'order_manufacturer_name', 'width' => 140, 'sortable' => false],
             ['title' => 'Products', 'key' => 'products', 'width' => 180, 'sortable' => false],
             ['title' => 'fields.Country', 'key' => 'order_country_code', 'width' => 64, 'sortable' => false],
+
+            ['title' => 'dates.Payment request', 'key' => 'payment_request_date_by_financier', 'width' => 180, 'sortable' => true],
+            ['title' => 'dates.Payment', 'key' => 'payment_date', 'width' => 124, 'sortable' => true],
+            ['title' => 'dates.Payment completed', 'key' => 'payment_completed_date', 'width' => 204, 'sortable' => true],
+            ['title' => 'fields.Invoie №', 'key' => 'number', 'width' => 120, 'sortable' => true],
+            ['title' => 'fields.Swift', 'key' => 'payment_confirmation_document', 'width' => 144, 'sortable' => false],
+
+            ['title' => 'Comments', 'key' => 'comments_count', 'width' => 132, 'sortable' => false],
+            ['title' => 'comments.Last', 'key' => 'last_comment_body', 'width' => 200, 'sortable' => false],
+
+            ['title' => 'dates.Date of creation', 'key' => 'created_at', 'width' => 130, 'sortable' => true],
+            ['title' => 'dates.Update date', 'key' => 'updated_at', 'width' => 150, 'sortable' => true],
+        ];
+
+        foreach ($additionalColumns as $column) {
+            array_push($columns, [
+                ...$column,
+                'visible' => 1,
+                'order' => $order++,
+            ]);
+        }
+
+        return $columns;
+    }
+
+    public static function getImportTableHeadersForUser($user): ?array
+    {
+        if (Gate::forUser($user)->denies(Permission::extractAbilityName(Permission::CAN_VIEW_IMPORT_INVOICES_NAME))) {
+            return null;
+        }
+
+        $order = 1;
+        $columns = array();
+
+        if (Gate::forUser($user)->allows(Permission::extractAbilityName(Permission::CAN_EDIT_IMPORT_INVOICES_NAME))) {
+            array_push(
+                $columns,
+                ['title' => 'Record', 'key' => 'edit', 'width' => 60, 'sortable' => false, 'visible' => 1, 'order' => $order++],
+            );
+        }
+
+        $additionalColumns = [
+            ['title' => 'ID', 'key' => 'id', 'width' => 62, 'sortable' => true],
+            ['title' => 'dates.Receive', 'key' => 'receive_date', 'width' => 142, 'sortable' => true],
+            ['title' => 'dates.Sent for payment', 'key' => 'sent_for_payment_date', 'width' => 200, 'sortable' => true],
+            ['title' => 'dates.Accepted', 'key' => 'accepted_by_financier_date', 'width' => 132, 'sortable' => true],
+            ['title' => 'fields.Pdf', 'key' => 'pdf_file', 'width' => 144, 'sortable' => false],
+
+            ['title' => 'Shipment', 'key' => 'shipment_id', 'width' => 160, 'sortable' => true],
+            ['title' => 'fields.Packing list', 'key' => 'shipment_packing_list_file', 'width' => 152, 'sortable' => false],
 
             ['title' => 'dates.Payment request', 'key' => 'payment_request_date_by_financier', 'width' => 180, 'sortable' => true],
             ['title' => 'dates.Payment', 'key' => 'payment_date', 'width' => 124, 'sortable' => true],

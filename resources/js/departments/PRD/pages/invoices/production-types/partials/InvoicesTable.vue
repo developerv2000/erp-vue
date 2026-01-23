@@ -12,9 +12,9 @@ import TdEditButton from "@/core/components/table/td/TdEditButton.vue";
 import TogglableThreeLinesLimitedText from "@/core/components/misc/TogglableThreeLinesLimitedText.vue";
 import TdRecordCommentsLink from "@/core/components/table/td/TdRecordCommentsLink.vue";
 import TableNavigateToPage from "@/core/components/table/misc/TableNavigateToPage.vue";
-import TdInvoiceAccept from "@/core/components/table/td/shared/invoices/TdInvoiceAccept.vue";
-import TdInvoiceCompletePayment from "@/core/components/table/td/shared/invoices/TdInvoiceCompletePayment.vue";
 import TdInvoicePaymentType from "@/core/components/table/td/shared/invoices/TdInvoicePaymentType.vue";
+import TdInvoiceAccept from "@/core/components/table/td/PRD/invoices/TdInvoiceAccept.vue";
+import TdInvoiceCompletePayment from "@/core/components/table/td/PRD/invoices/TdInvoiceCompletePayment.vue";
 
 const { get } = useQueryParams();
 const page = usePage();

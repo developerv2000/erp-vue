@@ -78,7 +78,7 @@ class User extends Authenticatable
     // 6. MD
     const MD_SERIALIZED_BY_MANUFACTURER_HEADERS_KEY = 'MD_SERIALIZED_BY_MANUFACTURER';
 
-    // 7. MD
+    // 7. Import
     const IMPORT_PRODUCTS_HEADERS_KEY = 'IMPORT_PRODUCTS';
     const IMPORT_SHIPMENTS_HEADERS_KEY = 'IMPORT_SHIPMENTS';
     const IMPORT_INVOICES_HEADERS_KEY = 'IMPORT_INVOICES';
@@ -802,7 +802,7 @@ class User extends Authenticatable
 
         $headersSettings[self::IMPORT_PRODUCTS_HEADERS_KEY] = OrderProduct::getImportTableHeadersForUser($this);
         $headersSettings[self::IMPORT_SHIPMENTS_HEADERS_KEY] = Shipment::getImportTableHeadersForUser($this);
-        // $headersSettings[self::IMPORT_INVOICES_HEADERS_KEY] = Invoice::getImportTableHeadersForUser($this);
+        $headersSettings[self::IMPORT_INVOICES_HEADERS_KEY] = Invoice::getImportTableHeadersForUser($this);
 
         $settings['table_headers'] = $headersSettings;
         $this->settings = $settings;

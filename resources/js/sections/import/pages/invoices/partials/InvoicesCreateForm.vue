@@ -3,7 +3,7 @@ import { ref } from "vue";
 import { usePage } from "@inertiajs/vue3";
 import { useI18n } from "vue-i18n";
 import { Form, useForm } from "vee-validate";
-import { object, array, date, mixed } from "yup";
+import { object, date, mixed } from "yup";
 import { useVeeFormFields } from "@/core/composables/useVeeFormFields";
 import { useFormData } from "@/core/composables/useFormData";
 import { useMessagesStore } from "@/core/stores/messages";
@@ -11,7 +11,6 @@ import { useDateFormatter } from "@/core/composables/useDateFormatter";
 import axios from "axios";
 
 import DefaultSheet from "@/core/components/containers/DefaultSheet.vue";
-import DefaultTitle from "@/core/components/titles/DefaultTitle.vue";
 import DefaultWysiwyg from "@/core/components/form/inputs/DefaultWysiwyg.vue";
 import FormActionsContainer from "@/core/components/form/containers/FormActionsContainer.vue";
 import FormResetButton from "@/core/components/form/buttons/FormResetButton.vue";
@@ -32,14 +31,12 @@ const loading = ref(false);
 const schema = object({
     receive_date: date().required(),
     pdf_file: mixed().required(),
-    products: array().required().min(1),
 });
 
 // Default form values
 const defaultFields = {
     receive_date: null,
     pdf_file: null,
-    products: page.props.availableProducts.map((p) => p.id),
     comment: null,
 };
 
@@ -56,8 +53,7 @@ const { values } = useVeeFormFields(Object.keys(defaultFields));
 const submit = handleSubmit((values) => {
     const formData = objectToFormData({
         ...values,
-        order_id: page.props.order.id,
-        payment_type_id: page.props.paymentType.id,
+        shipment_id: page.props.shipment.id,
     });
 
     removeDateTimezonesFromFormData(formData);
@@ -65,7 +61,7 @@ const submit = handleSubmit((values) => {
     loading.value = true;
 
     axios
-        .post(route("cmd.invoices.store"), formData)
+        .post(route("import.invoices.store"), formData)
         .then(() => {
             messages.addCreatedSuccessfullyMessage();
             window.history.back();
@@ -86,10 +82,7 @@ const submit = handleSubmit((values) => {
 
 <template>
     <Form class="d-flex flex-column ga-6 pb-8" enctype="multipart/form-data">
-        <!-- Invoice -->
         <DefaultSheet>
-            <DefaultTitle>{{ t("Invoice") }}</DefaultTitle>
-
             <v-row>
                 <v-col>
                     <DefaultDateInput
@@ -112,28 +105,7 @@ const submit = handleSubmit((values) => {
             </v-row>
         </DefaultSheet>
 
-        <!-- Products -->
         <DefaultSheet>
-            <DefaultTitle>{{ t("Products") }}</DefaultTitle>
-
-            <div>
-                <!-- Disable checkboxes toggling if payment type is prepayment -->
-                <v-checkbox-btn
-                    v-for="product in page.props.availableProducts"
-                    :key="product.id"
-                    v-model="values.products"
-                    :value="product.id"
-                    :label="product.process.full_english_product_label"
-                    :disabled="page.props.isPrepayment"
-                    color="primary"
-                >
-                </v-checkbox-btn>
-            </div>
-        </DefaultSheet>
-
-        <DefaultSheet>
-            <DefaultTitle>{{ t("Comment") }}</DefaultTitle>
-
             <v-row>
                 <v-col cols="12">
                     <DefaultWysiwyg

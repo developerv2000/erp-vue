@@ -2,10 +2,8 @@
 
 namespace App\Models;
 
-use App\Http\Requests\import\ImportProductStoreRequest;
-use App\Http\Requests\import\ImportProductUpdateRequest;
-use App\Http\Requests\ImportShipmentStoreRequest;
-use App\Http\Requests\ImportShipmentUpdateRequest;
+use App\Http\Requests\import\ImportShipmentStoreRequest;
+use App\Http\Requests\import\ImportShipmentUpdateRequest;
 use App\Support\Contracts\Model\HasTitleAttribute;
 use App\Support\Helpers\ModelHelper;
 use App\Support\Helpers\QueryFilterHelper;
@@ -88,6 +86,15 @@ class Shipment extends Model implements HasTitleAttribute
         return $this->belongsTo(Currency::class);
     }
 
+    /**
+     * 'ImportType' invoices associated with the 'Shipment' model.
+     */
+    public function importInvoice()
+    {
+        return $this->morphOne(Invoice::class, 'invoiceable')
+            ->onlyImportType();
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Additional attributes & appends
@@ -108,6 +115,7 @@ class Shipment extends Model implements HasTitleAttribute
             'packing_list_file_url',
             'confirmed',
             'completed',
+            'can_attach_import_invoice',
             'has_arrived_at_warehouse',
         ]);
 
@@ -119,6 +127,10 @@ class Shipment extends Model implements HasTitleAttribute
                 'full_russian_product_label',
             ]);
         }
+
+        $this->importInvoice?->append([
+            'payment_is_completed',
+        ]);
     }
 
     public function getConfirmedAttribute(): bool
@@ -129,6 +141,22 @@ class Shipment extends Model implements HasTitleAttribute
     public function getCompletedAttribute(): bool
     {
         return !is_null($this->completed_at);
+    }
+
+    /**
+     * Indicates whether new import invoice can be attached to the shipment.
+     *
+     * Requirements:
+     * - Shipment must be completed.
+     * - Shipment must not already have an import invoice attached.
+     *
+     * Required loaded relations:
+     * - importInvoice
+     */
+    public function getCanAttachImportInvoiceAttribute(): bool
+    {
+        return $this->completed
+            && (! $this->importInvoice);
     }
 
     // Avoid duplicate 'arrived_at_warehouse' attribute
@@ -197,6 +225,15 @@ class Shipment extends Model implements HasTitleAttribute
             'products.process' => function ($processQuery) {
                 $processQuery->withRelationsForOrderProduct()
                     ->withOnlySelectsForOrderProduct();
+            },
+
+            'importInvoice' => function ($invoiceQuery) {
+                $invoiceQuery->select(
+                    'invoices.id',
+                    'invoices.invoiceable_id',
+                    'invoices.invoiceable_type',
+                    'invoices.payment_completed_date', // for 'payment_is_completed' attribute
+                );
             },
         ]);
     }
@@ -445,6 +482,7 @@ class Shipment extends Model implements HasTitleAttribute
             ['title' => 'dates.Rate approved', 'key' => 'rate_approved_at', 'width' => 184, 'sortable' => true],
             ['title' => 'dates.Confirmed', 'key' => 'confirmed_at', 'width' => 172, 'sortable' => true],
             ['title' => 'dates.Completed', 'key' => 'completed_at', 'width' => 156, 'sortable' => true],
+            ['title' => 'Invoice', 'key' => 'import_invoice', 'width' => 136, 'sortable' => false],
             ['title' => 'dates.Arrived at warehouse', 'key' => 'arrived_at_warehouse', 'width' => 188, 'sortable' => true],
 
             ['title' => 'Comments', 'key' => 'comments_count', 'width' => 132, 'sortable' => false],

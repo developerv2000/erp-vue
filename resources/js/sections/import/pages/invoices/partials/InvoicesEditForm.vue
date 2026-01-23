@@ -1,21 +1,21 @@
 <script setup>
-import { ref } from "vue";
-import { usePage } from "@inertiajs/vue3";
+import { ref, computed } from "vue";
+import { usePage, router } from "@inertiajs/vue3";
 import { useI18n } from "vue-i18n";
 import { Form, useForm } from "vee-validate";
-import { object, array, date, mixed } from "yup";
+import { object, mixed, date, array } from "yup";
 import { useVeeFormFields } from "@/core/composables/useVeeFormFields";
 import { useFormData } from "@/core/composables/useFormData";
 import { useMessagesStore } from "@/core/stores/messages";
 import { useDateFormatter } from "@/core/composables/useDateFormatter";
-import axios from "axios";
 
 import DefaultSheet from "@/core/components/containers/DefaultSheet.vue";
 import DefaultTitle from "@/core/components/titles/DefaultTitle.vue";
 import DefaultWysiwyg from "@/core/components/form/inputs/DefaultWysiwyg.vue";
 import FormActionsContainer from "@/core/components/form/containers/FormActionsContainer.vue";
 import FormResetButton from "@/core/components/form/buttons/FormResetButton.vue";
-import FormStoreAndRedirectBack from "@/core/components/form/buttons/FormStoreAndRedirectBack.vue";
+import FormUpdateAndRedirectBack from "@/core/components/form/buttons/FormUpdateAndRedirectBack.vue";
+import FormUpdateWithourRedirect from "@/core/components/form/buttons/FormUpdateWithourRedirect.vue";
 import DefaultDateInput from "@/core/components/form/inputs/DefaultDateInput.vue";
 import DefaultFileInput from "@/core/components/form/inputs/DefaultFileInput.vue";
 
@@ -26,49 +26,63 @@ const page = usePage();
 const messages = useMessagesStore();
 const { removeDateTimezonesFromFormData } = useDateFormatter();
 
+const record = computed(() => page.props.record);
 const loading = ref(false);
+const redirectBack = ref(false);
 
 // Yup schema
 const schema = object({
     receive_date: date().required(),
-    pdf_file: mixed().required(),
+    pdf_file: mixed().nullable(),
     products: array().required().min(1),
 });
 
-// Default form values
-const defaultFields = {
-    receive_date: null,
+// Backend-driven values (reactive to record)
+const baseInitialValues = computed(() => ({
+    receive_date: record.value.receive_date,
     pdf_file: null,
-    products: page.props.availableProducts.map((p) => p.id),
+    products: record.value.products.map((p) => p.id),
+}));
+
+// Always-reset values
+const extraResetValues = {
     comment: null,
 };
 
+// Merged initial values
+const mergedInitialValues = computed(() => ({
+    ...baseInitialValues.value,
+    ...extraResetValues,
+}));
+
 // VeeValidate form
-const { errors, handleSubmit, resetForm, setErrors, meta } = useForm({
+const { handleSubmit, errors, setErrors, resetForm, meta } = useForm({
     validationSchema: schema,
-    initialValues: { ...defaultFields },
+    initialValues: mergedInitialValues.value,
 });
 
 // Get form values as ref
-const { values } = useVeeFormFields(Object.keys(defaultFields));
+const { values } = useVeeFormFields(Object.keys(mergedInitialValues.value));
 
 // Submit handler
 const submit = handleSubmit((values) => {
-    const formData = objectToFormData({
-        ...values,
-        order_id: page.props.order.id,
-        payment_type_id: page.props.paymentType.id,
-    });
-
+    const formData = objectToFormData(values);
     removeDateTimezonesFromFormData(formData);
-
     loading.value = true;
 
     axios
-        .post(route("cmd.invoices.store"), formData)
+        .post(
+            route("cmd.invoices.update", { record: record.value.id }),
+            formData
+        )
         .then(() => {
-            messages.addCreatedSuccessfullyMessage();
-            window.history.back();
+            messages.addUpdatedSuccessfullyMessage();
+
+            if (redirectBack.value) {
+                window.history.back();
+            } else {
+                reloadRequiredDataAndResetForm();
+            }
         })
         .catch((error) => {
             if (error.response?.status === 422) {
@@ -82,6 +96,17 @@ const submit = handleSubmit((values) => {
             loading.value = false;
         });
 });
+
+const reloadRequiredDataAndResetForm = () => {
+    router.reload({
+        only: ["record", "availableProducts"],
+        onSuccess: () => {
+            resetForm({
+                values: mergedInitialValues.value,
+            });
+        },
+    });
+};
 </script>
 
 <template>
@@ -117,7 +142,6 @@ const submit = handleSubmit((values) => {
             <DefaultTitle>{{ t("Products") }}</DefaultTitle>
 
             <div>
-                <!-- Disable checkboxes toggling if payment type is prepayment -->
                 <v-checkbox-btn
                     v-for="product in page.props.availableProducts"
                     :key="product.id"
@@ -131,15 +155,25 @@ const submit = handleSubmit((values) => {
             </div>
         </DefaultSheet>
 
+        <!-- Comment -->
         <DefaultSheet>
-            <DefaultTitle>{{ t("Comment") }}</DefaultTitle>
+            <DefaultTitle>{{ t("Comments") }}</DefaultTitle>
 
             <v-row>
-                <v-col cols="12">
+                <v-col>
                     <DefaultWysiwyg
                         v-model="values.comment"
-                        :label="t('Comment')"
+                        :label="t('comments.New')"
+                        :error-messages="errors.comment"
                         folder="comments"
+                    />
+                </v-col>
+
+                <v-col v-if="record.last_comment">
+                    <DefaultWysiwyg
+                        v-model="record.last_comment.body"
+                        :label="t('comments.Last')"
+                        disabled
                     />
                 </v-col>
             </v-row>
@@ -148,8 +182,20 @@ const submit = handleSubmit((values) => {
         <FormActionsContainer>
             <FormResetButton @click="resetForm" :loading="loading" />
 
-            <FormStoreAndRedirectBack
-                @click="submit"
+            <FormUpdateWithourRedirect
+                @click="
+                    redirectBack = false;
+                    submit();
+                "
+                :loading="loading"
+                :disabled="!meta.valid"
+            />
+
+            <FormUpdateAndRedirectBack
+                @click="
+                    redirectBack = true;
+                    submit();
+                "
                 :loading="loading"
                 :disabled="!meta.valid"
             />

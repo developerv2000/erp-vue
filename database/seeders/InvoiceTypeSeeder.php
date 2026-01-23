@@ -14,7 +14,7 @@ class InvoiceTypeSeeder extends Seeder
     {
         $name = [
             InvoiceType::PRODUCTION_TYPE_NAME,
-            InvoiceType::DELIVERY_TO_WAREHOUSE_TYPE_NAME,
+            InvoiceType::IMPORT_TYPE_NAME,
             InvoiceType::EXPORT_TYPE_NAME,
         ];
 

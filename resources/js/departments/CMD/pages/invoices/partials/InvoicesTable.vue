@@ -13,8 +13,8 @@ import TdInertiaLink from "@/core/components/table/td/TdInertiaLink.vue";
 import TogglableThreeLinesLimitedText from "@/core/components/misc/TogglableThreeLinesLimitedText.vue";
 import TdRecordCommentsLink from "@/core/components/table/td/TdRecordCommentsLink.vue";
 import TableNavigateToPage from "@/core/components/table/misc/TableNavigateToPage.vue";
-import TdInvoiceSentForPayment from "@/core/components/table/td/shared/invoices/TdInvoiceSentForPayment.vue";
 import TdInvoicePaymentType from "@/core/components/table/td/shared/invoices/TdInvoicePaymentType.vue";
+import TdCMDInvoiceSentForPayment from "@/core/components/table/td/CMD/invoices/TdCMDInvoiceSentForPayment.vue";
 
 const { get } = useQueryParams();
 const page = usePage();
@@ -105,7 +105,7 @@ const generateProductsList = (products) => {
                 {{ formatDate(item.sent_for_payment_date) }}
             </template>
 
-            <TdInvoiceSentForPayment v-else :invoice-id="item.id" />
+            <TdCMDInvoiceSentForPayment v-else :invoice-id="item.id" />
         </template>
 
         <template #item.accepted_by_financier_date="{ item }">

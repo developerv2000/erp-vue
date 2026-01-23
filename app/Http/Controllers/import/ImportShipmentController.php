@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\import;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\ImportShipmentStoreRequest;
-use App\Http\Requests\ImportShipmentUpdateRequest;
+use App\Http\Requests\import\ImportShipmentStoreRequest;
+use App\Http\Requests\import\ImportShipmentUpdateRequest;
 use App\Models\Currency;
 use App\Models\Manufacturer;
 use App\Models\OrderProduct;

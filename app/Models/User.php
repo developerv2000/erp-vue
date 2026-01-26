@@ -71,6 +71,7 @@ class User extends Authenticatable
 
     // 4. PRD
     const PRD_PRODUCTION_TYPE_INVOICES_HEADERS_KEY = 'PRD_PRODUCTION_TYPE_INVOICES';
+    const PRD_IMPORT_TYPE_INVOICES_HEADERS_KEY = 'PRD_IMPORT_TYPE_INVOICES';
 
     // 5. DD
     const DD_ORDER_PRODUCTS_HEADERS_KEY = 'DD_ORDER_PRODUCTS';
@@ -642,6 +643,7 @@ class User extends Authenticatable
 
             // PRD
             self::PRD_PRODUCTION_TYPE_INVOICES_HEADERS_KEY => Invoice::getPRDProductionTypesTableHeadersForUser($this),
+            self::PRD_IMPORT_TYPE_INVOICES_HEADERS_KEY => Invoice::getPRDImportTypesTableHeadersForUser($this),
 
             // DD
             self::DD_ORDER_PRODUCTS_HEADERS_KEY => OrderProduct::getDDTableHeadersForUser($this),
@@ -762,6 +764,7 @@ class User extends Authenticatable
         $headersSettings = isset($settings['table_headers']) ? $settings['table_headers'] : [];
 
         $headersSettings[self::PRD_PRODUCTION_TYPE_INVOICES_HEADERS_KEY] = Invoice::getPRDProductionTypesTableHeadersForUser($this);
+        $headersSettings[self::PRD_IMPORT_TYPE_INVOICES_HEADERS_KEY] = Invoice::getPRDImportTypesTableHeadersForUser($this);
 
         $settings['table_headers'] = $headersSettings;
         $this->settings = $settings;

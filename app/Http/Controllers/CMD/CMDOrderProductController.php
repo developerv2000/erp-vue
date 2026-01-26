@@ -33,6 +33,9 @@ class CMDOrderProductController extends Controller
         ]);
     }
 
+    /**
+     * Don`t use ServiceController binding for OrderProduct (record) because of custom gates!
+     */
     public function edit($record): Response
     {
         $record = OrderProduct::withBasicCMDRelations()
@@ -51,9 +54,12 @@ class CMDOrderProductController extends Controller
 
     /**
      * AJAX request
+     *
+     * Don`t use ServiceController binding for OrderProduct (record) because of custom gates!
      */
-    public function update(CMDOrderProductUpdateRequest $request, OrderProduct $record): JsonResponse
+    public function update(CMDOrderProductUpdateRequest $request, $record): JsonResponse
     {
+        $record = OrderProduct::findorfail($record);
         $record->updateByCMDFromRequest($request);
 
         return response()->json([

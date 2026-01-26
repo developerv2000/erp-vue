@@ -38,6 +38,7 @@ class PRDInvoiceController extends Controller
     {
         return match ($invoiceType->id) {
             InvoiceType::PRODUCTION_TYPE_ID => $this->getProductionTypeInvoice($id),
+            InvoiceType::IMPORT_TYPE_ID => $this->getImportTypeInvoice($id),
             default => abort(404),
         };
     }
@@ -49,6 +50,17 @@ class PRDInvoiceController extends Controller
             ->findOrFail($id);
 
         $record->appendBasicPRDProductionTypesAttributes();
+
+        return $record;
+    }
+
+    private function getImportTypeInvoice(int $id): Invoice
+    {
+        $record = Invoice::withBasicPRDImportTypesRelations()
+            ->withBasicPRDImportTypesRelationCounts()
+            ->findOrFail($id);
+
+        $record->appendBasicPRDImportTypesAttributes();
 
         return $record;
     }

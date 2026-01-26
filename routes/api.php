@@ -108,6 +108,12 @@ Route::middleware('auth:sanctum')->name('api.')->group(function () {
                     ->middleware('can:view-PRD-invoices')
                     ->name('get');
             });
+
+            Route::prefix('/import-types')->name('import-types.')->group(function () {
+                Route::get('/', fn(Request $request) => Invoice::queryPRDImportTypeRecordsFromRequest($request, 'paginate', true))
+                    ->middleware('can:view-PRD-invoices')
+                    ->name('get');
+            });
         });
     });
 

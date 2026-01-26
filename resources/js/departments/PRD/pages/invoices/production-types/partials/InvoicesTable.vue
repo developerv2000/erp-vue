@@ -111,7 +111,11 @@ const generateProductsList = (products) => {
                 {{ formatDate(item.accepted_by_financier_date) }}
             </template>
 
-            <TdInvoiceAccept v-else :invoice-id="item.id" />
+            <TdInvoiceAccept
+                v-else
+                :invoices-store="store"
+                :invoice-id="item.id"
+            />
         </template>
 
         <template #item.pdf_file="{ item }">
@@ -153,6 +157,7 @@ const generateProductsList = (products) => {
 
             <TdInvoiceCompletePayment
                 v-else-if="item.can_complete_payment"
+                :invoices-store="store"
                 :invoice-id="item.id"
             />
         </template>

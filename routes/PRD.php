@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\PRD\PRDInvoiceController;
+use App\Http\Controllers\PRD\PRDInvoiceImportTypeController;
 use App\Http\Controllers\PRD\PRDInvoiceProductionTypeController;
 use App\Support\Generators\CRUDRouteGenerator;
 use Illuminate\Support\Facades\Route;
@@ -21,6 +22,21 @@ Route::prefix('prd')->name('prd.')->middleware('auth', 'auth.session')->group(fu
         Route::prefix('/production-types')
             ->name('production-types.')
             ->controller(PRDInvoiceProductionTypeController::class)
+            ->group(function () {
+                Route::get('/', 'index')->middleware('can:view-PRD-invoices')->name('index');
+
+                CRUDRouteGenerator::defineDefaultRoutesOnly(
+                    ['edit', 'update'],
+                    'id',
+                    'can:view-PRD-invoices',
+                    'can:edit-PRD-invoices'
+                );
+            });
+
+        // Import types
+        Route::prefix('/import-types')
+            ->name('import-types.')
+            ->controller(PRDInvoiceImportTypeController::class)
             ->group(function () {
                 Route::get('/', 'index')->middleware('can:view-PRD-invoices')->name('index');
 

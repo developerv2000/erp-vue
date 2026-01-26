@@ -456,6 +456,7 @@ class Permission extends Model
     {
         return [
             self::CAN_VIEW_CMD_ORDERS_NAME,
+            self::CAN_VIEW_CMD_ORDERS_OF_ALL_BDMS_NAME,
             self::CAN_VIEW_CMD_ORDER_PRODUCTS_NAME,
             self::CAN_VIEW_CMD_INVOICES_NAME,
 
@@ -505,6 +506,7 @@ class Permission extends Model
             self::CAN_EDIT_PRD_INVOICES_NAME,
 
             self::CAN_VIEW_STORAGE_INVOICE_FILES_NAME,
+            self::CAN_VIEW_STORAGE_SHIPMENT_FILES_NAME,
 
             self::CAN_RECEIVE_NOTIFICATION_WHEN_PRODUCTION_TYPE_INVOICE_IS_SENT_FOR_PAYMENT_BY_CMD,
             self::CAN_RECEIVE_NOTIFICATION_WHEN_IMPORT_TYPE_INVOICE_IS_SENT_FOR_PAYMENT_BY_ELD,

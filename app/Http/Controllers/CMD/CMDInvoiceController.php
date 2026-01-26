@@ -182,7 +182,7 @@ class CMDInvoiceController extends Controller
     {
         return [
             'paymentTypes' => InvoicePaymentType::orderBy('id')->get(),
-            'invoiceNumbers' => Invoice::onlyProductionType()->orderBy('number')->get(),
+            'invoiceNumbers' => Invoice::onlyProductionType()->whereNotNull('number')->orderBy('number')->get()->pluck('number'),
             'orderNames' => Order::onlyWithName()->orderByName()->pluck('name'),
             'manufacturers' => Manufacturer::getMinifiedRecordsWithProcessesReadyForOrder(),
             'countriesOrderedByProcessesCount' => Country::orderByProcessesCount()->get(),

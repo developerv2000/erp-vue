@@ -1,0 +1,1 @@
+import{f as t,o as a,t as n,az as m}from"./app-Bv235s-M.js";const s={__name:"TdInvoicePaymentType",props:{type:String},setup(e){return(o,p)=>(a(),t("span",{class:m(["text-caption font-weight-medium",{"text-orange":e.type=="Prepayment","text-green":e.type=="Final payment","text-blue":e.type=="Full payment"}])},n(e.type),3))}};export{s as _};

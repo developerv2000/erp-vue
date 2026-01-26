@@ -114,7 +114,7 @@ class ImportInvoiceController extends Controller
     private function getFilterDependencies(): array
     {
         return [
-            'invoiceNumbers' => Invoice::onlyImportType()->orderBy('number')->get(),
+            'invoiceNumbers' => Invoice::onlyImportType()->whereNotNull('number')->orderBy('number')->get()->pluck('number'),
             'manufacturers' => Manufacturer::getMinifiedRecordsWithProcessesReadyForOrder(),
         ];
     }

@@ -64,6 +64,7 @@
     "pages.Invoices": "Invoices",
     "pages.Production": "Production",
     "pages.Shipments": "Shipments",
+    "pages.Import": "Import",
 
     "actions.Logout": "Logout",
     "actions.Add": "Add",

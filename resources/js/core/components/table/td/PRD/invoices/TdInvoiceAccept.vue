@@ -1,5 +1,4 @@
 <script setup>
-import { usePRDProductionTypeInvoicesStore } from "@/departments/PRD/stores/productionTypeInvoices";
 import { useMessagesStore } from "@/core/stores/messages";
 import { useGlobalStore } from "@/core/stores/global";
 import { useI18n } from "vue-i18n";
@@ -9,22 +8,22 @@ import DefaultButton from "@/core/components/buttons/DefaultButton.vue";
 import { mdiCheckBold } from "@mdi/js";
 
 const props = defineProps({
+    invoicesStore: Object,
     invoiceId: Number,
 });
 
 const { t } = useI18n();
-const invoicesStore = usePRDProductionTypeInvoicesStore();
 const globalStore = useGlobalStore();
 const messagesStore = useMessagesStore();
 
-const submit = (id) => {
+const submit = () => {
     globalStore.loading = true;
 
     axios
-        .post(route("prd.invoices.accept", { record: id }))
+        .post(route("prd.invoices.accept", { record: props.invoiceId }))
         .then((response) => {
             messagesStore.addSuccessMessage();
-            invoicesStore.updateRecord(response.data);
+            props.invoicesStore.updateRecord(response.data);
         })
         .catch(() => {
             messagesStore.addSubmitionFailedMessage();
@@ -40,7 +39,7 @@ const submit = (id) => {
         size="small"
         :append-icon="mdiCheckBold"
         color="secondary"
-        @click="submit(props.invoiceId)"
+        @click="submit"
     >
         {{ t("actions.Accept") }}
     </DefaultButton>

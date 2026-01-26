@@ -64,6 +64,7 @@
     "pages.Invoices": "Инвойсы",
     "pages.Production": "Производство",
     "pages.Shipments": "Отгрузки",
+    "pages.Import": "Импорт",
 
     "actions.Logout": "Выйти",
     "actions.Create": "Создать",

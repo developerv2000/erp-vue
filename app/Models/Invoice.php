@@ -6,7 +6,9 @@ use App\Http\Requests\CMD\CMDInvoiceStoreProductionTypeRequest;
 use App\Http\Requests\CMD\CMDInvoiceUpdateProductionTypeRequest;
 use App\Http\Requests\import\ImportInvoiceStoreRequest;
 use App\Http\Requests\import\ImportInvoiceUpdateRequest;
+use App\Http\Requests\PRD\PRDInvoiceUpdateImportTypeRequest;
 use App\Http\Requests\PRD\PRDInvoiceUpdateProductionTypeRequest;
+use App\Notifications\ImportTypeInvoicePaymentCompleted;
 use App\Notifications\NewImportTypeInvoiceForPaymentReceived;
 use App\Notifications\NewProductionTypeInvoiceForPaymentReceived;
 use App\Notifications\ProductionTypeInvoicePaymentCompleted;
@@ -50,15 +52,19 @@ class Invoice extends Model implements HasTitleAttribute
     const DEFAULT_PLD_ORDER_DIRECTION = 'asc';
     const DEFAULT_PLD_PER_PAGE = 50;
 
+    // Import
+    const DEFAULT_IMPORT_ORDER_BY = 'id';
+    const DEFAULT_IMPORT_ORDER_DIRECTION = 'asc';
+    const DEFAULT_IMPORT_PER_PAGE = 50;
+
     // PRD
     const DEFAULT_PRD_PRODUCTION_TYPES_ORDER_BY = 'id';
     const DEFAULT_PRD_PRODUCTION_TYPES_ORDER_DIRECTION = 'asc';
     const DEFAULT_PRD_PRODUCTION_TYPES_PER_PAGE = 50;
 
-    // Import
-    const DEFAULT_IMPORT_ORDER_BY = 'id';
-    const DEFAULT_IMPORT_ORDER_DIRECTION = 'asc';
-    const DEFAULT_IMPORT_PER_PAGE = 50;
+    const DEFAULT_PRD_IMPORT_TYPES_ORDER_BY = 'id';
+    const DEFAULT_PRD_IMPORT_TYPES_ORDER_DIRECTION = 'asc';
+    const DEFAULT_PRD_IMPORT_TYPES_PER_PAGE = 50;
 
     /*
     |--------------------------------------------------------------------------
@@ -194,6 +200,31 @@ class Invoice extends Model implements HasTitleAttribute
         ]);
 
         $this->products->each(fn($product) => $product->process->append('full_english_product_label'));
+    }
+
+    public static function appendRecordsBasicPRDImportTypesAttributes($records): void
+    {
+        foreach ($records as $record) {
+            $record->appendBasicPRDImportTypesAttributes();
+        }
+    }
+
+    public function appendBasicPRDImportTypesAttributes(): void
+    {
+        $this->append([
+            'base_model_class',
+            'pdf_file_url',
+            'is_sent_for_payment',
+            'is_accepted_by_financier',
+            'payment_confirmation_document_url',
+            'payment_is_completed',
+            'can_complete_payment',
+        ]);
+
+        $this->invoiceable->append([
+            'title',
+            'packing_list_file_url',
+        ]);
     }
 
     public static function appendRecordsBasicImportAttributes($records): void
@@ -382,6 +413,31 @@ class Invoice extends Model implements HasTitleAttribute
     }
 
     public function scopeWithBasicPRDProductionTypesRelationCounts($query): Builder
+    {
+        return $query->withCount([
+            'comments',
+        ]);
+    }
+
+    public function scopeWithBasicPRDImportTypesRelations($query): Builder
+    {
+        return $query->with([
+            'lastComment',
+
+            'invoiceable' => function ($orderQuery) {
+                $orderQuery->with([
+                    'manufacturer' => function ($manufacturersQuery) {
+                        $manufacturersQuery->select(
+                            'manufacturers.id',
+                            'manufacturers.name',
+                        );
+                    },
+                ]);
+            },
+        ]);
+    }
+
+    public function scopeWithBasicPRDImportTypesRelationCounts($query): Builder
     {
         return $query->withCount([
             'comments',
@@ -592,6 +648,49 @@ class Invoice extends Model implements HasTitleAttribute
      * @param $action  ('paginate', 'get' or 'query')
      * @return mixed
      */
+    public static function queryPRDImportTypeRecordsFromRequest(Request $request, string $action = 'paginate', bool $appendAttributes = false)
+    {
+        $query = self::onlySentForPayment()
+            ->onlyImportType()
+            ->withBasicPRDImportTypesRelations()
+            ->withBasicPRDImportTypesRelationCounts();
+
+        // Normalize request parameters
+        self::addDefaultQueryParamsToRequest(
+            $request,
+            'DEFAULT_PRD_IMPORT_TYPES_ORDER_BY',
+            'DEFAULT_PRD_IMPORT_TYPES_ORDER_DIRECTION',
+            'DEFAULT_PRD_IMPORT_TYPES_PER_PAGE'
+        );
+
+        // Apply filters
+        self::filterQueryForRequest($query, $request);
+
+        // Finalize (sorting & pagination)
+        $records = ModelHelper::finalizeQueryForRequest($query, $request, $action);
+
+        // Append attributes unless raw query is requested
+        if ($appendAttributes && $action !== 'query') {
+            self::appendRecordsBasicPRDImportTypesAttributes($records);
+        }
+
+        return $records;
+    }
+
+    /**
+     * Build and execute a model query based on request parameters.
+     *
+     * Steps:
+     *  - Apply default relations & counts
+     *  - Apply soft delete scope (if requested)
+     *  - Normalize query params (pagination, sorting, etc.)
+     *  - Apply filters
+     *  - Finalize query with sorting & pagination
+     *  - Append basic attributes (if requested and unless returning raw query)
+     *
+     * @param $action  ('paginate', 'get' or 'query')
+     * @return mixed
+     */
     public static function queryImportRecordsFromRequest(Request $request, string $action = 'paginate', bool $appendAttributes = false)
     {
         $query = self::onlyImportType()
@@ -607,7 +706,7 @@ class Invoice extends Model implements HasTitleAttribute
         );
 
         // Apply filters
-        self::filterQueryForRequest($query, $request, applyPermissionsFilter: true);
+        self::filterQueryForRequest($query, $request);
 
         // Finalize (sorting & pagination)
         $records = ModelHelper::finalizeQueryForRequest($query, $request, $action);
@@ -822,6 +921,28 @@ class Invoice extends Model implements HasTitleAttribute
         $this->uploadFile('pdf_file', self::getPdfFilesFolderPath());
     }
 
+    /**
+     * AJAX request by PRD
+     */
+    public function updateImportTypeByPRDFromRequest(PRDInvoiceUpdateImportTypeRequest $request): void
+    {
+        $this->update($request->except([ // exclude nullable files
+            'payment_confirmation_document',
+        ]));
+
+        // Validate 'accepted_by_financier_date' attribute
+        if (!$this->is_accepted_by_financier) {
+            $this->accepted_by_financier_date = now();
+            $this->save();
+        }
+
+        // HasMany relations
+        $this->storeCommentFromRequest($request);
+
+        // Upload SWIFT file
+        $this->uploadFile('payment_confirmation_document', self::getPaymentConfirmationDocumentsFolderPath());
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Storage paths
@@ -904,6 +1025,11 @@ class Invoice extends Model implements HasTitleAttribute
                 case InvoiceType::PRODUCTION_TYPE_ID:
                     $notificationClass = ProductionTypeInvoicePaymentCompleted::class;
                     $permissionName = 'receive-notification-when-production-type-invoice-payment-is-completed-by-PRD';
+                    break;
+
+                case InvoiceType::IMPORT_TYPE_ID:
+                    $notificationClass = ImportTypeInvoicePaymentCompleted::class;
+                    $permissionName = 'receive-notification-when-import-type-invoice-payment-is-completed-by-PRD';
                     break;
             }
 
@@ -999,6 +1125,57 @@ class Invoice extends Model implements HasTitleAttribute
             ['title' => 'Manufacturer', 'key' => 'order_manufacturer_name', 'width' => 140, 'sortable' => false],
             ['title' => 'Products', 'key' => 'products', 'width' => 180, 'sortable' => false],
             ['title' => 'fields.Country', 'key' => 'order_country_code', 'width' => 64, 'sortable' => false],
+
+            ['title' => 'dates.Payment request', 'key' => 'payment_request_date_by_financier', 'width' => 180, 'sortable' => true],
+            ['title' => 'dates.Payment', 'key' => 'payment_date', 'width' => 124, 'sortable' => true],
+            ['title' => 'dates.Payment completed', 'key' => 'payment_completed_date', 'width' => 204, 'sortable' => true],
+            ['title' => 'fields.Invoie №', 'key' => 'number', 'width' => 120, 'sortable' => true],
+            ['title' => 'fields.Swift', 'key' => 'payment_confirmation_document', 'width' => 144, 'sortable' => false],
+
+            ['title' => 'Comments', 'key' => 'comments_count', 'width' => 132, 'sortable' => false],
+            ['title' => 'comments.Last', 'key' => 'last_comment_body', 'width' => 200, 'sortable' => false],
+
+            ['title' => 'dates.Date of creation', 'key' => 'created_at', 'width' => 130, 'sortable' => true],
+            ['title' => 'dates.Update date', 'key' => 'updated_at', 'width' => 150, 'sortable' => true],
+        ];
+
+        foreach ($additionalColumns as $column) {
+            array_push($columns, [
+                ...$column,
+                'visible' => 1,
+                'order' => $order++,
+            ]);
+        }
+
+        return $columns;
+    }
+
+    public static function getPRDImportTypesTableHeadersForUser($user): ?array
+    {
+        if (Gate::forUser($user)->denies(Permission::extractAbilityName(Permission::CAN_VIEW_PRD_INVOICES_NAME))) {
+            return null;
+        }
+
+        $order = 1;
+        $columns = array();
+
+        if (Gate::forUser($user)->allows(Permission::extractAbilityName(Permission::CAN_EDIT_PRD_INVOICES_NAME))) {
+            array_push(
+                $columns,
+                ['title' => 'Record', 'key' => 'edit', 'width' => 60, 'sortable' => false, 'visible' => 1, 'order' => $order++],
+            );
+        }
+
+        $additionalColumns = [
+            ['title' => 'ID', 'key' => 'id', 'width' => 62, 'sortable' => true],
+            ['title' => 'dates.Receive', 'key' => 'receive_date', 'width' => 142, 'sortable' => true],
+            ['title' => 'dates.Sent for payment', 'key' => 'sent_for_payment_date', 'width' => 200, 'sortable' => true],
+            ['title' => 'dates.Accepted', 'key' => 'accepted_by_financier_date', 'width' => 132, 'sortable' => true],
+            ['title' => 'fields.Pdf', 'key' => 'pdf_file', 'width' => 144, 'sortable' => false],
+
+            ['title' => 'Manufacturer', 'key' => 'shipment_manufacturer_name', 'width' => 140, 'sortable' => false],
+            ['title' => 'Shipment', 'key' => 'shipment_id', 'width' => 160, 'sortable' => true],
+            ['title' => 'fields.Packing list', 'key' => 'shipment_packing_list_file', 'width' => 152, 'sortable' => false],
 
             ['title' => 'dates.Payment request', 'key' => 'payment_request_date_by_financier', 'width' => 180, 'sortable' => true],
             ['title' => 'dates.Payment', 'key' => 'payment_date', 'width' => 124, 'sortable' => true],

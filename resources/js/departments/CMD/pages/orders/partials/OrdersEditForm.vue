@@ -169,7 +169,6 @@ const reloadRequiredDataAndResetForm = () => {
                         v-model="values.pdf_file"
                         :error-messages="errors.pdf_file"
                         accept=".pdf"
-                        required
                     />
                 </v-col>
 

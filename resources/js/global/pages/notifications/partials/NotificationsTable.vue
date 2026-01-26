@@ -20,6 +20,7 @@ import OrderSentToManufacturer from "./types/OrderSentToManufacturer.vue";
 import NewProductionTypeInvoiceForPaymentReceived from "./types/NewProductionTypeInvoiceForPaymentReceived.vue";
 import NewImportTypeInvoiceForPaymentReceived from "./types/NewImportTypeInvoiceForPaymentReceived.vue";
 import ProductionTypeInvoicePaymentCompleted from "./types/ProductionTypeInvoicePaymentCompleted.vue";
+import ImportTypeInvoicePaymentCompleted from "./types/ImportTypeInvoicePaymentCompleted.vue";
 
 const { t } = useI18n();
 const { get } = useQueryParams();
@@ -37,6 +38,7 @@ const types = {
     NewProductionTypeInvoiceForPaymentReceived,
     NewImportTypeInvoiceForPaymentReceived,
     ProductionTypeInvoicePaymentCompleted,
+    ImportTypeInvoicePaymentCompleted,
 };
 
 onMounted(() => {

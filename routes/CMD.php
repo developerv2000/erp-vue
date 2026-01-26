@@ -44,9 +44,16 @@ Route::prefix('cmd')->name('cmd.')->middleware('auth', 'auth.session')->group(fu
     // Invoices
     Route::prefix('/invoices')->controller(CMDInvoiceController::class)->name('invoices.')->group(function () {
         CRUDRouteGenerator::defineDefaultRoutesOnly(
-            ['index', 'create', 'store', 'edit', 'update', 'destroy'],
+            ['index', 'create', 'store', 'destroy'],
             'id',
             'can:view-CMD-invoices',
+            'can:edit-CMD-invoices'
+        );
+
+        CRUDRouteGenerator::defineDefaultRoutesOnly(
+            ['edit', 'update'],
+            'id',
+            null,
             'can:edit-current-CMD-invoice'
         );
 

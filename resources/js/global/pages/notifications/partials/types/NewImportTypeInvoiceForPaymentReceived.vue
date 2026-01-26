@@ -16,7 +16,7 @@ const { t } = useI18n();
         <InertiaLink
             class="text-primary"
             :link="
-                route('import.invoices.index', {
+                route('prd.invoices.import-types.index', {
                     'id[]': data.invoice_id,
                     initialize_from_inertia_page: true,
                 })

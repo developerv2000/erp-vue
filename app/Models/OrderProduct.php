@@ -1354,7 +1354,7 @@ class OrderProduct extends Model implements HasTitleAttribute
         }
 
         $additionalColumns = [
-            ['title' => 'fields.Manufacturer', 'key' => 'order_manufacturer_id', 'width' => 140, 'sortable' => false],
+            ['title' => 'Manufacturer', 'key' => 'order_manufacturer_id', 'width' => 140, 'sortable' => false],
             ['title' => 'fields.Country', 'key' => 'order_country_id', 'width' => 80, 'sortable' => false],
             ['title' => 'Order', 'key' => 'order_id', 'width' => 120, 'sortable' => true],
             ['title' => 'fields.TM Eng', 'key' => 'process_trademark_en', 'width' => 146, 'sortable' => false],
@@ -1409,7 +1409,7 @@ class OrderProduct extends Model implements HasTitleAttribute
 
         $additionalColumns = [
             ['title' => 'ID', 'key' => 'id', 'width' => 62, 'sortable' => true],
-            ['title' => 'fields.Manufacturer', 'key' => 'order_manufacturer_id', 'width' => 140, 'sortable' => false],
+            ['title' => 'Manufacturer', 'key' => 'order_manufacturer_id', 'width' => 140, 'sortable' => false],
             ['title' => 'fields.Country', 'key' => 'order_country_id', 'width' => 80, 'sortable' => false],
             ['title' => 'Order', 'key' => 'order_id', 'width' => 120, 'sortable' => true],
             ['title' => 'fields.TM Eng', 'key' => 'process_trademark_en', 'width' => 146, 'sortable' => false],
@@ -1478,7 +1478,7 @@ class OrderProduct extends Model implements HasTitleAttribute
 
         $additionalColumns = [
             ['title' => 'ID', 'key' => 'id', 'width' => 62, 'sortable' => true],
-            ['title' => 'fields.Manufacturer', 'key' => 'order_manufacturer_id', 'width' => 140, 'sortable' => false],
+            ['title' => 'Manufacturer', 'key' => 'order_manufacturer_id', 'width' => 140, 'sortable' => false],
             ['title' => 'fields.Country', 'key' => 'order_country_id', 'width' => 80, 'sortable' => false],
             ['title' => 'fields.TM Eng', 'key' => 'process_trademark_en', 'width' => 146, 'sortable' => false],
             ['title' => 'fields.TM Rus', 'key' => 'process_trademark_ru', 'width' => 146, 'sortable' => false],
@@ -1531,7 +1531,7 @@ class OrderProduct extends Model implements HasTitleAttribute
         $additionalColumns = [
             ['title' => 'ID', 'key' => 'id', 'width' => 62, 'sortable' => true],
             ['title' => 'Status', 'key' => 'status', 'width' => 144, 'sortable' => false],
-            ['title' => 'fields.Manufacturer', 'key' => 'order_manufacturer_id', 'width' => 140, 'sortable' => false],
+            ['title' => 'Manufacturer', 'key' => 'order_manufacturer_id', 'width' => 140, 'sortable' => false],
             ['title' => 'fields.Country', 'key' => 'order_country_id', 'width' => 80, 'sortable' => false],
             ['title' => 'fields.TM Eng', 'key' => 'process_trademark_en', 'width' => 146, 'sortable' => false],
             ['title' => 'fields.TM Rus', 'key' => 'process_trademark_ru', 'width' => 146, 'sortable' => false],
@@ -1573,7 +1573,7 @@ class OrderProduct extends Model implements HasTitleAttribute
 
         $additionalColumns = [
             ['title' => 'ID', 'key' => 'id', 'width' => 62, 'sortable' => true],
-            ['title' => 'fields.Manufacturer', 'key' => 'order_manufacturer_id', 'width' => 140, 'sortable' => false],
+            ['title' => 'Manufacturer', 'key' => 'order_manufacturer_id', 'width' => 140, 'sortable' => false],
             ['title' => 'fields.Country', 'key' => 'order_country_id', 'width' => 80, 'sortable' => false],
             ['title' => 'Order', 'key' => 'order_id', 'width' => 120, 'sortable' => true],
             ['title' => 'fields.TM Eng', 'key' => 'process_trademark_en', 'width' => 146, 'sortable' => false],

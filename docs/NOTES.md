@@ -29,3 +29,4 @@ and also Manufacturer models saving event!
 - Optimize loading relations and selecting only required attributes when detecting Order 
 and OrderProduct models statuses (like OrderProduct::scopeWithOnlySelectsForDetectingStatus)
 - Add 'arrived at warehouse filter' for Order and OrderProduct
+- Separate notification send to specific BDM on order confirmation/receive etc

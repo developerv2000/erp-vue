@@ -20,7 +20,7 @@ const { t } = useI18n();
         <v-table density="compact" striped="odd">
             <tbody>
                 <tr>
-                    <td>{{ t("fields.Manufacturer") }}</td>
+                    <td>{{ t("Manufacturer") }}</td>
                     <td>{{ product.manufacturer.name }}</td>
                 </tr>
 

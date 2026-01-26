@@ -38,7 +38,7 @@ const store = usePLDOrderProductsTableStore();
         />
 
         <FilterAutocomplete
-            :label="t('fields.Manufacturer')"
+            :label="t('Manufacturer')"
             name="order_manufacturer_id[]"
             v-model="store.filters.order_manufacturer_id"
             :items="page.props.filterDependencies.manufacturers"

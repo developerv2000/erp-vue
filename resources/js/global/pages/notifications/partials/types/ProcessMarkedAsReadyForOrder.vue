@@ -27,7 +27,7 @@ const { t } = useI18n();
     </p>
 
     <p>
-        {{ t("fields.Manufacturer") }}: {{ data.manufacturer }}<br />
+        {{ t("Manufacturer") }}: {{ data.manufacturer }}<br />
         {{ t("fields.Country") }}: {{ data.country }}<br />
         {{ t("fields.MAH") }}:
         {{ data.marketing_authorization_holder }}

@@ -166,7 +166,8 @@
     "notifications.New order for confirmation received": "Получен новый заказ для подтверждения",
     "notifications.Order confirmed": "Данный заказ был подтверждён",
     "notifications.Order sent to manufacturer": "Данный заказ был отправлен заводу",
-    "notifications.New invoice for payment received": "Получен новый инвойс для оплаты",
+    "notifications.New production type invoice for payment received": "Получен новый инвойс типа 'Производства' для оплаты",
+    "notifications.New import type invoice for payment received": "Получен новый инвойс типа 'Импорт' для оплаты",
     "notifications.Invoice payment completed": "Оплата данного инвойса завершена",
 
     "files.Generating": "Генерация файла",
@@ -304,7 +305,6 @@
     "fields.Analyst": "Аналитик",
     "fields.BDM": "БДМ",
     "fields.Country": "Страна",
-    "fields.Manufacturer": "Производитель",
     "fields.Category": "Категория",
     "fields.Product class": "Класс Пд",
     "fields.ATX": "ATX",

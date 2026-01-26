@@ -142,5 +142,11 @@ Route::middleware('auth:sanctum')->name('api.')->group(function () {
                 ->middleware('can:view-import-shipments')
                 ->name('get');
         });
+
+        Route::prefix('/invoices')->name('invoices.')->group(function () {
+            Route::get('/', fn(Request $request) => Invoice::queryImportRecordsFromRequest($request, 'paginate', true))
+                ->middleware('can:view-import-invoices')
+                ->name('get');
+        });
     });
 });

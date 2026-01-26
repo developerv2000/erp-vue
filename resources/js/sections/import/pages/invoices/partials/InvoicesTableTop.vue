@@ -1,6 +1,6 @@
 <script setup>
 import { useI18n } from "vue-i18n";
-import useImportInvoicesTableStore from "@/sections/import/stores/invoices";
+import { useImportInvoicesTableStore } from "@/sections/import/stores/invoices";
 import useAuth from "@/core/composables/useAuth";
 
 import DefaultTableToolbar from "@/core/components/table/toolbar/DefaultTableToolbar.vue";

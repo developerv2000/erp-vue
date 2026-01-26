@@ -3,7 +3,7 @@ import { ref, computed } from "vue";
 import { usePage, router } from "@inertiajs/vue3";
 import { useI18n } from "vue-i18n";
 import { Form, useForm } from "vee-validate";
-import { object, mixed, date, array } from "yup";
+import { object, mixed, date } from "yup";
 import { useVeeFormFields } from "@/core/composables/useVeeFormFields";
 import { useFormData } from "@/core/composables/useFormData";
 import { useMessagesStore } from "@/core/stores/messages";
@@ -34,14 +34,12 @@ const redirectBack = ref(false);
 const schema = object({
     receive_date: date().required(),
     pdf_file: mixed().nullable(),
-    products: array().required().min(1),
 });
 
 // Backend-driven values (reactive to record)
 const baseInitialValues = computed(() => ({
     receive_date: record.value.receive_date,
     pdf_file: null,
-    products: record.value.products.map((p) => p.id),
 }));
 
 // Always-reset values
@@ -72,7 +70,7 @@ const submit = handleSubmit((values) => {
 
     axios
         .post(
-            route("cmd.invoices.update", { record: record.value.id }),
+            route("import.invoices.update", { record: record.value.id }),
             formData
         )
         .then(() => {
@@ -99,7 +97,7 @@ const submit = handleSubmit((values) => {
 
 const reloadRequiredDataAndResetForm = () => {
     router.reload({
-        only: ["record", "availableProducts"],
+        only: ["record"],
         onSuccess: () => {
             resetForm({
                 values: mergedInitialValues.value,
@@ -135,24 +133,6 @@ const reloadRequiredDataAndResetForm = () => {
                     />
                 </v-col>
             </v-row>
-        </DefaultSheet>
-
-        <!-- Products -->
-        <DefaultSheet>
-            <DefaultTitle>{{ t("Products") }}</DefaultTitle>
-
-            <div>
-                <v-checkbox-btn
-                    v-for="product in page.props.availableProducts"
-                    :key="product.id"
-                    v-model="values.products"
-                    :value="product.id"
-                    :label="product.process.full_english_product_label"
-                    :disabled="page.props.isPrepayment"
-                    color="primary"
-                >
-                </v-checkbox-btn>
-            </div>
         </DefaultSheet>
 
         <!-- Comment -->

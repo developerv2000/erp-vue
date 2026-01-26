@@ -16,7 +16,7 @@ const store = useImportShipmentsTableStore();
 <template>
     <StoreBindedFilter :store="store">
         <FilterAutocomplete
-            :label="t('fields.Manufacturer')"
+            :label="t('Manufacturer')"
             name="manufacturer_id[]"
             v-model="store.filters.manufacturer_id"
             :items="page.props.filterDependencies.manufacturers"

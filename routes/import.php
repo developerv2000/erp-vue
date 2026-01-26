@@ -34,7 +34,7 @@ Route::prefix('import')->name('import.')->middleware('auth', 'auth.session')->gr
     // Invoices
     Route::prefix('/invoices')->controller(ImportInvoiceController::class)->name('invoices.')->group(function () {
         CRUDRouteGenerator::defineDefaultRoutesOnly(
-            ['index', 'create', 'store', 'edit', 'update'],
+            ['index', 'create', 'store', 'edit', 'update', 'destroy'],
             'id',
             'can:view-import-invoices',
             'can:edit-import-invoices'

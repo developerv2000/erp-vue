@@ -647,7 +647,7 @@ class Manufacturer extends Model implements HasTitleAttribute, GeneratesBreadcru
             ['title' => 'fields.Analyst', 'key' => 'analyst_user_id', 'width' => 146, 'sortable' => true],
             ['title' => 'fields.Country', 'key' => 'country_id', 'width' => 144, 'sortable' => true],
             ['title' => 'pages.IVP', 'key' => 'products_count', 'width' => 104, 'sortable' => true],
-            ['title' => 'fields.Manufacturer', 'key' => 'name', 'width' => 140, 'sortable' => true],
+            ['title' => 'Manufacturer', 'key' => 'name', 'width' => 140, 'sortable' => true],
             ['title' => 'fields.Category', 'key' => 'category_id', 'width' => 104, 'sortable' => true],
             ['title' => 'fields.Status', 'key' => 'active', 'width' => 106, 'sortable' => true],
             ['title' => 'properties.Important', 'key' => 'important', 'width' => 100, 'sortable' => true],

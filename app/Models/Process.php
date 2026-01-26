@@ -1854,7 +1854,7 @@ class Process extends Model implements
 
             ['title' => 'fields.Manufacturer category', 'key' => 'manufacturer_category_name', 'width' => 110, 'sortable' => false],
             ['title' => 'fields.Manufacturer country', 'key' => 'manufacturer_country_name', 'width' => 140, 'sortable' => false],
-            ['title' => 'fields.Manufacturer', 'key' => 'product_manufacturer_name', 'width' => 140, 'sortable' => true],
+            ['title' => 'Manufacturer', 'key' => 'product_manufacturer_name', 'width' => 140, 'sortable' => true],
 
             ['title' => 'fields.Generic', 'key' => 'product_inn_name', 'width' => 180, 'sortable' => true],
             ['title' => 'fields.Form', 'key' => 'product_form_name', 'width' => 120, 'sortable' => true],

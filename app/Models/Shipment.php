@@ -186,6 +186,8 @@ class Shipment extends Model implements HasTitleAttribute
                 $product->produced_by_manufacturer_quantity = null;
                 $product->save();
             }
+
+            $record->importInvoice?->delete();
         });
     }
 
@@ -468,7 +470,7 @@ class Shipment extends Model implements HasTitleAttribute
 
         $additionalColumns = [
             ['title' => 'ID', 'key' => 'id', 'width' => 62, 'sortable' => true],
-            ['title' => 'fields.Manufacturer', 'key' => 'manufacturer_id', 'width' => 140, 'sortable' => true],
+            ['title' => 'Manufacturer', 'key' => 'manufacturer_id', 'width' => 140, 'sortable' => true],
             ['title' => 'fields.Packing list', 'key' => 'packing_list_file', 'width' => 152, 'sortable' => false],
             ['title' => 'Products', 'key' => 'products_count', 'width' => 100, 'sortable' => false],
             ['title' => 'fields.Transportation method', 'key' => 'transportation_method_id', 'width' => 144, 'sortable' => true],

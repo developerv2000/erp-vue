@@ -60,10 +60,16 @@ class Permission extends Model
     const CAN_RECEIVE_NOTIFICATION_WHEN_ORDER_IS_SENT_TO_MANUFACTURER_BY_CMD = 'can-receive-notification-when-order-is-sent-to-manufacturer-by-CMD';
 
     // PLD and PRD
-    const CAN_RECEIVE_NOTIFICATION_WHEN_INVOICE_IS_SENT_FOR_PAYMENT_BY_CMD = 'can-receive-notification-when-invoice-is-sent-for-payment-by-CMD';
+    const CAN_RECEIVE_NOTIFICATION_WHEN_PRODUCTION_TYPE_INVOICE_IS_SENT_FOR_PAYMENT_BY_CMD = 'can-receive-notification-when-production-type-invoice-is-sent-for-payment-by-CMD';
+
+    // PRD
+    const CAN_RECEIVE_NOTIFICATION_WHEN_IMPORT_TYPE_INVOICE_IS_SENT_FOR_PAYMENT_BY_ELD = 'can-receive-notification-when-import-type-invoice-is-sent-for-payment-by-ELD';
 
     // PLD and CMD
     const CAN_RECEIVE_NOTIFICATION_WHEN_PRODUCTION_TYPE_INVOICE_PAYMENT_IS_COMPLETED_BY_RPD = 'can-receive-notification-when-production-type-invoice-payment-is-completed-by-PRD';
+
+    // ELD
+    const CAN_RECEIVE_NOTIFICATION_WHEN_IMPORT_TYPE_INVOICE_PAYMENT_IS_COMPLETED_BY_RPD = 'can-receive-notification-when-import-type-invoice-payment-is-completed-by-PRD';
 
     /*
     |--------------------------------------------------------------------------
@@ -486,7 +492,7 @@ class Permission extends Model
             self::CAN_RECEIVE_NOTIFICATION_WHEN_MAD_VPS_IS_MARKED_AS_READY_FOR_ORDER,
             self::CAN_RECEIVE_NOTIFICATION_WHEN_ORDER_IS_SENT_FOR_CONFIRMATION_BY_CMD,
             self::CAN_RECEIVE_NOTIFICATION_WHEN_ORDER_IS_SENT_TO_MANUFACTURER_BY_CMD,
-            self::CAN_RECEIVE_NOTIFICATION_WHEN_INVOICE_IS_SENT_FOR_PAYMENT_BY_CMD,
+            self::CAN_RECEIVE_NOTIFICATION_WHEN_PRODUCTION_TYPE_INVOICE_IS_SENT_FOR_PAYMENT_BY_CMD,
             self::CAN_RECEIVE_NOTIFICATION_WHEN_PRODUCTION_TYPE_INVOICE_PAYMENT_IS_COMPLETED_BY_RPD,
         ];
     }
@@ -500,7 +506,8 @@ class Permission extends Model
 
             self::CAN_VIEW_STORAGE_INVOICE_FILES_NAME,
 
-            self::CAN_RECEIVE_NOTIFICATION_WHEN_INVOICE_IS_SENT_FOR_PAYMENT_BY_CMD,
+            self::CAN_RECEIVE_NOTIFICATION_WHEN_PRODUCTION_TYPE_INVOICE_IS_SENT_FOR_PAYMENT_BY_CMD,
+            self::CAN_RECEIVE_NOTIFICATION_WHEN_IMPORT_TYPE_INVOICE_IS_SENT_FOR_PAYMENT_BY_ELD,
         ];
     }
 
@@ -534,6 +541,9 @@ class Permission extends Model
             self::CAN_EDIT_IMPORT_INVOICES_NAME,
 
             self::CAN_VIEW_STORAGE_SHIPMENT_FILES_NAME,
+            self::CAN_VIEW_STORAGE_INVOICE_FILES_NAME,
+
+            self::CAN_RECEIVE_NOTIFICATION_WHEN_IMPORT_TYPE_INVOICE_PAYMENT_IS_COMPLETED_BY_RPD,
         ];
     }
 }

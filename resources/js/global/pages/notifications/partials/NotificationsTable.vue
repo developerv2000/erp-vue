@@ -18,6 +18,7 @@ import OrderSentToConfirmation from "./types/OrderSentToConfirmation.vue";
 import OrderConfirmed from "./types/OrderConfirmed.vue";
 import OrderSentToManufacturer from "./types/OrderSentToManufacturer.vue";
 import NewProductionTypeInvoiceForPaymentReceived from "./types/NewProductionTypeInvoiceForPaymentReceived.vue";
+import NewImportTypeInvoiceForPaymentReceived from "./types/NewImportTypeInvoiceForPaymentReceived.vue";
 import ProductionTypeInvoicePaymentCompleted from "./types/ProductionTypeInvoicePaymentCompleted.vue";
 
 const { t } = useI18n();
@@ -34,6 +35,7 @@ const types = {
     OrderConfirmed,
     OrderSentToManufacturer,
     NewProductionTypeInvoiceForPaymentReceived,
+    NewImportTypeInvoiceForPaymentReceived,
     ProductionTypeInvoicePaymentCompleted,
 };
 

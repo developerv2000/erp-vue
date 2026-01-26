@@ -131,7 +131,7 @@ const reloadRequiredDataAndResetForm = () => {
             <v-row>
                 <v-col cols="4">
                     <DefaultTextField
-                        :label="t('fields.Manufacturer')"
+                        :label="t('Manufacturer')"
                         v-model="values.name"
                         :error-messages="errors.name"
                         required

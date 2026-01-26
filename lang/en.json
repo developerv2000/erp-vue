@@ -155,7 +155,8 @@
     "notifications.New order for confirmation received": "New order for confirmation received",
     "notifications.Order confirmed": "Below order has been confirmed",
     "notifications.Order sent to manufacturer": "Below order has been sent to manufacturer",
-    "notifications.New invoice for payment received": "New invoice for payment received",
+    "notifications.New production type invoice for payment received": "New production type invoice for payment received",
+    "notifications.New import type invoice for payment received": "New import type invoice for payment received",
     "notifications.Invoice payment completed": "Below Invoice payment completed",
 
     "files.Generating": "Generating file",
@@ -304,7 +305,6 @@
     "fields.Analyst": "Analyst",
     "fields.BDM": "BDM",
     "fields.Country": "Country",
-    "fields.Manufacturer": "Manufacturer",
     "fields.Category": "Category",
     "fields.Product class": "Product class",
     "fields.ATX": "ATX",

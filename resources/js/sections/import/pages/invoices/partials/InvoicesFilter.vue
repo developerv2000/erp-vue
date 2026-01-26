@@ -39,7 +39,7 @@ const store = useImportInvoicesTableStore();
         />
 
         <FilterAutocomplete
-            :label="t('fields.Manufacturer')"
+            :label="t('Manufacturer')"
             name="shipment_manufacturer_id[]"
             v-model="store.filters.shipment_manufacturer_id"
             :items="page.props.filterDependencies.manufacturers"

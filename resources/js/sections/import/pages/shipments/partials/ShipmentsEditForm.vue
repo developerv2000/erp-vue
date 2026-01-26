@@ -153,7 +153,7 @@ const reloadRequiredDataAndResetForm = () => {
             <v-row>
                 <v-col cols="4">
                     <DefaultTextField
-                        :label="t('fields.Manufacturer')"
+                        :label="t('Manufacturer')"
                         :value="record.manufacturer.name"
                         disabled
                     />

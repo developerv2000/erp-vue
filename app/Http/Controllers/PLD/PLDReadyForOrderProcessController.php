@@ -33,7 +33,7 @@ class PLDReadyForOrderProcessController extends Controller
         $headers = collect([
             ['title' => 'fields.BDM', 'key' => 'manufacturer_bdm', 'width' => 146, 'sortable' => false],
             ['title' => 'dates.Readiness', 'key' => 'readiness_for_order_date', 'width' => 144, 'sortable' => true],
-            ['title' => 'fields.Manufacturer', 'key' => 'product_manufacturer_name', 'width' => 140, 'sortable' => false],
+            ['title' => 'Manufacturer', 'key' => 'product_manufacturer_name', 'width' => 140, 'sortable' => false],
             ['title' => 'fields.Country', 'key' => 'country_id', 'width' => 80, 'sortable' => true],
             ['title' => 'fields.MAH', 'key' => 'marketing_authorization_holder_id', 'width' => 102, 'sortable' => true],
 

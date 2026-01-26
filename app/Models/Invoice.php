@@ -7,6 +7,7 @@ use App\Http\Requests\CMD\CMDInvoiceUpdateProductionTypeRequest;
 use App\Http\Requests\import\ImportInvoiceStoreRequest;
 use App\Http\Requests\import\ImportInvoiceUpdateRequest;
 use App\Http\Requests\PRD\PRDInvoiceUpdateProductionTypeRequest;
+use App\Notifications\NewImportTypeInvoiceForPaymentReceived;
 use App\Notifications\NewProductionTypeInvoiceForPaymentReceived;
 use App\Notifications\ProductionTypeInvoicePaymentCompleted;
 use App\Support\Contracts\Model\HasTitleAttribute;
@@ -53,6 +54,11 @@ class Invoice extends Model implements HasTitleAttribute
     const DEFAULT_PRD_PRODUCTION_TYPES_ORDER_BY = 'id';
     const DEFAULT_PRD_PRODUCTION_TYPES_ORDER_DIRECTION = 'asc';
     const DEFAULT_PRD_PRODUCTION_TYPES_PER_PAGE = 50;
+
+    // Import
+    const DEFAULT_IMPORT_ORDER_BY = 'id';
+    const DEFAULT_IMPORT_ORDER_DIRECTION = 'asc';
+    const DEFAULT_IMPORT_PER_PAGE = 50;
 
     /*
     |--------------------------------------------------------------------------
@@ -188,6 +194,30 @@ class Invoice extends Model implements HasTitleAttribute
         ]);
 
         $this->products->each(fn($product) => $product->process->append('full_english_product_label'));
+    }
+
+    public static function appendRecordsBasicImportAttributes($records): void
+    {
+        foreach ($records as $record) {
+            $record->appendBasicImportAttributes();
+        }
+    }
+
+    public function appendBasicImportAttributes(): void
+    {
+        $this->append([
+            'base_model_class',
+            'pdf_file_url',
+            'is_sent_for_payment',
+            'is_accepted_by_financier',
+            'payment_confirmation_document_url',
+            'payment_is_completed',
+        ]);
+
+        $this->invoiceable->append([
+            'title',
+            'packing_list_file_url',
+        ]);
     }
 
     public function getIsSentForPaymentAttribute(): bool
@@ -358,6 +388,31 @@ class Invoice extends Model implements HasTitleAttribute
         ]);
     }
 
+    public function scopeWithBasicImportRelations($query): Builder
+    {
+        return $query->with([
+            'lastComment',
+
+            'invoiceable' => function ($shipmentQuery) {
+                $shipmentQuery->with([
+                    'manufacturer' => function ($manufacturersQuery) {
+                        $manufacturersQuery->select(
+                            'manufacturers.id',
+                            'manufacturers.name',
+                        );
+                    },
+                ]);
+            },
+        ]);
+    }
+
+    public function scopeWithBasicImportRelationCounts($query): Builder
+    {
+        return $query->withCount([
+            'comments',
+        ]);
+    }
+
     public function scopeOnlyProductionType($query): Builder
     {
         return $query->where('type_id', InvoiceType::PRODUCTION_TYPE_ID);
@@ -412,7 +467,8 @@ class Invoice extends Model implements HasTitleAttribute
      */
     public static function queryCMDRecordsFromRequest(Request $request, string $action = 'paginate', bool $appendAttributes = false)
     {
-        $query = self::withBasicCMDRelations()
+        $query = self::onlyProductionType()
+            ->withBasicCMDRelations()
             ->withBasicCMDRelationCounts();
 
         // Normalize request parameters
@@ -453,7 +509,8 @@ class Invoice extends Model implements HasTitleAttribute
      */
     public static function queryPLDRecordsFromRequest(Request $request, string $action = 'paginate', bool $appendAttributes = false)
     {
-        $query = self::withBasicPLDRelations()
+        $query = self::onlyProductionType()
+            ->withBasicPLDRelations()
             ->withBasicPLDRelationCounts();
 
         // Normalize request parameters
@@ -495,6 +552,7 @@ class Invoice extends Model implements HasTitleAttribute
     public static function queryPRDProductionTypeRecordsFromRequest(Request $request, string $action = 'paginate', bool $appendAttributes = false)
     {
         $query = self::onlySentForPayment()
+            ->onlyProductionType()
             ->withBasicPRDProductionTypesRelations()
             ->withBasicPRDProductionTypesRelationCounts();
 
@@ -515,6 +573,48 @@ class Invoice extends Model implements HasTitleAttribute
         // Append attributes unless raw query is requested
         if ($appendAttributes && $action !== 'query') {
             self::appendRecordsBasicPRDProductionTypesAttributes($records);
+        }
+
+        return $records;
+    }
+
+    /**
+     * Build and execute a model query based on request parameters.
+     *
+     * Steps:
+     *  - Apply default relations & counts
+     *  - Apply soft delete scope (if requested)
+     *  - Normalize query params (pagination, sorting, etc.)
+     *  - Apply filters
+     *  - Finalize query with sorting & pagination
+     *  - Append basic attributes (if requested and unless returning raw query)
+     *
+     * @param $action  ('paginate', 'get' or 'query')
+     * @return mixed
+     */
+    public static function queryImportRecordsFromRequest(Request $request, string $action = 'paginate', bool $appendAttributes = false)
+    {
+        $query = self::onlyImportType()
+            ->withBasicImportRelations()
+            ->withBasicImportRelationCounts();
+
+        // Normalize request parameters
+        self::addDefaultQueryParamsToRequest(
+            $request,
+            'DEFAULT_IMPORT_ORDER_BY',
+            'DEFAULT_IMPORT_ORDER_DIRECTION',
+            'DEFAULT_IMPORT_PER_PAGE'
+        );
+
+        // Apply filters
+        self::filterQueryForRequest($query, $request, applyPermissionsFilter: true);
+
+        // Finalize (sorting & pagination)
+        $records = ModelHelper::finalizeQueryForRequest($query, $request, $action);
+
+        // Append attributes unless raw query is requested
+        if ($appendAttributes && $action !== 'query') {
+            self::appendRecordsBasicImportAttributes($records);
         }
 
         return $records;
@@ -709,7 +809,18 @@ class Invoice extends Model implements HasTitleAttribute
     /**
      * AJAX request by ELD
      */
-    public static function updateImportTypeByELDFromRequest(ImportInvoiceUpdateRequest $request): void {}
+    public function updateImportTypeByELDFromRequest(ImportInvoiceUpdateRequest $request): void
+    {
+        $this->update($request->except([ // exclude nullable files
+            'pdf_file',
+        ]));
+
+        // HasMany relations
+        $this->storeCommentFromRequest($request);
+
+        // Upload PDF file
+        $this->uploadFile('pdf_file', self::getPdfFilesFolderPath());
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -745,7 +856,7 @@ class Invoice extends Model implements HasTitleAttribute
             $this->save();
 
             $notification = new NewProductionTypeInvoiceForPaymentReceived($this);
-            User::notifyUsersBasedOnPermission($notification, 'receive-notification-when-invoice-is-sent-for-payment-by-CMD');
+            User::notifyUsersBasedOnPermission($notification, 'receive-notification-when-production-type-invoice-is-sent-for-payment-by-CMD');
         }
     }
 
@@ -760,8 +871,8 @@ class Invoice extends Model implements HasTitleAttribute
             $this->sent_for_payment_date = now();
             $this->save();
 
-            // $notification = new NewProductionTypeInvoiceForPaymentReceived($this);
-            // User::notifyUsersBasedOnPermission($notification, 'receive-notification-when-invoice-is-sent-for-payment-by-CMD');
+            $notification = new NewImportTypeInvoiceForPaymentReceived($this);
+            User::notifyUsersBasedOnPermission($notification, 'receive-notification-when-import-type-invoice-is-sent-for-payment-by-ELD');
         }
     }
 
@@ -832,7 +943,7 @@ class Invoice extends Model implements HasTitleAttribute
             ['title' => 'fields.Pdf', 'key' => 'pdf_file', 'width' => 144, 'sortable' => false],
 
             ['title' => 'Order', 'key' => 'order_title', 'width' => 128, 'sortable' => true],
-            ['title' => 'fields.Manufacturer', 'key' => 'order_manufacturer_name', 'width' => 140, 'sortable' => false],
+            ['title' => 'Manufacturer', 'key' => 'order_manufacturer_name', 'width' => 140, 'sortable' => false],
             ['title' => 'Products', 'key' => 'products', 'width' => 180, 'sortable' => false],
             ['title' => 'fields.Country', 'key' => 'order_country_code', 'width' => 64, 'sortable' => false],
 
@@ -885,7 +996,7 @@ class Invoice extends Model implements HasTitleAttribute
             ['title' => 'fields.Pdf', 'key' => 'pdf_file', 'width' => 144, 'sortable' => false],
 
             ['title' => 'Order', 'key' => 'order_title', 'width' => 128, 'sortable' => true],
-            ['title' => 'fields.Manufacturer', 'key' => 'order_manufacturer_name', 'width' => 140, 'sortable' => false],
+            ['title' => 'Manufacturer', 'key' => 'order_manufacturer_name', 'width' => 140, 'sortable' => false],
             ['title' => 'Products', 'key' => 'products', 'width' => 180, 'sortable' => false],
             ['title' => 'fields.Country', 'key' => 'order_country_code', 'width' => 64, 'sortable' => false],
 
@@ -931,7 +1042,7 @@ class Invoice extends Model implements HasTitleAttribute
             ['title' => 'fields.Pdf', 'key' => 'pdf_file', 'width' => 144, 'sortable' => false],
 
             ['title' => 'Order', 'key' => 'order_title', 'width' => 128, 'sortable' => true],
-            ['title' => 'fields.Manufacturer', 'key' => 'order_manufacturer_name', 'width' => 140, 'sortable' => false],
+            ['title' => 'Manufacturer', 'key' => 'order_manufacturer_name', 'width' => 140, 'sortable' => false],
             ['title' => 'Products', 'key' => 'products', 'width' => 180, 'sortable' => false],
             ['title' => 'fields.Country', 'key' => 'order_country_code', 'width' => 64, 'sortable' => false],
 

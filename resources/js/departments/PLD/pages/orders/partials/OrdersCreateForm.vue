@@ -116,7 +116,7 @@ const submit = handleSubmit((values) => {
             <v-row>
                 <v-col cols="4">
                     <DefaultAutocomplete
-                        :label="t('fields.Manufacturer')"
+                        :label="t('Manufacturer')"
                         :items="page.props.manufacturers"
                         v-model="values.manufacturer_id"
                         :error-messages="errors.manufacturer_id"

@@ -2,7 +2,7 @@
 import { useI18n } from "vue-i18n";
 import InertiaLink from "@/core/components/inertia/InertiaLink.vue";
 
-defineProps({
+const props = defineProps({
     data: Object,
 });
 
@@ -11,24 +11,24 @@ const { t } = useI18n();
 
 <template>
     <p>
-        {{ t("notifications.New order received") }}:
+        {{ t("notifications.New import type invoice for payment received") }}:
 
         <InertiaLink
             class="text-primary"
             :link="
-                route('cmd.orders.index', {
-                    'id[]': data.order_id,
+                route('import.invoices.index', {
+                    'id[]': data.invoice_id,
                     initialize_from_inertia_page: true,
                 })
             "
         >
-            <strong># {{ data.order_id }}</strong>
+            <strong># {{ data.invoice_id }}</strong>
         </InertiaLink>
     </p>
 
     <p>
-        {{ t("Products") }}: {{ data.products_count }}<br />
-        {{ t("Manufacturer") }}: {{ data.manufacturer }}<br />
-        {{ t("fields.Country") }}: {{ data.country }}
+        {{ t("Shipment") }}: <strong>{{ data.shipment_title }}</strong
+        ><br />
+        {{ t("Products") }}: {{ data.shipment_products_count }}<br />
     </p>
 </template>

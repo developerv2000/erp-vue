@@ -31,7 +31,7 @@ const link = detectLink();
 
 <template>
     <p>
-        {{ t("notifications.New invoice for payment received") }}:
+        {{ t("notifications.New production type invoice for payment received") }}:
 
         <InertiaLink
             class="text-primary"
@@ -45,7 +45,7 @@ const link = detectLink();
         {{ t("fields.PO №") }}: <strong>{{ data.order_name }}</strong
         ><br />
         {{ t("Products") }}: {{ data.products_count }}<br />
-        {{ t("fields.Manufacturer") }}: {{ data.order_manufacturer_name }}<br />
+        {{ t("Manufacturer") }}: {{ data.order_manufacturer_name }}<br />
         {{ t("fields.Country") }}: {{ data.order_country_code }}
     </p>
 </template>

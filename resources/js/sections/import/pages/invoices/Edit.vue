@@ -17,7 +17,7 @@ const title = computed(
 const breadcrumbs = computed(() => [
     {
         title: t("pages.Invoices"),
-        link: route("cmd.invoices.index"),
+        link: route("import.invoices.index"),
     },
 
     {

@@ -82,7 +82,7 @@ const refreshSmartFiltersDebounced = debounce(refreshSmartFilters, 500);
         />
 
         <FilterAutocomplete
-            :label="'* ' + t('fields.Manufacturer')"
+            :label="'* ' + t('Manufacturer')"
             name="manufacturer_id[]"
             v-model="store.filters.manufacturer_id"
             :items="page.props.smartFilterDependencies.manufacturers"

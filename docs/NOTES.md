@@ -30,3 +30,4 @@ and also Manufacturer models saving event!
 and OrderProduct models statuses (like OrderProduct::scopeWithOnlySelectsForDetectingStatus)
 - Add 'arrived at warehouse filter' for Order and OrderProduct
 - Separate notification send to specific BDM on order confirmation/receive etc
+- FIX edit-current-CMD-order/products/invoices. Gate is too complex

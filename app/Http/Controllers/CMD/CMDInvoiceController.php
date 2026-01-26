@@ -75,6 +75,9 @@ class CMDInvoiceController extends Controller
         ]);
     }
 
+    /**
+     * Don`t use ServiceController binding for Invoice (record) because of custom gates!
+     */
     public function edit($record): Response
     {
         $record = Invoice::withBasicCMDRelations()
@@ -99,9 +102,12 @@ class CMDInvoiceController extends Controller
 
     /**
      * AJAX request
+     *
+     * Don`t use ServiceController binding for Invoice (record) because of custom gates!
      */
-    public function update(CMDInvoiceUpdateProductionTypeRequest $request, Invoice $record): JsonResponse
+    public function update(CMDInvoiceUpdateProductionTypeRequest $request, $record): JsonResponse
     {
+        $record = Invoice::findorfail($record);
         $record->updateProductionTypeByCMDFromRequest($request);
 
         return response()->json([

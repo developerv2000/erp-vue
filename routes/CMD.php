@@ -13,7 +13,7 @@ Route::prefix('cmd')->name('cmd.')->middleware('auth', 'auth.session')->group(fu
             ['index', 'edit', 'update'],
             'id',
             'can:view-CMD-orders',
-            'can:edit-current-CMD-order'
+            'can:edit-CMD-orders'
         );
 
         // AJAX requests
@@ -30,7 +30,7 @@ Route::prefix('cmd')->name('cmd.')->middleware('auth', 'auth.session')->group(fu
             ['index', 'edit', 'update'],
             'id',
             'can:view-CMD-order-products',
-            'can:edit-current-CMD-order-product'
+            'can:edit-CMD-order-products'
         );
 
         // AJAX requests
@@ -44,17 +44,10 @@ Route::prefix('cmd')->name('cmd.')->middleware('auth', 'auth.session')->group(fu
     // Invoices
     Route::prefix('/invoices')->controller(CMDInvoiceController::class)->name('invoices.')->group(function () {
         CRUDRouteGenerator::defineDefaultRoutesOnly(
-            ['index', 'create', 'store', 'destroy'],
+            ['index', 'create', 'store', 'edit', 'update', 'destroy'],
             'id',
             'can:view-CMD-invoices',
             'can:edit-CMD-invoices'
-        );
-
-        CRUDRouteGenerator::defineDefaultRoutesOnly(
-            ['edit', 'update'],
-            'id',
-            null,
-            'can:edit-current-CMD-invoice'
         );
 
         // AJAX requests

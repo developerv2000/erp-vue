@@ -13,6 +13,7 @@ use App\Models\Process;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -33,19 +34,22 @@ class CMDOrderProductController extends Controller
         ]);
     }
 
-    /**
-     * Don`t use ServiceController binding for OrderProduct (record) because of custom gates!
-     */
     public function edit($record): Response
     {
+        // Fetch record with required relations
         $record = OrderProduct::withBasicCMDRelations()
             ->withBasicCMDRelationCounts()
             ->findorfail($record);
 
+        // Secure action
+        $this->authorizeOrderProductEdit($record);
+
+        // Append additional attributes
         $record->appendBasicCMDAttributes();
         $record->append('can_be_prepared_for_shipping_from_manufacturer');
         $record->append('title'); // Used on generating breadcrumbs
 
+        // Return response
         return Inertia::render('departments/CMD/pages/order-products/Edit', [
             // Refetched after record update
             'record' => $record,
@@ -54,14 +58,16 @@ class CMDOrderProductController extends Controller
 
     /**
      * AJAX request
-     *
-     * Don`t use ServiceController binding for OrderProduct (record) because of custom gates!
      */
-    public function update(CMDOrderProductUpdateRequest $request, $record): JsonResponse
+    public function update(CMDOrderProductUpdateRequest $request,  OrderProduct $record): JsonResponse
     {
-        $record = OrderProduct::findorfail($record);
+        // Secure action
+        $this->authorizeOrderProductEdit($record);
+
+        // Update record
         $record->updateByCMDFromRequest($request);
 
+        // Return response
         return response()->json([
             'success' => true,
         ]);
@@ -72,6 +78,10 @@ class CMDOrderProductController extends Controller
      */
     public function endProduction(OrderProduct $record): OrderProduct
     {
+        // Secure action
+        $this->authorizeOrderProductEdit($record);
+
+        // End production
         $record->endProduction();
 
         // Return refetched updated record
@@ -89,6 +99,10 @@ class CMDOrderProductController extends Controller
      */
     public function setAsReadyForShipmentFromManufacturer(OrderProduct $record): OrderProduct
     {
+        // Secure action
+        $this->authorizeOrderProductEdit($record);
+
+        // Set as ready for shipment from manufacturer
         $record->setAsReadyForShipmentFromManufacturer();
 
         // Return refetched updated record
@@ -113,5 +127,10 @@ class CMDOrderProductController extends Controller
             'ruTrademarks' => Process::pluckAllRuTrademarks(),
             'orderNames' => Order::onlyWithName()->orderByName()->pluck('name'),
         ];
+    }
+
+    private function authorizeOrderProductEdit(OrderProduct $product): void
+    {
+        Gate::authorize('edit-CMD-order-product', $product);
     }
 }

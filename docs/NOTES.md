@@ -1,18 +1,4 @@
-# New version differences:
-
-## Attachments
-- file_path => folder
-- file_type => removed!
-- file_size => file_size_in_mb // REQUIRES RECALCULATiON!
-    string => decimal(6,2)
-
-## Atx
-- Added unique for 'inn_id' and 'form_id'
-
-## Processes
-- order_priority => days_past_since_last_activity
-
-## Misc
+# Required fixes:
 - Fix uploading attachments for multiple "Products" create
 - User model, fix 'productSearches relation/count' after adding 'ProductSearch'
 - Add :return typos for controller functions
@@ -29,5 +15,3 @@ and also Manufacturer models saving event!
 - Optimize loading relations and selecting only required attributes when detecting Order 
 and OrderProduct models statuses (like OrderProduct::scopeWithOnlySelectsForDetectingStatus)
 - Add 'arrived at warehouse filter' for Order and OrderProduct
-- Separate notification send to specific BDM on order confirmation/receive etc
-- FIX edit-current-CMD-order/products/invoices. Gate is too complex

@@ -320,6 +320,7 @@ class Invoice extends Model implements HasTitleAttribute
                         $manufacturersQuery->select(
                             'manufacturers.id',
                             'manufacturers.name',
+                            'manufacturers.bdm_user_id', // Required for 'edit-CMD-invoice' gate
                         );
                     },
                 ]);
@@ -810,10 +811,8 @@ class Invoice extends Model implements HasTitleAttribute
     /**
      * AJAX request by CMD
      */
-    public static function storeProductionTypeByCMDFromRequest(CMDInvoiceStoreProductionTypeRequest $request): void
+    public static function storeProductionTypeByCMDFromRequest(CMDInvoiceStoreProductionTypeRequest $request, Order $order): void
     {
-        $order = Order::findorfail($request->input('order_id'));
-
         // Create invoice
         $record = $order->productionInvoices()->create([
             ...$request->all(),

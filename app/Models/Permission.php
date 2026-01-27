@@ -456,13 +456,14 @@ class Permission extends Model
     {
         return [
             self::CAN_VIEW_CMD_ORDERS_NAME,
-            self::CAN_VIEW_CMD_ORDERS_OF_ALL_BDMS_NAME,
             self::CAN_VIEW_CMD_ORDER_PRODUCTS_NAME,
             self::CAN_VIEW_CMD_INVOICES_NAME,
 
             self::CAN_EDIT_CMD_ORDERS_NAME,
             self::CAN_EDIT_CMD_ORDER_PRODUCTS_NAME,
             self::CAN_EDIT_CMD_INVOICES_NAME,
+
+            self::CAN_VIEW_CMD_ORDERS_OF_ALL_BDMS_NAME,
 
             self::CAN_VIEW_STORAGE_ORDER_FILES_NAME,
             self::CAN_VIEW_STORAGE_ORDER_PRODUCT_FILES_NAME,

@@ -12,6 +12,7 @@ use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -35,6 +36,9 @@ class CMDOrderController extends Controller
 
     public function edit(Order $record): Response
     {
+        // Secure action
+        $this->authorizeOrderEdit($record);
+
         // Order::withBasicCMDRelations::find($record) is not used because we need to load other relations
         $record->appendBasicCMDAttributes();
         $record->append('title'); // Used on generating breadcrumbs
@@ -78,8 +82,13 @@ class CMDOrderController extends Controller
      */
     public function update(CMDOrderUpdateRequest $request, Order $record): JsonResponse
     {
+        // Secure action
+        $this->authorizeOrderEdit($record);
+
+        // Update record
         $record->updateByCMDFromRequest($request);
 
+        // Return response
         return response()->json([
             'success' => true,
         ]);
@@ -90,6 +99,10 @@ class CMDOrderController extends Controller
      */
     public function sentToConfirmation(Order $record): Order
     {
+        // Secure action
+        $this->authorizeOrderEdit($record);
+
+        // Send to confirmation
         $record->sendToConfirmation();
 
         // Return refetched updated record
@@ -107,6 +120,10 @@ class CMDOrderController extends Controller
      */
     public function sentToManufacturer(Order $record): Order
     {
+        // Secure action
+        $this->authorizeOrderEdit($record);
+
+        // Send to manufacturer
         $record->sendToManufacturer();
 
         // Return refetched updated record
@@ -124,6 +141,10 @@ class CMDOrderController extends Controller
      */
     public function startProduction(Order $record): Order
     {
+        // Secure action
+        $this->authorizeOrderEdit($record);
+
+        // Start production
         $record->startProduction();
 
         // Return refetched updated record
@@ -145,5 +166,10 @@ class CMDOrderController extends Controller
             'statusOptions' => Order::getFilterStatusOptions(),
             'orderNames' => Order::onlyWithName()->orderByName()->pluck('name'),
         ];
+    }
+
+    private function authorizeOrderEdit(Order $order): void
+    {
+        Gate::authorize('edit-CMD-order', $order);
     }
 }

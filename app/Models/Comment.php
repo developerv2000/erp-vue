@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Support\Helpers\GeneralHelper;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Route;
 
 class Comment extends Model
 {
@@ -62,9 +63,9 @@ class Comment extends Model
                 $record->commentable->updateSelfOnCommentCreate();
             }
 
-            if ($record->commentable_type == Process::class) {
-                // Recalculate 'days_past_since_last_activity' of process after creating comment.
-                $record->commentable->recalculateDaysPastSinceLastActivity();
+            // Recalculate 'days_past_since_last_activity' of related processes.
+            if ($record->commentable_type == Process::class && Route::currentRouteName() == 'comments.store') {
+                $record->commentable->recalculateDaysPastSinceLastActivity(refresh: false);
             }
         });
     }

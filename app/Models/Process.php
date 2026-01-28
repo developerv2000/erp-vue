@@ -408,33 +408,9 @@ class Process extends Model implements
 
     protected static function booted(): void
     {
-        static::creating(function ($record) {
-            $record->responsible_person_update_date = now();
-            $record->created_at = $record->created_at ?: now();
-        });
-
         static::created(function ($record) {
-            $record->addStatusHistoryForCurrentStatus($record->created_at);
-            $record->recalculateDaysPastSinceLastActivity(true); // Must be executed only AFTER creating status_history!
-        });
-
-        static::updating(function ($record) {
-            $record->updateStatusHistory();
-            $record->notifyUsersOnContractStage();
-            $record->handleResponsiblePersonUpdateDate();
-        });
-
-        static::updated(function ($record) {
-            // Recalculate 'days_past_since_last_activity' after updating event, because records status maybe be updated.
-            $record->recalculateDaysPastSinceLastActivity(true);
-        });
-
-        static::saving(function ($record) {
-            $record->trademark_en = mb_strtoupper($record->trademark_en ?: '');
-            $record->trademark_ru = mb_strtoupper($record->trademark_ru ?: '');
-
-            $record->handleForecastUpdateDate();
-            $record->handleIncreasedPriceDate();
+            $record->createStatusHistoryForCurrentStatus($record->created_at);
+            $record->recalculateDaysPastSinceLastActivity(refresh: true); // Must be executed only AFTER creating status_history!
         });
 
         static::restoring(function ($record) {
@@ -1318,14 +1294,14 @@ class Process extends Model implements
     */
 
     /**
-     * Create multiple instances of the model from the request data.
+     * Create multiple Process records from MAD request.
      *
      * AJAX request.
      *
-     * This method processes an array of countries from the request,
-     * merges specific forecast year data for each country, and creates
-     * model instances with the combined data. It also attaches related
-     * clinical trial countries and responsible people, and stores comments.
+     * Each country entry is combined with shared request data
+     * and stored as a separate Process record.
+     *
+     * Action is already wrapped in DB transaction in Controller.
      */
     public static function storeMultipleRecordsByMADFromRequest(ProcessStoreRequest $request): void
     {
@@ -1344,7 +1320,13 @@ class Process extends Model implements
             $request->validateUniquenessOfRecord();
 
             // Create an instance using the process data
-            $record = self::create($request->all());
+            $record = new self($request->all());
+
+            // Normalize attributes before insert
+            $record->normalizeAttributesOnStoringByMAD();
+
+            // Save the model
+            $record->save();
 
             // BelongsToMany relations
             $record->clinicalTrialCountries()->attach($request->input('clinical_trial_country_ids'));
@@ -1356,48 +1338,71 @@ class Process extends Model implements
 
     /**
      * AJAX request
+     *
+     * Action is already wrapped in DB transaction in Controller.
      */
     public function updateByMADFromRequest(ProcessUpdateRequest $request): void
     {
-        $this->update($request->all());
+        $this->fill($request->all());
+
+        // Normalize attributes before update
+        $this->normalizeAttributesOnUpdatingByMAD();
+
+        // Side effects BEFORE save
+        $this->updateStatusHistory();
+        $this->notifyUsersOnContractStage();
+
+        // Save the model
+        $this->save();
 
         // BelongsToMany relations
         $this->clinicalTrialCountries()->sync($request->input('clinical_trial_country_ids'));
 
         // HasMany relations
         $this->storeCommentFromRequest($request);
-    }
 
-    /**
-     * AJAX request
-     */
-    public static function duplicateByMADFromRequest(ProcessDuplicateRequest $request): void
-    {
-        $record = self::create($request->all());
-
-        // BelongsToMany relations
-        $record->clinicalTrialCountries()->attach($request->input('clinicalTrialCountries'));
-
-        // HasMany relations
-        $record->storeCommentFromRequest($request);
+        // IMPORTANT: Recalculate 'days_past_since_last_activity' after updates and storing comment!
+        // Storing comment on this route won`t update 'days_past_since_last_activity' automatically.
+        $this->recalculateDaysPastSinceLastActivity(refresh: true);
     }
 
     /*
     |--------------------------------------------------------------------------
-    | Date validations of model on saving & updating events
+    | Normalizing attributes of model on storing & updating by MAD
     |--------------------------------------------------------------------------
     */
+
+    private function normalizeAttributesOnStoringByMAD(): void
+    {
+        $this->created_at = $this->created_at ?: now(); // Fillable 'created_at' for historical records
+        $this->handleForecastUpdateDate();
+        $this->handleIncreasedPriceDate();
+        $this->handleResponsiblePersonUpdateDate();
+        $this->uppercaseTrademarks();
+    }
+
+    private function normalizeAttributesOnUpdatingByMAD(): void
+    {
+        $this->handleForecastUpdateDate();
+        $this->handleIncreasedPriceDate();
+        $this->handleResponsiblePersonUpdateDate();
+        $this->uppercaseTrademarks();
+    }
 
     /**
      * Handle validation and automatic updates for the 'forecast_year_1_update_date' attribute.
      *
      * This method ensures that the 'forecast_year_1_update_date' is set appropriately
-     * whenever the 'forecast_year_1' attribute is modified during the saving event.
+     * whenever the 'forecast_year_1' attribute is modified during creating and updating of model by MAD.
      */
     private function handleForecastUpdateDate(): void
     {
-        // forecast_year_1 is available from stage 2
-        if ($this->isDirty('forecast_year_1') && $this->forecast_year_1) {
+        // The 'forecast_year_1' attribute is relevant starting from stage 2
+        // If 'forecast_year_1' is not set, clear the 'forecast_year_1_update_date' attribute
+        if (!$this->forecast_year_1) {
+            $this->forecast_year_1_update_date = null;
+            // If 'forecast_year_1' is set and has been modified, update 'forecast_year_1_update_date'
+        } else if ($this->isDirty('forecast_year_1') && $this->forecast_year_1) {
             $this->forecast_year_1_update_date = now();
         }
     }
@@ -1406,7 +1411,7 @@ class Process extends Model implements
      * Handle validation and automatic updates for the 'increased_price_date' attribute.
      *
      * This method ensures that the 'increased_price_date' is set appropriately
-     * whenever the 'increased_price' attribute is modified during the saving event.
+     * whenever the 'increased_price' attribute is modified during creating and updating of model by MAD.
      */
     private function handleIncreasedPriceDate(): void
     {
@@ -1422,18 +1427,30 @@ class Process extends Model implements
     }
 
     /**
-     * Handle updates for the 'responsible_person_update_date' attribute.
+     * Handle validation and automatic updates for the 'responsible_person_update_date' attribute.
      *
-     * This method updates the 'responsible_person_update_date'
-     * attribute whenever the 'responsible_person_id' attribute is modified during
-     * the updating event.
+     * This method set as 'now' 'responsible_person_update_date' attribute
+     * on creation or updates the 'responsible_person_update_date'
+     * attribute whenever the 'responsible_person_id' attribute is modified
+     * during creating and updating of model by MAD.
      */
     private function handleResponsiblePersonUpdateDate(): void
     {
-        // Set the timestamp to the current date when the model is created
-        if ($this->isDirty('responsible_person_id')) {
+        if (
+            !$this->responsible_person_update_date
+            || $this->isDirty('responsible_person_id')
+        ) {
             $this->responsible_person_update_date = now();
         }
+    }
+
+    /**
+     * Uppercase trademarks during creating and updating of model by MAD.
+     */
+    private function uppercaseTrademarks(): void
+    {
+        $this->trademark_en = mb_strtoupper($this->trademark_en ?: '');
+        $this->trademark_ru = mb_strtoupper($this->trademark_ru ?: '');
     }
 
     /*
@@ -1449,7 +1466,7 @@ class Process extends Model implements
      * are properly recorded in the process status history. It closes the
      * current status history entry (if applicable) and creates a new one.
      *
-     * Used during updating event of the model.
+     * Used on 'updateByMADFromRequest' method.
      */
     private function updateStatusHistory(): void
     {
@@ -1459,12 +1476,12 @@ class Process extends Model implements
             $this->activeStatusHistory->close();
 
             // Create a new status history entry
-            $this->addStatusHistoryForCurrentStatus();
+            $this->createStatusHistoryForCurrentStatus();
         }
     }
 
     /**
-     * Add a new status history record for the current process status.
+     * Create a new status history record for the current process status.
      *
      * This method creates a new entry in the status history table, storing the
      * current 'status_id'. If no specific start date is provided, it defaults
@@ -1475,7 +1492,7 @@ class Process extends Model implements
      *
      * @param string|null $startDate Optional start date for the status history.
      */
-    private function addStatusHistoryForCurrentStatus($startDate = null): void
+    private function createStatusHistoryForCurrentStatus($startDate = null): void
     {
         // If no start date is provided, use the current timestamp.
         $startDate = $startDate ?? now();
@@ -1515,8 +1532,10 @@ class Process extends Model implements
     /**
      * Validates and sets the 'days_past_since_last_activity' attribute of the record.
      *
-     * This method is typically called on model 'created'/'updated' events,
-     * after storing comments and on 'updating' event of ProcessStatusHistory model.
+     * This method is typically used in below cases:
+     * 1. On models 'created' event after creating status history.
+     * 2. On 'updateByMADFromRequest' method after updates and storing comment.
+     * 3. On 'updating' event of ProcessStatusHistory model.
      *
      * It assigns 'days_past_since_last_activity' based on the following logic:
      * - **-1**: For records with a 'stopped' status.
@@ -1595,7 +1614,7 @@ class Process extends Model implements
     {
         self::withTrashed()->with(['activeStatusHistory', 'lastComment'])->chunk(1000, function ($records) {
             foreach ($records as $record) {
-                $record->recalculateDaysPastSinceLastActivity(false); // false => don`t refresh records
+                $record->recalculateDaysPastSinceLastActivity(refresh: false);
             }
         });
     }
@@ -1609,7 +1628,7 @@ class Process extends Model implements
     /**
      * Notify users if status has been updated to contact stage.
      *
-     * Used during the updating event of the model.
+     * Used on 'updateByMADFromRequest' method.
      */
     private function notifyUsersOnContractStage(): void
     {

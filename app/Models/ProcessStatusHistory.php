@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Http\Requests\MAD\ProcessStatusHistoryUpdateRequest;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 
 class ProcessStatusHistory extends Model
@@ -66,16 +67,17 @@ class ProcessStatusHistory extends Model
     protected static function booted(): void
     {
         static::updated(function ($record) {
-            // Recalculate related processes 'days_past_since_last_activity' after updating processes status history.
-            $record->process->recalculateDaysPastSinceLastActivity();
+            // Recalculate 'days_past_since_last_activity' of related processes.
+            if (Route::currentRouteName() == 'mad.processes.status-history.update') {
+                $record->process->recalculateDaysPastSinceLastActivity(refresh: false);
+            }
         });
 
         static::deleting(function ($record) {
-            // Active status history cannot be deleted from "mad.processes.status-history.destroy" route.
-            // But it can be deleted from "mad.processes.destroy" route.
-            $currentRouteName = request()->route()->getName();
+            // Active status history cannot be deleted from "mad.processes.status-history.destroy" route,
+            // but it can be deleted from "mad.processes.destroy" route and in other cases.
 
-            if ($record->is_active_history && $currentRouteName == 'mad.processes.status-history.destroy') {
+            if ($record->is_active_history && Route::currentRouteName() == 'mad.processes.status-history.destroy') {
                 throw ValidationException::withMessages([
                     'process_status_history_deletion' => trans('validation.custom.process_status_history.is_active_history'),
                 ]);
